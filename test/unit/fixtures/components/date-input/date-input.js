@@ -1,4 +1,4 @@
-import { formatDate } from '../../../../blocks/form/rules/model/afb-formatters.min.js';
+import { formatDate } from '../../../../../blocks/form/rules/model/afb-formatters.min.js';
 
 export const fieldDef = {
   items: [{

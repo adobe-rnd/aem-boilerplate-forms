@@ -3,8 +3,8 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import * as dom from 'dom-compare';
-import decorate, { DELAY_MS } from '../blocks/form/form.js';
-import { resetIds } from '../blocks/form/util.js';
+import decorate, { DELAY_MS } from '../../blocks/form/form.js';
+import { resetIds } from '../../blocks/form/util.js';
 
 function escapeHTML(str) {
   return (str.replace(/[&<>'"]/g, (tag) => ({

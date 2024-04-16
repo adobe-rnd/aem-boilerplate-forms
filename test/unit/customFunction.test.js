@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 import assert from 'assert';
 
-import { days } from '../blocks/form/functions.js';
+import { days } from '../../blocks/form/functions.js';
 
 describe('Custom Functions', () => {
   it('should load custom functions', () => {

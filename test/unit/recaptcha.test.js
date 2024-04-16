@@ -2,7 +2,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import jsdom from 'jsdom';
-import GoogleReCaptcha from '../blocks/form/integrations/recaptcha.js';
+import GoogleReCaptcha from '../../blocks/form/integrations/recaptcha.js';
 
 const siteKey = 'test-site-key';
 const testToken = 'token123';

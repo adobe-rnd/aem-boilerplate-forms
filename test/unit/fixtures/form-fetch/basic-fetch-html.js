@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { fetchForm } from '../../../blocks/form/form.js';
+import { fetchForm } from '../../../../blocks/form/form.js';
 
 function escapeHTML(str) {
   return (str.replace(/[&<>'"]/g, (tag) => ({

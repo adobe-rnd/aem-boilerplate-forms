@@ -74,7 +74,7 @@
   },
   "mocha": {
     "spec": "test/**/*.test.js",
-    "require": "test/setup-env.js",
+    "require": "test/unit/setup-env.js",
     "recursive": "true"
   }
 }
