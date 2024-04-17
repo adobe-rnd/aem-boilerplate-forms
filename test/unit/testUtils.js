@@ -126,8 +126,9 @@ async function test(
   after = () => {},
   bUrlMode = false,
   formPath = '',
+  refresh = false,
 ) {
-  const block = bUrlMode ? createBlockWithUrl(sample, formPath) : createBlock(sample);
+  var block = bUrlMode ? createBlockWithUrl(sample, formPath) : createBlock(sample);
   before();
   // console.log('before');
   await decorate(block);
@@ -137,6 +138,10 @@ async function test(
     op(block);
   }, opDelay);
   // console.log('op');
+  if (refresh) {
+      block = bUrlMode ? createBlockWithUrl(sample, formPath) : createBlock(sample);
+      await decorate(block);
+  }
   await runAfterdelay(() => {
     // console.log('before expect');
     expect(block);
@@ -149,13 +154,13 @@ export async function testDynamism(filePath, bUrlMode = false) {
   const testName = `checking dynamic behaviour for ${filePath?.substr(filePath.lastIndexOf('/') + 1).split('.')[0]}`;
   it(testName, async () => {
     const {
-      sample, before, op, expect, opDelay, after, formPath, ignore = false,
+      sample, before, op, expect, opDelay, after, formPath, ignore = false, refresh = false,
     } = await import(filePath);
     if (ignore) {
       return;
     }
     resetIds();
-    await test(sample, before, op, expect, opDelay, after, bUrlMode, formPath);
+    await test(sample, before, op, expect, opDelay, after, bUrlMode, formPath, refresh);
   });
 }
 

@@ -312,6 +312,31 @@ export const fieldDef = {
               },
               ':type': 'formsninja/components/adaptiveForm/textinput',
             },
+            {
+              id: 'fileinput-9d805e9eca',
+              fieldType: 'file-input',
+              name: 'fileinput1713343980571',
+              type: 'file',
+              accept: [
+                'audio/*',
+                ' video/*',
+                ' image/*',
+                ' text/*',
+                ' application/pdf'
+              ],
+              properties: {
+                dragDropText: 'Drag and drop to Upload'
+              },
+              label: {
+                value: 'Your ID'
+              },
+              events: {
+                'custom:setProperty': [
+                  '$event.payload'
+                ]
+              },
+              ":type": "formsninja/components/adaptiveForm/fileinput"
+            },
           ],
         },
         {
@@ -534,6 +559,28 @@ export const fieldDef = {
                 ],
               },
               ':type': 'formsninja/components/adaptiveForm/textinput',
+            },
+            {
+              id: 'reset-0d74964a9e',
+              fieldType: 'button',
+              name: 'reset1713344016774',
+              type: 'string',
+              buttonType: 'reset',
+              properties: {
+                'fd:buttonType': 'reset'
+              },
+              label: {
+                value: 'Reset'
+              },
+              events: {
+                click: [
+                  'dispatchEvent("reset")'
+                ],
+                'custom:setProperty': [
+                  '$event.payload'
+                ]
+              },
+              ":type": "formsninja/components/adaptiveForm/actions/reset"
             },
           ],
         },
