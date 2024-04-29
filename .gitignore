@@ -10,3 +10,8 @@ helix-importer-ui
 
 .env*
 .vscode
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+test/e2e/reports/
