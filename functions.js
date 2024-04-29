@@ -28,5 +28,20 @@ function days(endDate, startDate) {
   return Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * Formats telephone input by masking the first 6 digits and appends +91
+ * @name formatTelephoneInput Formats telephone input
+ * @param {object} field field whose value to be formatted
+ * @return {string}
+ */
+function formatTelephoneInput(field) {
+  const phoneNumber = field.$value;
+  if (phoneNumber) {
+    const maskedPhoneNumber = phoneNumber.replace(/.(?=.{4,}$)/g, '*');
+    return `+91 ${maskedPhoneNumber}`;
+  }
+  return phoneNumber || '';
+}
+
 // eslint-disable-next-line import/prefer-default-export
-export { getFullName, days };
+export { getFullName, days, formatTelephoneInput };
