@@ -12,7 +12,7 @@ jobs:
       - run:
           name: Run lint
           command: npm run lint
-  test-node:
+  unit-tests:
     # Install node dependencies and run tests
     executor: node/default
     steps:
@@ -34,8 +34,19 @@ jobs:
                 For an example, see https://circleci.com/blog/publishing-npm-packages-using-circleci-2-0/#:~:text=the%20deploy%20job%20has%20several%20steps%20that%20run%20to%20authenticate%20with%20and%20publish%20to"
           when: on_fail
       - run:
-          name: Run tests
+          name: Run unit tests
           command: npm test --passWithNoTests
+  e2e-tests:
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.40.0-jammy
+    steps:
+      - checkout
+      - run: npm i -D @playwright/test
+      - run: npx playwright install
+      - run: npx playwright install chrome
+      - run:
+          name: Run end-to-end tests
+          command: npm run test:playwright
   check-coverage:
     executor: node/default
     steps:
@@ -53,7 +64,8 @@ workflows:
       - lint
   build-and-test:
     jobs:
-      - test-node
+      - unit-tests
+      - e2e-tests
   check-coverage:
     jobs:
       - check-coverage
