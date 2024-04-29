@@ -3,7 +3,6 @@ import nock from 'nock';
 import multipart from 'parse-multipart-data';
 import { setSubmitBaseUrl } from '../../../../blocks/form/constant.js';
 
-
 const thankYouMessage = 'thank you for submitting the form';
 
 const scope = nock('http://abc.com')
