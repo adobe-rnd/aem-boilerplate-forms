@@ -6,5 +6,5 @@ test('Test formatting using custom functions', async ({ page }) => {
   const telephoneInput = await page.getByRole('textbox', { name: 'Telephone Input' });
   await telephoneInput.fill('1234567890');
   await telephoneInput.blur();
-  expect(await telephoneInput.inputValue()).toBe('1234567890');
+  expect(await telephoneInput.inputValue()).toBe('+91 ******7890');
 });
