@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { getCurrentBranch } from '../utils.js';
 
-test('Required message test', async ({ page }) => {
+test('Test formatting using custom functions', async ({ page }) => {
   await page.goto(`https://${getCurrentBranch()}--aem-boilerplate-forms--adobe-rnd.hlx.live/drafts/tests/x-walk/formatting-using-customfunctions`, { waitUntil: 'networkidle' });
   const telephoneInput = await page.getByRole('textbox', { name: 'Telephone Input' });
   await telephoneInput.fill('1234567890');
