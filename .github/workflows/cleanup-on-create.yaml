@@ -44,11 +44,6 @@ jobs:
           mv package-prod.json package.json
           mv package-prod-lock.json package-lock.json
 
-      - name: Update github workflow
-        run: |
-          rm -rf .github/workflows/main.yaml
-          mv workflow_prod.yaml .github/workflows/main.yaml
-
       - name: Initialize README
         # replace {repo} and {owner} with the actual values
         run: |
