@@ -44,7 +44,7 @@ jobs:
           mv package-prod.json package.json
           mv package-prod-lock.json package-lock.json
 
-     - name: Update github workflow
+      - name: Update github workflow
         run: |
           rm -rf .github/workflows/main.yaml
           mv workflow_prod.yaml .github/workflows/main.yaml
@@ -58,7 +58,6 @@ jobs:
         run: |
           sed -i.bak "s/aem-boilerplate-forms/$(basename ${{ github.repository }})/g" .github/pull_request_template.md
           sed -i.bak "s/adobe-rnd/$(dirname ${{ github.repository }})/g" .github/pull_request_template.md
-
 
         # commit back to the repository
       - name: Commit changes
