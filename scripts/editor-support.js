@@ -86,7 +86,6 @@ async function applyChanges(event) {
       }
     }
   }
-
   return false;
 }
 
