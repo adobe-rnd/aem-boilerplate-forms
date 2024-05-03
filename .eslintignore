@@ -2,3 +2,5 @@ helix-importer-ui
 rollup/*
 blocks/form/rules/formula/*
 blocks/form/rules/model/*
+scripts/editor-support.js
+scripts/editor-support-rte.js
