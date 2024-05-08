@@ -41,7 +41,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'validationMessage':
-        if (field.setCustomValidity && payload.field.expressionMismatch) {
+        if (field.setCustomValidity) {
           field.setCustomValidity(currentValue);
           updateOrCreateInvalidMsg(field, currentValue);
         }
