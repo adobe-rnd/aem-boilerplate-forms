@@ -29,7 +29,7 @@ test.describe('error messages test', () => {
     const submitButton = await page.getByRole('button', { name: 'Submit' });
     await submitButton.click();
     const f7 = await page.locator('input[name="f7"]').locator('..');
-    expect(await f7.locator('.field-description').innerText()).toBe('Please fill in this field.');
+    expect(await f7.locator('.field-description').innerText()).toBe('This is a required text field, please fill this.');
   });
 
   test('minLength and maxLength error messages', async () => {
