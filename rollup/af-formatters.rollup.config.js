@@ -23,7 +23,7 @@ export default {
     }),
   ],
   output: [{
-    dir: 'blocks/form//rules/model',
+    dir: 'blocks/form/rules/model',
     format: 'es',
     entryFileNames: 'afb-formatters.js',
   },
