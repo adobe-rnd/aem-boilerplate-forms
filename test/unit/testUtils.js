@@ -128,7 +128,7 @@ async function test(
   formPath = '',
   refresh = false,
 ) {
-  var block = bUrlMode ? createBlockWithUrl(sample, formPath) : createBlock(sample);
+  let block = bUrlMode ? createBlockWithUrl(sample, formPath) : createBlock(sample);
   before();
   // console.log('before');
   await decorate(block);
@@ -139,8 +139,8 @@ async function test(
   }, opDelay);
   // console.log('op');
   if (refresh) {
-      block = bUrlMode ? createBlockWithUrl(sample, formPath) : createBlock(sample);
-      await decorate(block);
+    block = bUrlMode ? createBlockWithUrl(sample, formPath) : createBlock(sample);
+    await decorate(block);
   }
   await runAfterdelay(() => {
     // console.log('before expect');

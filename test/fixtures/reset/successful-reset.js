@@ -13,15 +13,11 @@ export function op(block) {
     bubbles: true,
     cancelable: true,
   });
-  try {
   input.files = [file1];
   input.dispatchEvent(event);
   const fileList = block.querySelector('.files-list');
   assert.equal(fileList.children.length, 1, 'Should render file1');
   assert.equal(fileList.innerHTML.includes('file1.png'), true, 'Should show file1.png');
-  } catch (e) {
-    console.log(e);
-  }
   const nxt = block.querySelector('.wizard .field-next');
   nxt.click();
   const instances = block.querySelector('.wizard-menu-active-item');

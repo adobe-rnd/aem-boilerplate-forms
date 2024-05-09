@@ -322,20 +322,20 @@ export const fieldDef = {
                 ' video/*',
                 ' image/*',
                 ' text/*',
-                ' application/pdf'
+                ' application/pdf',
               ],
               properties: {
-                dragDropText: 'Drag and drop to Upload'
+                dragDropText: 'Drag and drop to Upload',
               },
               label: {
-                value: 'Your ID'
+                value: 'Your ID',
               },
               events: {
                 'custom:setProperty': [
-                  '$event.payload'
-                ]
+                  '$event.payload',
+                ],
               },
-              ":type": "formsninja/components/adaptiveForm/fileinput"
+              ':type': 'formsninja/components/adaptiveForm/fileinput',
             },
           ],
         },
@@ -567,20 +567,20 @@ export const fieldDef = {
               type: 'string',
               buttonType: 'reset',
               properties: {
-                'fd:buttonType': 'reset'
+                'fd:buttonType': 'reset',
               },
               label: {
-                value: 'Reset'
+                value: 'Reset',
               },
               events: {
                 click: [
-                  'dispatchEvent("reset")'
+                  'dispatchEvent("reset")',
                 ],
                 'custom:setProperty': [
-                  '$event.payload'
-                ]
+                  '$event.payload',
+                ],
               },
-              ":type": "formsninja/components/adaptiveForm/actions/reset"
+              ':type': 'formsninja/components/adaptiveForm/actions/reset',
             },
           ],
         },
