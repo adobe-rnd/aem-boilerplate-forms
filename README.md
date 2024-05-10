@@ -24,3 +24,26 @@ npm run lint
 1. Install the [AEM CLI](https://github.com/adobe/helix-cli): `npm install -g @adobe/aem-cli`
 1. Start AEM Proxy: `aem up` (opens your browser at `http://localhost:3000`)
 1. Open the `{repo}` directory in your favorite IDE and start coding :)
+
+### Running test cases
+
+#### Unit Tests
+Run the following command to execute unit tests
+```sh
+npm run test:unit
+```
+
+#### Integration Tests
+Run the following command to execute integration tests
+```sh
+npm run test:e2e
+```
+To run a specific test file, use the following command
+```sh
+npm run test:e2e <name-of-the-test-file>
+```
+
+To debug a specific test file, use the following command
+```sh
+npm run debug:e2e <name-of-the-test-file>
+```

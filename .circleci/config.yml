@@ -51,7 +51,7 @@ jobs:
           command: npx playwright install chrome
       - run:
           name: Run end-to-end tests
-          command: npm run test:playwright
+          command: npm run test:e2e
       - store_artifacts:
           path: test/e2e/reports
           destination: test-results
