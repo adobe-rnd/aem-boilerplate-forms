@@ -48,9 +48,6 @@ jobs:
         run: |
           sed -i.bak "s/{repo}/$(basename ${{ github.repository }})/g" README.md
           sed -i.bak "s/{owner}/$(dirname ${{ github.repository }})/g" README.md
-      - name: Remove test cases section from README file
-        run: |
-          sed -i '/### Running test cases/,$d' README.md
       - name: Initialize Pull Request Template
         run: |
           sed -i.bak "s/{repo}/$(basename ${{ github.repository }})/g" .github/pull_request_template.md
