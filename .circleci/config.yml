@@ -35,7 +35,7 @@ jobs:
           when: on_fail
       - run:
           name: Run unit tests
-          command: npm test:unit --passWithNoTests
+          command: npm run test:unit --passWithNoTests
   e2e-tests:
     docker:
       - image: mcr.microsoft.com/playwright:v1.40.0-jammy
