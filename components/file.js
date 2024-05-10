@@ -256,10 +256,6 @@ export default async function decorate(fieldDiv, field, htmlForm) {
       fileHandler.previewFile(e.target?.parentElement?.dataset?.index || 0);
     }
   });
-  htmlForm.addEventListener('reset', () => {
-    fileListElement.innerHTML = '';
-    input.value = '';
-  });
   fieldDiv.insertBefore(fileListElement, input.nextElementSibling);
   // pre-fill file attachment
   if (field.value) {

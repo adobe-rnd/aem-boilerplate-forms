@@ -152,6 +152,11 @@ export class WizardLayout {
       });
     }
 
+    const resetBtn = panel.querySelector('.reset-wrapper');
+    if (resetBtn) {
+      wrapper.append(resetBtn);
+    }
+
     const submitBtn = panel.querySelector('.submit-wrapper');
     if (submitBtn) {
       wrapper.append(submitBtn);
