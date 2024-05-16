@@ -111,14 +111,6 @@ async function instrumentForms(mutationsList) {
   annotateFormsForEditing(formsEl);
 }
 
-function enableRuleEditorExtension() {
-  const head = document.getElementsByTagName('head')[0];
-  const meta = document.createElement('meta');
-  meta.name = 'urn:adobe:aue:config:extensions';
-  meta.content = 'https://283250-452aquachinchilla-stage.adobeio-static.net';
-  head.appendChild(meta);
-}
-
 function cleanUp(content) {
   const formDef = content.replaceAll('^(([^<>()\\\\[\\\\]\\\\\\\\.,;:\\\\s@\\"]+(\\\\.[^<>()\\\\[\\\\]\\\\\\\\.,;:\\\\s@\\"]+)*)|(\\".+\\"))@((\\\\[[0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3}])|(([a-zA-Z\\\\-0-9]+\\\\.)\\+[a-zA-Z]{2,}))$', '');
   return formDef?.replace(/\x83\n|\n|\s\s+/g, '');
@@ -202,4 +194,3 @@ const forms = document.querySelectorAll('form');
 annotateFormsForEditing(forms);
 const observer = new MutationObserver(instrumentForms);
 observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
-enableRuleEditorExtension();
