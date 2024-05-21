@@ -81,11 +81,22 @@ export class WizardLayout {
 
   static handleMutation(panel, mutationsList) {
     mutationsList.forEach((mutation) => {
+      const { type, target, attributeName } = mutation;
+      const menuItems = panel.querySelector('.wizard-menu-items');
       // Check if the mutation is a change in attributes(data-visible)
-      if (mutation.type === 'attributes' && mutation.attributeName === 'data-visible') {
+      if (type === 'attributes' && attributeName === 'data-visible') {
         const element = mutation.target;
         const menuItem = panel.querySelector(`li[data-index="${element.dataset.index}"]`);
         menuItem.dataset.visible = element.dataset.visible;
+      } else if (type === 'attributes' && attributeName === 'data-active') {
+        // for active panel
+        panel.querySelector('.current-wizard-step')?.classList.remove('current-wizard-step');
+        const activePanel = panel.querySelector(`#${target?.id}`);
+        activePanel?.classList.add('current-wizard-step');
+        // for active menu item
+        panel.querySelector('.wizard-menu-active-item')?.classList.remove('wizard-menu-active-item');
+        menuItems.querySelector(`[data-index="${activePanel.dataset.index}"]`)?.classList.add('wizard-menu-active-item');
+        target.querySelector('[data-active="true"]')?.focus();
       }
     });
   }
