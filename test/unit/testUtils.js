@@ -18,7 +18,7 @@ function escapeHTML(str) {
 
 export function createBlock(def) {
   const pre = `<pre><code>
-    ${escapeHTML(JSON.stringify(def))}
+    ${escapeHTML(JSON.stringify(JSON.stringify(def)))}
   </code></pre>`;
   const div = document.createElement('div');
   div.innerHTML = pre;
