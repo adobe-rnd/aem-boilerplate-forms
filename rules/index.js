@@ -16,7 +16,7 @@ function compare(fieldVal, htmlVal, type) {
     return fieldVal === Number(htmlVal);
   }
   if (type === 'boolean') {
-    return fieldVal.toString() === htmlVal;
+    return fieldVal?.toString() === htmlVal;
   }
   return fieldVal === htmlVal;
 }
@@ -69,6 +69,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
           });
         } else if (fieldType === 'checkbox') {
           field.checked = compare(currentValue, field.value, type);
+        } else if (fieldType === 'plain-text') {
+          field.innerHTML = currentValue;
         } else if (field.type !== 'file') {
           field.value = currentValue;
         }
