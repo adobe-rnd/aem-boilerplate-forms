@@ -43,8 +43,8 @@
   "homepage": "https://github.com/adobe-rnd/aem-boilerplate-forms#readme",
   "devDependencies": {
     "@adobe/json-formula": "0.1.50",
-    "@aemforms/af-core": "0.22.76",
-    "@aemforms/af-formatters": "0.22.76",
+    "@aemforms/af-core": "0.22.85",
+    "@aemforms/af-formatters": "0.22.85",
     "@playwright/test": "^1.43.1",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/user-event": "14.3.0",

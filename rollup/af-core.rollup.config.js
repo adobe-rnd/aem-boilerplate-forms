@@ -33,7 +33,7 @@ export default {
     },
   },
   {
-    dir: 'src/rules/model',
+    dir: 'blocks/form/rules/model',
     format: 'es',
     entryFileNames: 'afb-[name].min.js',
     paths: {
