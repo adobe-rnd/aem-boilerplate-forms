@@ -273,6 +273,22 @@
               }
             }
           }
+        },
+        {
+          "title": "Reset",
+          "id": "form-reset-button",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/actions/reset/v1/reset",
+                "template": {
+                  "jcr:title": "Reset",
+                  "buttonType": "reset",
+                  "fieldType": "button"
+                }
+              }
+            }
+          }
         }
       ]
     },

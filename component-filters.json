@@ -52,7 +52,9 @@
       "email",
       "fragment",
       "form-button",
-      "form-image"
+      "form-image",
+      "form-submit-button",
+      "form-reset-button"
     ]
   }
 ]
