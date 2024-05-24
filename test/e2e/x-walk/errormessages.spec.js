@@ -59,4 +59,11 @@ test.describe('error messages test', () => {
     await f2.press('Tab');
     expect(await f2.locator('..').locator('.field-description').innerText()).toBe('Value must be less than or equal to 10.');
   });
+
+  test('error message set via rule editor', async () => {
+    const f8 = await page.locator('input[name="f8"]');
+    const button = await page.getByRole('button', { name: 'Button' });
+    button.click();
+    expect(await f8.locator('..').locator('.field-description').innerText()).toBe('error message set via rule editor');
+  });
 });
