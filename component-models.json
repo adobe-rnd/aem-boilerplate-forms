@@ -625,6 +625,129 @@
         ]
     },
     {
+        "id": "file-input",
+        "fields": [
+            {
+                "component": "container",
+                "name": "basic",
+                "label": "Basic",
+                "collapsible": false,
+                "fields": [
+                    {
+                        "component": "text",
+                        "name": "name",
+                        "label": "Name",
+                        "valueType": "string",
+                        "required": true
+                    },
+                    {
+                        "component": "text",
+                        "name": "jcr:title",
+                        "label": "Label",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "text",
+                        "name": "dataRef",
+                        "label": "Bind reference",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "unboundFormElement",
+                        "label": "Mark as Unbound Form Element",
+                        "valueType": "boolean"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "visible",
+                        "label": "Show Component",
+                        "valueType": "boolean",
+                        "value": true
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "enabled",
+                        "label": "Enable Component",
+                        "valueType": "boolean",
+                        "value": true
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "readOnly",
+                        "label": "Read-only",
+                        "valueType": "boolean"
+                    }
+                ]
+            },
+            {
+                "component": "container",
+                "name": "help",
+                "label": "Help Content",
+                "collapsible": true,
+                "fields": [
+                    {
+                        "component": "richtext",
+                        "name": "description",
+                        "label": "Help text",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "richtext",
+                        "name": "tooltip",
+                        "label": "Short description",
+                        "valueType": "string"
+                    }
+                ]
+            },
+            {
+                "component": "container",
+                "name": "validation",
+                "label": "Validation",
+                "collapsible": true,
+                "fields": [
+                    {
+                        "component": "boolean",
+                        "name": "required",
+                        "label": "Required",
+                        "valueType": "boolean"
+                    },
+                    {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error message",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "number",
+                        "name": "maxFileSize",
+                        "label": "Maximum file size (MB)",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "text",
+                        "name": "maxFileSizeMessage",
+                        "label": "Maximum file size error message",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "text",
+                        "name": "accept",
+                        "label": "Allowed file types",
+                        "valueType": "string",
+                        "multi": true
+                    },
+                    {
+                        "component": "text",
+                        "name": "acceptMessage",
+                        "label": "File type error message",
+                        "valueType": "string"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "id": "panel",
         "fields": [
             {
