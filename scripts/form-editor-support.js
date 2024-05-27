@@ -1,4 +1,5 @@
 import { generateFormRendition } from '../blocks/form/form.js';
+import { loadCSS } from './aem.js';
 
 function getItems(container) {
   if (container[':itemsOrder'] && container[':items']) {
@@ -28,30 +29,66 @@ function getFieldById(panel, id, formFieldMap) {
   return field;
 }
 
+function generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition) {
+  const titleEl = document.createElement('div');
+  titleEl.classList.add('fragment-title');
+  titleEl.textContent = fragmentDefinition.label?.value || fragmentDefinition.name;
+  fragmentFieldWrapper.appendChild(titleEl);
+  fragmentFieldWrapper.appendChild(document.createElement('hr'));
+  const fragItems = getItems(fragmentDefinition);
+  fragItems.forEach((fragItem) => {
+    const itemLabel = fragItem.label?.value || fragItem.name;
+    const itemLabelEl = document.createTextNode(itemLabel);
+    fragmentFieldWrapper.appendChild(itemLabelEl);
+    fragmentFieldWrapper.appendChild(document.createElement('br'));
+  });
+}
+
+function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
+  fragmentFieldWrapper.classList.toggle('fragment-wrapper', true);
+  if (!fragmentFieldWrapper.classList.contains('edit-mode')) {
+    const newFieldWrapper = fragmentFieldWrapper.cloneNode(true);
+    newFieldWrapper.setAttribute('data-aue-type', 'component');
+    newFieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fragmentDefinition.properties['fd:path']}`);
+    newFieldWrapper.setAttribute('data-aue-model', 'form-fragment');
+    newFieldWrapper.setAttribute('data-aue-label', fragmentDefinition.name);
+    newFieldWrapper.classList.add('edit-mode');
+    newFieldWrapper.replaceChildren();
+    fragmentFieldWrapper.insertAdjacentElement('afterend', newFieldWrapper);
+    generateFragmentRendition(newFieldWrapper, fragmentDefinition);
+  } else {
+    fragmentFieldWrapper.replaceChildren();
+    generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition);
+  }
+}
+
 function annotateItems(items, formDefinition, formFieldMap) {
-  items.forEach((fieldWrapper) => {
+  for (let i = items.length - 1; i >= 0; i -= 1) {
+    const fieldWrapper = items[i];
     if (fieldWrapper.classList.contains('field-wrapper')) {
       const { id } = fieldWrapper.dataset;
       const fd = getFieldById(formDefinition, id, formFieldMap);
       if (fd && fd.properties) {
-        fieldWrapper.setAttribute('data-aue-type', 'component');
-        fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-        if (fd.properties['fd:fragment']) {
-          fieldWrapper.setAttribute('data-aue-model', 'fragment');
-        } else {
+        if (!fd.properties['fd:fragment']) {
+          fieldWrapper.setAttribute('data-aue-type', 'component');
+          fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
           fieldWrapper.setAttribute('data-aue-model', fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType);
+          fieldWrapper.setAttribute('data-aue-label', fd.name);
         }
-        fieldWrapper.setAttribute('data-aue-label', fd.name);
       } else {
         console.warn(`field ${id} not found in form definition`);
       }
       if (fieldWrapper.classList.contains('panel-wrapper')) {
-        fieldWrapper.setAttribute('data-aue-type', 'container');
-        fieldWrapper.setAttribute('data-aue-behavior', 'component');
-        annotateItems(fieldWrapper.childNodes, formDefinition, formFieldMap);
+        if (fd.properties['fd:fragment']) {
+          annotateFormFragment(fieldWrapper, fd);
+        } else {
+          fieldWrapper.setAttribute('data-aue-type', 'container');
+          fieldWrapper.setAttribute('data-aue-behavior', 'component');
+          annotateItems(fieldWrapper.childNodes, formDefinition, formFieldMap);
+        }
       }
     }
-  });
+  }
 }
 
 function annotateFormForEditing(formEl, formDefinition) {
@@ -140,7 +177,7 @@ async function applyChanges(event) {
   if (!content) return false;
 
   const parsedUpdate = new DOMParser().parseFromString(content, 'text/html');
-  const element = document.querySelector(`[data-aue-resource="${resource}"]`);
+  let element = document.querySelector(`[data-aue-resource="${resource}"]`);
 
   if (element) {
     const block = element.parentElement?.closest('.block[data-aue-resource]') || element?.closest('.block[data-aue-resource]');
@@ -152,7 +189,10 @@ async function applyChanges(event) {
         const codeEl = newContainer?.querySelector('code');
         const jsonContent = codeEl?.textContent;
         if (jsonContent) {
-          const formDef = decode(jsonContent);
+          const formDef = JSON.parse(cleanUp(jsonContent));
+          if (element.classList.contains('panel-wrapper')) {
+            element = element.parentNode;
+          }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
           parent.replaceChildren();
@@ -199,6 +239,7 @@ function attachEventListners(main) {
   });
 }
 
+loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
 attachEventListners(document.querySelector('main'));
 const forms = document.querySelectorAll('form');
 annotateFormsForEditing(forms);

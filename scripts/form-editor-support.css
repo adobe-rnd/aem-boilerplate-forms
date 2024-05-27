@@ -1,0 +1,26 @@
+main .form form.edit-mode .fragment-wrapper:not(.edit-mode){
+    display: none;
+}
+
+main .form form:not(.edit-mode) .fragment-wrapper.edit-mode{
+    display: none;
+}
+
+main .form form.edit-mode .fragment-wrapper.edit-mode{
+    border-width: 1px;
+    padding: 15px;
+    font-weight: normal;
+    font-size: 13px;
+    text-align: left;
+    color: #969696;
+    border-color: rgba(0 0 0 / 15%);
+    border-radius: 4px;
+    background: linear-gradient(180deg,rgba(0 0 0 / 5%),rgba(255 255 255 / 5%),rgba(0 0 0 / 5%)),
+                linear-gradient(90deg,rgba(0 0 0 / 5%),rgba(255 255 255 / 5%),rgba(0 0 0 / 5%));
+}
+
+form.edit-mode .fragment-wrapper.edit-mode .fragment-title {
+    text-align: left;
+    color: #4b4b4b;
+    padding-left: 25px;
+}
