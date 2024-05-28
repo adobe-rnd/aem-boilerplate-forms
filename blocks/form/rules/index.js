@@ -154,6 +154,11 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'activeChild': handleActiveChild(activeChild, form);
         break;
+      case 'validity': {
+        const { validity } = payload.field;
+        field.validity.valid = validity?.valid;
+      }
+        break;
       default:
         break;
     }
