@@ -51,9 +51,7 @@ jobs:
           command: npx playwright install chrome
       - run:
           name: Run end-to-end tests and capture coverage
-          command:  |
-                c8 --reporter=json --check-coverage --lines=50 npm run test:e2e
-                mv coverage/coverage-final.json coverage/coverage-final-e2e.json
+          command:  npm run test:e2e
       - store_artifacts:
           path: test/e2e/reports
           destination: test-results
@@ -64,12 +62,11 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
+          name: Install browsers
+          command: npx playwright install chrome
+      - run:
           name : check coverage
-          command:  |
-            c8 --reporter=json npm run test:unit
-            mv coverage/coverage-final.json coverage/coverage-final-unit.json
-            nyc merge coverage .nyc_output/coverage.json
-            nyc report --check-coverage --lines 89 --functions 93 --branches 87
+          command:  npm run check-coverage
       - store_artifacts:
           path: coverage
 workflows:
