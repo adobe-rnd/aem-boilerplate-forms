@@ -62,6 +62,11 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
+          name: Install Playwright
+          command: |
+              npm i -D @playwright/test
+              npx playwright install
+      - run:
           name: Install browsers
           command: npx playwright install chrome
       - run:
