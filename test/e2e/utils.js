@@ -6,7 +6,10 @@ function executeGitCommand(command) {
     .replace(/[\n\r\s]+$/, '');
 }
 
-// eslint-disable-next-line import/prefer-default-export
-export function getCurrentBranch() {
-  return executeGitCommand('git rev-parse --abbrev-ref HEAD');
-}
+const getCurrentBranch = () => executeGitCommand('git rev-parse --abbrev-ref HEAD');
+const openPage = async (page, relativeURL) => {
+  const url = `https://${getCurrentBranch()}--aem-boilerplate-forms--adobe-rnd.hlx.live${relativeURL}`;
+  await page.goto(url, { waitUntil: 'networkidle' });
+};
+
+export { openPage, getCurrentBranch };

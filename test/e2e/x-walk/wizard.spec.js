@@ -1,13 +1,10 @@
-import { test, expect } from '@playwright/test';
-import { getCurrentBranch } from '../utils.js';
+import { test, expect } from '../fixtures.js';
+import { openPage } from '../utils.js';
 
 test.describe('wizard tests', () => {
-  let page;
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage();
-    await page.goto(`https://${getCurrentBranch()}--aem-boilerplate-forms--adobe-rnd.hlx.live/drafts/tests/x-walk/wizardvalidation`, { waitUntil: 'networkidle' });
-  });
-  test('setFocus test', async () => {
+  const testURL = '/drafts/tests/x-walk/wizardvalidation';
+  test('setFocus test', async ({ page }) => {
+    await openPage(page, testURL);
     await expect(await page.$eval('fieldset[name="item_1"]', (el) => el.classList.contains('current-wizard-step'))).toBeTruthy(); // check first panel is active
     await expect(await page.$eval('li[data-index="0"]', (el) => el.classList.contains('wizard-menu-active-item'))).toBeTruthy(); // check first menu item is active
 
