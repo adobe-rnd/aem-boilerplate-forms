@@ -50,7 +50,7 @@ jobs:
           name: Install browsers
           command: npx playwright install chrome
       - run:
-          name: Run end-to-end tests and capture coverage
+          name: Run end-to-end
           command:  npm run test:e2e
       - store_artifacts:
           path: test/e2e/reports
