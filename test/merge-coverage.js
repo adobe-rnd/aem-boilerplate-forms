@@ -11,7 +11,7 @@ const runCommand = (command, failOnError = true) => {
 
 runCommand('c8 --reporter=json npm run test:unit');
 runCommand('mv coverage/coverage-final.json coverage/coverage-final-unit.json');
-runCommand("c8 --reporter=json playwright test --project='chromium'", false);
+runCommand("c8 --reporter=json npx playwright test --project='chromium'", false);
 runCommand('mv coverage/coverage-final.json coverage/coverage-final-e2e.json');
 runCommand('nyc merge coverage .nyc_output/coverage.json');
 runCommand('nyc report --check-coverage --lines 89 --functions 93 --branches 87');
