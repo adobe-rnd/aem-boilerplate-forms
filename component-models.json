@@ -423,10 +423,10 @@
                         "valueType": "boolean"
                     },
                     {
-                        "component": "text",
+                        "component": "date-time",
                         "name": "default",
                         "label": "Default Value",
-                        "valueType": "string"
+                        "valueType": "date"
                     },
                     {
                         "component": "boolean",
@@ -561,7 +561,7 @@
                         "valueType": "boolean"
                     },
                     {
-                        "component": "text",
+                        "component": "number",
                         "name": "default",
                         "label": "Default Value",
                         "valueType": "string"
