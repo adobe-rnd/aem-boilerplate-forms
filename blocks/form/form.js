@@ -67,7 +67,7 @@ const createTextArea = withFieldWrapper((fd) => {
 const createSelect = withFieldWrapper((fd) => {
   const select = document.createElement('select');
   select.required = fd.required;
-  select.title = fd.tooltip ?? '';
+  select.title = fd.tooltip ? stripTags(fd.tooltip, '') : '';
   select.readOnly = fd.readOnly;
   select.multiple = fd.type === 'string[]' || fd.type === 'boolean[]' || fd.type === 'number[]';
   let ph;

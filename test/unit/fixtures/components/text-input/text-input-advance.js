@@ -12,7 +12,7 @@ export const fieldDef = {
     autoComplete: 'off',
     placeholder: 'Aya Tan',
     description: '<p>Hint - First name should be minimum 3 characters and a maximum of 10 characters.</p>',
-    tooltip: '<p>Enter your first name.</p>',
+    tooltip: '<script><p>Enter your first name.</p></script>',
     label: {
       visible: false,
       value: 'Display Name',
