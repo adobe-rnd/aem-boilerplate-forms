@@ -32,7 +32,7 @@
     "update:core": "rollup -c rollup/af-core.rollup.config.js",
     "update:formatters": "rollup -c rollup/af-formatters.rollup.config.js",
     "update": "npm run update:core && npm run update:formula && npm run update:formatters",
-    "postinstall": "npx playwright install chrome"
+    "postinstall": "npx playwright install --with-deps chromium"
   },
   "repository": {
     "type": "git",
