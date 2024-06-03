@@ -67,9 +67,6 @@ jobs:
               npm i -D @playwright/test
               npx playwright install
       - run:
-          name: Install browsers
-          command: npx playwright install chrome
-      - run:
           name : check coverage
           command:  npm run coverage
       - store_artifacts:
