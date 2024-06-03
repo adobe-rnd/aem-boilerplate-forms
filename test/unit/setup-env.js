@@ -2,7 +2,12 @@
 import 'jsdom-global';
 import 'jsdom-global/register.js';
 import fetch from 'node-fetch';
-import 'mutationobserver-shim';
+import sinon from 'sinon';
+
+global.MutationObserver = sinon.stub().returns({
+  observe: sinon.spy(),
+  disconnect: sinon.spy(),
+});
 
 global.fetch = (url, opts) => {
   let finalUrl = url;
