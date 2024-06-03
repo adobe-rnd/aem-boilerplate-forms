@@ -62,10 +62,8 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
-          name: Install Playwright
-          command: |
-              npm i -D @playwright/test
-              npx playwright install
+          name: Install Dependencies
+          command: npm i
       - run:
           name : check coverage
           command:  npm run coverage
