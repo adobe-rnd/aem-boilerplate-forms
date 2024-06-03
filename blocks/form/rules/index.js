@@ -154,6 +154,11 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'activeChild': handleActiveChild(activeChild, form);
         break;
+      case 'valid':
+        if (currentValue === true) {
+          updateOrCreateInvalidMsg(field, '');
+        }
+        break;
       default:
         break;
     }
