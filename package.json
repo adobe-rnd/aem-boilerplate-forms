@@ -18,6 +18,7 @@
     "check-coverage": true
   },
   "scripts": {
+    "test": "mocha & playwright test",
     "test:unit": "mocha",
     "test:e2e": "playwright test",
     "debug:e2e": "playwright test --project='chromium' --debug",

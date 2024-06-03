@@ -1,7 +1,10 @@
 
 
 ## Running test cases
-
+To execute both unit and e2e test use command
+```sh
+npm run test
+```
 ### Unit Tests
 Run the following command to execute unit tests
 ```sh
