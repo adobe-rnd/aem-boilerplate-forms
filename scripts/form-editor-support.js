@@ -99,6 +99,16 @@ export function annotateFormForEditing(formEl, formDefinition) {
   annotateItems(formEl.childNodes, formDefinition, formFieldMap);
 }
 
+function handleWizardNavigation(wizardEl, navigateTo) {
+  const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
+  existingSelectedEl.classList.remove('current-wizard-step');
+  navigateTo.classList.add('current-wizard-step');
+  const navigateToMenuItem = wizardEl.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
+  const currentMenuItem = wizardEl.querySelector('.wizard-menu-active-item');
+  currentMenuItem.classList.remove('wizard-menu-active-item');
+  navigateToMenuItem.classList.add('wizard-menu-active-item');
+}
+
 /**
  * Event listener for aue:ui-select, selection of a component
  */
@@ -107,16 +117,14 @@ function handleEditorSelect(event) {
     const wizardEl = event.target.closest('.wizard');
     const { resource } = event.detail;
     const el = wizardEl.querySelector(`[data-aue-resource='${resource}']`);
-    const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
-    existingSelectedEl.classList.remove('current-wizard-step');
     if (el.hasAttribute('data-index')) {
-      // if selected element is the direct chld of wizard
-      el.classList.add('current-wizard-step');
+      // if selected element is the direct child of wizard
+      handleWizardNavigation(wizardEl, el);
     } else {
-      wizardEl.children.forEach((child) => {
+      Array.from(wizardEl.children).forEach((child) => {
         const isElPresentUnderChild = child.querySelector(`[data-aue-resource='${resource}']`);
         if (isElPresentUnderChild) {
-          child.classList.add('current-wizard-step');
+          handleWizardNavigation(wizardEl, child);
         }
       });
     }
