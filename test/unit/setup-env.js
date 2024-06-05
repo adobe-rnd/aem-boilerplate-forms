@@ -9,6 +9,22 @@ global.MutationObserver = sinon.stub().returns({
   disconnect: sinon.spy(),
 });
 
+class Headers {
+  constructor() {
+    this.headers = {};
+  }
+
+  set(key, value) {
+    this.headers[key] = value;
+  }
+
+  get(key) {
+    return this.headers[key];
+  }
+}
+
+global.Headers = Headers;
+
 global.fetch = (url, opts) => {
   let finalUrl = url;
   if (!(url.startsWith('https') || url.startsWith('http'))) {

@@ -4,7 +4,9 @@ const data = {
   data: {
     afData: {
       afBoundData: {
-        f1: 10,
+        data: {
+          f1: 10,
+        },
       },
     },
   },

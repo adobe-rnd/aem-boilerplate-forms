@@ -270,9 +270,9 @@ async function fetchData({ id }) {
     const url = externalize(`/adobe/forms/af/data/${id}${search}`);
     const response = await fetch(url);
     const json = await response.json();
-    const { data } = json;
-    const { data: { afData: { afBoundData = {} } = {} } = {} } = json;
-    return Object.keys(afBoundData).length > 0 ? afBoundData : (data || json);
+    const { data: prefillData } = json;
+    const { data: { afData: { afBoundData: { data = {} } = {} } = {} } = {} } = json;
+    return Object.keys(data).length > 0 ? data : (prefillData || json);
   } catch (ex) {
     return null;
   }

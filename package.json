@@ -18,7 +18,7 @@
     "check-coverage": true
   },
   "scripts": {
-    "test": "mocha & playwright test",
+    "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "mocha",
     "test:e2e": "playwright test",
     "debug:e2e": "playwright test --project='chromium' --debug",
