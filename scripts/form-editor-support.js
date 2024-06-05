@@ -78,7 +78,7 @@ function annotateItems(items, formDefinition, formFieldMap) {
       } else {
         console.warn(`field ${id} not found in form definition`);
       }
-      if (fieldWrapper.classList.contains('panel-wrapper')) {
+      if (fd && fd.fieldType === 'panel') {
         if (fd.properties['fd:fragment']) {
           annotateFormFragment(fieldWrapper, fd);
         } else {

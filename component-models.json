@@ -1400,12 +1400,6 @@
                     },
                     {
                         "component": "boolean",
-                        "name": "unboundFormElement",
-                        "label": "Mark as Unbound Form Element",
-                        "valueType": "boolean"
-                    },
-                    {
-                        "component": "boolean",
                         "name": "visible",
                         "label": "Show Component",
                         "valueType": "boolean",
@@ -1553,12 +1547,6 @@
                         "component": "text",
                         "name": "jcr:title",
                         "label": "Label",
-                        "valueType": "string"
-                    },
-                    {
-                        "component": "text",
-                        "name": "placeholder",
-                        "label": "Placeholder text",
                         "valueType": "string"
                     },
                     {
