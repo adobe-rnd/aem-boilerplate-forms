@@ -219,7 +219,14 @@ function createPlainText(fd) {
 
 function createImage(fd) {
   const field = createFieldWrapper(fd);
-  const imagePath = (fd.source!==undefined) ? fd.source : (fd.properties['fd:repoPath']!=undefined)? fd.properties['fd:repoPath']: '';
+  let imagePath = '';
+  if (fd.source !== undefined) {
+    imagePath = fd.source;
+  } else if (fd.properties['fd:repoPath'] != undefined) {
+    imagePath = fd.properties['fd:repoPath'];
+  } else {
+    imagePath = '';
+  }
   const image = `
   <picture>
     <source srcset="${imagePath}?width=2000&optimize=medium" media="(min-width: 600px)">
