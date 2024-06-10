@@ -222,7 +222,7 @@ function createImage(fd) {
   let imagePath = '';
   if (fd.source !== undefined) {
     imagePath = fd.source;
-  } else if (fd.properties['fd:repoPath'] != undefined) {
+  } else if (fd.properties['fd:repoPath'] !== undefined) {
     imagePath = fd.properties['fd:repoPath'];
   } else {
     imagePath = '';
