@@ -207,7 +207,8 @@
                 "template": {
                   "jcr:title": "Text",
                   "fieldType": "plain-text",
-                  "visible": true
+                  "visible": true,
+                  "textIsRich": true
                 }
               }
             }
