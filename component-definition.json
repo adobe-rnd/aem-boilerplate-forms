@@ -277,7 +277,9 @@
                 "template": {
                   "jcr:title": "Wizard",
                   "fieldType": "panel",
-                  "fd:viewType": "wizard"
+                  "fd:viewType": "wizard",
+                  "enabled": true,
+                  "visible": true
                 }
               }
             }
