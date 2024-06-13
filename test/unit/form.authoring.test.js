@@ -26,6 +26,15 @@ describe('Universal Editor Authoring Test Cases', () => {
       assert.equal(node.dataset.aueLabel, fd.label.value, `data-aue-label not set ${fd.id}`);
     }
 
+    function testPlainTextAnnotation(node, fd, auetype, auemodel) {
+      assert.equal(node.dataset.aueType, auetype, `data-aue-type not set ${fd.id}`);
+      assert.equal(node.dataset.aueResource, `urn:aemconnection:${fd.properties['fd:path']}`, `data-aue-resource not set ${fd.id}`);
+      assert.equal(node.dataset.aueModel, auemodel, `data-aue-model not set ${fd.id}`);
+      assert.equal(node.dataset.aueLabel, 'Text');
+      assert.equal(node.dataset.aueProp, 'value');
+      assert.equal(node.dataset.aueBehavior, 'component');
+    }
+
     function testChildren(items, formDef, fieldMap) {
       items.forEach((node) => {
         if (node.classList.contains('field-wrapper')) {
@@ -38,6 +47,8 @@ describe('Universal Editor Authoring Test Cases', () => {
             const textNodeCount = Array.from(node.childNodes)
               .filter((child) => child.nodeType === 3).length;
             assert.equal(textNodeCount, Object.keys(fd[':items']).length, `fragment items not set ${textNodeCount} ${fd.id}`);
+          } else if (fd.fieldType === 'plain-text') {
+            testPlainTextAnnotation(node, fd, 'richtext', fd.fieldType);
           } else if (!fd.properties['fd:fragment']) {
             testAnnotation(node, fd, 'component', fd.fieldType);
           }

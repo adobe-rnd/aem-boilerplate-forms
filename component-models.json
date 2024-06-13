@@ -1380,32 +1380,18 @@
         "id": "plain-text",
         "fields": [
             {
-                "component": "container",
-                "name": "basic",
-                "label": "Basic",
-                "collapsible": false,
-                "fields": [
-                    {
-                        "component": "text",
-                        "name": "name",
-                        "label": "Name",
-                        "valueType": "string",
-                        "required": true
-                    },
-                    {
-                        "component": "richtext",
-                        "name": "value",
-                        "label": "Text",
-                        "valueType": "string"
-                    },
-                    {
-                        "component": "boolean",
-                        "name": "visible",
-                        "label": "Show Component",
-                        "valueType": "boolean",
-                        "value": true
-                    }
-                ]
+                "component": "text",
+                "name": "name",
+                "label": "Name",
+                "valueType": "string",
+                "required": true
+            },
+            {
+                "component": "boolean",
+                "name": "visible",
+                "label": "Show Component",
+                "valueType": "boolean",
+                "value": true
             }
         ]
     },

@@ -69,7 +69,14 @@ function annotateItems(items, formDefinition, formFieldMap) {
       const { id } = fieldWrapper.dataset;
       const fd = getFieldById(formDefinition, id, formFieldMap);
       if (fd && fd.properties) {
-        if (!fd.properties['fd:fragment']) {
+        if (fd.fieldType === 'plain-text') {
+          fieldWrapper.setAttribute('data-aue-type', 'richtext');
+          fieldWrapper.setAttribute('data-aue-behavior', 'component');
+          fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
+          fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
+          fieldWrapper.setAttribute('data-aue-label', 'Text');
+          fieldWrapper.setAttribute('data-aue-prop', 'value');
+        } else if (!fd.properties['fd:fragment']) {
           fieldWrapper.setAttribute('data-aue-type', 'component');
           fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
           fieldWrapper.setAttribute('data-aue-model', fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType);
