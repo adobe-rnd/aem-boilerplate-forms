@@ -1168,6 +1168,12 @@
                     },
                     {
                         "component": "text",
+                        "name": "dataRef",
+                        "label": "Bind reference",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "text",
                         "name": "enum",
                         "label": "Options (Data Value)",
                         "valueType": "string",
