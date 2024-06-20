@@ -1592,7 +1592,7 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
                     },
                     {
@@ -1658,7 +1658,7 @@
             {
                 "component": "text",
                 "name": "jcr:title",
-                "label": "Label",
+                "label": "Title",
                 "valueType": "string"
             },
             {
