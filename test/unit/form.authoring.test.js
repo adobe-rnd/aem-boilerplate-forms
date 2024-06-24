@@ -49,6 +49,8 @@ describe('Universal Editor Authoring Test Cases', () => {
             assert.equal(textNodeCount, Object.keys(fd[':items']).length, `fragment items not set ${textNodeCount} ${fd.id}`);
           } else if (fd.fieldType === 'plain-text') {
             testPlainTextAnnotation(node, fd, 'richtext', fd.fieldType);
+          } else if (fd[':type'] === 'rating') {
+            testAnnotation(node, fd, 'component', fd[':type']);
           } else if (!fd.properties['fd:fragment']) {
             testAnnotation(node, fd, 'component', fd.fieldType);
           }

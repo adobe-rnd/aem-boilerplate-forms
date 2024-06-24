@@ -13,6 +13,17 @@ export const ueFormDef = {
         'fd:path': '/content/test2/index/jcr:content/root/section_0/form/textinput',
       },
     },
+    rating: {
+      id: 'rating-input',
+      fieldType: 'text-input',
+      label: {
+        value: 'Text Input',
+      },
+      properties: {
+        'fd:path': '/content/test2/index/jcr:content/root/section_0/form/textinput',
+      },
+      ':type': 'rating',
+    },
     panelcontainer: {
       id: 'panelcontainer-084914a499',
       fieldType: 'panel',
@@ -39,6 +50,7 @@ export const ueFormDef = {
           properties: {
             'fd:path': '/content/test2/index/jcr:content/root/section_0/form/panelcontainer/textinput',
           },
+          ':type': 'core/fd/components/form/textinput/v1/textinput',
         },
       },
     },
@@ -65,11 +77,13 @@ export const ueFormDef = {
           properties: {
             'fd:path': '/content/test2/formfrag3/jcr:content/root/section/form/textinput',
           },
+          ':type': 'core/fd/components/form/textinput/v1/textinput',
         },
       },
       ':itemsOrder': [
         'textinput_360975137',
       ],
+      ':type': 'core/fd/components/form/panelcontainer/v1/panelcontainer',
     },
   },
   ':itemsOrder': ['textinput', 'panelcontainer', 'fragment_1198843043'],

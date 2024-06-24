@@ -62,6 +62,13 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
   }
 }
 
+function getPropertyModel(fd) {
+  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components')) {
+    return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
+  }
+  return fd[':type'];
+}
+
 function annotateItems(items, formDefinition, formFieldMap) {
   for (let i = items.length - 1; i >= 0; i -= 1) {
     const fieldWrapper = items[i];
@@ -73,13 +80,13 @@ function annotateItems(items, formDefinition, formFieldMap) {
           fieldWrapper.setAttribute('data-aue-type', 'richtext');
           fieldWrapper.setAttribute('data-aue-behavior', 'component');
           fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-          fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
+          fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
           fieldWrapper.setAttribute('data-aue-label', 'Text');
           fieldWrapper.setAttribute('data-aue-prop', 'value');
         } else if (!fd.properties['fd:fragment']) {
           fieldWrapper.setAttribute('data-aue-type', 'component');
           fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-          fieldWrapper.setAttribute('data-aue-model', fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType);
+          fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
           fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
         }
       } else {
