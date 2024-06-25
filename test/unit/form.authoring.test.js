@@ -24,6 +24,9 @@ describe('Universal Editor Authoring Test Cases', () => {
       assert.equal(node.dataset.aueResource, `urn:aemconnection:${fd.properties['fd:path']}`, `data-aue-resource not set ${fd.id}`);
       assert.equal(node.dataset.aueModel, auemodel, `data-aue-model not set ${fd.id}`);
       assert.equal(node.dataset.aueLabel, fd.label.value, `data-aue-label not set ${fd.id}`);
+      if (auetype === 'container') {
+        assert.equal(node.dataset.aueFilter, 'form');
+      }
     }
 
     function testPlainTextAnnotation(node, fd, auetype, auemodel) {

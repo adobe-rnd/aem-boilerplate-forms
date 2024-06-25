@@ -98,6 +98,7 @@ function annotateItems(items, formDefinition, formFieldMap) {
         } else {
           fieldWrapper.setAttribute('data-aue-type', 'container');
           fieldWrapper.setAttribute('data-aue-behavior', 'component');
+          fieldWrapper.setAttribute('data-aue-filter', 'form');
           annotateItems(fieldWrapper.childNodes, formDefinition, formFieldMap);
         }
       }
@@ -107,6 +108,10 @@ function annotateItems(items, formDefinition, formFieldMap) {
 
 export function annotateFormForEditing(formEl, formDefinition) {
   if (document.documentElement.classList.contains('adobe-ue-edit')) {
+    const block = formEl.closest('.block[data-aue-resource]');
+    if (block) {
+      block.setAttribute('data-aue-filter', 'form');
+    }
     formEl.classList.add('edit-mode');
   }
   const formFieldMap = {};
