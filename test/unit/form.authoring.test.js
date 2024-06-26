@@ -43,7 +43,11 @@ describe('Universal Editor Authoring Test Cases', () => {
         if (node.classList.contains('field-wrapper')) {
           const fd = getFieldById(ueFormDef, node.dataset.id, formFieldMap);
           if (node.classList.contains('panel-wrapper') && !fd.properties['fd:fragment']) {
-            testAnnotation(node, fd, 'container', fd.fieldType);
+            if (fd[':type'] === 'wizard') {
+              testAnnotation(node, fd, 'container', fd[':type']);
+            } else {
+              testAnnotation(node, fd, 'container', fd.fieldType);
+            }
             testChildren(node.childNodes, formDef, fieldMap);
           } else if (fd.properties['fd:fragment'] && node.classList.contains('edit-mode')) {
             testAnnotation(node, fd, 'component', 'form-fragment');
