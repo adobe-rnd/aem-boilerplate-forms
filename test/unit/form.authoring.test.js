@@ -66,17 +66,24 @@ describe('Universal Editor Authoring Test Cases', () => {
   it('test form component definitions for UE', async () => {
     const definitionFilePath = path.resolve('component-definition.json');
     const modelsFilePath = path.resolve('component-models.json');
+    const filtersFilePath = path.resolve('component-filters.json');
     const componentDefinitions = fs.readFileSync(definitionFilePath, 'utf8');
     const componentModels = fs.readFileSync(modelsFilePath, 'utf8');
+    const filters = fs.readFileSync(filtersFilePath, 'utf8');
     try {
       const definition = JSON.parse(componentDefinitions);
       const componentModelsArray = JSON.parse(componentModels);
+      const filtersArray = JSON.parse(filters);
+      const { components: formComponents } = filtersArray.find((filter) => filter.id === 'form');
       const idsArray = componentModelsArray.map((component) => component.id);
       if (definition) {
         definition?.groups.forEach((group) => {
           if (group.id === 'form-general') {
             group.components.forEach((component) => {
               const cmpId = component.id;
+              if (!formComponents.includes(cmpId)) {
+                throw new Error(`component not present in filter ${component.id}`);
+              }
               const { fieldType } = component.plugins.xwalk.page.template;
               let cmpIdfromFieldType = fieldType;
               if (fieldType === 'image' || fieldType === 'button') {
