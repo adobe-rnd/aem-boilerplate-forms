@@ -7,9 +7,9 @@ import {
   toClassName,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
-import componentDecorater from './mappings.js';
+import componentDecorator from './mappings.js';
 import DocBasedFormToAF from './transform.js';
-import transferRepeatableDOM from './components/repeat.js';
+import transferRepeatableDOM from './components/repeat/repeat.js';
 import { handleSubmit } from './submit.js';
 import { getSubmitBaseUrl, emailPattern } from './constant.js';
 
@@ -355,14 +355,11 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
         element.className += ` ${field.appliedCssClassNames}`;
       }
       colSpanDecorator(field, element);
-      const decorator = await componentDecorater(field);
       if (field?.fieldType === 'panel') {
         await generateFormRendition(field, element, getItems);
         return element;
       }
-      if (typeof decorator === 'function') {
-        return decorator(element, field, container);
-      }
+      await componentDecorator(element, field, container);
       return element;
     }
     return null;
@@ -370,11 +367,7 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
 
   const children = await Promise.all(promises);
   container.append(...children.filter((_) => _ != null));
-  const decorator = await componentDecorater(panel);
-  if (typeof decorator === 'function') {
-    return decorator(container, panel);
-  }
-  return container;
+  await componentDecorator(container, panel);
 }
 
 function enableValidation(form) {
