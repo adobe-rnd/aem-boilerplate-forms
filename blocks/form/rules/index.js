@@ -17,6 +17,7 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
+import { DEFAULT_OPTIONS, resolveAudiences } from '../martech/index.js';
 import { submitSuccess, submitFailure } from '../submit.js';
 import {
   createHelpText, createLabel, updateOrCreateInvalidMsg, getCheckboxGroupValue,
@@ -293,12 +294,14 @@ async function fetchData({ id }) {
     const { data: { afData: { afBoundData: { data = {} } = {} } = {} } = {} } = json;
     return Object.keys(data).length > 0 ? data : (prefillData || json);
   } catch (ex) {
-    return null;
+    return {};
   }
 }
 
 export async function initAdaptiveForm(formDef, createForm) {
+  const audiences = await resolveAudiences();
   const data = await fetchData(formDef);
+  data[DEFAULT_OPTIONS.audiencesDataAttribute] = audiences
   await registerCustomFunctions();
   const form = await initializeRuleEngineWorker({
     ...formDef,

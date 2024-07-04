@@ -1,0 +1,12 @@
+{
+    "segments": [ 
+        {
+            "name" : "desktop",
+            "displayName" : "Desktop"
+        },
+        {
+            "name" : "mobile",
+            "displayName" : "Mobile"
+        }
+    ]
+}
