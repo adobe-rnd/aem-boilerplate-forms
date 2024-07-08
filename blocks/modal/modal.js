@@ -7,12 +7,12 @@ import {
 // the createModal() and openModal() functions.
 
 // eslint-disable-next-line import/prefer-default-export
-export async function createModal(contentNodes) {
+export async function createModal(panel) {
   await loadCSS(`${window.hlx.codeBasePath}/blocks/modal/modal.css`);
   const dialog = document.createElement('dialog');
   const dialogContent = document.createElement('div');
   dialogContent.classList.add('modal-content');
-  dialogContent.append(...contentNodes);
+  dialogContent.append(panel);
   dialog.append(dialogContent);
 
   const closeButton = document.createElement('button');
@@ -51,7 +51,7 @@ export async function createModal(contentNodes) {
   return {
     block,
     showModal: () => {
-      document.querySelector('dialog')?.showModal();
+      panel?.closest('dialog')?.showModal();
       // Google Chrome restores the scroll position when the dialog is reopened,
       // so we need to reset it.
       setTimeout(() => { dialogContent.scrollTop = 0; }, 0);
