@@ -196,28 +196,15 @@
                 "label": "Submit Action",
                 "options": [
                     {
-                        "name": "Submit to Workfront Fusion",
-                        "value": "fd/workfrontfusion/components/actions/wfsubmit"
-                    },
-                    {
                         "name": "Submit to REST endpoint",
                         "value": "fd/af/components/guidesubmittype/restendpoint"
+                    },
+                    {
+                        "name": "Send email",
+                        "value": "fd/af/components/guidesubmittype/email"
                     }
                 ],
                 "value" : ""
-            },
-            {
-                "component": "select",
-                "name": "callbackId",
-                "label": "Fusion Scenario",
-                "valueType": "string",
-                "condition": { "==": [{ "var": "actionType" }, "fd/workfrontfusion/components/actions/wfsubmit"] },
-                "options": [
-                    {
-                        "name": "HDFC Sign Scenario",
-                        "value": "8366d120-80b1-4ad2-9f2b-743aa38b2a00"
-                    }
-                ]
             },
             {
                 "component": "text",
@@ -227,14 +214,71 @@
                 "condition": { "==": [{ "var": "actionType" }, "fd/af/components/guidesubmittype/restendpoint"] }
             },
             {
-                "component": "select",
-                "name": "dorType",
-                "label": "Document of Record",
-                "valueType": "string",
-                "options": [
+                "component": "container",
+                "name": "email",
+                "label": "Email Configuration",
+                "collapsible": false,
+                "condition": { "==": [{ "var": "actionType" }, "fd/af/components/guidesubmittype/email"] },
+                "fields": [
                     {
-                        "name": "Generate Auto DoR",
-                        "value": "generate"
+                        "component": "text",
+                        "name": "from",
+                        "label": "From",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "text",
+                        "name": "mailto",
+                        "label": "To",
+                        "valueType": "string",
+                        "multi": true,
+                        "required": true
+                    },
+                    {
+                        "component": "text",
+                        "name": "cc",
+                        "label": "CC",
+                        "valueType": "string",
+                        "multi": true
+                    },
+                    {
+                        "component": "text",
+                        "name": "bcc",
+                        "label": "BCC",
+                        "valueType": "string",
+                        "multi": true
+                    },
+                    {
+                        "component": "text",
+                        "name": "subject",
+                        "label": "Subject",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "useExternalEmailTemplate",
+                        "label": "Use external template",
+                        "valueType": "boolean"
+                    },
+                    {
+                        "component": "aem-content",
+                        "name": "templatePath",
+                        "label": "External template path",
+                        "valueType": "string",
+                        "condition": { "==": [{ "var": "useExternalEmailTemplate" }, true] }
+                    },
+                    {
+                        "component": "richtext",
+                        "name": "template",
+                        "label": "Email template",
+                        "valueType": "string",
+                        "condition": { "!=": [{ "var": "useExternalEmailTemplate" }, true] }
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "includeAttachments",
+                        "label": "Include attachments",
+                        "valueType": "boolean"
                     }
                 ]
             }
@@ -259,8 +303,14 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
                     },
                     {
                         "component": "text",
@@ -377,8 +427,14 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
                     },
                     {
                         "component": "text",
@@ -515,8 +571,14 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
                     },
                     {
                         "component": "text",
@@ -633,8 +695,14 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
                     },
                     {
                         "component": "text",
@@ -756,7 +824,7 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
                     },
                     {
@@ -862,8 +930,14 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
                     },
                     {
                         "component": "boolean",
@@ -974,8 +1048,14 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
                     },
                     {
                         "component": "text",
@@ -1111,7 +1191,19 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
+                    },
+                    {
+                        "component": "text",
+                        "name": "dataRef",
+                        "label": "Bind reference",
                         "valueType": "string"
                     },
                     {
@@ -1230,8 +1322,14 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
                     },
                     {
                         "component": "text",
@@ -1404,8 +1502,14 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
                     },
                     {
                         "component": "text",
@@ -1522,7 +1626,7 @@
                     {
                         "component": "text",
                         "name": "jcr:title",
-                        "label": "Label",
+                        "label": "Title",
                         "valueType": "string"
                     },
                     {
@@ -1588,7 +1692,7 @@
             {
                 "component": "text",
                 "name": "jcr:title",
-                "label": "Label",
+                "label": "Title",
                 "valueType": "string"
             },
             {

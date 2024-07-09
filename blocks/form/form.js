@@ -4,6 +4,7 @@ import {
   getId,
   stripTags,
   checkValidation,
+  toClassName,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorater from './mappings.js';
@@ -172,7 +173,7 @@ function createRadioOrCheckboxGroup(fd) {
   const wrapper = createFieldSet({ ...fd });
   const type = fd.fieldType.split('-')[0];
   fd.enum.forEach((value, index) => {
-    const label = typeof fd.enumNames?.[index] === 'object' ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
+    const label = (typeof fd.enumNames?.[index] === 'object' && fd.enumNames?.[index] !== null) ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
     const id = getId(fd.name);
     const field = createRadioOrCheckbox({
       name: fd.name,
@@ -182,7 +183,7 @@ function createRadioOrCheckboxGroup(fd) {
       enum: [value],
       required: fd.required,
     });
-    field.classList.remove('field-wrapper', `field-${fd.name}`);
+    field.classList.remove('field-wrapper', `field-${toClassName(fd.name)}`);
     const input = field.querySelector('input');
     input.id = id;
     input.dataset.fieldType = fd.fieldType;

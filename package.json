@@ -31,6 +31,7 @@
     "update:formula": "rollup -c rollup/jsonformula.rollup.config.js",
     "update:core": "rollup -c rollup/af-core.rollup.config.js",
     "update:formatters": "rollup -c rollup/af-formatters.rollup.config.js",
+    "update:functions": "cp node_modules/@aemforms/af-custom-functions/src/index.js blocks/form/rules/functions.js",
     "update": "npm run update:core && npm run update:formula && npm run update:formatters",
     "postinstall": "npx playwright install --with-deps chromium"
   },
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@adobe/json-formula": "0.1.50",
     "@aemforms/af-core": "0.22.85",
+    "@aemforms/af-custom-functions": "^1.0.8",
     "@aemforms/af-formatters": "0.22.85",
     "@babel/core": "7.24.0",
     "@babel/eslint-parser": "7.23.10",

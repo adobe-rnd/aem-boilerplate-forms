@@ -26,7 +26,7 @@ export function stripTags(input, allowd = allowedTags) {
  * @param {string} name The unsanitized string
  * @returns {string} The class name
  */
-function toClassName(name) {
+export function toClassName(name) {
   return typeof name === 'string'
     ? name
       .toLowerCase()
@@ -232,4 +232,19 @@ export function checkValidation(fieldElement) {
 
   const message = getValidationMessage(fieldElement, wrapper);
   updateOrCreateInvalidMsg(fieldElement, message);
+}
+
+export function subscribe(fieldDiv, callback) {
+  if (callback) {
+    fieldDiv.dataset.subscribe = true;
+    const observer = new MutationObserver((mutationsList) => {
+      mutationsList?.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-field-model') {
+          callback(fieldDiv, JSON.parse(fieldDiv.dataset.fieldModel));
+        }
+      });
+    });
+
+    observer.observe(fieldDiv, { attributes: true });
+  }
 }

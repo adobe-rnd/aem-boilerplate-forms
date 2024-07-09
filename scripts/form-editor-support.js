@@ -1,3 +1,22 @@
+/** ***********************************************************************
+ * ADOBE CONFIDENTIAL
+ * ___________________
+ *
+ * Copyright 2024 Adobe
+ * All Rights Reserved.
+ *
+ * NOTICE: All information contained herein is, and remains
+ * the property of Adobe and its suppliers, if any. The intellectual
+ * and technical concepts contained herein are proprietary to Adobe
+ * and its suppliers and are protected by all applicable intellectual
+ * property laws, including trade secret and copyright laws.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from Adobe.
+
+ * Adobe permits you to use and modify this file solely in accordance with
+ * the terms of the Adobe license agreement accompanying it.
+ ************************************************************************ */
 import { generateFormRendition } from '../blocks/form/form.js';
 import { loadCSS } from './aem.js';
 
@@ -62,6 +81,13 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
   }
 }
 
+function getPropertyModel(fd) {
+  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard') {
+    return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
+  }
+  return fd[':type'];
+}
+
 function annotateItems(items, formDefinition, formFieldMap) {
   for (let i = items.length - 1; i >= 0; i -= 1) {
     const fieldWrapper = items[i];
@@ -73,13 +99,13 @@ function annotateItems(items, formDefinition, formFieldMap) {
           fieldWrapper.setAttribute('data-aue-type', 'richtext');
           fieldWrapper.setAttribute('data-aue-behavior', 'component');
           fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-          fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
+          fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
           fieldWrapper.setAttribute('data-aue-label', 'Text');
           fieldWrapper.setAttribute('data-aue-prop', 'value');
         } else if (!fd.properties['fd:fragment']) {
           fieldWrapper.setAttribute('data-aue-type', 'component');
           fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-          fieldWrapper.setAttribute('data-aue-model', fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType);
+          fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
           fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
         }
       } else {
@@ -91,6 +117,7 @@ function annotateItems(items, formDefinition, formFieldMap) {
         } else {
           fieldWrapper.setAttribute('data-aue-type', 'container');
           fieldWrapper.setAttribute('data-aue-behavior', 'component');
+          fieldWrapper.setAttribute('data-aue-filter', 'form');
           annotateItems(fieldWrapper.childNodes, formDefinition, formFieldMap);
         }
       }
@@ -100,6 +127,10 @@ function annotateItems(items, formDefinition, formFieldMap) {
 
 export function annotateFormForEditing(formEl, formDefinition) {
   if (document.documentElement.classList.contains('adobe-ue-edit')) {
+    const block = formEl.closest('.block[data-aue-resource]');
+    if (block) {
+      block.setAttribute('data-aue-filter', 'form');
+    }
     formEl.classList.add('edit-mode');
   }
   const formFieldMap = {};

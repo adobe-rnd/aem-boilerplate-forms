@@ -24,6 +24,9 @@ describe('Universal Editor Authoring Test Cases', () => {
       assert.equal(node.dataset.aueResource, `urn:aemconnection:${fd.properties['fd:path']}`, `data-aue-resource not set ${fd.id}`);
       assert.equal(node.dataset.aueModel, auemodel, `data-aue-model not set ${fd.id}`);
       assert.equal(node.dataset.aueLabel, fd.label.value, `data-aue-label not set ${fd.id}`);
+      if (auetype === 'container') {
+        assert.equal(node.dataset.aueFilter, 'form');
+      }
     }
 
     function testPlainTextAnnotation(node, fd, auetype, auemodel) {
@@ -40,7 +43,11 @@ describe('Universal Editor Authoring Test Cases', () => {
         if (node.classList.contains('field-wrapper')) {
           const fd = getFieldById(ueFormDef, node.dataset.id, formFieldMap);
           if (node.classList.contains('panel-wrapper') && !fd.properties['fd:fragment']) {
-            testAnnotation(node, fd, 'container', fd.fieldType);
+            if (fd[':type'] === 'wizard') {
+              testAnnotation(node, fd, 'container', fd[':type']);
+            } else {
+              testAnnotation(node, fd, 'container', fd.fieldType);
+            }
             testChildren(node.childNodes, formDef, fieldMap);
           } else if (fd.properties['fd:fragment'] && node.classList.contains('edit-mode')) {
             testAnnotation(node, fd, 'component', 'form-fragment');
@@ -49,6 +56,8 @@ describe('Universal Editor Authoring Test Cases', () => {
             assert.equal(textNodeCount, Object.keys(fd[':items']).length, `fragment items not set ${textNodeCount} ${fd.id}`);
           } else if (fd.fieldType === 'plain-text') {
             testPlainTextAnnotation(node, fd, 'richtext', fd.fieldType);
+          } else if (fd[':type'] === 'rating') {
+            testAnnotation(node, fd, 'component', fd[':type']);
           } else if (!fd.properties['fd:fragment']) {
             testAnnotation(node, fd, 'component', fd.fieldType);
           }
@@ -61,17 +70,24 @@ describe('Universal Editor Authoring Test Cases', () => {
   it('test form component definitions for UE', async () => {
     const definitionFilePath = path.resolve('component-definition.json');
     const modelsFilePath = path.resolve('component-models.json');
+    const filtersFilePath = path.resolve('component-filters.json');
     const componentDefinitions = fs.readFileSync(definitionFilePath, 'utf8');
     const componentModels = fs.readFileSync(modelsFilePath, 'utf8');
+    const filters = fs.readFileSync(filtersFilePath, 'utf8');
     try {
       const definition = JSON.parse(componentDefinitions);
       const componentModelsArray = JSON.parse(componentModels);
+      const filtersArray = JSON.parse(filters);
+      const { components: formComponents } = filtersArray.find((filter) => filter.id === 'form');
       const idsArray = componentModelsArray.map((component) => component.id);
       if (definition) {
         definition?.groups.forEach((group) => {
           if (group.id === 'form-general') {
             group.components.forEach((component) => {
               const cmpId = component.id;
+              if (!formComponents.includes(cmpId)) {
+                throw new Error(`component not present in filter ${component.id}`);
+              }
               const { fieldType } = component.plugins.xwalk.page.template;
               let cmpIdfromFieldType = fieldType;
               if (fieldType === 'image' || fieldType === 'button') {
