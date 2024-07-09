@@ -25,7 +25,7 @@ export default async function decorate(panel) {
   const modal = await createModal(panel);
   // attachMutationObserver(modal);
   subscribe(panel, (fieldDiv, fieldModel) => {
-    if (fieldModel?.visible) {
+    if (fieldModel?.visible === true) {
       modal.showModal();
     }
   });
