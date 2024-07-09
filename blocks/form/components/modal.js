@@ -21,7 +21,7 @@ const attachMutationObserver = (modal) => {
 };
 
 export default async function decorate(panel) {
-  const modal = await createModal([panel]);
+  const modal = await createModal(panel);
   attachMutationObserver(modal);
   return modal.block;
 }
