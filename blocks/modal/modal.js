@@ -22,7 +22,11 @@ export async function createModal(panel) {
   closeButton.innerHTML = '<span class="icon icon-close"></span>';
   closeButton.addEventListener('click', () => {
     dialog.close();
-    dialog.querySelector('fieldset').dataset.fieldModel.visible = false;
+    const panelModel = JSON.parse(panel?.dataset?.fieldModel);
+    if (panelModel) {
+      panelModel.visible = false;
+      panel.dataset.fieldModel = JSON.stringify(panelModel);
+    }
   });
   dialog.append(closeButton);
 
