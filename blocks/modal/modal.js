@@ -22,7 +22,7 @@ export async function createModal(panel) {
   closeButton.innerHTML = '<span class="icon icon-close"></span>';
   closeButton.addEventListener('click', () => {
     dialog.close();
-    dialog.querySelector('fieldset').dataset.visible = 'false';
+    dialog.querySelector('fieldset').dataset.fieldModel.visible = false;
   });
   dialog.append(closeButton);
 
@@ -34,7 +34,6 @@ export async function createModal(panel) {
       dialog.close();
     }
   });
-
   const block = buildBlock('modal', '');
   const wrapper = document.createElement('div');
   wrapper.appendChild(block);
