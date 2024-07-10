@@ -74,14 +74,14 @@ export function testBasicMarkup(filePath, bUrlMode = false) {
     if (fieldDef && markUp) {
       await decorate(block);
       const form = block.querySelector('form');
-      // console.log('----------Actual----------');
-      // console.log(form.outerHTML);
-      // console.log('----------Expected----------');
-      // console.log(createElementFromHTML(markUp, fieldDef));
+      console.log('----------Actual----------');
+      console.log(form.outerHTML);
+      console.log('----------Expected----------');
+      console.log(createElementFromHTML(markUp, fieldDef));
       const result = dom.default.compare(createElementFromHTML(markUp, fieldDef), form);
       const differences = result.getDifferences();
-      // console.log('---------diff--------');
-      // console.log(differences);
+      console.log('---------diff--------');
+      console.log(differences);
       if (Array.isArray(expectedDiffs)) {
         assert.equal(differences.length, Array.isArray(expectedDiffs) ? expectedDiffs.length : expectedDiffs, 'Number of differences do not match expected differences');
         const computedDiffs = differences.map((d) => {

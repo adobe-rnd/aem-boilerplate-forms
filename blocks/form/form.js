@@ -312,7 +312,7 @@ function inputDecorator(field, element) {
       input.dataset.maxFileSize = field.maxFileSize;
     }
     if (field.default !== undefined) {
-      input.value = field.default;
+      input.setAttribute('value', field.default);
     }
     if (input.type === 'email') {
       input.pattern = emailPattern;
