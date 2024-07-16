@@ -1,6 +1,8 @@
 import { test, expect } from '../fixtures.js';
 
 test.describe('Subscribe function validation', () => {
+  const emailInputValue = 'newValue';
+  const textInputValue = 'subscribeTest';
   test('Subscribe function validation on text input', async ({ page }) => {
     // eslint-disable-next-line no-unused-expressions
     await page.goto('https://subscribe--aem-boilerplate-forms--adobe-rnd.hlx.live/drafts/tests/x-walk/subscribevalidation', { waitUntil: 'networkidle' });
@@ -19,10 +21,9 @@ test.describe('Subscribe function validation', () => {
         });
       });
     });
-    await page.getByLabel('Text Input').fill('subscribeTest');
+    await page.getByLabel('Text Input').fill(textInputValue);
     await page.getByLabel('Text Input').blur();
-    expect(await page.getByLabel('Email Input').inputValue()).toBe('newValue');
+    expect(await page.getByLabel('Email Input').inputValue()).toBe(emailInputValue);
     expect(await page.getByRole('checkbox', { name: 'Item 1' }).isChecked()).toBe(true);
-    await page.pause();
   });
 });
