@@ -5,6 +5,7 @@ import path from 'path';
 import * as dom from 'dom-compare';
 import decorate, { DELAY_MS } from '../../blocks/form/form.js';
 import { resetIds } from '../../blocks/form/util.js';
+import { getCustomComponents, setCustomComponents } from '../../blocks/form/mappings.js';
 
 function escapeHTML(str) {
   return (str.replace(/[&<>'"]/g, (tag) => ({
@@ -51,7 +52,7 @@ function createElementFromHTML(htmlString, fieldDef) {
   return form;
 }
 
-export function testBasicMarkup(filePath, bUrlMode = false) {
+export function testBasicMarkup(filePath, bUrlMode = false, customComponents = [], codeBasePath = '../..') {
   it(`Rendering of ${filePath?.substr(filePath.lastIndexOf('/') + 1)}`, async () => {
     resetIds();
     const module = await import(filePath);
@@ -70,18 +71,21 @@ export function testBasicMarkup(filePath, bUrlMode = false) {
     if (bUrlMode && !formPath) {
       assert.equal(true, false, 'formpath is not defined');
     }
+    const oldCustomComponents = getCustomComponents();
+    window.hlx = { codeBasePath };
+    setCustomComponents(customComponents);
     const block = bUrlMode ? createBlockWithUrl(fieldDef, `${formPath}`) : createBlock(fieldDef);
     if (fieldDef && markUp) {
       await decorate(block);
       const form = block.querySelector('form');
-      // console.log('----------Actual----------');
-      // console.log(form.outerHTML);
-      // console.log('----------Expected----------');
-      // console.log(createElementFromHTML(markUp, fieldDef));
+      console.log('----------Actual----------');
+      console.log(form.outerHTML);
+      console.log('----------Expected----------');
+      console.log(createElementFromHTML(markUp, fieldDef).outerHTML);
       const result = dom.default.compare(createElementFromHTML(markUp, fieldDef), form);
       const differences = result.getDifferences();
-      // console.log('---------diff--------');
-      // console.log(differences);
+      console.log('---------diff--------');
+      console.log(differences);
       if (Array.isArray(expectedDiffs)) {
         assert.equal(differences.length, Array.isArray(expectedDiffs) ? expectedDiffs.length : expectedDiffs, 'Number of differences do not match expected differences');
         const computedDiffs = differences.map((d) => {
@@ -105,6 +109,7 @@ export function testBasicMarkup(filePath, bUrlMode = false) {
         extraChecks.forEach((check) => check(form));
       }
     }
+    setCustomComponents(oldCustomComponents);
   });
 }
 

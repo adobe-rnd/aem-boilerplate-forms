@@ -1,3 +1,22 @@
+/** ***********************************************************************
+ * ADOBE CONFIDENTIAL
+ * ___________________
+ *
+ * Copyright 2024 Adobe
+ * All Rights Reserved.
+ *
+ * NOTICE: All information contained herein is, and remains
+ * the property of Adobe and its suppliers, if any. The intellectual
+ * and technical concepts contained herein are proprietary to Adobe
+ * and its suppliers and are protected by all applicable intellectual
+ * property laws, including trade secret and copyright laws.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from Adobe.
+
+ * Adobe permits you to use and modify this file solely in accordance with
+ * the terms of the Adobe license agreement accompanying it.
+ ************************************************************************ */
 import { generateFormRendition } from '../blocks/form/form.js';
 import { loadCSS } from './aem.js';
 
@@ -62,6 +81,13 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
   }
 }
 
+function getPropertyModel(fd) {
+  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard') {
+    return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
+  }
+  return fd[':type'];
+}
+
 function annotateItems(items, formDefinition, formFieldMap) {
   for (let i = items.length - 1; i >= 0; i -= 1) {
     const fieldWrapper = items[i];
@@ -69,21 +95,29 @@ function annotateItems(items, formDefinition, formFieldMap) {
       const { id } = fieldWrapper.dataset;
       const fd = getFieldById(formDefinition, id, formFieldMap);
       if (fd && fd.properties) {
-        if (!fd.properties['fd:fragment']) {
+        if (fd.fieldType === 'plain-text') {
+          fieldWrapper.setAttribute('data-aue-type', 'richtext');
+          fieldWrapper.setAttribute('data-aue-behavior', 'component');
+          fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
+          fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
+          fieldWrapper.setAttribute('data-aue-label', 'Text');
+          fieldWrapper.setAttribute('data-aue-prop', 'value');
+        } else if (!fd.properties['fd:fragment']) {
           fieldWrapper.setAttribute('data-aue-type', 'component');
           fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-          fieldWrapper.setAttribute('data-aue-model', fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType);
+          fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
           fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
         }
       } else {
         console.warn(`field ${id} not found in form definition`);
       }
-      if (fieldWrapper.classList.contains('panel-wrapper')) {
+      if (fd && fd.fieldType === 'panel') {
         if (fd.properties['fd:fragment']) {
           annotateFormFragment(fieldWrapper, fd);
         } else {
           fieldWrapper.setAttribute('data-aue-type', 'container');
           fieldWrapper.setAttribute('data-aue-behavior', 'component');
+          fieldWrapper.setAttribute('data-aue-filter', 'form');
           annotateItems(fieldWrapper.childNodes, formDefinition, formFieldMap);
         }
       }
@@ -93,10 +127,24 @@ function annotateItems(items, formDefinition, formFieldMap) {
 
 export function annotateFormForEditing(formEl, formDefinition) {
   if (document.documentElement.classList.contains('adobe-ue-edit')) {
+    const block = formEl.closest('.block[data-aue-resource]');
+    if (block) {
+      block.setAttribute('data-aue-filter', 'form');
+    }
     formEl.classList.add('edit-mode');
   }
   const formFieldMap = {};
   annotateItems(formEl.childNodes, formDefinition, formFieldMap);
+}
+
+function handleWizardNavigation(wizardEl, navigateTo) {
+  const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
+  existingSelectedEl.classList.remove('current-wizard-step');
+  navigateTo.classList.add('current-wizard-step');
+  const navigateToMenuItem = wizardEl.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
+  const currentMenuItem = wizardEl.querySelector('.wizard-menu-active-item');
+  currentMenuItem.classList.remove('wizard-menu-active-item');
+  navigateToMenuItem.classList.add('wizard-menu-active-item');
 }
 
 /**
@@ -107,16 +155,14 @@ function handleEditorSelect(event) {
     const wizardEl = event.target.closest('.wizard');
     const { resource } = event.detail;
     const el = wizardEl.querySelector(`[data-aue-resource='${resource}']`);
-    const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
-    existingSelectedEl.classList.remove('current-wizard-step');
     if (el.hasAttribute('data-index')) {
-      // if selected element is the direct chld of wizard
-      el.classList.add('current-wizard-step');
+      // if selected element is the direct child of wizard
+      handleWizardNavigation(wizardEl, el);
     } else {
-      wizardEl.children.forEach((child) => {
+      Array.from(wizardEl.children).forEach((child) => {
         const isElPresentUnderChild = child.querySelector(`[data-aue-resource='${resource}']`);
         if (isElPresentUnderChild) {
-          child.classList.add('current-wizard-step');
+          handleWizardNavigation(wizardEl, child);
         }
       });
     }
@@ -190,12 +236,18 @@ async function applyChanges(event) {
         const jsonContent = codeEl?.textContent;
         if (jsonContent) {
           const formDef = decode(jsonContent);
+          let panelLabel;
           if (element.classList.contains('panel-wrapper')) {
             element = element.parentNode;
+            panelLabel = element.querySelector('legend');
           }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
-          parent.replaceChildren();
+          if (parent.classList.contains('panel-wrapper') && panelLabel) {
+            parent.replaceChildren(panelLabel);
+          } else {
+            parent.replaceChildren();
+          }
           await generateFormRendition(parentDef, parent, getItems);
           annotateItems(parent.childNodes, formDef, {});
           return true;
