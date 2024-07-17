@@ -29,7 +29,6 @@ const data = {
   ],
 };
 
-
 export function before() {
   const headers = new Headers();
   headers.set('Content-Type', 'application/json');
