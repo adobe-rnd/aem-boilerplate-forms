@@ -18,8 +18,9 @@
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
 import { registerFunctions } from './model/afb-runtime.js';
+import decorate from '../functions.js';
 
-export default async function registerCustomFunctions() {
+export default async function registerCustomFunctions(id) {
   try {
     // eslint-disable-next-line no-inner-declarations
     function registerFunctionsInRuntime(module) {
@@ -36,8 +37,11 @@ export default async function registerCustomFunctions() {
       }
     }
 
-    const customFunctionModule = await import('../functions.js');
+    // const customFunctionModule = await import('../functions.js');
     const ootbFunctionModule = await import('./functions.js');
+    const customFunctionPath = decorate(id);
+    const customFunctionModule = await import(`${customFunctionPath}`);
+
     registerFunctionsInRuntime(ootbFunctionModule);
     registerFunctionsInRuntime(customFunctionModule);
   } catch (e) {
