@@ -16,3 +16,4 @@ executeTestInFolder('./test/unit/fixtures/doc-based-submit/', testDynamism, true
 executeTestInFolder('./test/unit/fixtures/prefill/', testDynamism);
 executeTestInFolder('./test/unit/fixtures/docForms/', testDynamism, true);
 executeTestInFolder('./test/unit/fixtures/form-fetch/', testFormFetch);
+executeTestInFolder('./test/unit/fixtures/form-embed/', testFormFetch);
