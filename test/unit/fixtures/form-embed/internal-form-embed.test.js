@@ -1,7 +1,7 @@
 import assert from 'assert';
+import { JSDOM } from 'jsdom';
 import { createBlockWithUrl } from '../../testUtils.js';
 import { fetchForm } from '../../../../blocks/form/form.js';
-import {JSDOM} from "jsdom";
 
 const data = {
   id: 'someid',
@@ -29,7 +29,6 @@ const data = {
   ],
 };
 
-let doc;
 
 export function before() {
   const headers = new Headers();
@@ -37,7 +36,7 @@ export function before() {
 
   const dom = new JSDOM('', { url: 'http://localhost:3000' });
   global.window = dom.window;
-  doc = createBlockWithUrl(data, 'http://localhost:3000/adobe/forms/myform.html');
+  createBlockWithUrl(data, 'http://localhost:3000/adobe/forms/myform.html');
 }
 
 export const formPath = 'http://localhost:3000/adobe/forms/myform.html';
