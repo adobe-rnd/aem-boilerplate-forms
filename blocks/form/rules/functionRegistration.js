@@ -18,8 +18,7 @@
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
 import { registerFunctions } from './model/afb-runtime.js';
-import decorate from '../functions.js';
-import getCustomFunctionPath from "../functions.js";
+import getCustomFunctionPath from '../functions.js';
 
 export default async function registerCustomFunctions(id) {
   try {
