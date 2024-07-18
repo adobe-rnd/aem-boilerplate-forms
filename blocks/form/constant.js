@@ -30,6 +30,6 @@ export function getSubmitBaseUrl() {
 }
 
 export const formIdPathMapping = {
-  L2NvbnRlbnQvZm9ybXMvYWYvcmFlL2Yx: '../../../myforms/f1/functions.js',
-  L2NvbnRlbnQvZm9ybXMvYWYvcmFlL2Yy: '../../../myforms/f2/functions.js',
+  '/content/forms/af/rae/f1': '../../../myforms/f1/functions.js',
+  '/content/forms/af/rae/f2': '../../../myforms/f2/functions.js',
 };

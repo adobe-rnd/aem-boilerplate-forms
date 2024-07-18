@@ -1,5 +1,5 @@
 import { formIdPathMapping } from './constant.js';
 
 export default function decorate(id) {
-  return formIdPathMapping ? formIdPathMapping[id] : null;
+  return id ? formIdPathMapping[atob(id)] : null;
 }
