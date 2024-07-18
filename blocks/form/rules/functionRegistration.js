@@ -19,6 +19,7 @@
  ************************************************************************ */
 import { registerFunctions } from './model/afb-runtime.js';
 import decorate from '../functions.js';
+import getCustomFunctionPath from "../functions.js";
 
 export default async function registerCustomFunctions(id) {
   try {
@@ -37,12 +38,10 @@ export default async function registerCustomFunctions(id) {
       }
     }
 
-    // const customFunctionModule = await import('../functions.js');
     const ootbFunctionModule = await import('./functions.js');
-    const customFunctionPath = decorate(id);
-    const customFunctionModule = await import(`${customFunctionPath}`);
-
     registerFunctionsInRuntime(ootbFunctionModule);
+    const customFunctionPath = getCustomFunctionPath(id);
+    const customFunctionModule = await import(`${customFunctionPath}`);
     registerFunctionsInRuntime(customFunctionModule);
   } catch (e) {
     console.log(`error occured while registering custom functions in web worker ${e.message}`);
