@@ -31,6 +31,7 @@ test.describe('test cases prefill', async () => {
     await expect(page.getByLabel('Name')).toHaveValue(petName);
     expect(await page.getByLabel('id').inputValue()).toBe(id);
     await expect(page.locator(dropDownSelector)).toHaveValue(status);
+    // Upon hitting the button the page will be redirecting to EDS Pre-fill Form.
     await page.getByRole('button', { name: 'Button' }).click();
     // eslint-disable-next-line no-use-before-define
     await setSubmitBaseUrl(page);
