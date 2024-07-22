@@ -174,8 +174,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'activeChild': handleActiveChild(activeChild, form);
         break;
       case 'valid':
-        if (currentValue === true) {
-          updateOrCreateInvalidMsg(field, '');
+        if (currentValue === true && field.validity.customError) {
+          field.setCustomValidity(''); // reset customError in validity
         }
         break;
       default:
