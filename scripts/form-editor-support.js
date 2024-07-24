@@ -209,7 +209,7 @@ function decode(rawContent) {
   return JSON.parse(cleanUp(content));
 }
 
-async function applyChanges(event) {
+export async function applyChanges(event) {
   // redecorate default content and blocks on patches (in the properties rail)
   const { detail } = event;
 

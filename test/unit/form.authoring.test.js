@@ -2,9 +2,13 @@
 import assert from 'assert';
 import path from 'path';
 import fs from 'fs';
-import { annotateFormForEditing, getItems, getFieldById } from '../../scripts/form-editor-support.js';
+import {
+  annotateFormForEditing, getItems, getFieldById, applyChanges,
+} from '../../scripts/form-editor-support.js';
 import { generateFormRendition } from '../../blocks/form/form.js';
 import { ueFormDef } from './forms/universaleditorform.js';
+import { ueAddEvent } from './fixtures/ue/events/add-event.js';
+import { ueFormDefForAddTest } from './fixtures/ue/events/formdefinition.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
   it('test form annotation for UE', async () => {
@@ -105,5 +109,36 @@ describe('Universal Editor Authoring Test Cases', () => {
     } catch (err) {
       assert.equal(true, false, err);
     }
+  });
+
+  it('test UE add event', async () => {
+    document.documentElement.classList.add('adobe-ue-edit');
+    const mainEl = document.createElement('main');
+    const divInsideMain = document.createElement('div');
+    const formWrapperDiv = document.createElement('div');
+    formWrapperDiv.classList.add('form-wrapper');
+    const formBlockDiv = document.createElement('div');
+    formBlockDiv.classList.add('block');
+    formBlockDiv.classList.add('form');
+    formBlockDiv.dataset.aueResource = `urn:aemconnection:${ueFormDefForAddTest.properties['fd:path']}`;
+    formBlockDiv.dataset.aueModel = 'form';
+    const div1 = document.createElement('div');
+    const div2 = document.createElement('div');
+    div1.appendChild(div2);
+    formBlockDiv.appendChild(div1);
+    formWrapperDiv.appendChild(formBlockDiv);
+    divInsideMain.appendChild(formWrapperDiv);
+    const formEl = document.createElement('form');
+    formEl.dataset.id = ueFormDefForAddTest.id;
+    div2.appendChild(formEl);
+    mainEl.appendChild(divInsideMain);
+    await generateFormRendition(ueFormDefForAddTest, formEl, getItems);
+    annotateFormForEditing(formEl, ueFormDefForAddTest);
+    document.body.appendChild(mainEl);
+    const applied = await applyChanges({ detail: ueAddEvent });
+    assert.equal(applied, true);
+    assert.equal(formEl.childNodes.length, 1);
+    const panel = formEl.querySelector('.panel-wrapper');
+    assert.equal(panel.childNodes.length, 2); // 1 legend and other new panel added
   });
 });
