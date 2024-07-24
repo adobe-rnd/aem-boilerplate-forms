@@ -3,7 +3,8 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import * as dom from 'dom-compare';
-import decorate, { DELAY_MS } from '../../blocks/form/form.js';
+import decorate, { DELAY_MS, generateFormRendition } from '../../blocks/form/form.js';
+import { annotateFormForEditing, getItems } from '../../scripts/form-editor-support.js';
 import { resetIds } from '../../blocks/form/util.js';
 import { getCustomComponents, setCustomComponents } from '../../blocks/form/mappings.js';
 
@@ -208,4 +209,30 @@ export function testFormFetch(filePath) {
     }
     await test(null, before, op, expect, opDelay, after);
   });
+}
+
+export async function renderForm(formDef) {
+  document.documentElement.classList.add('adobe-ue-edit');
+  const mainEl = document.createElement('main');
+  const divInsideMain = document.createElement('div');
+  const formWrapperDiv = document.createElement('div');
+  formWrapperDiv.classList.add('form-wrapper');
+  const formBlockDiv = document.createElement('div');
+  formBlockDiv.classList.add('block');
+  formBlockDiv.classList.add('form');
+  formBlockDiv.dataset.aueResource = `urn:aemconnection:${formDef.properties['fd:path']}`;
+  formBlockDiv.dataset.aueModel = 'form';
+  const div1 = document.createElement('div');
+  const div2 = document.createElement('div');
+  div1.appendChild(div2);
+  formBlockDiv.appendChild(div1);
+  formWrapperDiv.appendChild(formBlockDiv);
+  divInsideMain.appendChild(formWrapperDiv);
+  const formEl = document.createElement('form');
+  formEl.dataset.id = formDef.id;
+  div2.appendChild(formEl);
+  mainEl.appendChild(divInsideMain);
+  await generateFormRendition(formDef, formEl, getItems);
+  annotateFormForEditing(formEl, formDef);
+  document.body.appendChild(mainEl);
 }
