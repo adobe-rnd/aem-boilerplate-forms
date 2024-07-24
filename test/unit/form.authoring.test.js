@@ -7,8 +7,11 @@ import {
 } from '../../scripts/form-editor-support.js';
 import { generateFormRendition } from '../../blocks/form/form.js';
 import { ueFormDef } from './forms/universaleditorform.js';
-import { ueAddEvent } from './fixtures/ue/events/add-event.js';
-import { ueFormDefForAddTest } from './fixtures/ue/events/formdefinition.js';
+import { ueAddEvent } from './fixtures/ue/events/event-add.js';
+import { uePatchEvent } from './fixtures/ue/events/event-patch.js';
+import { ueFormDefForAddTest } from './fixtures/ue/events/formdefinition-add.js';
+import { ueFormDefForPatchTest } from './fixtures/ue/events/formdefinition-patch.js';
+import { renderForm } from './testUtils.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
   it('test form annotation for UE', async () => {
@@ -112,33 +115,32 @@ describe('Universal Editor Authoring Test Cases', () => {
   });
 
   it('test UE add event', async () => {
-    document.documentElement.classList.add('adobe-ue-edit');
-    const mainEl = document.createElement('main');
-    const divInsideMain = document.createElement('div');
-    const formWrapperDiv = document.createElement('div');
-    formWrapperDiv.classList.add('form-wrapper');
-    const formBlockDiv = document.createElement('div');
-    formBlockDiv.classList.add('block');
-    formBlockDiv.classList.add('form');
-    formBlockDiv.dataset.aueResource = `urn:aemconnection:${ueFormDefForAddTest.properties['fd:path']}`;
-    formBlockDiv.dataset.aueModel = 'form';
-    const div1 = document.createElement('div');
-    const div2 = document.createElement('div');
-    div1.appendChild(div2);
-    formBlockDiv.appendChild(div1);
-    formWrapperDiv.appendChild(formBlockDiv);
-    divInsideMain.appendChild(formWrapperDiv);
-    const formEl = document.createElement('form');
-    formEl.dataset.id = ueFormDefForAddTest.id;
-    div2.appendChild(formEl);
-    mainEl.appendChild(divInsideMain);
-    await generateFormRendition(ueFormDefForAddTest, formEl, getItems);
-    annotateFormForEditing(formEl, ueFormDefForAddTest);
-    document.body.appendChild(mainEl);
+    await renderForm(ueFormDefForAddTest);
+    window.hlx.codeBasePath = '../../';
     const applied = await applyChanges({ detail: ueAddEvent });
     assert.equal(applied, true);
-    assert.equal(formEl.childNodes.length, 1);
+    const formEl = document.querySelector('form');
+    assert.equal(formEl.childNodes.length, 1); // only 1 panel is there
     const panel = formEl.querySelector('.panel-wrapper');
-    assert.equal(panel.childNodes.length, 2); // 1 legend and other new panel added
+    // 1 legend + wizard menu item + panel + wizard button wrapper
+    assert.equal(panel.childNodes.length, 4);
+    document.body.replaceChildren();
+  });
+
+  it('test UE patch event', async () => {
+    await renderForm(ueFormDefForPatchTest);
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: uePatchEvent });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    assert.equal(formEl.childNodes.length, 1); // only 1 panel is there
+    const panel = formEl.querySelector('.panel-wrapper');
+    // 1 legend + wizard menu item + panel + wizard button wrapper
+    assert.equal(panel.childNodes.length, 4);
+    const labelEl = panel.querySelector('legend[for="panelcontainer-215d71f184"]');
+    assert.equal(labelEl.textContent, 'Panel new');
+    const wizardMenuItems = panel.querySelectorAll('.wizard-menu-item');
+    assert.equal(wizardMenuItems.length, 1);
+    document.body.replaceChildren();
   });
 });
