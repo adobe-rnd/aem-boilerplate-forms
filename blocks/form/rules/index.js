@@ -323,6 +323,8 @@ export function subscribe(fieldDiv, callback, updateFormModelCallback) {
   }
   if (updateFormModelCallback) {
     fieldDiv.dataset.updateFormModel = true;
-    document?.addEventListener('updateFormModel', updateFormModelCallback(fieldDiv, formModel));
+    fieldDiv.addEventListener('updateFormModel', () => {
+      updateFormModelCallback(fieldDiv, formModel);
+    });
   }
 }

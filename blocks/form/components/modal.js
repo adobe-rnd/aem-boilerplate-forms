@@ -7,11 +7,6 @@ export default async function decorate(panel) {
     if (formModel?.getElement(fieldDiv?.dataset?.id).visible === true) {
       modal.showModal();
     }
-    panel.addEventListener('updateFormModel', () => {
-      if (formModel) {
-        formModel.getElement(fieldDiv.dataset.id).visible = false;
-      }
-    });
   }, (fieldDiv, formModel) => {
     console.log('updateFormModelCallback invoked');
     if (formModel) {
