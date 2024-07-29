@@ -309,7 +309,7 @@ export async function initAdaptiveForm(formDef, createForm) {
   return form;
 }
 
-export function subscribe(fieldDiv, callback) {
+export function subscribe(fieldDiv, callback, updateModelCallback) {
   if (callback) {
     fieldDiv.dataset.subscribe = true;
     const observer = new MutationObserver((mutationsList) => {

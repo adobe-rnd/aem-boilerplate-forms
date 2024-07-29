@@ -2,10 +2,6 @@ import {
   buildBlock, decorateBlock, decorateIcons, loadBlock, loadCSS,
 } from '../../scripts/aem.js';
 
-// This is not a traditional block, so there is no decorate function. Instead, links to
-// a */modals/* path  are automatically transformed into a modal. Other blocks can also use
-// the createModal() and openModal() functions.
-
 // eslint-disable-next-line import/prefer-default-export
 export async function createModal(panel) {
   await loadCSS(`${window.hlx.codeBasePath}/blocks/modal/modal.css`);
@@ -22,6 +18,8 @@ export async function createModal(panel) {
   closeButton.innerHTML = '<span class="icon icon-close"></span>';
   closeButton.addEventListener('click', () => {
     dialog.close();
+    const closeModalEvent = new Event('close-modal', { bubbles: true });
+    dialog.dispatchEvent(closeModalEvent);
   });
   dialog.append(closeButton);
 
@@ -42,7 +40,6 @@ export async function createModal(panel) {
 
   dialog.addEventListener('close', () => {
     document.body.classList.remove('modal-open');
-    // block.remove();
   });
 
   block.append(dialog);
