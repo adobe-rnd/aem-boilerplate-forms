@@ -9,7 +9,9 @@ export default async function decorate(panel) {
       modal.showModal();
     }
   }, (fieldDiv, formModel) => {
-    formModel.getElement(fieldDiv.dataset.id).visible = false;
+    if (formModel) {
+      formModel.getElement(fieldDiv.dataset.id).visible = false;
+    }
   });
   return modal.block;
 }

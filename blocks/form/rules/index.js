@@ -25,7 +25,7 @@ import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
 import initializeRuleEngineWorker from './worker.js';
 
-let formModel = {};
+let formModel = null;
 
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
