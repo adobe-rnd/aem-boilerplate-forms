@@ -191,6 +191,25 @@
         "fields": [
             {
                 "component": "select",
+                "name": "thankYouOption",
+                "label": "On Submit",
+                "valueType": "string",
+                "options": [
+                    {
+                        "name": "Show message",
+                        "value": "message"
+                    }
+                ]
+            },
+            {
+                "component": "richtext",
+                "name": "thankYouMessage",
+                "label": "Message Content",
+                "valueType": "string",
+                "condition": { "==": [{ "var": "thankYouOption" }, "message"] }
+            },
+            {
+                "component": "select",
                 "valueType": "string",
                 "name": "actionType",
                 "label": "Submit Action",
@@ -205,6 +224,13 @@
                     }
                 ],
                 "value" : ""
+            },
+            {
+                "component": "boolean",
+                "name": "enableRestEndpointPost",
+                "label": "Enable POST request",
+                "valueType": "string",
+                "condition": { "==": [{ "var": "actionType" }, "fd/af/components/guidesubmittype/restendpoint"] }
             },
             {
                 "component": "text",
