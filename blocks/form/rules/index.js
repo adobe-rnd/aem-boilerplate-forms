@@ -25,7 +25,7 @@ import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
 import initializeRuleEngineWorker from './worker.js';
 
-let formModel = {}
+let formModel = {};
 
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
@@ -309,16 +309,20 @@ export async function initAdaptiveForm(formDef, createForm) {
   return form;
 }
 
-export function subscribe(fieldDiv, callback, updateModelCallback) {
+export function subscribe(fieldDiv, callback, updateFormModelCallback) {
   if (callback) {
     fieldDiv.dataset.subscribe = true;
     const observer = new MutationObserver((mutationsList) => {
       mutationsList?.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'data-field-model') {
-          callback(fieldDiv, JSON.parse(fieldDiv.dataset.fieldModel), formModel);
+          callback(fieldDiv, JSON.parse(fieldDiv.dataset.fieldModel));
         }
       });
     });
     observer.observe(fieldDiv, { attributes: true });
+  }
+  if (updateFormModelCallback) {
+    fieldDiv.dataset.updateFormModel = true;
+    document.addEventListener('updateFormModel', updateFormModelCallback(fieldDiv, formModel));
   }
 }
