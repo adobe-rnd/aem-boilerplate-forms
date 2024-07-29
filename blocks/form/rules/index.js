@@ -323,6 +323,6 @@ export function subscribe(fieldDiv, callback, updateFormModelCallback) {
   }
   if (updateFormModelCallback) {
     fieldDiv.dataset.updateFormModel = true;
-    fieldDiv.addEventListener('updateFormModel', updateFormModelCallback(fieldDiv, formModel));
+    fieldDiv?.parentElement?.addEventListener('updateFormModel', updateFormModelCallback(fieldDiv, formModel));
   }
 }
