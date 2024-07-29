@@ -8,6 +8,7 @@ export default async function decorate(panel) {
       modal.showModal();
     }
   }, (fieldDiv, formModel) => {
+    console.log('updateFormModelCallback invoked');
     if (formModel) {
       formModel.getElement(fieldDiv.dataset.id).visible = false;
     }
