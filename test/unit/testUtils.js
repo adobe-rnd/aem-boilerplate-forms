@@ -3,8 +3,10 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import * as dom from 'dom-compare';
-import decorate, { DELAY_MS } from '../../blocks/form/form.js';
+import decorate, { DELAY_MS, generateFormRendition } from '../../blocks/form/form.js';
+import { annotateFormForEditing, getItems } from '../../scripts/form-editor-support.js';
 import { resetIds } from '../../blocks/form/util.js';
+import { getCustomComponents, setCustomComponents } from '../../blocks/form/mappings.js';
 
 function escapeHTML(str) {
   return (str.replace(/[&<>'"]/g, (tag) => ({
@@ -51,7 +53,7 @@ function createElementFromHTML(htmlString, fieldDef) {
   return form;
 }
 
-export function testBasicMarkup(filePath, bUrlMode = false) {
+export function testBasicMarkup(filePath, bUrlMode = false, customComponents = [], codeBasePath = '../..') {
   it(`Rendering of ${filePath?.substr(filePath.lastIndexOf('/') + 1)}`, async () => {
     resetIds();
     const module = await import(filePath);
@@ -70,18 +72,21 @@ export function testBasicMarkup(filePath, bUrlMode = false) {
     if (bUrlMode && !formPath) {
       assert.equal(true, false, 'formpath is not defined');
     }
+    const oldCustomComponents = getCustomComponents();
+    window.hlx = { codeBasePath };
+    setCustomComponents(customComponents);
     const block = bUrlMode ? createBlockWithUrl(fieldDef, `${formPath}`) : createBlock(fieldDef);
     if (fieldDef && markUp) {
       await decorate(block);
       const form = block.querySelector('form');
-      // console.log('----------Actual----------');
-      // console.log(form.outerHTML);
-      // console.log('----------Expected----------');
-      // console.log(createElementFromHTML(markUp, fieldDef));
+      console.log('----------Actual----------');
+      console.log(form.outerHTML);
+      console.log('----------Expected----------');
+      console.log(createElementFromHTML(markUp, fieldDef).outerHTML);
       const result = dom.default.compare(createElementFromHTML(markUp, fieldDef), form);
       const differences = result.getDifferences();
-      // console.log('---------diff--------');
-      // console.log(differences);
+      console.log('---------diff--------');
+      console.log(differences);
       if (Array.isArray(expectedDiffs)) {
         assert.equal(differences.length, Array.isArray(expectedDiffs) ? expectedDiffs.length : expectedDiffs, 'Number of differences do not match expected differences');
         const computedDiffs = differences.map((d) => {
@@ -105,6 +110,7 @@ export function testBasicMarkup(filePath, bUrlMode = false) {
         extraChecks.forEach((check) => check(form));
       }
     }
+    setCustomComponents(oldCustomComponents);
   });
 }
 
@@ -203,4 +209,30 @@ export function testFormFetch(filePath) {
     }
     await test(null, before, op, expect, opDelay, after);
   });
+}
+
+export async function renderForm(formDef) {
+  document.documentElement.classList.add('adobe-ue-edit');
+  const mainEl = document.createElement('main');
+  const divInsideMain = document.createElement('div');
+  const formWrapperDiv = document.createElement('div');
+  formWrapperDiv.classList.add('form-wrapper');
+  const formBlockDiv = document.createElement('div');
+  formBlockDiv.classList.add('block');
+  formBlockDiv.classList.add('form');
+  formBlockDiv.dataset.aueResource = `urn:aemconnection:${formDef.properties['fd:path']}`;
+  formBlockDiv.dataset.aueModel = 'form';
+  const div1 = document.createElement('div');
+  const div2 = document.createElement('div');
+  div1.appendChild(div2);
+  formBlockDiv.appendChild(div1);
+  formWrapperDiv.appendChild(formBlockDiv);
+  divInsideMain.appendChild(formWrapperDiv);
+  const formEl = document.createElement('form');
+  formEl.dataset.id = formDef.id;
+  div2.appendChild(formEl);
+  mainEl.appendChild(divInsideMain);
+  await generateFormRendition(formDef, formEl, getItems);
+  annotateFormForEditing(formEl, formDef);
+  document.body.appendChild(mainEl);
 }

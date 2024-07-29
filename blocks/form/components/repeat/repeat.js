@@ -1,4 +1,4 @@
-import { getId } from '../util.js';
+import { getId } from '../../util.js';
 
 function update(fieldset, index, labelTemplate) {
   const legend = fieldset.querySelector(':scope>.field-label')?.firstChild;
