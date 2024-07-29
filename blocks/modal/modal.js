@@ -18,7 +18,7 @@ export async function createModal(panel) {
   closeButton.innerHTML = '<span class="icon icon-close"></span>';
   closeButton.addEventListener('click', () => {
     dialog.close();
-    panel.dispatchEvent(new Event('updateFormModel'));
+    panel.dispatchEvent(new Event('updateFormModel', { bubbles: true }));
   });
   dialog.append(closeButton);
 
