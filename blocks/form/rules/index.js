@@ -25,6 +25,8 @@ import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
 import initializeRuleEngineWorker from './worker.js';
 
+let formModel = {}
+
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
   el.toggleAttribute('aria-readonly', value === true);
@@ -260,7 +262,7 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data);
   window.myForm = form;
-
+  formModel = form;
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'fieldChanged');
@@ -305,4 +307,18 @@ export async function initAdaptiveForm(formDef, createForm) {
     data,
   }, createForm);
   return form;
+}
+
+export function subscribe(fieldDiv, callback) {
+  if (callback) {
+    fieldDiv.dataset.subscribe = true;
+    const observer = new MutationObserver((mutationsList) => {
+      mutationsList?.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-field-model') {
+          callback(fieldDiv, JSON.parse(fieldDiv.dataset.fieldModel), formModel);
+        }
+      });
+    });
+    observer.observe(fieldDiv, { attributes: true });
+  }
 }
