@@ -1,5 +1,5 @@
 import { createModal } from '../../modal/modal.js';
-import { subscribe } from '../util.js';
+import { subscribe } from '../rules/index.js';
 
 const handleMutation = (modal, mutations) => {
   mutations.forEach((mutation) => {
@@ -23,11 +23,11 @@ const attachMutationObserver = (modal) => {
 
 export default async function decorate(panel) {
   const modal = await createModal(panel);
-  attachMutationObserver(modal);
-  // subscribe(panel, (fieldDiv, fieldModel) => {
-  //   if (fieldModel?.visible === true) {
-  //     modal.showModal();
-  //   }
-  // });
+  // attachMutationObserver(modal);
+  subscribe(panel, (fieldDiv, fieldModel, formModel) => {
+    if (formModel.getElement(fieldDiv.dataset.id)?.visible === true) {
+      modal.showModal();
+    }
+  });
   return modal.block;
 }
