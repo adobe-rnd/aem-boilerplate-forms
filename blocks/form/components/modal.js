@@ -4,8 +4,7 @@ import { subscribe } from '../rules/index.js';
 export default async function decorate(panel) {
   const modal = await createModal(panel);
   subscribe(panel, (fieldDiv, fieldModel, formModel) => {
-    const { visible } = formModel.getElement(fieldDiv.dataset.id);
-    if (visible === true) {
+    if (formModel?.getElement(fieldDiv?.dataset?.id).visible === true) {
       modal.showModal();
     }
   }, (fieldDiv, formModel) => {
