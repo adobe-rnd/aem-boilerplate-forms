@@ -315,7 +315,7 @@ export function subscribe(fieldDiv, callback, updateFormModelCallback) {
     const observer = new MutationObserver((mutationsList) => {
       mutationsList?.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'data-field-model') {
-          callback(fieldDiv, JSON.parse(fieldDiv.dataset.fieldModel));
+          callback(fieldDiv, JSON.parse(fieldDiv.dataset.fieldModel), formModel);
         }
       });
     });
