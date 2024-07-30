@@ -403,6 +403,20 @@
                         "label": "Maximum Value",
                         "valueType": "number",
                         "description": "Maximum length of the text in the field"
+                    },
+                    {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error message",
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty."
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
                     }
                 ]
             }
@@ -527,6 +541,20 @@
                         "label": "Maximum Value",
                         "valueType": "number",
                         "description": "Maximum length of the text in the field"
+                    },
+                    {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error message",
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty."
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
                     }
                 ]
             },
@@ -671,6 +699,20 @@
                         "label": "Maximum Value",
                         "valueType": "number",
                         "description": "Maximum length of the text in the field"
+                    },
+                    {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error message",
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty."
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
                     }
                 ]
             }
@@ -774,7 +816,15 @@
                         "component": "text",
                         "name": "mandatoryMessage",
                         "label": "Error message",
-                        "valueType": "string"
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty."
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
                     },
                     {
                         "component": "number",
@@ -1147,6 +1197,13 @@
                         "label": "Error Message",
                         "valueType": "string",
                         "description": "Error message shown when required field is left empty"
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
                     }
                 ]
             },
@@ -1298,6 +1355,13 @@
                         "label": "Error Message",
                         "valueType": "string",
                         "description": "Error message shown when required field is left empty"
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
                     }
                 ]
             }
@@ -1459,6 +1523,13 @@
                         "label": "Error Message",
                         "valueType": "string",
                         "description": "Error message shown when required field is left empty"
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
                     }
                 ]
             }
@@ -1602,6 +1673,20 @@
                         "label": "Maximum Number of characters",
                         "valueType": "number",
                         "description": "Maximum Number of characters"
+                    },
+                    {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error message",
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty."
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
                     }
                 ]
             }
