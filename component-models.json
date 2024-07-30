@@ -391,11 +391,25 @@
                         "valueType": "boolean"
                     },
                     {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error message",
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty."
+                    },
+                    {
                         "component": "number",
                         "name": "minimum",
                         "label": "Minimum Value",
                         "valueType": "number",
                         "description": "Minimum length of the text in the field"
+                    },
+                    {
+                        "component": "text",
+                        "name": "minLengthMessage",
+                        "valueType": "string",
+                        "label": "Minimum characters error message",
+                        "description": "Error message shown when less than minimum characters are entered."
                     },
                     {
                         "component": "number",
@@ -406,10 +420,10 @@
                     },
                     {
                         "component": "text",
-                        "name": "mandatoryMessage",
-                        "label": "Error message",
+                        "name": "maxLengthMessage",
                         "valueType": "string",
-                        "description": "Error message shown when required field is left empty."
+                        "label": "Maximum characters error message",
+                        "description": "Error message shown when more than maximum characters are entered."
                     },
                     {
                         "component": "text",
@@ -417,6 +431,20 @@
                         "label": "Script validation message",
                         "valueType": "string",
                         "description": "Displayed when validation script fails."
+                    },
+                    {
+                        "component": "text",
+                        "name": "pattern",
+                        "valueType": "string",
+                        "label": "Pattern",
+                        "description": "Regular Expression is permitted."
+                    },
+                    {
+                        "component": "text",
+                        "name": "validatePictureClauseMessage",
+                        "valueType": "string",
+                        "label": "Pattern Error message",
+                        "description": "Error message shown when the pattern is not matched."
                     }
                 ]
             }
@@ -529,25 +557,41 @@
                         "valueType": "boolean"
                     },
                     {
-                        "component": "number",
-                        "name": "minimum",
-                        "label": "Minimum Value",
-                        "valueType": "number",
-                        "description": "Minimum length of the text in the field"
-                    },
-                    {
-                        "component": "number",
-                        "name": "maximum",
-                        "label": "Maximum Value",
-                        "valueType": "number",
-                        "description": "Maximum length of the text in the field"
-                    },
-                    {
                         "component": "text",
                         "name": "mandatoryMessage",
                         "label": "Error message",
                         "valueType": "string",
                         "description": "Error message shown when required field is left empty."
+                    },
+                    {
+                        "component": "date-time",
+                        "name": "minimumDate",
+                        "label": "Minimum date",
+                        "valueType": "date",
+                        "description": "Minimum date allowed in the field",
+                        "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
+                    },
+                    {
+                        "component": "text",
+                        "name": "minimumMessage",
+                        "valueType": "string",
+                        "label": "Minimum error message",
+                        "description": "Error message shown when the date entered is before the minimum date."
+                    },
+                    {
+                        "component": "date-time",
+                        "name": "maximumDate",
+                        "label": "Maximum date",
+                        "valueType": "date",
+                        "description": "Maximum date allowed in the field",
+                        "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
+                    },
+                    {
+                        "component": "text",
+                        "name": "maximumMessage",
+                        "valueType": "string",
+                        "label": "Maximum error message",
+                        "description": "Error message shown when the date entered is after the maximum date."
                     },
                     {
                         "component": "text",
@@ -687,6 +731,13 @@
                         "valueType": "boolean"
                     },
                     {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error message",
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty."
+                    },
+                    {
                         "component": "number",
                         "name": "minimum",
                         "label": "Minimum Value",
@@ -699,13 +750,6 @@
                         "label": "Maximum Value",
                         "valueType": "number",
                         "description": "Maximum length of the text in the field"
-                    },
-                    {
-                        "component": "text",
-                        "name": "mandatoryMessage",
-                        "label": "Error message",
-                        "valueType": "string",
-                        "description": "Error message shown when required field is left empty."
                     },
                     {
                         "component": "text",
@@ -1661,6 +1705,13 @@
                         "valueType": "boolean"
                     },
                     {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error message",
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty."
+                    },
+                    {
                         "component": "number",
                         "name": "minLength",
                         "label": "Minimum Number of characters",
@@ -1673,13 +1724,6 @@
                         "label": "Maximum Number of characters",
                         "valueType": "number",
                         "description": "Maximum Number of characters"
-                    },
-                    {
-                        "component": "text",
-                        "name": "mandatoryMessage",
-                        "label": "Error message",
-                        "valueType": "string",
-                        "description": "Error message shown when required field is left empty."
                     },
                     {
                         "component": "text",
