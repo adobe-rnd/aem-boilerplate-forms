@@ -35,12 +35,14 @@ export class AddComponentsInUePage {
   componentSelectorValidation(component) {
     return `li[data-resource*="/${component}"] [class="node-content selected"]`;
   }
+
   // eslint-disable-next-line class-methods-use-this
   async addingComponentsInUE(frame, componentName, component) {
     await frame.locator(this.selectors.insertComponent).click();
     await expect(frame.getByLabel('Adaptive Form Components')).toBeVisible();
     expect(await frame.getByLabel('Adaptive Form Components').innerText()).toContain('Text Input');
     await frame.getByLabel(componentName).click();
+    // eslint-disable-next-line max-len
     await expect(frame.locator(this.selectors.adaptiveFormDropdown)).toBeVisible({ timeout: 15000 });
     await expect(frame.locator(`${this.selectors.componentPath + component}"]`)).toBeVisible({ timeout: 20000 });
     await frame.locator(this.selectors.adaptiveFormDropdown).click();

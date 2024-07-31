@@ -1,5 +1,4 @@
 import { test, expect } from '../fixtures.js';
-import { ueSties } from '../main/page/ueSites.page.js';
 // eslint-disable-next-line import/named
 import { AddComponentsInUePage } from '../main/page/addComponentsInUePage.js';
 
