@@ -572,13 +572,6 @@
                         "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
                     },
                     {
-                        "component": "boolean",
-                        "name": "excludeMinimum",
-                        "label": "Exclude minimum date",
-                        "valueType": "boolean",
-                        "description": "Exclude the minimum date from the validation."
-                    },
-                    {
                         "component": "text",
                         "name": "minimumMessage",
                         "valueType": "string",
@@ -592,13 +585,6 @@
                         "valueType": "date",
                         "description": "Maximum date allowed in the field",
                         "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
-                    },
-                    {
-                        "component": "boolean",
-                        "name": "excludeMaximum",
-                        "label": "Exclude maximum date",
-                        "valueType": "boolean",
-                        "description": "Exclude the maximum date from the validation."
                     },
                     {
                         "component": "text",
@@ -759,13 +745,6 @@
                         "description": "Minimum number allowed in the field"
                     },
                     {
-                        "component": "boolean",
-                        "name": "excludeMinimum",
-                        "label": "Exclude minimum value",
-                        "valueType": "boolean",
-                        "description": "Exclude the minimum number from the validation."
-                    },
-                    {
                         "component": "text",
                         "name": "minimumMessage",
                         "valueType": "string",
@@ -778,13 +757,6 @@
                         "label": "Highest number / Largest number",
                         "valueType": "number",
                         "description": "Maximum number allowed in the field"
-                    },
-                    {
-                        "component": "boolean",
-                        "name": "excludeMaximum",
-                        "label": "Exclude maximum value",
-                        "valueType": "boolean",
-                        "description": "Exclude the maximum number from the validation."
                     },
                     {
                         "component": "text",
