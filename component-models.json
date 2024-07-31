@@ -3,7 +3,7 @@
         "id": "title",
         "fields": [
             {
-        	"component": "text",
+                "component": "text",
                 "valueType": "string",
                 "name": "jcr:title",
                 "value": "",
@@ -55,7 +55,7 @@
                 "multi": false
             },
             {
-        	"component": "text",
+                "component": "text",
                 "valueType": "string",
                 "name": "alt",
                 "value": "Default alt",
@@ -64,53 +64,53 @@
         ]
     },
     {
-    "id": "button",
-    "fields": [
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "href",
-        "value": "",
-        "label": "Link"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "text",
-        "value": "",
-        "label": "Text"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "title",
-        "value": "",
-        "label": "Title"
-      },
-      {
-        "component": "select",
-        "name": "type",
-        "value": "",
-        "label": "Type",
-        "valueType": "string",
-        "options": [
-          {
-            "name": "default",
-            "value": ""
-          },
-          {
-            "name": "primary",
-            "value": "primary"
-          },
-          {
-            "name": "secondary",
-            "value": "secondary"
-          }
+        "id": "button",
+        "fields": [
+            {
+                "component": "text",
+                "valueType": "string",
+                "name": "href",
+                "value": "",
+                "label": "Link"
+            },
+            {
+                "component": "text",
+                "valueType": "string",
+                "name": "text",
+                "value": "",
+                "label": "Text"
+            },
+            {
+                "component": "text",
+                "valueType": "string",
+                "name": "title",
+                "value": "",
+                "label": "Title"
+            },
+            {
+                "component": "select",
+                "name": "type",
+                "value": "",
+                "label": "Type",
+                "valueType": "string",
+                "options": [
+                    {
+                        "name": "default",
+                        "value": ""
+                    },
+                    {
+                        "name": "primary",
+                        "value": "primary"
+                    },
+                    {
+                        "name": "secondary",
+                        "value": "secondary"
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  },
-  {
+    },
+    {
         "id": "columns",
         "fields": [
             {
@@ -399,8 +399,8 @@
                     },
                     {
                         "component": "number",
-                        "name": "minimum",
-                        "label": "Minimum Value",
+                        "name": "minLength",
+                        "label": "Minimum number of characters",
                         "valueType": "number",
                         "description": "Minimum length of the text in the field"
                     },
@@ -413,8 +413,8 @@
                     },
                     {
                         "component": "number",
-                        "name": "maximum",
-                        "label": "Maximum Value",
+                        "name": "maxLength",
+                        "label": "Maximum number of characters",
                         "valueType": "number",
                         "description": "Maximum length of the text in the field"
                     },
@@ -572,6 +572,13 @@
                         "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
                     },
                     {
+                        "component": "boolean",
+                        "name": "excludeMinimum",
+                        "label": "Exclude minimum date",
+                        "valueType": "boolean",
+                        "description": "Exclude the minimum date from the validation."
+                    },
+                    {
                         "component": "text",
                         "name": "minimumMessage",
                         "valueType": "string",
@@ -585,6 +592,13 @@
                         "valueType": "date",
                         "description": "Maximum date allowed in the field",
                         "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "excludeMaximum",
+                        "label": "Exclude maximum date",
+                        "valueType": "boolean",
+                        "description": "Exclude the maximum date from the validation."
                     },
                     {
                         "component": "text",
@@ -740,16 +754,44 @@
                     {
                         "component": "number",
                         "name": "minimum",
-                        "label": "Minimum Value",
+                        "label": "Lowest number / Smallest number",
                         "valueType": "number",
-                        "description": "Minimum length of the text in the field"
+                        "description": "Minimum number allowed in the field"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "excludeMinimum",
+                        "label": "Exclude minimum value",
+                        "valueType": "boolean",
+                        "description": "Exclude the minimum number from the validation."
+                    },
+                    {
+                        "component": "text",
+                        "name": "minimumMessage",
+                        "valueType": "string",
+                        "label": "Minimum error message",
+                        "description": "Error message shown when entered value is less than minimum."
                     },
                     {
                         "component": "number",
                         "name": "maximum",
-                        "label": "Maximum Value",
+                        "label": "Highest number / Largest number",
                         "valueType": "number",
-                        "description": "Maximum length of the text in the field"
+                        "description": "Maximum number allowed in the field"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "excludeMaximum",
+                        "label": "Exclude maximum value",
+                        "valueType": "boolean",
+                        "description": "Exclude the maximum number from the validation."
+                    },
+                    {
+                        "component": "text",
+                        "name": "maximumMessage",
+                        "valueType": "string",
+                        "label": "Maximum error message",
+                        "description": "Error message shown when the entered value is more than maximum."
                     },
                     {
                         "component": "text",
@@ -757,6 +799,38 @@
                         "label": "Script validation message",
                         "valueType": "string",
                         "description": "Displayed when validation script fails."
+                    }
+                ]
+            },
+            {
+                "component": "container",
+                "name": "formats",
+                "label": "Formats",
+                "collapsible": true,
+                "fields": [
+                    {
+                        "component": "select",
+                        "label": "Display Format",
+                        "name": "displayFormat",
+                        "valueType": "string",
+                        "options": [
+                            {
+                                "name": "$1,234.21",
+                                "value": "¤#,##0.00"
+                            },
+                            {
+                                "name": "$1234.21",
+                                "value": "()¤####0.00"
+                            },
+                            {
+                                "name": "1,234.210",
+                                "value": "#,###,##0.000"
+                            },
+                            {
+                                "name": "123,421%",
+                                "value": "#,###,##0%"
+                            }
+                        ]
                     }
                 ]
             }
@@ -1719,11 +1793,25 @@
                         "description": "Minimum Number of characters"
                     },
                     {
+                        "component": "text",
+                        "name": "minLengthMessage",
+                        "valueType": "string",
+                        "label": "Minimum error message",
+                        "description": "Error message shown when entered value has less characters than the minimum."
+                    },
+                    {
                         "component": "number",
                         "name": "maxLength",
                         "label": "Maximum Number of characters",
                         "valueType": "number",
                         "description": "Maximum Number of characters"
+                    },
+                    {
+                        "component": "text",
+                        "name": "maxLengthMessage",
+                        "valueType": "string",
+                        "label": "Maximum error message",
+                        "description": "Error message shown when entered value has more characters than the maximum."
                     },
                     {
                         "component": "text",
