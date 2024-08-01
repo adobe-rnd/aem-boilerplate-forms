@@ -55,6 +55,7 @@
       "panel",
       "plain-text",
       "radio-group",
+      "checkbox-group",
       "text-input",
       "wizard"
     ]

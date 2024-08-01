@@ -1346,6 +1346,174 @@
         ]
     },
     {
+        "id": "checkbox-group",
+        "fields": [
+            {
+                "component": "container",
+                "name": "basic",
+                "label": "Basic",
+                "collapsible": false,
+                "fields": [
+                    {
+                        "component": "text",
+                        "name": "name",
+                        "label": "Name",
+                        "valueType": "string",
+                        "required": true
+                    },
+                    {
+                        "component": "text",
+                        "name": "jcr:title",
+                        "label": "Title",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "hideTitle",
+                        "label": "Hide title",
+                        "valueType": "boolean"
+                    },
+                    {
+                        "component": "text",
+                        "name": "enum",
+                        "label": "Options (Data Value)",
+                        "valueType": "string",
+                        "multi": true
+                    },
+                    {
+                        "component": "text",
+                        "name": "enumNames",
+                        "label": "Options (Display Value)",
+                        "valueType": "string",
+                        "multi": true
+                    },
+                    {
+                        "component": "text",
+                        "name": "dataRef",
+                        "label": "Bind reference",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "unboundFormElement",
+                        "label": "Mark as Unbound Form Element",
+                        "valueType": "boolean"
+                    },
+                    {
+                        "component": "select",
+                        "label": "Data type of submitted value",
+                        "name": "type",
+                        "valueType": "string",
+                        "options": [
+                            {
+                                "name": "String",
+                                "value": "string"
+                            },
+                            {
+                                "name": "Boolean",
+                                "value": "boolean"
+                            },
+                            {
+                                "name": "Number",
+                                "value": "number"
+                            }
+                        ]
+                    },
+                    {
+                        "component": "text",
+                        "name": "default",
+                        "label": "Default option",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "radio-group",
+                        "label": "Display Options",
+                        "name": "orientation",
+                        "valueType": "string",
+                        "options": [
+                            {
+                                "name": "Horizontally",
+                                "value": "horizontal"
+                            },
+                            {
+                                "name": "Vertically",
+                                "value": "vertical"
+                            }
+                        ]
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "visible",
+                        "label": "Show Component",
+                        "valueType": "boolean",
+                        "value": true
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "enabled",
+                        "label": "Enable Component",
+                        "valueType": "boolean",
+                        "value": true
+                    },
+                    {
+                        "component": "boolean",
+                        "name": "readOnly",
+                        "label": "Read-only",
+                        "valueType": "boolean"
+                    }
+                ]
+            },
+            {
+                "component": "container",
+                "name": "help",
+                "label": "Help Content",
+                "collapsible": true,
+                "fields": [
+                    {
+                        "component": "richtext",
+                        "name": "description",
+                        "label": "Help text",
+                        "valueType": "string"
+                    },
+                    {
+                        "component": "richtext",
+                        "name": "tooltip",
+                        "label": "Short description",
+                        "valueType": "string"
+                    }
+                ]
+            },
+            {
+                "component": "container",
+                "name": "validation",
+                "label": "Validation",
+                "collapsible": true,
+                "fields": [
+                    {
+                        "component": "boolean",
+                        "name": "required",
+                        "label": "Required",
+                        "valueType": "boolean"
+                    },
+                    {
+                        "component": "text",
+                        "name": "mandatoryMessage",
+                        "label": "Error Message",
+                        "valueType": "string",
+                        "description": "Error message shown when required field is left empty"
+                    },
+                    {
+                        "component": "text",
+                        "name": "validateExpMessage",
+                        "label": "Script validation message",
+                        "valueType": "string",
+                        "description": "Displayed when validation script fails."
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "id": "drop-down",
         "fields": [
             {
