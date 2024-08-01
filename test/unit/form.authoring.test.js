@@ -2,9 +2,16 @@
 import assert from 'assert';
 import path from 'path';
 import fs from 'fs';
-import { annotateFormForEditing, getItems, getFieldById } from '../../scripts/form-editor-support.js';
+import {
+  annotateFormForEditing, getItems, getFieldById, applyChanges,
+} from '../../scripts/form-editor-support.js';
 import { generateFormRendition } from '../../blocks/form/form.js';
 import { ueFormDef } from './forms/universaleditorform.js';
+import { ueAddEvent } from './fixtures/ue/events/event-add.js';
+import { uePatchEvent } from './fixtures/ue/events/event-patch.js';
+import { ueFormDefForAddTest } from './fixtures/ue/events/formdefinition-add.js';
+import { ueFormDefForPatchTest } from './fixtures/ue/events/formdefinition-patch.js';
+import { renderForm } from './testUtils.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
   it('test form annotation for UE', async () => {
@@ -24,6 +31,9 @@ describe('Universal Editor Authoring Test Cases', () => {
       assert.equal(node.dataset.aueResource, `urn:aemconnection:${fd.properties['fd:path']}`, `data-aue-resource not set ${fd.id}`);
       assert.equal(node.dataset.aueModel, auemodel, `data-aue-model not set ${fd.id}`);
       assert.equal(node.dataset.aueLabel, fd.label.value, `data-aue-label not set ${fd.id}`);
+      if (auetype === 'container') {
+        assert.equal(node.dataset.aueFilter, 'form');
+      }
     }
 
     function testPlainTextAnnotation(node, fd, auetype, auemodel) {
@@ -40,7 +50,11 @@ describe('Universal Editor Authoring Test Cases', () => {
         if (node.classList.contains('field-wrapper')) {
           const fd = getFieldById(ueFormDef, node.dataset.id, formFieldMap);
           if (node.classList.contains('panel-wrapper') && !fd.properties['fd:fragment']) {
-            testAnnotation(node, fd, 'container', fd.fieldType);
+            if (fd[':type'] === 'wizard') {
+              testAnnotation(node, fd, 'container', fd[':type']);
+            } else {
+              testAnnotation(node, fd, 'container', fd.fieldType);
+            }
             testChildren(node.childNodes, formDef, fieldMap);
           } else if (fd.properties['fd:fragment'] && node.classList.contains('edit-mode')) {
             testAnnotation(node, fd, 'component', 'form-fragment');
@@ -63,17 +77,24 @@ describe('Universal Editor Authoring Test Cases', () => {
   it('test form component definitions for UE', async () => {
     const definitionFilePath = path.resolve('component-definition.json');
     const modelsFilePath = path.resolve('component-models.json');
+    const filtersFilePath = path.resolve('component-filters.json');
     const componentDefinitions = fs.readFileSync(definitionFilePath, 'utf8');
     const componentModels = fs.readFileSync(modelsFilePath, 'utf8');
+    const filters = fs.readFileSync(filtersFilePath, 'utf8');
     try {
       const definition = JSON.parse(componentDefinitions);
       const componentModelsArray = JSON.parse(componentModels);
+      const filtersArray = JSON.parse(filters);
+      const { components: formComponents } = filtersArray.find((filter) => filter.id === 'form');
       const idsArray = componentModelsArray.map((component) => component.id);
       if (definition) {
         definition?.groups.forEach((group) => {
           if (group.id === 'form-general') {
             group.components.forEach((component) => {
               const cmpId = component.id;
+              if (!formComponents.includes(cmpId)) {
+                throw new Error(`component not present in filter ${component.id}`);
+              }
               const { fieldType } = component.plugins.xwalk.page.template;
               let cmpIdfromFieldType = fieldType;
               if (fieldType === 'image' || fieldType === 'button') {
@@ -91,5 +112,35 @@ describe('Universal Editor Authoring Test Cases', () => {
     } catch (err) {
       assert.equal(true, false, err);
     }
+  });
+
+  it('test UE add event', async () => {
+    await renderForm(ueFormDefForAddTest);
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: ueAddEvent });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    assert.equal(formEl.childNodes.length, 1); // only 1 panel is there
+    const panel = formEl.querySelector('.panel-wrapper');
+    // 1 legend + wizard menu item + panel + wizard button wrapper
+    assert.equal(panel.childNodes.length, 4);
+    document.body.replaceChildren();
+  });
+
+  it('test UE patch event', async () => {
+    await renderForm(ueFormDefForPatchTest);
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: uePatchEvent });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    assert.equal(formEl.childNodes.length, 1); // only 1 panel is there
+    const panel = formEl.querySelector('.panel-wrapper');
+    // 1 legend + wizard menu item + panel + wizard button wrapper
+    assert.equal(panel.childNodes.length, 4);
+    const labelEl = panel.querySelector('legend[for="panelcontainer-215d71f184"]');
+    assert.equal(labelEl.textContent, 'Panel new');
+    const wizardMenuItems = panel.querySelectorAll('.wizard-menu-item');
+    assert.equal(wizardMenuItems.length, 1);
+    document.body.replaceChildren();
   });
 });

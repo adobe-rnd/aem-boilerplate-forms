@@ -1,5 +1,5 @@
-import { updateOrCreateInvalidMsg, stripTags } from '../util.js';
-import { fileAttachmentText, dragDropText, defaultErrorMessages } from '../constant.js';
+import { updateOrCreateInvalidMsg, stripTags } from '../../util.js';
+import { fileAttachmentText, dragDropText, defaultErrorMessages } from '../../constant.js';
 
 const fileSizeRegex = /^(\d*\.?\d+)(\\?(?=[KMGT])([KMGT])(?:i?B)?|B?)$/i;
 

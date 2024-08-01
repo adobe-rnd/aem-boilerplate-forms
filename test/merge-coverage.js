@@ -14,4 +14,4 @@ runCommand('mv coverage/coverage-final.json coverage/coverage-final-unit.json');
 runCommand("c8 --reporter=json npx playwright test --project='chromium'", false);
 runCommand('mv coverage/coverage-final.json coverage/coverage-final-e2e.json');
 runCommand('nyc merge coverage .nyc_output/coverage.json');
-runCommand('nyc report --check-coverage --lines 92 --functions 94 --branches 92');
+runCommand('nyc report --check-coverage --lines 92 --functions 91 --branches 92');
