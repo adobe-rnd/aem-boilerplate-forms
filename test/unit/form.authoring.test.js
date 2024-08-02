@@ -82,9 +82,9 @@ describe('Universal Editor Authoring Test Cases', () => {
     const componentModels = fs.readFileSync(modelsFilePath, 'utf8');
     const filters = fs.readFileSync(filtersFilePath, 'utf8');
 
-    const isSorted = (arr) => {
+    const isSorted = (arr, property) => {
       const arrCopy = [...arr];
-      arrCopy.sort((a, b) => a.title.localeCompare(b.title));
+      arrCopy.sort((a, b) => a[property].localeCompare(b[property]));
       return JSON.stringify(arr) === JSON.stringify(arrCopy);
     };
 
@@ -94,10 +94,15 @@ describe('Universal Editor Authoring Test Cases', () => {
       const filtersArray = JSON.parse(filters);
       const { components: formComponents } = filtersArray.find((filter) => filter.id === 'form');
       const idsArray = componentModelsArray.map((component) => component.id);
+
+      if (!isSorted(formComponents, 'id')) {
+        throw new Error('components in component-filters.json are not sorted in alphabetical order');
+      }
+
       if (definition) {
         definition?.groups.forEach((group) => {
           if (group.id === 'form-general') {
-            if (!isSorted(group.components)) {
+            if (!isSorted(group.components, 'title')) {
               throw new Error(`components in component-definition.json are not sorted in alphabetical order in ${group.id}`);
             }
             group.components.forEach((component) => {
