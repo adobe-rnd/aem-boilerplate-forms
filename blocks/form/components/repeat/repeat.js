@@ -14,7 +14,9 @@ function update(fieldset, index, labelTemplate) {
     fieldset.querySelectorAll('.field-wrapper').forEach((f) => {
       const [label, input, description] = ['label', 'input,select,button,textarea', 'description']
         .map((x) => f.querySelector(x));
-      input.id = getId(input.name);
+      if (input) {
+        input.id = getId(input.name);
+      }
       if (label) {
         label.htmlFor = input.id;
       }
@@ -83,7 +85,7 @@ function getInstances(el) {
   const siblings = [el];
   while (nextSibling && nextSibling.matches('[data-repeatable="true"]:not([data-repeatable="0"])')) {
     siblings.push(nextSibling);
-    nextSibling = siblings.nextSiblingElement;
+    nextSibling = nextSibling.nextElementSibling;
   }
   return siblings;
 }
