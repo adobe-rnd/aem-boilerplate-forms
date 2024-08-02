@@ -83,7 +83,7 @@ function getInstances(el) {
   const siblings = [el];
   while (nextSibling && nextSibling.matches('[data-repeatable="true"]:not([data-repeatable="0"])')) {
     siblings.push(nextSibling);
-    nextSibling = siblings.nextSiblingElement;
+    nextSibling = nextSibling.nextElementSibling;
   }
   return siblings;
 }
