@@ -643,6 +643,22 @@
                             {
                                 "name": "01 April, 2007",
                                 "value": "d MMMM, y"
+                            },
+                            {
+                                "name": "April 01, 2007",
+                                "value": "MMMM d, y"
+                            },
+                            {
+                                "name": "Sunday, 01 April, 2007",
+                                "value": "EEEE, d MMMM, y"
+                            },
+                            {
+                                "name": "Sunday, April 01, 2007",
+                                "value": "EEEE, MMMM d, y"
+                            },
+                            {
+                                "name": "1/4/2007",
+                                "value": "d/M/y"
                             }
                         ]
                     }
