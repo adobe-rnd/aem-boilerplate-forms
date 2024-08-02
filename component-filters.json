@@ -57,6 +57,7 @@
       "radio-group",
       "checkbox-group",
       "text-input",
+      "telephone-input",
       "wizard"
     ]
   }

@@ -179,6 +179,24 @@
             }
         },
         {
+          "title": "Telephone input",
+          "id": "telephone-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
+                "template": {
+                  "jcr:title": "Telephone Input",
+                  "fieldType": "text-input",
+                  "enabled": true,
+                  "visible": true,
+                  "validationPatternType": "^[+][0-9]{0,14}$"
+                }
+              }
+            }
+          }
+        },
+        {
             "title": "File Attachment",
             "id": "file-input",
             "plugins": {
