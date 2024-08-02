@@ -14,7 +14,9 @@ function update(fieldset, index, labelTemplate) {
     fieldset.querySelectorAll('.field-wrapper').forEach((f) => {
       const [label, input, description] = ['label', 'input,select,button,textarea', 'description']
         .map((x) => f.querySelector(x));
-      input.id = getId(input.name);
+      if (input) {
+        input.id = getId(input.name);
+      }
       if (label) {
         label.htmlFor = input.id;
       }
