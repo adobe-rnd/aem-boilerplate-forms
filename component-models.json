@@ -378,6 +378,12 @@
                     },
                     {
                         "component": "boolean",
+                        "name": "multiLine",
+                        "label": "Allow multiple lines",
+                        "valueType": "boolean"
+                    },
+                    {
+                        "component": "boolean",
                         "name": "unboundFormElement",
                         "label": "Mark as Unbound Form Element",
                         "valueType": "boolean"
