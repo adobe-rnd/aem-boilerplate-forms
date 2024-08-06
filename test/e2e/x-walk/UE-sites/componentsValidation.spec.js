@@ -1,6 +1,6 @@
-import { test, expect } from '../fixtures.js';
+import { test, expect } from '../../fixtures.js';
 // eslint-disable-next-line import/named
-import { AddComponentsInUePage } from '../main/page/addComponentsInUePage.js';
+import { AddComponentsInUePage } from '../../main/page/addComponentsInUePage.js';
 
 // eslint-disable-next-line new-cap
 const addComponentsInUe = new AddComponentsInUePage();
@@ -10,7 +10,7 @@ const component = 'textinput';
 test.describe('todo tests', () => {
   let frame;
   let properties;
-  const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/venky2/index.html';
+  const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/componentValidation/index.html';
   // eslint-disable-next-line no-shadow
   test.beforeEach(async ({ page }) => {
     await page.goto(testURL, { waitUntil: 'load' });

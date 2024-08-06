@@ -1,8 +1,5 @@
 import { chromium, expect } from '@playwright/test';
-// eslint-disable-next-line import/extensions
-//import auth from './env';
 
-//const { userName, password } = auth;
 const userName = process.env.USERNAME;
 const password = process.env.PASSWORD;
 
