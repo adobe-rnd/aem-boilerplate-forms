@@ -21,8 +21,7 @@ test.describe('todo tests', () => {
     expect(await frame.locator(addComponentsInUe.selectors.panelHeaders).innerText()).toBe('Content tree');
     await frame.locator(addComponentsInUe.selectors.mainInContentTree).first().click();
     // eslint-disable-next-line max-len
-    await expect(frame.locator(addComponentsInUe.selectors.experimentation)).toBeVisible({ timeout: 16000 });
-    await expect(frame.locator(addComponentsInUe.selectors.personalization)).toBeVisible();
+    await expect(frame.locator(addComponentsInUe.selectors.ruleEditor)).toBeVisible({ timeout: 15000 });
     const adaptiveForm = frame.locator(addComponentsInUe.componentLocatorForUe(component));
     if (await adaptiveForm.isVisible()) {
       await addComponentsInUe.componentDelete(frame, component);

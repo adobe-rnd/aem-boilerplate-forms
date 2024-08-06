@@ -1,8 +1,11 @@
 import { chromium, expect } from '@playwright/test';
 // eslint-disable-next-line import/extensions
-import auth from './env';
+//import auth from './env';
 
-const { userName, password } = auth;
+//const { userName, password } = auth;
+const userName = process.env.USERNAME;
+const password = process.env.PASSWORD;
+
 const filePath = './LoginAuth.json';
 const baseUrl = 'https://author-p133911-e1313554.adobeaemcloud.com/aem/start.html';
 const usernameInput = 'input[name="username"]';

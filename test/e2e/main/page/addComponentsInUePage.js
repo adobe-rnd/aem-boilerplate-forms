@@ -5,8 +5,7 @@ import { expect } from '../../fixtures.js';
 export class AddComponentsInUePage {
   selectors = {
     contentTreeLabel: '[aria-label="Content tree"]',
-    experimentation: '[aria-label="Experimentation"]',
-    personalization: '[aria-label="Personalization"]',
+    ruleEditor: 'button[aria-label="Rule Editor"]',
     mainInContentTree: 'li > [class*="content expandable collapsed"]',
     componentPath: 'main[class="Canvas"] [data-resource*="/',
     adaptiveFormDropdown: 'li[data-resource*="content/root/section_0/form"] p[class="arrow"]',
