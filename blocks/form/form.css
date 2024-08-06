@@ -437,6 +437,12 @@ main .form form .panel-wrapper{
   gap: var(--form-field-vert-gap) var(--form-field-horz-gap);
 }
 
+main .form form .repeat-wrapper{
+    display: grid;
+    grid-template-columns: repeat(var(--form-columns), minmax(0, 1fr));
+    gap: var(--form-field-vert-gap) var(--form-field-horz-gap);
+}
+
 main .form form .wizard.left .panel-wrapper{
   flex: 1;
 }
