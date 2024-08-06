@@ -7,9 +7,9 @@ import {
   toClassName,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
-import componentDecorater from './mappings.js';
+import componentDecorator from './mappings.js';
 import DocBasedFormToAF from './transform.js';
-import transferRepeatableDOM from './components/repeat.js';
+import transferRepeatableDOM from './components/repeat/repeat.js';
 import { handleSubmit } from './submit.js';
 import { getSubmitBaseUrl, emailPattern } from './constant.js';
 
@@ -311,8 +311,8 @@ function inputDecorator(field, element) {
     if (field.maxFileSize) {
       input.dataset.maxFileSize = field.maxFileSize;
     }
-    if (field.default) {
-      input.value = field.default;
+    if (field.default !== undefined) {
+      input.setAttribute('value', field.default);
     }
     if (input.type === 'email') {
       input.pattern = emailPattern;
@@ -355,13 +355,10 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
         element.className += ` ${field.appliedCssClassNames}`;
       }
       colSpanDecorator(field, element);
-      const decorator = await componentDecorater(field);
       if (field?.fieldType === 'panel') {
         return generateFormRendition(field, element, getItems);
       }
-      if (typeof decorator === 'function') {
-        return decorator(element, field, container);
-      }
+      await componentDecorator(element, field, container);
       return element;
     }
     return null;
@@ -369,11 +366,7 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
 
   const children = await Promise.all(promises);
   container.append(...children.filter((_) => _ != null));
-  const decorator = await componentDecorater(panel);
-  if (typeof decorator === 'function') {
-    return decorator(container, panel);
-  }
-  return container;
+  await componentDecorator(container, panel);
 }
 
 function enableValidation(form) {
@@ -386,6 +379,17 @@ function enableValidation(form) {
   form.addEventListener('change', (event) => {
     checkValidation(event.target);
   });
+}
+
+async function createFormForAuthoring(formDef) {
+  const form = document.createElement('form');
+  await generateFormRendition(formDef, form, (container) => {
+    if (container[':itemsOrder'] && container[':items']) {
+      return container[':itemsOrder'].map((itemKey) => container[':items'][itemKey]);
+    }
+    return [];
+  });
+  return form;
 }
 
 export async function createForm(formDef, data) {
@@ -473,12 +477,18 @@ function extractFormDefinition(block) {
 export async function fetchForm(pathname) {
   // get the main form
   let data;
-  let resp = await fetch(pathname);
+  let path = pathname;
+  if (path.startsWith(window.location.origin)) {
+    if (path.endsWith('.html')) {
+      path = path.substring(0, path.lastIndexOf('.html'));
+    }
+    path += '/jcr:content/root/section/form.html';
+  }
+  let resp = await fetch(path);
 
   if (resp?.headers?.get('Content-Type')?.includes('application/json')) {
     data = await resp.json();
   } else if (resp?.headers?.get('Content-Type')?.includes('text/html')) {
-    const path = pathname.replace('.html', '.md.html');
     resp = await fetch(path);
     data = await resp.text().then((html) => {
       try {
@@ -488,7 +498,7 @@ export async function fetchForm(pathname) {
         }
         return doc;
       } catch (e) {
-        console.error('Unable to fetch form definition for path', pathname);
+        console.error('Unable to fetch form definition for path', pathname, path);
         return null;
       }
     });
@@ -521,8 +531,10 @@ export default async function decorate(block) {
       rules = false;
     } else {
       afModule = await import('./rules/index.js');
-      if (afModule && afModule.initAdaptiveForm) {
+      if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
         form = await afModule.initAdaptiveForm(formDef, createForm);
+      } else {
+        form = await createFormForAuthoring(formDef);
       }
     }
     form.dataset.redirectUrl = formDef.redirectUrl || '';

@@ -55,6 +55,8 @@ global.DataTransfer = function DataTransfer() {
   return this;
 };
 
+global.DOMParser = window.DOMParser;
+
 Object.defineProperties(HTMLInputElement.prototype, {
   files: {
     set(v) {
