@@ -52,7 +52,7 @@ async function loadComponent(componentName, element, fd, container) {
  *
  * */
 export default async function componentDecorator(element, fd, container) {
-  const { ':type': type = '', fieldType } = fd;
+  const { ':type': type = '', fieldType, properties } = fd;
   if (fieldType === 'file-input') {
     await loadComponent('file', element, fd, container);
   }
@@ -65,5 +65,8 @@ export default async function componentDecorator(element, fd, container) {
     await loadComponent(type, element, fd, container);
   }
 
+  if (properties?.modal) {
+    await loadComponent('modal', element, fd, container);
+  }
   return null;
 }
