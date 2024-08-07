@@ -24,7 +24,7 @@ async function globalSetup() {
   await expect(page.locator(createAnAccount)).toBeVisible();
   console.log('username '+userName);
   console.log('password '+password);
-  await page.locator(usernameInput).fill('**********');
+  await page.locator(usernameInput).fill(userName);
   await page.locator(continueButton).click();
   
   await console.log('error '+await page.locator(error).innerText());
