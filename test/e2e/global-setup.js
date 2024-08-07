@@ -15,7 +15,7 @@ const createAnAccount = 'a[class="spectrum-Link EmailPage__create-account-link"]
 
 async function globalSetup() {
   // eslint-disable-next-line no-console
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
