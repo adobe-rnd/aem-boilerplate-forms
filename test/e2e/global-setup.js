@@ -11,7 +11,7 @@ const passwordInput = 'input[name="password"]';
 const iFrame = 'iframe[id*="exc-app-sandbox"]';
 const continueButton = '[class="spectrum-Button-label"]';
 const emailValidation = '.Profile-Email';
-const error = '[data-id="EmailPage-EmailField-Error"]';
+const error = '[class="description-big"] span';
 const createAnAccount = 'a[class="spectrum-Link EmailPage__create-account-link"]';
 
 async function globalSetup() {
@@ -26,11 +26,11 @@ async function globalSetup() {
   console.log('password '+password);
   await page.locator(usernameInput).fill(userName);
   await page.locator(continueButton).click();
-  
-  await console.log('error '+await page.locator(error).innerText());
-  expect(await page.locator(error).innerText()).toBe('Please enter an email address.');
-  
-  
+
+  await console.log(`error ${await page.locator(error).first().innerText()}`);
+  expect(await page.getByLabel(error).first().innerText()).toBe('ptippa+test@adobetest.com');
+
+
   //expect(await page.locator(emailValidation).innerText()).toBe(userName);
   await page.locator(passwordInput).fill(password);
   await page.getByLabel('Continue').click();
