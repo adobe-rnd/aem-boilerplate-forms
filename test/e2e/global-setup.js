@@ -21,6 +21,8 @@ async function globalSetup() {
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
   await page.getByText('Sign in with Adobe').click();
   await expect(page.locator(createAnAccount)).toBeVisible();
+  console.log(userName);
+  console.log(password);
   await page.locator(usernameInput).fill(userName);
   await page.locator(continueButton).click();
   expect(await page.locator(emailValidation).innerText()).toBe(userName);
