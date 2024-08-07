@@ -51,22 +51,23 @@ function handleActiveChild(id, form) {
 
 async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
+  const {
+    id, fieldType, readOnly, type, displayValue, displayFormat, displayValueExpression,
+    activeChild,
+  } = fieldModel;
+  const field = form.querySelector(`#${id}`);
+  const fieldWrapper = field?.closest('.field-wrapper');
   changes.forEach((change) => {
-    const {
-      id, fieldType, readOnly, type, displayValue, displayFormat, displayValueExpression,
-      activeChild,
-    } = fieldModel;
     const { propertyName, currentValue, prevValue } = change;
-    const field = form.querySelector(`#${id}`);
     if (!field) {
       return;
     }
     switch (propertyName) {
       case 'required':
         if (currentValue === true) {
-          field.closest('.field-wrapper').dataset.required = '';
+          fieldWrapper.dataset.required = '';
         } else {
-          field.closest('.field-wrapper').removeAttribute('data-required');
+          fieldWrapper.removeAttribute('data-required');
         }
         break;
       case 'validationMessage':
@@ -99,7 +100,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'visible':
-        field.closest('.field-wrapper').dataset.visible = currentValue;
+        fieldWrapper.dataset.visible = currentValue;
         break;
       case 'enabled':
         // If checkboxgroup/radiogroup/drop-down is readOnly then it should remain disabled.
@@ -129,8 +130,6 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'label':
-        // eslint-disable-next-line no-case-declarations
-        const fieldWrapper = field.closest('.field-wrapper');
         if (fieldWrapper) {
           let labelEl = fieldWrapper.querySelector('.field-label');
           if (labelEl) {
@@ -148,10 +147,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'description':
-        // eslint-disable-next-line no-case-declarations
-        const fieldContainer = field.closest('.field-wrapper');
-        if (fieldContainer) {
-          let descriptionEl = fieldContainer.querySelector('.field-description');
+        if (fieldWrapper) {
+          let descriptionEl = fieldWrapper.querySelector('.field-description');
           if (descriptionEl) {
             descriptionEl.innerHTML = currentValue;
           } else if (currentValue !== '') {
@@ -159,7 +156,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
               id,
               description: currentValue,
             });
-            fieldContainer.append(descriptionEl);
+            fieldWrapper.append(descriptionEl);
           }
         }
         break;
@@ -182,6 +179,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
     }
   });
+  if (fieldWrapper?.dataset?.subscribe) {
+    fieldWrapper.dataset.fieldModel = JSON.stringify(fieldModel);
+  }
 }
 
 function formChanged(payload, form) {
