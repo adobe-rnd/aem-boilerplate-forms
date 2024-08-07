@@ -39,9 +39,6 @@ jobs:
   e2e-tests:
     docker:
       - image: mcr.microsoft.com/playwright:v1.40.0-jammy
-    environment:
-      USERNAME: $AEM_username
-      PASSWORD: $AEM_password
     steps:
       - checkout
       - run:

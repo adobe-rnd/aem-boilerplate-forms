@@ -1,7 +1,7 @@
 import { chromium, expect } from '@playwright/test';
 
-const userName = process.env.USERNAME;
-const password = process.env.PASSWORD;
+const userName = process.env.AEM_username;
+const password = process.env.AEM_password;
 
 const filePath = './LoginAuth.json';
 const baseUrl = 'https://author-p133911-e1313554.adobeaemcloud.com/aem/start.html';
