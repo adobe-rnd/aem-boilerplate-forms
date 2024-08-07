@@ -1,5 +1,6 @@
 import { chromium, expect } from '@playwright/test';
 
+
 const userName = process.env.AEM_username;
 const password = process.env.AEM_password;
 
@@ -14,7 +15,7 @@ const createAnAccount = 'a[class="spectrum-Link EmailPage__create-account-link"]
 
 async function globalSetup() {
   // eslint-disable-next-line no-console
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
@@ -22,8 +23,6 @@ async function globalSetup() {
   await expect(page.locator(createAnAccount)).toBeVisible();
   await page.locator(usernameInput).fill(userName);
   await page.locator(continueButton).click();
-  console.log('userName', userName);
-  console.log('password', password);
   expect(await page.locator(emailValidation).innerText()).toBe(userName);
   await page.locator(passwordInput).fill(password);
   await page.getByLabel('Continue').click();
@@ -32,5 +31,4 @@ async function globalSetup() {
   await page.context().storageState({ path: filePath });
   await browser.close();
 }
-
 export default globalSetup;
