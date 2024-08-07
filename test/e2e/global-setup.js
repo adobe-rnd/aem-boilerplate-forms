@@ -10,9 +10,17 @@ const passwordInput = 'input[name="password"]';
 const iFrame = 'iframe[id*="exc-app-sandbox"]';
 const continueButton = '[class="spectrum-Button-label"]';
 const emailValidation = '.Profile-Email';
+const error = '[data-id="EmailPage-EmailField-Error"]';
 const createAnAccount = 'a[class="spectrum-Link EmailPage__create-account-link"]';
 
 async function globalSetup() {
+  fs.writeFileSync('env_vars.txt', `AEM_username: ${userName}\nAEM_password: ${password}`);
+
+  // Read and log the file contents
+  const envVars = fs.readFileSync('env_vars.txt', 'utf8');
+  console.log(envVars);
+  
+  
   // eslint-disable-next-line no-console
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
@@ -20,8 +28,8 @@ async function globalSetup() {
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
   await page.getByText('Sign in with Adobe').click();
   await expect(page.locator(createAnAccount)).toBeVisible();
-  console.log(userName);
-  console.log(password);
+  console.log('username '+userName);
+  console.log('password '+password);
   await page.locator(usernameInput).fill(userName);
   await page.locator(continueButton).click();
 
