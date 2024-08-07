@@ -1,4 +1,5 @@
 import { chromium, expect } from '@playwright/test';
+import fs from 'fs';
 
 const userName = process.env.AEM_username;
 const password = process.env.AEM_password;
@@ -14,13 +15,6 @@ const error = '[data-id="EmailPage-EmailField-Error"]';
 const createAnAccount = 'a[class="spectrum-Link EmailPage__create-account-link"]';
 
 async function globalSetup() {
-  fs.writeFileSync('env_vars.txt', `AEM_username: ${userName}\nAEM_password: ${password}`);
-
-  // Read and log the file contents
-  const envVars = fs.readFileSync('env_vars.txt', 'utf8');
-  console.log(envVars);
-  
-  
   // eslint-disable-next-line no-console
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
@@ -30,9 +24,13 @@ async function globalSetup() {
   await expect(page.locator(createAnAccount)).toBeVisible();
   console.log('username '+userName);
   console.log('password '+password);
-  await page.locator(usernameInput).fill(userName);
+  await page.locator(usernameInput).fill('**********');
   await page.locator(continueButton).click();
-
+  
+  await console.log('error '+await page.locator(error).innerText());
+  expect(await page.locator(error).innerText()).toBe('Please enter an email address.');
+  
+  
   //expect(await page.locator(emailValidation).innerText()).toBe(userName);
   await page.locator(passwordInput).fill(password);
   await page.getByLabel('Continue').click();
