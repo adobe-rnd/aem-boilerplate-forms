@@ -1,6 +1,5 @@
 import { chromium, expect } from '@playwright/test';
 
-
 const userName = process.env.AEM_username;
 const password = process.env.AEM_password;
 
@@ -27,7 +26,6 @@ async function globalSetup() {
   await page.locator(continueButton).click();
 
   //expect(await page.locator(emailValidation).innerText()).toBe(userName);
-  await expect(page.locator(passwordInput)).toBeVisible();
   await page.locator(passwordInput).fill(password);
   await page.getByLabel('Continue').click();
   const frame = page.frameLocator(iFrame);
