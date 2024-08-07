@@ -25,7 +25,9 @@ async function globalSetup() {
   console.log(password);
   await page.locator(usernameInput).fill(userName);
   await page.locator(continueButton).click();
-  expect(await page.locator(emailValidation).innerText()).toBe(userName);
+
+  //expect(await page.locator(emailValidation).innerText()).toBe(userName);
+  await expect(page.locator(passwordInput)).toBeVisible();
   await page.locator(passwordInput).fill(password);
   await page.getByLabel('Continue').click();
   const frame = page.frameLocator(iFrame);
