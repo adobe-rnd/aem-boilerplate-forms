@@ -1,6 +1,5 @@
 import { test, expect } from '../fixtures.js';
 import { fillField, openPage } from '../utils.js';
-import { globalSetup } from '../global-setup.js';
 
 const inputValues = {
   textInput: 'adobe',
@@ -31,9 +30,5 @@ test.describe('Form with Submit Button', async () => {
     await page.getByRole('button', { name: 'Submit' }).click();
     await expect(page.getByText('Thank you for submitting the form.')).toBeVisible();
     await responsePromise;
-  });
-  
-  test('Clicking the button should submit the form', async ({ page }) => {
-    globalSetup();
   });
 });
