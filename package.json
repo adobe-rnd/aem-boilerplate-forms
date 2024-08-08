@@ -12,7 +12,8 @@
     ],
     "include": [
       "blocks/form/**/*.js",
-      "blocks/form/rules/*.js"
+      "blocks/form/rules/*.js",
+      "scripts/form-editor-support.js"
     ],
     "report-dir": "coverage",
     "check-coverage": true

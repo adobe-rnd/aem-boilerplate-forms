@@ -1,5 +1,4 @@
 import { chromium, expect } from '@playwright/test';
-import fs from 'fs';
 
 const userName = process.env.AEM_username;
 const password = process.env.AEM_password;
@@ -22,16 +21,12 @@ async function globalSetup() {
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
   await page.getByText('Sign in with Adobe').click();
   await expect(page.locator(createAnAccount)).toBeVisible();
-  console.log('username '+userName);
-  console.log('password '+password);
   await page.locator(usernameInput).fill(userName);
   await page.locator(continueButton).click();
 
   await console.log(`error ${await page.locator(error).first().innerText()}`);
-  expect(await page.getByLabel(error).first().innerText()).toBe('ptippa+test@adobetest.com');
-
-
-  //expect(await page.locator(emailValidation).innerText()).toBe(userName);
+  expect(await page.locator(error).first().innerText()).toBe('ptippa+test@adobetest.com');
+  expect(await page.locator(emailValidation).innerText()).toBe(userName);
   await page.locator(passwordInput).fill(password);
   await page.getByLabel('Continue').click();
   const frame = page.frameLocator(iFrame);

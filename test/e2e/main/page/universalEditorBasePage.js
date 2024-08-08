@@ -2,7 +2,7 @@
 import { expect } from '../../fixtures.js';
 
 // eslint-disable-next-line import/prefer-default-export
-export class AddComponentsInUePage {
+export class UniversalEditorBase {
   selectors = {
     contentTreeLabel: '[aria-label="Content tree"]',
     ruleEditor: 'button[aria-label="Rule Editor"]',
@@ -36,7 +36,7 @@ export class AddComponentsInUePage {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async addingComponentsInUE(frame, componentName, component) {
+  async verifyComponentInsert(frame, componentName, component) {
     await frame.locator(this.selectors.insertComponent).click();
     await expect(frame.getByLabel('Adaptive Form Components')).toBeVisible();
     expect(await frame.getByLabel('Adaptive Form Components').innerText()).toContain('Text Input');
@@ -48,7 +48,7 @@ export class AddComponentsInUePage {
     await expect(frame.locator(`li[data-resource*="${component}"]`)).toBeVisible({ timeout: 2000 });
   }
 
-  async componentDelete(frame, component) {
+  async verifyComponentDelete(frame, component) {
     const adaptiveFormPath = await frame.locator(this.componentLocatorForUe(component));
     await adaptiveFormPath.click();
     await expect(frame.locator(this.componentSelectorValidation(component))).toBeVisible();
