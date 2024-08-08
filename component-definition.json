@@ -127,7 +127,9 @@
                   "enumNames": [
                     "Item 1",
                     "Item 2"
-                  ]
+                  ],
+                  "enabled": true,
+                  "visible": true
                 }
               }
             }
@@ -384,6 +386,36 @@
                   "fieldType": "text-input",
                   "enabled": true,
                   "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Terms and conditions",
+          "id": "tnc",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Terms and conditions",
+                  "fieldType": "panel",
+                  "fd:viewType": "tnc",
+                  "enabled": true,
+                  "visible": true,
+                  "text": {
+                    "jcr:title": "",
+                    "value": "Text related to the terms and conditions come here.",
+                    "sling:resourceType": "core/fd/components/form/text/v1/text",
+                    "fieldType": "plain-text"
+                  },
+                  "approvalcheckbox": {
+                    "jcr:title": "I agree to the terms & conditions.",
+                    "sling:resourceType": "core/fd/components/form/checkbox/v1/checkbox",
+                    "fieldType": "checkbox",
+                    "checkedValue": "true"
+                  }
                 }
               }
             }

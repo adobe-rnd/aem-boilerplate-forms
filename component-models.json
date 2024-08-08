@@ -1852,6 +1852,12 @@
                 "required": true
             },
             {
+                "component": "text",
+                "name": "value",
+                "label": "Value",
+                "valueType": "string"
+            },
+            {
                 "component": "boolean",
                 "name": "visible",
                 "label": "Show Component",
