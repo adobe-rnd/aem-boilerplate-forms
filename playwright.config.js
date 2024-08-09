@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
+  globalSetup: './test/e2e/global-setup.js',
   testDir: './test/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -15,6 +16,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    storageState: './LoginAuth.json',
   },
 
   projects: [
