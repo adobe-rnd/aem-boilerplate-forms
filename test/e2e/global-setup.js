@@ -18,7 +18,7 @@ const selectors = {
 };
 
 async function globalSetup() {
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ recordVideo: { dir: './videos/' } });
   const page = await context.newPage();
   try {
