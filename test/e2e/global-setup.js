@@ -27,8 +27,7 @@ async function globalSetup() {
     await expect(page.locator(selectors.createAnAccount)).toBeVisible();
     await page.locator(selectors.googleSignIn).click();
     await page.waitForLoadState('networkidle');
-    await expect(page.locator(selectors.headingText)).toBeVisible({ timeout: 20000 });
-    expect(await page.locator(selectors.headingText).innerText()).toBe('Sign in');
+    await expect(page.getByText('Forgot email?')).toBeVisible({ timeout: 15000 });
     await page.locator(selectors.emailInput).fill(emailId);
     await page.locator(selectors.emailInput).blur();
     await page.locator(selectors.nextButton).click();
