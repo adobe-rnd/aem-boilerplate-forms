@@ -33,8 +33,8 @@ async function globalSetup() {
     await page.locator(selectors.nextButton).click();
     await expect(page.locator(selectors.forgotPassword)).toBeVisible({ timeout: 20000 });
     expect(await page.locator('div[data-email][data-profile-identifier]').innerText()).toBe(emailId);
-    await page.locator(selectors.passwordInput).fill(password);
-    await page.locator(selectors.passwordInput).blur();
+    await page.getByLabel('Enter your password').fill(password);
+    await page.getByLabel('Enter your password').blur();
     await page.locator(selectors.nextButton).click();
     await page.waitForURL('https://author-p133911-e1313554.adobeaemcloud.com/ui#/aem/aem/start.html', { timeout: 30000 });
     await page.waitForLoadState('load');
