@@ -44,7 +44,7 @@ export class UniversalEditorBase {
     // eslint-disable-next-line max-len
     await expect(frame.locator(this.selectors.adaptiveFormDropdown)).toBeVisible({ timeout: 15000 });
     await expect(frame.locator(`${this.selectors.componentPath + component}"]`)).toBeVisible({ timeout: 20000 });
-    await frame.locator(this.selectors.adaptiveFormDropdown).click();
+    await frame.locator(`${this.selectors.componentPath + component}"]`).click();
     await expect(frame.locator(`li[data-resource*="${component}"]`)).toBeVisible({ timeout: 2000 });
   }
 
