@@ -21,6 +21,7 @@ import decorate, { generateFormRendition } from '../blocks/form/form.js';
 import { loadCSS } from './aem.js';
 
 window.currentMode = 'preview';
+let activeWizardStep;
 
 export function getItems(container) {
   if (container[':itemsOrder'] && container[':items']) {
@@ -48,6 +49,17 @@ export function getFieldById(panel, id, formFieldMap) {
     });
   }
   return field;
+}
+
+export function handleWizardNavigation(wizardEl, navigateTo) {
+  const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
+  existingSelectedEl.classList.remove('current-wizard-step');
+  navigateTo.classList.add('current-wizard-step');
+  activeWizardStep = navigateTo.dataset.id;
+  const navigateToMenuItem = wizardEl.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
+  const currentMenuItem = wizardEl.querySelector('.wizard-menu-active-item');
+  currentMenuItem.classList.remove('wizard-menu-active-item');
+  navigateToMenuItem.classList.add('wizard-menu-active-item');
 }
 
 function generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition) {
@@ -115,6 +127,10 @@ function annotateItems(items, formDefinition, formFieldMap) {
             fieldWrapper.setAttribute('data-aue-behavior', 'component');
             fieldWrapper.setAttribute('data-aue-filter', 'form');
             annotateItems(fieldWrapper.childNodes, formDefinition, formFieldMap);
+            // retain wizard step selection
+            if (activeWizardStep === fieldWrapper.dataset.id) {
+              handleWizardNavigation(fieldWrapper.parentElement, fieldWrapper);
+            }
           }
         } else {
           fieldWrapper.setAttribute('data-aue-type', 'component');
@@ -139,16 +155,6 @@ export function annotateFormForEditing(formEl, formDefinition) {
   }
   const formFieldMap = {};
   annotateItems(formEl.childNodes, formDefinition, formFieldMap);
-}
-
-function handleWizardNavigation(wizardEl, navigateTo) {
-  const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
-  existingSelectedEl.classList.remove('current-wizard-step');
-  navigateTo.classList.add('current-wizard-step');
-  const navigateToMenuItem = wizardEl.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
-  const currentMenuItem = wizardEl.querySelector('.wizard-menu-active-item');
-  currentMenuItem.classList.remove('wizard-menu-active-item');
-  navigateToMenuItem.classList.add('wizard-menu-active-item');
 }
 
 /**
