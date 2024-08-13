@@ -3,14 +3,16 @@ import assert from 'assert';
 import path from 'path';
 import fs from 'fs';
 import {
-  annotateFormForEditing, getItems, getFieldById, applyChanges,
+  annotateFormForEditing, getItems, getFieldById, applyChanges, handleWizardNavigation,
 } from '../../scripts/form-editor-support.js';
 import { generateFormRendition } from '../../blocks/form/form.js';
 import { ueFormDef } from './forms/universaleditorform.js';
 import { ueAddEvent } from './fixtures/ue/events/event-add.js';
+import { ueAddEventForWizardNavigation } from './fixtures/ue/events/event-add-wizardnavigation.js';
 import { uePatchEvent } from './fixtures/ue/events/event-patch.js';
 import { ueFormDefForAddTest } from './fixtures/ue/events/formdefinition-add.js';
 import { ueFormDefForPatchTest } from './fixtures/ue/events/formdefinition-patch.js';
+import { ueFormDefForWizardNavigationTest } from './fixtures/ue/events/formdefinition-wizardnavigation.js';
 import { renderForm } from './testUtils.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
@@ -156,6 +158,21 @@ describe('Universal Editor Authoring Test Cases', () => {
     assert.equal(labelEl.textContent, 'Panel new');
     const wizardMenuItems = panel.querySelectorAll('.wizard-menu-item');
     assert.equal(wizardMenuItems.length, 1);
+    document.body.replaceChildren();
+  });
+
+  it('test UE wizard navigation on add', async () => {
+    await renderForm(ueFormDefForWizardNavigationTest);
+    const formElPrev = document.querySelector('form');
+    handleWizardNavigation(formElPrev.querySelector('.wizard'), formElPrev.querySelector('fieldset[data-id="panelcontainer-6a979252b1"]'));
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: ueAddEventForWizardNavigation });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    const currentActiveStep = formEl.querySelector('.current-wizard-step');
+    assert.equal(currentActiveStep.dataset.id, 'panelcontainer-6a979252b1');
+    const currentActiveMenuItem = currentActiveStep.parentElement.querySelector(`li[data-index="${currentActiveStep.dataset.index}"]`);
+    assert.equal(currentActiveMenuItem.classList.contains('wizard-menu-active-item'), true);
     document.body.replaceChildren();
   });
 });
