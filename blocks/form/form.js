@@ -382,6 +382,17 @@ function enableValidation(form) {
   });
 }
 
+async function createFormForAuthoring(formDef) {
+  const form = document.createElement('form');
+  await generateFormRendition(formDef, form, (container) => {
+    if (container[':itemsOrder'] && container[':items']) {
+      return container[':itemsOrder'].map((itemKey) => container[':items'][itemKey]);
+    }
+    return [];
+  });
+  return form;
+}
+
 export async function createForm(formDef, data) {
   const { action: formPath } = formDef;
   const form = document.createElement('form');
@@ -467,12 +478,18 @@ function extractFormDefinition(block) {
 export async function fetchForm(pathname) {
   // get the main form
   let data;
-  let resp = await fetch(pathname);
+  let path = pathname;
+  if (path.startsWith(window.location.origin)) {
+    if (path.endsWith('.html')) {
+      path = path.substring(0, path.lastIndexOf('.html'));
+    }
+    path += '/jcr:content/root/section/form.html';
+  }
+  let resp = await fetch(path);
 
   if (resp?.headers?.get('Content-Type')?.includes('application/json')) {
     data = await resp.json();
   } else if (resp?.headers?.get('Content-Type')?.includes('text/html')) {
-    const path = pathname.replace('.html', '.md.html');
     resp = await fetch(path);
     data = await resp.text().then((html) => {
       try {
@@ -482,7 +499,7 @@ export async function fetchForm(pathname) {
         }
         return doc;
       } catch (e) {
-        console.error('Unable to fetch form definition for path', pathname);
+        console.error('Unable to fetch form definition for path', pathname, path);
         return null;
       }
     });
@@ -515,8 +532,10 @@ export default async function decorate(block) {
       rules = false;
     } else {
       afModule = await import('./rules/index.js');
-      if (afModule && afModule.initAdaptiveForm) {
+      if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
         form = await afModule.initAdaptiveForm(formDef, createForm);
+      } else {
+        form = await createFormForAuthoring(formDef);
       }
     }
     form.dataset.redirectUrl = formDef.redirectUrl || '';
