@@ -7,8 +7,9 @@ export class UniversalEditorBase {
     contentTreeLabel: '[aria-label="Content tree"]',
     ruleEditor: 'button[aria-label="Rule Editor"]',
     mainInContentTree: 'li > [class*="content expandable collapsed"]',
+    adaptiveFormPathInUE: 'main[class="Canvas"] div[data-resource*="content/root/section_0/form"]',
     componentPath: 'main[class="Canvas"] [data-resource*="/',
-    adaptiveFormDropdown: 'li[data-resource*="content/root/section_0/form"] p[class="arrow"]',
+    adaptiveFormDropdown: 'li[data-resource*="content/root/section_0/form"] button[aria-label]',
     componentSelectorValidation: 'li[data-resource*="/textinput"] [class="node-content selected"]',
     insertComponent: 'div[data-testid="right-rail-tools"] button[aria-haspopup]',
     formPathInContentTree: 'li[data-resource*="/root/section_0/form"] p[class*="node-content"]',
@@ -32,7 +33,16 @@ export class UniversalEditorBase {
 
   // eslint-disable-next-line class-methods-use-this
   componentSelectorValidation(component) {
-    return `li[data-resource*="/${component}"] [class="node-content selected"]`;
+    return `li[data-resource*="/${component}"] [class*="node-content selected"]`;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async waitForCountToDecreaseByOne(adaptiveFormPath, initialCount) {
+    // eslint-disable-next-line no-await-in-loop
+    while (await adaptiveFormPath.count() !== initialCount - 1) {
+      // eslint-disable-next-line no-await-in-loop
+      await adaptiveFormPath.page().waitForTimeout(100);
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -48,13 +58,27 @@ export class UniversalEditorBase {
     await expect(frame.locator(`li[data-resource*="${component}"]`)).toBeVisible({ timeout: 2000 });
   }
 
-  async verifyComponentDelete(frame, component) {
-    const adaptiveFormPath = await frame.locator(this.componentLocatorForUe(component));
-    await adaptiveFormPath.click();
-    await expect(frame.locator(this.componentSelectorValidation(component))).toBeVisible();
-    await frame.locator(this.selectors.deleteButton).click();
-    await expect(frame.locator(this.selectors.deletePopup)).toBeVisible();
-    await frame.locator(this.selectors.deleteConfirmationButton).last().click();
+  async verifyComponentDelete(page, frame, component) {
+    let adaptiveFormPath = frame.locator(this.componentLocatorForUe(component));
+    let count = await adaptiveFormPath.count();
+    while (count > 0) {
+      // eslint-disable-next-line no-await-in-loop
+      await adaptiveFormPath.first().click();
+      // eslint-disable-next-line no-await-in-loop
+      await frame.locator(this.componentSelectorValidation(component)).isVisible();
+      // eslint-disable-next-line no-await-in-loop
+      await frame.locator(this.selectors.deleteButton).click();
+      // eslint-disable-next-line no-await-in-loop
+      await expect(frame.locator(this.selectors.deletePopup)).toBeVisible();
+      // eslint-disable-next-line no-await-in-loop
+      await frame.locator(this.selectors.deleteConfirmationButton).last().click();
+      // eslint-disable-next-line no-await-in-loop
+      await this.waitForCountToDecreaseByOne(adaptiveFormPath, count);
+      // eslint-disable-next-line no-await-in-loop
+      adaptiveFormPath = await frame.locator(this.componentLocatorForUe(component));
+      // eslint-disable-next-line no-await-in-loop
+      count = await adaptiveFormPath.count();
+    }
     await expect(adaptiveFormPath).toHaveCount(0);
   }
 }
