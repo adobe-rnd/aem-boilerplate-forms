@@ -269,14 +269,13 @@ export async function applyChanges(event) {
         const jsonContent = codeEl?.textContent;
         if (jsonContent) {
           const formDef = decode(jsonContent);
-          let panelLabel;
           if (element.classList.contains('panel-wrapper')) {
             element = element.parentNode;
-            panelLabel = element.querySelector('legend');
           }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
-          if (parent.classList.contains('panel-wrapper') && panelLabel) {
+          if (parent.classList.contains('panel-wrapper')) {
+            const panelLabel = parent.querySelector('legend');
             parent.replaceChildren(panelLabel);
           } else {
             parent.replaceChildren();

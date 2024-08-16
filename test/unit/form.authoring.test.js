@@ -10,8 +10,10 @@ import { ueFormDef } from './forms/universaleditorform.js';
 import { ueAddEvent } from './fixtures/ue/events/event-add.js';
 import { ueAddEventForWizardNavigation } from './fixtures/ue/events/event-add-wizardnavigation.js';
 import { uePatchEvent } from './fixtures/ue/events/event-patch.js';
+import { uePatchTitleEvent } from './fixtures/ue/events/event-patch-title.js';
 import { ueFormDefForAddTest } from './fixtures/ue/events/formdefinition-add.js';
 import { ueFormDefForPatchTest } from './fixtures/ue/events/formdefinition-patch.js';
+import { ueFormDefForPatchTitleTest } from './fixtures/ue/events/formdefinition-patch-title.js';
 import { ueFormDefForWizardNavigationTest } from './fixtures/ue/events/formdefinition-wizardnavigation.js';
 import { renderForm } from './testUtils.js';
 
@@ -158,6 +160,23 @@ describe('Universal Editor Authoring Test Cases', () => {
     assert.equal(labelEl.textContent, 'Panel new');
     const wizardMenuItems = panel.querySelectorAll('.wizard-menu-item');
     assert.equal(wizardMenuItems.length, 1);
+    document.body.replaceChildren();
+  });
+
+  it('test UE patch event for panel title', async () => {
+    await renderForm(ueFormDefForPatchTitleTest);
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: uePatchTitleEvent });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    assert.equal(formEl.childNodes.length, 1); // only 1 panel is there
+    const panel = formEl.querySelector('.panel-wrapper');
+    // 1 legend + panel
+    assert.equal(panel.childNodes.length, 2);
+    const labelEl = panel.querySelector('legend[for="panelcontainer-5012648f84"]');
+    assert.equal(labelEl.textContent, 'Panel');
+    const textInputElLabel = panel.querySelector('label[for="textinput-3eb2e7d0b6"]');
+    assert.equal(textInputElLabel.textContent, 'Text Input new');
     document.body.replaceChildren();
   });
 
