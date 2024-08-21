@@ -31,7 +31,7 @@ jobs:
       - name: Remove Form Developement Files
         run: |
           rm -rf \
-            .circleci .npmrc test rollup
+            .circleci .npmrc test rollup playwright.config.js
 
       - name: Update .eslintignore
         run: |

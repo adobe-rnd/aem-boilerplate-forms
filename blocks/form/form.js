@@ -4,11 +4,12 @@ import {
   getId,
   stripTags,
   checkValidation,
+  toClassName,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
-import componentDecorater from './mappings.js';
+import componentDecorator from './mappings.js';
 import DocBasedFormToAF from './transform.js';
-import transferRepeatableDOM from './components/repeat.js';
+import transferRepeatableDOM from './components/repeat/repeat.js';
 import { handleSubmit } from './submit.js';
 import { getSubmitBaseUrl, emailPattern } from './constant.js';
 
@@ -172,7 +173,7 @@ function createRadioOrCheckboxGroup(fd) {
   const wrapper = createFieldSet({ ...fd });
   const type = fd.fieldType.split('-')[0];
   fd.enum.forEach((value, index) => {
-    const label = typeof fd.enumNames?.[index] === 'object' ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
+    const label = (typeof fd.enumNames?.[index] === 'object' && fd.enumNames?.[index] !== null) ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
     const id = getId(fd.name);
     const field = createRadioOrCheckbox({
       name: fd.name,
@@ -182,11 +183,11 @@ function createRadioOrCheckboxGroup(fd) {
       enum: [value],
       required: fd.required,
     });
-    field.classList.remove('field-wrapper', `field-${fd.name}`);
+    field.classList.remove('field-wrapper', `field-${toClassName(fd.name)}`);
     const input = field.querySelector('input');
     input.id = id;
     input.dataset.fieldType = fd.fieldType;
-    input.name = fd.id; // since id is unique across radio/checkbox group
+    input.name = fd.name;
     input.checked = Array.isArray(fd.value) ? fd.value.includes(value) : value === fd.value;
     if ((index === 0 && type === 'radio') || type === 'checkbox') {
       input.required = fd.required;
@@ -219,11 +220,12 @@ function createPlainText(fd) {
 
 function createImage(fd) {
   const field = createFieldWrapper(fd);
+  const imagePath = fd.source || fd.properties['fd:repoPath'] || '';
   const image = `
   <picture>
-    <source srcset="${fd.source}?width=2000&optimize=medium" media="(min-width: 600px)">
-    <source srcset="${fd.source}?width=750&optimize=medium">
-    <img alt="${fd.altText || fd.name}" src="${fd.source}?width=750&optimize=medium">
+    <source srcset="${imagePath}?width=2000&optimize=medium" media="(min-width: 600px)">
+    <source srcset="${imagePath}?width=750&optimize=medium">
+    <img alt="${fd.altText || fd.name}" src="${imagePath}?width=750&optimize=medium">
   </picture>`;
   field.innerHTML = image;
   return field;
@@ -309,8 +311,8 @@ function inputDecorator(field, element) {
     if (field.maxFileSize) {
       input.dataset.maxFileSize = field.maxFileSize;
     }
-    if (field.default) {
-      input.value = field.default;
+    if (field.default !== undefined) {
+      input.setAttribute('value', field.default);
     }
     if (input.type === 'email') {
       input.pattern = emailPattern;
@@ -353,14 +355,11 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
         element.className += ` ${field.appliedCssClassNames}`;
       }
       colSpanDecorator(field, element);
-      const decorator = await componentDecorater(field);
       if (field?.fieldType === 'panel') {
         await generateFormRendition(field, element, getItems);
         return element;
       }
-      if (typeof decorator === 'function') {
-        return decorator(element, field, container);
-      }
+      await componentDecorator(element, field, container);
       return element;
     }
     return null;
@@ -368,11 +367,7 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
 
   const children = await Promise.all(promises);
   container.append(...children.filter((_) => _ != null));
-  const decorator = await componentDecorater(panel);
-  if (typeof decorator === 'function') {
-    return decorator(container, panel);
-  }
-  return container;
+  await componentDecorator(container, panel);
 }
 
 function enableValidation(form) {
@@ -385,6 +380,17 @@ function enableValidation(form) {
   form.addEventListener('change', (event) => {
     checkValidation(event.target);
   });
+}
+
+async function createFormForAuthoring(formDef) {
+  const form = document.createElement('form');
+  await generateFormRendition(formDef, form, (container) => {
+    if (container[':itemsOrder'] && container[':items']) {
+      return container[':itemsOrder'].map((itemKey) => container[':items'][itemKey]);
+    }
+    return [];
+  });
+  return form;
 }
 
 export async function createForm(formDef, data) {
@@ -472,12 +478,18 @@ function extractFormDefinition(block) {
 export async function fetchForm(pathname) {
   // get the main form
   let data;
-  let resp = await fetch(pathname);
+  let path = pathname;
+  if (path.startsWith(window.location.origin)) {
+    if (path.endsWith('.html')) {
+      path = path.substring(0, path.lastIndexOf('.html'));
+    }
+    path += '/jcr:content/root/section/form.html';
+  }
+  let resp = await fetch(path);
 
   if (resp?.headers?.get('Content-Type')?.includes('application/json')) {
     data = await resp.json();
   } else if (resp?.headers?.get('Content-Type')?.includes('text/html')) {
-    const path = pathname.replace('.html', '.md.html');
     resp = await fetch(path);
     data = await resp.text().then((html) => {
       try {
@@ -487,7 +499,7 @@ export async function fetchForm(pathname) {
         }
         return doc;
       } catch (e) {
-        console.error('Unable to fetch form definition for path', pathname);
+        console.error('Unable to fetch form definition for path', pathname, path);
         return null;
       }
     });
@@ -520,8 +532,10 @@ export default async function decorate(block) {
       rules = false;
     } else {
       afModule = await import('./rules/index.js');
-      if (afModule && afModule.initAdaptiveForm) {
+      if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
         form = await afModule.initAdaptiveForm(formDef, createForm);
+      } else {
+        form = await createFormForAuthoring(formDef);
       }
     }
     form.dataset.redirectUrl = formDef.redirectUrl || '';

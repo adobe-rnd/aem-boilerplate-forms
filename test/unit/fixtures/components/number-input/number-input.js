@@ -10,6 +10,7 @@ export const fieldDef = {
     enabled: true,
     readOnly: false,
     placeholder: '50065',
+    default: 0,
     label: {
       visible: true,
       value: 'Zip Code',

@@ -67,4 +67,15 @@ test.describe('error messages test', () => {
     button.click();
     expect(await f8.locator('..').locator('.field-description').innerText()).toBe('error message set via rule editor');
   });
+
+  test('clear errormessage when field is valid', async ({ page }) => {
+    await openPage(page, testURL);
+    const f1 = await page.locator('input[name="f1"]');
+    await f1.fill('a');
+    await f1.press('Tab');
+    expect(await f1.locator('..').locator('.field-description').innerText()).toBe('Please lengthen this text to 2 characters or more.');
+    const button = await page.getByRole('button', { name: 'clear' });
+    await button.click();
+    await expect(await f1.locator('..').locator('.field-description')).not.toBeVisible();
+  });
 });

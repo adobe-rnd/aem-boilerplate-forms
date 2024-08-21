@@ -77,66 +77,15 @@
       "id": "form-general",
       "components": [
         {
-          "title": "Text Input",
-          "id": "text-input",
+          "title": "Button",
+          "id": "form-button",
           "plugins": {
             "xwalk": {
               "page": {
-                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "resourceType": "core/fd/components/form/button/v1/button",
                 "template": {
-                  "jcr:title": "Text Input",
-                  "fieldType": "text-input",
-                  "enabled": true,
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Number Input",
-          "id": "number-input",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
-                "template": {
-                  "jcr:title": "Number Input",
-                  "fieldType": "number-input",
-                  "enabled": true,
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Date Picker",
-          "id": "date-input",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
-                "template": {
-                  "jcr:title": "Date Input",
-                  "fieldType": "date-input",
-                  "enabled": true,
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Panel",
-          "id": "panel",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
-                "template": {
-                  "jcr:title": "Panel",
-                  "fieldType": "panel",
+                  "jcr:title": "Button",
+                  "fieldType": "button",
                   "enabled": true,
                   "visible": true
                 }
@@ -162,6 +111,46 @@
           }
         },
         {
+          "title": "Checkbox group",
+          "id": "checkbox-group",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                "template": {
+                  "jcr:title": "Checkbox Group",
+                  "fieldType": "checkbox-group",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Item 1",
+                    "Item 2"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Date Picker",
+          "id": "date-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
+                "template": {
+                  "jcr:title": "Date Input",
+                  "fieldType": "date-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Dropdown List",
           "id": "drop-down",
           "plugins": {
@@ -171,61 +160,6 @@
                 "template": {
                   "jcr:title": "Drop Down List",
                   "fieldType": "drop-down",
-                  "enabled": true,
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Radio Group",
-          "id": "radio-group",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
-                "template": {
-                  "jcr:title": "Radio Group",
-                  "fieldType": "radio-group",
-                  "enum": ["0", "1"],
-                  "enumNumes": ["Item 1", "Item 2"],
-                  "enabled": true,
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Text",
-          "id": "plain-text",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/text/v1/text",
-                "template": {
-                  "jcr:title": "Text",
-                  "fieldType": "plain-text",
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "File Attachment",
-          "id": "file-input",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/fileinput/v2/fileinput",
-                "template": {
-                  "jcr:title": "File Attachment",
-                  "fieldType": "file-input",
-                  "accept": ["audio/*", " video/*", "image/*", "text/*", "application/pdf"],
-                  "buttonText": "Attach",
-                  "type": "file",
                   "enabled": true,
                   "visible": true
                 }
@@ -251,6 +185,32 @@
           }
         },
         {
+          "title": "File Attachment",
+          "id": "file-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/fileinput/v2/fileinput",
+                "template": {
+                  "jcr:title": "File Attachment",
+                  "fieldType": "file-input",
+                  "accept": [
+                    "audio/*",
+                    " video/*",
+                    "image/*",
+                    "text/*",
+                    "application/pdf"
+                  ],
+                  "buttonText": "Attach",
+                  "type": "file",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Form Fragment",
           "id": "form-fragment",
           "plugins": {
@@ -268,23 +228,6 @@
           }
         },
         {
-          "title": "Button",
-          "id": "form-button",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/button/v1/button",
-                "template": {
-                  "jcr:title": "Button",
-                  "fieldType": "button",
-                  "enabled": true,
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
           "title": "Image",
           "id": "form-image",
           "plugins": {
@@ -294,6 +237,83 @@
                 "template": {
                   "jcr:title": "Image",
                   "fieldType": "image",
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Number Input",
+          "id": "number-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                "template": {
+                  "jcr:title": "Number Input",
+                  "fieldType": "number-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Panel",
+          "id": "panel",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Panel",
+                  "fieldType": "panel",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Radio Group",
+          "id": "radio-group",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
+                "template": {
+                  "jcr:title": "Radio Group",
+                  "fieldType": "radio-group",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNumes": [
+                    "Item 1",
+                    "Item 2"
+                  ],
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Reset",
+          "id": "form-reset-button",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/actions/reset/v1/reset",
+                "template": {
+                  "jcr:title": "Reset",
+                  "buttonType": "reset",
+                  "fieldType": "button",
+                  "enabled": true,
                   "visible": true
                 }
               }
@@ -319,16 +339,67 @@
           }
         },
         {
-          "title": "Reset",
-          "id": "form-reset-button",
+          "title": "Telephone input",
+          "id": "telephone-input",
           "plugins": {
             "xwalk": {
               "page": {
-                "resourceType": "core/fd/components/form/actions/reset/v1/reset",
+                "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
                 "template": {
-                  "jcr:title": "Reset",
-                  "buttonType": "reset",
-                  "fieldType": "button",
+                  "jcr:title": "Telephone Input",
+                  "fieldType": "text-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Text",
+          "id": "plain-text",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/text/v1/text",
+                "template": {
+                  "jcr:title": "Text",
+                  "fieldType": "plain-text",
+                  "visible": true,
+                  "textIsRich": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Text Input",
+          "id": "text-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Text Input",
+                  "fieldType": "text-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Wizard",
+          "id": "wizard",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Wizard",
+                  "fieldType": "panel",
+                  "fd:viewType": "wizard",
                   "enabled": true,
                   "visible": true
                 }

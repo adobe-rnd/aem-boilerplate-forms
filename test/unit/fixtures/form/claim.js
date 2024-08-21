@@ -325,7 +325,7 @@ export const fieldDef = {
                 ' application/pdf',
               ],
               properties: {
-                dragDropText: 'Drag and drop to Upload',
+                dragDropText: 'Drag and Drop To Upload',
               },
               label: {
                 value: 'Your ID',

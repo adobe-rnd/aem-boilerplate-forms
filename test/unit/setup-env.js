@@ -2,7 +2,28 @@
 import 'jsdom-global';
 import 'jsdom-global/register.js';
 import fetch from 'node-fetch';
-import 'mutationobserver-shim';
+import sinon from 'sinon';
+
+global.MutationObserver = sinon.stub().returns({
+  observe: sinon.spy(),
+  disconnect: sinon.spy(),
+});
+
+class Headers {
+  constructor() {
+    this.headers = {};
+  }
+
+  set(key, value) {
+    this.headers[key] = value;
+  }
+
+  get(key) {
+    return this.headers[key];
+  }
+}
+
+global.Headers = Headers;
 
 global.fetch = (url, opts) => {
   let finalUrl = url;
@@ -33,6 +54,8 @@ global.DataTransfer = function DataTransfer() {
   this.files = [];
   return this;
 };
+
+global.DOMParser = window.DOMParser;
 
 Object.defineProperties(HTMLInputElement.prototype, {
   files: {

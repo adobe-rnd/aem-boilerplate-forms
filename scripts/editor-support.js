@@ -102,6 +102,7 @@ function attachEventListners(main) {
     const applied = await applyChanges(event);
     if (!applied) window.location.reload();
   }));
+  import('./form-editor-support.js');
 }
 
 attachEventListners(document.querySelector('main'));

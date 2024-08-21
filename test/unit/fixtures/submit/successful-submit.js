@@ -69,6 +69,8 @@ export function expect(block) {
   assert.equal(scope.isDone(), true, 'submit call was not made');
   const el = block.querySelector('.form-message.success-message');
   assert.equal(el.textContent, thankYouMessage);
+  assert.equal(el.nextSibling.nodeName, 'FORM');
+  assert.equal(el.parentElement.nodeName, 'DIV');
 }
 
 export const opDelay = 100;

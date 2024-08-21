@@ -7,13 +7,13 @@ export function submitSuccess(e, form) {
   if (redirectUrl) {
     window.location.assign(encodeURI(redirectUrl));
   } else {
-    let thankYouMessage = form.querySelector('.form-message.success-message');
+    let thankYouMessage = form.parentNode.querySelector('.form-message.success-message');
     if (!thankYouMessage) {
       thankYouMessage = document.createElement('div');
       thankYouMessage.className = 'form-message success-message';
     }
     thankYouMessage.innerHTML = thankYouMsg || DEFAULT_THANK_YOU_MESSAGE;
-    form.prepend(thankYouMessage);
+    form.parentNode.insertBefore(thankYouMessage, form);
     if (thankYouMessage.scrollIntoView) {
       thankYouMessage.scrollIntoView({ behavior: 'smooth' });
     }
