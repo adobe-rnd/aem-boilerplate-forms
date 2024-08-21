@@ -2,8 +2,8 @@ import { chromium, expect } from '@playwright/test';
 
 const filePath = './LoginAuth.json';
 const baseUrl = 'https://author-p133911-e1313554.adobeaemcloud.com/aem/start.html';
-const emailId = 'ptippa.test@outlook.com';
-const password = 'bqD_BsY2+m)32pV';
+const emailId = process.env.AEM_userName;
+const password = process.env.AEM_password;
 
 const selectors = {
   iFrame: 'iframe[id*="exc-app-sandbox"]',
@@ -20,19 +20,21 @@ async function globalSetup() {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  const emailLocator = page.locator(selectors.emailInput);
+  const passwordLocator = page.locator(selectors.passwordInput);
   await page.locator(selectors.signInWithAdobe).click();
   await expect(page.locator(selectors.createAnAccount)).toBeVisible();
   await page.getByRole('link', { name: 'View more' }).click();
   await expect(page.getByRole('button', { name: 'Continue with Microsoft' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue with Microsoft' }).click();
   await page.waitForLoadState('networkidle');
-  await expect(page.locator(selectors.emailInput)).toBeVisible();
-  await page.locator(selectors.emailInput).fill(emailId);
-  await page.locator(selectors.emailInput).blur();
+  await expect(emailLocator).toBeVisible();
+  await emailLocator.fill(emailId);
+  await emailLocator.blur();
   await page.getByRole('button', { name: 'Next' }).click();
   expect(await page.locator(selectors.userDisplayName).innerText()).toBe(emailId);
-  await page.locator(selectors.passwordInput).fill(password);
-  await page.locator(selectors.passwordInput).blur();
+  await passwordLocator.fill(password);
+  await passwordLocator.blur();
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page.getByText('Stay signed in?')).toBeVisible();
   await page.locator(selectors.firstExtButtonItem).first().click();
