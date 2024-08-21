@@ -54,7 +54,7 @@ function handleActiveChild(id, form) {
 async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
-    id, fieldType, readOnly, type, displayValue, displayFormat, displayValueExpression,
+    id, name, fieldType, readOnly, type, displayValue, displayFormat, displayValueExpression,
     activeChild,
   } = fieldModel;
   const field = form.querySelector(`#${id}`);
@@ -87,7 +87,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
           field.setAttribute('edit-value', currentValue);
           field.setAttribute('display-value', displayValue);
         } else if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
-          field.querySelectorAll(`input[name=${id}]`).forEach((el) => {
+          field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
             const exists = (Array.isArray(currentValue)
               && currentValue.some((x) => compare(x, el.value, type.replace('[]', ''))))
               || compare(currentValue, el.value, type);
@@ -108,7 +108,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
         // If checkboxgroup/radiogroup/drop-down is readOnly then it should remain disabled.
         if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
           if (readOnly === false) {
-            field.querySelectorAll(`input[name=${id}]`).forEach((el) => {
+            field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
               disableElement(el, !currentValue);
             });
           }
@@ -122,7 +122,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'readOnly':
         if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
-          field.querySelectorAll(`input[name=${id}]`).forEach((el) => {
+          field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
             disableElement(el, currentValue);
           });
         } else if (fieldType === 'drop-down') {
@@ -215,15 +215,14 @@ function handleRuleEngineEvent(e, form, generateFormRendition) {
 function applyRuleEngine(htmlForm, form, captcha) {
   htmlForm.addEventListener('change', (e) => {
     const field = e.target;
-    const {
-      id, value, name, checked,
-    } = field;
+    const { value, name, checked } = field;
+    const { id } = field.closest('.field-wrapper').dataset;
     if ((field.type === 'checkbox' && field.dataset.fieldType === 'checkbox-group')) {
       const val = getCheckboxGroupValue(name, htmlForm);
-      const el = form.getElement(name);
+      const el = form.getElement(id);
       el.value = val;
     } else if ((field.type === 'radio' && field.dataset.fieldType === 'radio-group')) {
-      const el = form.getElement(name);
+      const el = form.getElement(id);
       el.value = value;
     } else if (field.type === 'checkbox') {
       form.getElement(id).value = checked ? value : field.dataset.uncheckedValue;

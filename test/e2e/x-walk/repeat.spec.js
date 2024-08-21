@@ -19,4 +19,31 @@ test.describe('Repeatability test', () => {
       expect(gridColumn).toBe('span 4');
     }
   });
+
+  test('test the behaviour of radio button with same name for repeated panels', async ({ page }) => {
+    await openPage(page, testURL);
+    const radiobuttons = await page.$$('input[name="radio"]');
+    await radiobuttons[0].click();
+    expect(await radiobuttons[0].isChecked()).toBe(true);
+    // eslint-disable-next-line no-plusplus
+    for (let i = 1; i < radiobuttons.length; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      expect(await radiobuttons[i].isChecked()).toBe(false);
+    }
+  });
+
+  test('test the behaviour of checkbox with same name for repeated panels', async ({ page }) => {
+    await openPage(page, testURL);
+    const checkboxes = await page.$$('input[name="checkbox"]');
+    const n = checkboxes.length;
+    await checkboxes[0].click();
+    await checkboxes[n - 1].click();
+    expect(await checkboxes[0].isChecked()).toBe(true);
+    expect(await checkboxes[n - 1].isChecked()).toBe(true);
+    // eslint-disable-next-line no-plusplus
+    for (let i = 1; i < n - 1; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      expect(await checkboxes[i].isChecked()).toBe(false);
+    }
+  });
 });

@@ -13,6 +13,18 @@ export const ueFormDef = {
         'fd:path': '/content/test2/index/jcr:content/root/section_0/form/textinput',
       },
     },
+    text: {
+      id: 'text-1971d3e4a8',
+      fieldType: 'plain-text',
+      name: 'text1723553177950',
+      value: '\u003Cp\u003Ethis is a test\u003C/p\u003E',
+      visible: true,
+      richText: true,
+      properties: {
+        'fd:path': '/content/test2/index/jcr:content/root/section_0/form/text',
+      },
+      ':type': 'core/fd/components/form/text/v1/text',
+    },
     rating: {
       id: 'rating-input',
       fieldType: 'text-input',
@@ -123,5 +135,5 @@ export const ueFormDef = {
       ':type': 'wizard',
     },
   },
-  ':itemsOrder': ['textinput', 'panelcontainer', 'fragment_1198843043'],
+  ':itemsOrder': ['textinput', 'text', 'panelcontainer', 'fragment_1198843043'],
 };
