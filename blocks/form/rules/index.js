@@ -58,12 +58,12 @@ async function fieldChanged(payload, form, generateFormRendition) {
     activeChild,
   } = fieldModel;
   const field = form.querySelector(`#${id}`);
+  if (!field) {
+    return;
+  }
   const fieldWrapper = field?.closest('.field-wrapper');
   changes.forEach((change) => {
     const { propertyName, currentValue, prevValue } = change;
-    if (!field) {
-      return;
-    }
     switch (propertyName) {
       case 'required':
         if (currentValue === true) {
@@ -308,6 +308,12 @@ export async function initAdaptiveForm(formDef, createForm) {
   return form;
 }
 
+/**
+ * Subscribes to changes in the specified field element and triggers a callback
+ * with access to formModel when changes occur.
+ * @param {HTMLElement} fieldDiv - The field element to observe for changes.
+ * @param {Function} callback - The callback function to execute when changes are detected.
+ */
 export function subscribe(fieldDiv, callback) {
   if (callback) {
     fieldDiv.dataset.subscribe = true;

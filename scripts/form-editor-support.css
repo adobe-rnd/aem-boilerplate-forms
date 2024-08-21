@@ -55,3 +55,8 @@ form.edit-mode:not(:has(*)) {
 form.edit-mode:not(:has(*))::before {
    content: "Adaptive Form";
 }
+
+form.edit-mode .modal dialog {
+    display: inline-block;
+    position: relative;
+}
