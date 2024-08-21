@@ -1,6 +1,6 @@
 import { loadCSS } from '../../scripts/aem.js';
 
-let customComponents = [];
+let customComponents = ['modal'];
 
 export function setCustomComponents(components) {
   customComponents = components;
@@ -52,7 +52,7 @@ async function loadComponent(componentName, element, fd, container) {
  *
  * */
 export default async function componentDecorator(element, fd, container) {
-  const { ':type': type = '', fieldType, properties } = fd;
+  const { ':type': type = '', fieldType } = fd;
   if (fieldType === 'file-input') {
     await loadComponent('file', element, fd, container);
   }
@@ -65,8 +65,5 @@ export default async function componentDecorator(element, fd, container) {
     await loadComponent(type, element, fd, container);
   }
 
-  if (properties?.modal) {
-    await loadComponent('modal', element, fd, container);
-  }
   return null;
 }

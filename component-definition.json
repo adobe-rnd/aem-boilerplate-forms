@@ -244,6 +244,23 @@
           }
         },
         {
+          "title": "Modal",
+          "id": "modal",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "modal",
+                  "fieldType": "panel",
+                  "fd:viewType": "modal",
+                  "enabled": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Number Input",
           "id": "number-input",
           "plugins": {

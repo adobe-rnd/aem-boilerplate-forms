@@ -90,9 +90,18 @@ function getPropertyModel(fd) {
   return fd[':type'];
 }
 
+function annotateContainer(container, fd) {
+  container.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
+  container.setAttribute('data-aue-model', fd.fieldType);
+  container.setAttribute('data-aue-label', fd.label?.value || fd.name);
+  container.setAttribute('data-aue-type', 'container');
+  container.setAttribute('data-aue-behavior', 'component');
+  container.setAttribute('data-aue-filter', 'form');
+}
+
 function annotateItems(items, formDefinition, formFieldMap) {
   for (let i = items.length - 1; i >= 0; i -= 1) {
-    const fieldWrapper = items[i];
+    const fieldWrapper = items[i].classList.contains('modal') ? items[i].parentElement : items[i];
     if (fieldWrapper.classList.contains('field-wrapper')) {
       const { id } = fieldWrapper.dataset;
       const fd = getFieldById(formDefinition, id, formFieldMap);
@@ -107,13 +116,13 @@ function annotateItems(items, formDefinition, formFieldMap) {
         } else if (fd.fieldType === 'panel') {
           if (fd.properties['fd:fragment']) {
             annotateFormFragment(fieldWrapper, fd);
+          } else if (fd[':type'] === 'modal') {
+            const dialog = fieldWrapper.querySelector('dialog');
+            const { childNodes } = dialog.querySelector('.modal-content');
+            annotateContainer(dialog, fd);
+            annotateItems(childNodes, formDefinition, formFieldMap);
           } else {
-            fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-            fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
-            fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
-            fieldWrapper.setAttribute('data-aue-type', 'container');
-            fieldWrapper.setAttribute('data-aue-behavior', 'component');
-            fieldWrapper.setAttribute('data-aue-filter', 'form');
+            annotateContainer(fieldWrapper, fd);
             annotateItems(fieldWrapper.childNodes, formDefinition, formFieldMap);
           }
         } else {
