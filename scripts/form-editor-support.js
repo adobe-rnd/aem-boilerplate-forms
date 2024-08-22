@@ -191,7 +191,6 @@ async function renderFormBlock(form, editMode) {
     const formDefResp = await fetch(`${form.dataset.formpath}.model.json`);
     const formDef = await formDefResp.json();
     const div = form.parentElement;
-    div.style.display = 'none';
     div.replaceChildren();
     const pre = document.createElement('pre');
     const code = document.createElement('code');
@@ -199,7 +198,6 @@ async function renderFormBlock(form, editMode) {
     pre.appendChild(code);
     div.appendChild(pre);
     await decorate(block);
-    div.style.display = 'block';
     return {
       formEl: block.querySelector('form'),
       formDef,

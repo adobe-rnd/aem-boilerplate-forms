@@ -62,6 +62,10 @@
     box-sizing: border-box;
 }
 
+main .form pre {
+    display: none;
+}
+
 form output {
     display: block;
     font-weight: 700;
