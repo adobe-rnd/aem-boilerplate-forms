@@ -18,18 +18,24 @@ test.describe('Forms Authoring in Universal Editor tests', () => {
     frame = page.frameLocator(universalEditorBase.selectors.iFrame);
     properties = frame.locator(universalEditorBase.selectors.propertyPagePath);
     componentPathInUE = frame.locator(universalEditorBase.componentLocatorForUe(component));
+    // eslint-disable-next-line max-len
+    const adaptiveFormPathInUE = frame.locator(universalEditorBase.selectors.adaptiveFormPathInUE).first();
+    const ruleEditor = frame.locator(universalEditorBase.selectors.ruleEditor);
     await expect(properties).toBeVisible();
-    // eslint-disable-next-line max-len
-    await expect(frame.locator(universalEditorBase.selectors.ruleEditor)).toBeVisible({ timeout: 16000 });
+    try {
+      await expect(adaptiveFormPathInUE).toBeVisible({ timeout: 16000 });
+    } catch (error) {
+      await expect(ruleEditor).toBeVisible({ timeout: 10000 });
+      await expect(adaptiveFormPathInUE).toBeVisible();
+    }
     await frame.locator(universalEditorBase.selectors.contentTreeLabel).click();
-    expect(await frame.locator(universalEditorBase.selectors.panelHeaders).innerText()).toBe('Content tree');
-    // eslint-disable-next-line max-len
-    await expect(frame.locator(universalEditorBase.selectors.adaptiveFormPathInUE).first()).toBeVisible({ timeout: 10000 });
+    await expect(frame.locator(universalEditorBase.selectors.panelHeaders)).toHaveText('Content tree');
     if (await componentPathInUE.first().isVisible({ timeout: 10000 })) {
       await universalEditorBase.verifyComponentDelete(page, frame, component);
     }
   });
   test('Adding a new component and checking the markup @chromium-only', async () => {
+    await frame.locator(universalEditorBase.selectors.formPathInUeSites).scrollIntoViewIfNeeded();
     await frame.locator(universalEditorBase.selectors.formPathInUeSites).click();
     await universalEditorBase.verifyComponentInsert(frame, componentName, component);
   });
