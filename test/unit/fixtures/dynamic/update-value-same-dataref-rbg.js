@@ -34,12 +34,14 @@ export const sample = {
 };
 
 export function op(block) {
-  const radio = block.querySelector('#rb1-uv');
+  const radio = block.querySelector('input[id="rb1-uv"]');
   radio.click();
   radio.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 export function expect(block) {
-  assert.equal(block.querySelector('#rb1-uv-2').checked, true, 'checkbox in other group is selected');
-  assert.equal(block.querySelector('#rb1-uv-3').checked, false, 'checkbox in other group is selected');
+  assert.equal(block.querySelector('input[id="rb1-uv"]').checked, true, 'radio-button in other group is selected');
+  assert.equal(block.querySelector('input[id="rb1-uv-1"]').checked, false, 'radio-button in other group is selected');
+  assert.equal(block.querySelector('input[id="rb1-uv-2"]').checked, false, 'radio-button in other group is selected');
+  assert.equal(block.querySelector('input[id="rb1-uv-3"]').checked, false, 'radio-button in other group is selected');
 }
