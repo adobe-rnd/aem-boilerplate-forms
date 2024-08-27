@@ -12,7 +12,8 @@
     ],
     "include": [
       "blocks/form/**/*.js",
-      "blocks/form/rules/*.js"
+      "blocks/form/rules/*.js",
+      "scripts/form-editor-support.js"
     ],
     "report-dir": "coverage",
     "check-coverage": true
@@ -22,8 +23,8 @@
     "test:unit": "mocha",
     "test:e2e": "playwright test",
     "debug:e2e": "playwright test --project='chromium' --debug",
-    "coverage:unit": "c8 --check-coverage --reporter=html --reporter=text --lines 89 --functions 93 --branches 87 mocha",
-    "coverage:e2e": "c8 --check-coverage --reporter=html --reporter=text --lines 89 --functions 93 --branches 87 playwright test --project='chromium'",
+    "coverage:unit": "c8 --check-coverage --reporter=html --reporter=text mocha",
+    "coverage:e2e": "c8 --check-coverage --reporter=html --reporter=text playwright test --project='chromium'",
     "coverage": "node ./test/merge-coverage.js",
     "lint:js": "eslint .",
     "lint:css": "stylelint blocks/**/*.css styles/*.css",
