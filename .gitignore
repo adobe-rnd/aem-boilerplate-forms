@@ -16,3 +16,4 @@ helix-importer-ui
 /blob-report/
 /playwright/.cache/
 test/e2e/reports/
+LoginAuth.json
