@@ -102,11 +102,7 @@ function getPropertyModel(fd) {
   return fd[':type'];
 }
 
-function annotateContainer(container, fd) {
-  let fieldWrapper = container;
-  if (fd[':type'] === 'modal') {
-    fieldWrapper = container.closest('.panel-wrapper');
-  }
+function annotateContainer(fieldWrapper, fd) {
   fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
   fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
   fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
