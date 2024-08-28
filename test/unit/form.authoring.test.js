@@ -3,7 +3,8 @@ import assert from 'assert';
 import path from 'path';
 import fs from 'fs';
 import {
-  annotateFormForEditing, getItems, getFieldById, applyChanges, handleWizardNavigation, getContainerChildNodes,
+  annotateFormForEditing, getItems, getFieldById, applyChanges, handleWizardNavigation,
+  getContainerChildNodes,
 } from '../../scripts/form-editor-support.js';
 import { generateFormRendition } from '../../blocks/form/form.js';
 import { ueFormDef } from './forms/universaleditorform.js';
