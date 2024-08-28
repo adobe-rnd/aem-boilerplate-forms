@@ -111,7 +111,7 @@ function annotateContainer(fieldWrapper, fd) {
   fieldWrapper.setAttribute('data-aue-filter', 'form');
 }
 
-function getContainerChildNodes(container, fd) {
+export function getContainerChildNodes(container, fd) {
   if (fd[':type'] === 'modal') {
     return container.querySelector('.modal-content')?.childNodes;
   }

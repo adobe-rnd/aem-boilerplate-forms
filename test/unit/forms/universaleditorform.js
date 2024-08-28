@@ -134,6 +134,41 @@ export const ueFormDef = {
       },
       ':type': 'wizard',
     },
+    modal: {
+      id: 'modal-id',
+      fieldType: 'panel',
+      name: 'modal',
+      visible: false,
+      enabled: true,
+      label: {
+        visible: true,
+        value: 'Modal',
+      },
+      properties: {
+        'fd:path': '/content/forms-demo-ng/index/jcr:content/root/section_0/form_329757644/modal',
+      },
+      ':itemsOrder': [
+        'textinput',
+      ],
+      ':items': {
+        textinput: {
+          id: 'textinput-4494a13328',
+          fieldType: 'text-input',
+          name: 'firstName',
+          visible: true,
+          type: 'string',
+          enabled: true,
+          label: {
+            value: 'First Name',
+          },
+          properties: {
+            'fd:path': '/content/forms-demo-ng/index/jcr:content/root/section_0/form_329757644/modal/textinput',
+          },
+          ':type': 'core/fd/components/form/textinput/v1/textinput',
+        },
+      },
+      ':type': 'modal',
+    },
   },
-  ':itemsOrder': ['textinput', 'text', 'panelcontainer', 'fragment_1198843043'],
+  ':itemsOrder': ['textinput', 'text', 'panelcontainer', 'fragment_1198843043', 'modal'],
 };
