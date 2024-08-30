@@ -1,9 +1,14 @@
 import { loadCSS } from '../../scripts/aem.js';
 
-let customComponents = ['toggleable-link', 'tnc'];
+let customComponents = [];
+const OOTBComponentDecorators = ['file-input', 'wizard', 'modal'];
 
 export function setCustomComponents(components) {
   customComponents = components;
+}
+
+export function getOOTBComponents() {
+  return OOTBComponentDecorators;
 }
 
 export function getCustomComponents() {
@@ -61,7 +66,7 @@ export default async function componentDecorator(element, fd, container) {
     await loadComponent('wizard', element, fd, container);
   }
 
-  if (getCustomComponents().includes(type)) {
+  if (getCustomComponents().includes(type) || getOOTBComponents().includes(type)) {
     await loadComponent(type, element, fd, container);
   }
 

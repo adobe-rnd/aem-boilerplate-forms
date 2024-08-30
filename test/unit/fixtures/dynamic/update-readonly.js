@@ -62,7 +62,7 @@ export const sample = {
 function getValue(block, id, fieldType, property = 'disabled') {
   const fieldEl = block.querySelector(id);
   if (fieldType === 'checkbox-group' || fieldType === 'radio-group') {
-    const child = fieldEl.querySelector(`input[name=${fieldEl.id}]`);
+    const child = fieldEl.querySelector('input');
     return child[property];
   }
   return fieldEl[property];

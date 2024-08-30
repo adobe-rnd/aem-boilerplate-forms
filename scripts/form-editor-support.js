@@ -21,6 +21,7 @@ import decorate, { generateFormRendition } from '../blocks/form/form.js';
 import { loadCSS } from './aem.js';
 
 window.currentMode = 'preview';
+let activeWizardStep;
 
 export function getItems(container) {
   if (container[':itemsOrder'] && container[':items']) {
@@ -48,6 +49,17 @@ export function getFieldById(panel, id, formFieldMap) {
     });
   }
   return field;
+}
+
+export function handleWizardNavigation(wizardEl, navigateTo) {
+  const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
+  existingSelectedEl.classList.remove('current-wizard-step');
+  navigateTo.classList.add('current-wizard-step');
+  activeWizardStep = navigateTo.dataset.id;
+  const navigateToMenuItem = wizardEl.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
+  const currentMenuItem = wizardEl.querySelector('.wizard-menu-active-item');
+  currentMenuItem.classList.remove('wizard-menu-active-item');
+  navigateToMenuItem.classList.add('wizard-menu-active-item');
 }
 
 function generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition) {
@@ -84,48 +96,68 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
 }
 
 function getPropertyModel(fd) {
-  if ((!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard') && fd[':type'] !== 'tnc') {
+  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard') {
     return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
   }
   return fd[':type'];
 }
 
+function annotateContainer(fieldWrapper, fd) {
+  fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
+  fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
+  fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
+  fieldWrapper.setAttribute('data-aue-type', 'container');
+  fieldWrapper.setAttribute('data-aue-behavior', 'component');
+  fieldWrapper.setAttribute('data-aue-filter', 'form');
+}
+
+export function getContainerChildNodes(container, fd) {
+  if (fd[':type'] === 'modal') {
+    return container.querySelector('.modal-content')?.childNodes;
+  }
+  return container.childNodes;
+}
+
 function annotateItems(items, formDefinition, formFieldMap) {
-  for (let i = items.length - 1; i >= 0; i -= 1) {
-    const fieldWrapper = items[i];
-    if (fieldWrapper.classList.contains('field-wrapper')) {
-      const { id } = fieldWrapper.dataset;
-      const fd = getFieldById(formDefinition, id, formFieldMap);
-      if (fd && fd.properties) {
-        if (fd.fieldType === 'plain-text') {
-          fieldWrapper.setAttribute('data-aue-type', 'richtext');
-          fieldWrapper.setAttribute('data-aue-behavior', 'component');
-          fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-          fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
-          fieldWrapper.setAttribute('data-aue-label', 'Text');
-          fieldWrapper.setAttribute('data-aue-prop', 'value');
-        } else if (fd.fieldType === 'panel') {
-          if (fd.properties['fd:fragment']) {
-            annotateFormFragment(fieldWrapper, fd);
+  try {
+    for (let i = items.length - 1; i >= 0; i -= 1) {
+      const fieldWrapper = items[i];
+      if (fieldWrapper.classList.contains('field-wrapper')) {
+        const { id } = fieldWrapper.dataset;
+        const fd = getFieldById(formDefinition, id, formFieldMap);
+        if (fd && fd.properties) {
+          if (fd.fieldType === 'plain-text') {
+            fieldWrapper.setAttribute('data-aue-type', 'richtext');
+            fieldWrapper.setAttribute('data-aue-behavior', 'component');
+            fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
+            fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
+            fieldWrapper.setAttribute('data-aue-label', 'Text');
+            fieldWrapper.setAttribute('data-aue-prop', 'value');
+          } else if (fd.fieldType === 'panel') {
+            if (fd.properties['fd:fragment']) {
+              annotateFormFragment(fieldWrapper, fd);
+            } else {
+              annotateContainer(fieldWrapper, fd);
+              annotateItems(getContainerChildNodes(fieldWrapper, fd), formDefinition, formFieldMap);
+              // retain wizard step selection
+              if (activeWizardStep === fieldWrapper.dataset.id) {
+                handleWizardNavigation(fieldWrapper.parentElement, fieldWrapper);
+              }
+            }
           } else {
+            fieldWrapper.setAttribute('data-aue-type', 'component');
             fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
             fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
             fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
-            fieldWrapper.setAttribute('data-aue-type', 'container');
-            fieldWrapper.setAttribute('data-aue-behavior', 'component');
-            fieldWrapper.setAttribute('data-aue-filter', 'form');
-            annotateItems(fieldWrapper.childNodes, formDefinition, formFieldMap);
           }
         } else {
-          fieldWrapper.setAttribute('data-aue-type', 'component');
-          fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-          fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
-          fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
+          console.warn(`field ${id} not found in form definition`);
         }
-      } else {
-        console.warn(`field ${id} not found in form definition`);
       }
     }
+  } catch (error) {
+    console.error('Error while annotating form elements', error);
+    window.alert('Error while annotating form elements');
   }
 }
 
@@ -139,16 +171,6 @@ export function annotateFormForEditing(formEl, formDefinition) {
   }
   const formFieldMap = {};
   annotateItems(formEl.childNodes, formDefinition, formFieldMap);
-}
-
-function handleWizardNavigation(wizardEl, navigateTo) {
-  const existingSelectedEl = wizardEl.querySelector('.current-wizard-step');
-  existingSelectedEl.classList.remove('current-wizard-step');
-  navigateTo.classList.add('current-wizard-step');
-  const navigateToMenuItem = wizardEl.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
-  const currentMenuItem = wizardEl.querySelector('.wizard-menu-active-item');
-  currentMenuItem.classList.remove('wizard-menu-active-item');
-  navigateToMenuItem.classList.add('wizard-menu-active-item');
 }
 
 /**
@@ -263,14 +285,13 @@ export async function applyChanges(event) {
         const jsonContent = codeEl?.textContent;
         if (jsonContent) {
           const formDef = decode(jsonContent);
-          let panelLabel;
           if (element.classList.contains('panel-wrapper')) {
             element = element.parentNode;
-            panelLabel = element.querySelector('legend');
           }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
-          if (parent.classList.contains('panel-wrapper') && panelLabel) {
+          if (parent.classList.contains('panel-wrapper')) {
+            const panelLabel = parent.querySelector('legend');
             parent.replaceChildren(panelLabel);
           } else {
             parent.replaceChildren();
@@ -279,7 +300,7 @@ export async function applyChanges(event) {
             parent.removeAttribute('data-component-status');
           }
           await generateFormRendition(parentDef, parent, getItems);
-          annotateItems(parent.childNodes, formDef, {});
+          annotateItems(getContainerChildNodes(parent, parentDef), formDef, {});
           return true;
         }
         return false;
