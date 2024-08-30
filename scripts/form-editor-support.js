@@ -84,7 +84,7 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
 }
 
 function getPropertyModel(fd) {
-  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard') {
+  if ((!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard') && fd[':type'] !== 'tnc') {
     return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
   }
   return fd[':type'];
@@ -109,7 +109,7 @@ function annotateItems(items, formDefinition, formFieldMap) {
             annotateFormFragment(fieldWrapper, fd);
           } else {
             fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-            fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
+            fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
             fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
             fieldWrapper.setAttribute('data-aue-type', 'container');
             fieldWrapper.setAttribute('data-aue-behavior', 'component');
