@@ -322,16 +322,19 @@ function attachEventListners(main) {
     });
   });
 
-  document.body.addEventListener('aue:ui-edit', () => {
+  const ueEditModeHandler = () => {
     window.currentMode = 'edit';
     const forms = document.querySelectorAll('form');
     annotateFormsForEditing(forms);
-  });
-}
+  };
 
-loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
-attachEventListners(document.querySelector('main'));
-const forms = document.querySelectorAll('form');
-annotateFormsForEditing(forms);
+  if (document.documentElement.classList.contains('adobe-ue-edit')) {
+    ueEditModeHandler();
+  } else {
+    document.body.addEventListener('aue:ui-edit', ueEditModeHandler);
+  }
+}
 const observer = new MutationObserver(instrumentForms);
 observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
+loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
+attachEventListners(document.querySelector('main'));
