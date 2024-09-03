@@ -106,7 +106,7 @@ function annotateItems(items, formDefinition, formFieldMap) {
   try {
     for (let i = items.length - 1; i >= 0; i -= 1) {
       const fieldWrapper = items[i];
-      if (fieldWrapper.classList.contains('field-wrapper')) {
+      if (fieldWrapper.classList?.contains('field-wrapper')) {
         const { id } = fieldWrapper.dataset;
         const fd = getFieldById(formDefinition, id, formFieldMap);
         if (fd && fd.properties) {
@@ -279,7 +279,7 @@ export async function applyChanges(event) {
           }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
-          if (parent.classList.contains('panel-wrapper')) {
+          if (parent.classList?.contains('panel-wrapper') && parent.querySelector('legend')) {
             const panelLabel = parent.querySelector('legend');
             parent.replaceChildren(panelLabel);
           } else {

@@ -20,7 +20,7 @@ export class UniversalEditorBase {
     iFrame: 'iframe[name="Main Content"]',
     panelHeaders: 'div[class="PanelHeader"]',
     propertyPagePath: 'button[aria-label="Properties"]',
-    componentTitleInProperties: 'input[aria-label="Title"]',
+    componentTitleInProperties: 'textarea[aria-label="Title"]',
     deleteButton: 'button[aria-label="Delete"]',
     deleteConfirmationButton: '[data-variant="negative"][class*="aaz5ma_spectrum-ButtonGroup-Button"]',
     deletePopup: 'section[class*="spectrum-Dialog--destructive"]',

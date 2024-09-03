@@ -11,9 +11,11 @@ import { ueAddEvent } from './fixtures/ue/events/event-add.js';
 import { ueAddEventForWizardNavigation } from './fixtures/ue/events/event-add-wizardnavigation.js';
 import { uePatchEvent } from './fixtures/ue/events/event-patch.js';
 import { uePatchTitleEvent } from './fixtures/ue/events/event-patch-title.js';
+import { uePatchEmptyTitleEvent } from './fixtures/ue/events/event-patch-empty-title.js';
 import { ueFormDefForAddTest } from './fixtures/ue/events/formdefinition-add.js';
 import { ueFormDefForPatchTest } from './fixtures/ue/events/formdefinition-patch.js';
 import { ueFormDefForPatchTitleTest } from './fixtures/ue/events/formdefinition-patch-title.js';
+import { ueFormDefForPatchEmptyTitleTest } from './fixtures/ue/events/formdefinition-patch-empty-title.js';
 import { ueFormDefForWizardNavigationTest } from './fixtures/ue/events/formdefinition-wizardnavigation.js';
 import { renderForm } from './testUtils.js';
 
@@ -175,6 +177,23 @@ describe('Universal Editor Authoring Test Cases', () => {
     assert.equal(panel.childNodes.length, 2);
     const labelEl = panel.querySelector('legend[for="panelcontainer-5012648f84"]');
     assert.equal(labelEl.textContent, 'Panel');
+    const textInputElLabel = panel.querySelector('label[for="textinput-3eb2e7d0b6"]');
+    assert.equal(textInputElLabel.textContent, 'Text Input new');
+    document.body.replaceChildren();
+  });
+
+  it('test UE patch event for panel empty title', async () => {
+    await renderForm(ueFormDefForPatchEmptyTitleTest);
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: uePatchEmptyTitleEvent });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    assert.equal(formEl.childNodes.length, 1); // only 1 panel is there
+    const panel = formEl.querySelector('.panel-wrapper');
+    // only 1 text-input (no panel legend)
+    assert.equal(panel.childNodes.length, 1);
+    const labelEl = panel.querySelector('legend[for="panelcontainer-5012648f84"]');
+    assert.equal(labelEl == null, true);
     const textInputElLabel = panel.querySelector('label[for="textinput-3eb2e7d0b6"]');
     assert.equal(textInputElLabel.textContent, 'Text Input new');
     document.body.replaceChildren();
