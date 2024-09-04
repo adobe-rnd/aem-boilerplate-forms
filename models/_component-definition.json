@@ -68,6 +68,9 @@
           "...": "./form/_image.json#/definitions"
         },
         {
+          "...": "./form/_modal.json#/definitions"
+        },
+        {
           "...": "./form/_number-input.json#/definitions"
         },
         {

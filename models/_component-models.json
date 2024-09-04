@@ -45,6 +45,9 @@
     "...": "./form/_image.json#/models"
   },
   {
+    "...": "./form/_modal.json#/models"
+  },
+  {
     "...": "./form/_number-input.json#/models"
   },
   {
