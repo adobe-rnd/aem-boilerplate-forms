@@ -1,6 +1,6 @@
-// import { subscribe } from '../../rules/index.js';
+import { subscribe } from '../../rules/index.js';
 
-const textIntersectionClass = 'tnc__intersection';
+const textIntersectionClass = 'tnc__text-intersect';
 const textDecorationClass = 'tnc__text-decoration';
 
 class TermsAndConditions {
@@ -29,32 +29,27 @@ class TermsAndConditions {
   }
 
   handleScroll() {
-    const intersection = this.fieldDiv.querySelector(textIntersectionClass);
+    const intersection = this.fieldDiv.querySelector(`.${textIntersectionClass}`);
     if (intersection) {
-      console.log(intersection);
-      // const self = this;
-      // const io = new IntersectionObserver(onIntersection, {
-      //     threshold: [1],
-      // })
-      // function onIntersection ([{isIntersecting}]) {
-      //     const isEnabled = self.getModel()?.enabled && !self.getModel()?.readOnly;
-      //     if (isIntersecting) {
-      //         if (isEnabled) {
-      //             self.children.filter(c =>
-      //                c.getModel()._jsonModel.fieldType === 'checkbox').forEach(cb => {
-      //                   cb.getModel().enabled = true;
-      //             })}
-      //         io.unobserve(intersection);
-      //     }
-      // }
-      // io.observe(intersection)
+      const io = new IntersectionObserver(([{ isIntersecting }]) => {
+        if (isIntersecting) {
+          /*
+          * TODO: Enable the checkboxes that are disabled by default via the model.
+          *  Currently they are enabled by default
+          * */
+          io.unobserve(intersection);
+        }
+      }, {
+        threshold: [1],
+      });
+      io.observe(intersection);
     }
   }
 }
 export default async function decorate(tncDiv, fieldJson) {
   const tnc = new TermsAndConditions(tncDiv, fieldJson);
-  // subscribe(tncDiv, async (fieldDiv, formModel) => {
-  //     tnc.setFormModel(formModel);
-  // })
+  subscribe(tncDiv, async (fieldDiv, formModel) => {
+    tnc.setFormModel(formModel);
+  });
   return tnc.getfieldDiv();
 }

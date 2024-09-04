@@ -395,7 +395,6 @@
                     "textIsRich": true
                   },
                   "link": {
-                    "jcr:title": "",
                     "enum": ["dummy-link-1", "dummy-link-2"],
                     "type": "string[]",
                     "fd:viewType": "toggleable-link",
