@@ -48,7 +48,7 @@
   "homepage": "https://github.com/adobe-rnd/aem-boilerplate-forms#readme",
   "devDependencies": {
     "@adobe/json-formula": "0.1.50",
-    "@aemforms/af-core": "0.22.85",
+    "@aemforms/af-core": "/Users/rae/Documents/repos/af2-web-runtime/packages/forms-next-core",
     "@aemforms/af-custom-functions": "^1.0.8",
     "@aemforms/af-formatters": "0.22.85",
     "@babel/core": "7.24.0",

@@ -18,9 +18,9 @@
 * the terms of the Adobe license agreement accompanying it.
 *************************************************************************/
 
-import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, SubmitError, SubmitFailure, Submit, Save, Reset, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
+import { E as EventSource, p as propertyChange, a as ExecuteRule, I as Initialize, R as RemoveItem, C as Change, F as FormLoad, b as FocusOption, c as FieldChanged, V as ValidationComplete, d as constraintKeys, g as getConstraintTypeMessages, e as Valid, f as Invalid, h as ValidationError, S as SubmitSuccess, i as CustomEvent, j as SubmitError, k as SubmitFailure, l as CaptchaDisplayMode, m as Submit, n as Save, o as Reset, q as RemoveInstance, A as AddInstance, r as AddItem, s as Click } from './Events-f062426b-7d817b42.js';
 import Formula from '../formula/index.js';
-import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, formatDate, numberToDatetime } from './afb-formatters.min.js';
+import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -28,77 +28,6 @@ function __decorate(decorators, target, key, desc) {
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 }
-const ConstraintType = Object.freeze({
-    PATTERN_MISMATCH: 'patternMismatch',
-    TOO_SHORT: 'tooShort',
-    TOO_LONG: 'tooLong',
-    RANGE_OVERFLOW: 'rangeOverflow',
-    RANGE_UNDERFLOW: 'rangeUnderflow',
-    TYPE_MISMATCH: 'typeMismatch',
-    VALUE_MISSING: 'valueMissing',
-    STEP_MISMATCH: 'stepMismatch',
-    FORMAT_MISMATCH: 'formatMismatch',
-    ACCEPT_MISMATCH: 'acceptMismatch',
-    FILE_SIZE_MISMATCH: 'fileSizeMismatch',
-    UNIQUE_ITEMS_MISMATCH: 'uniqueItemsMismatch',
-    MIN_ITEMS_MISMATCH: 'minItemsMismatch',
-    MAX_ITEMS_MISMATCH: 'maxItemsMismatch',
-    EXPRESSION_MISMATCH: 'expressionMismatch'
-});
-const constraintKeys = Object.freeze({
-    pattern: ConstraintType.PATTERN_MISMATCH,
-    minLength: ConstraintType.TOO_SHORT,
-    maxLength: ConstraintType.TOO_LONG,
-    maximum: ConstraintType.RANGE_OVERFLOW,
-    minimum: ConstraintType.RANGE_UNDERFLOW,
-    type: ConstraintType.TYPE_MISMATCH,
-    required: ConstraintType.VALUE_MISSING,
-    step: ConstraintType.STEP_MISMATCH,
-    format: ConstraintType.FORMAT_MISMATCH,
-    accept: ConstraintType.ACCEPT_MISMATCH,
-    maxFileSize: ConstraintType.FILE_SIZE_MISMATCH,
-    uniqueItems: ConstraintType.UNIQUE_ITEMS_MISMATCH,
-    minItems: ConstraintType.MIN_ITEMS_MISMATCH,
-    maxItems: ConstraintType.MAX_ITEMS_MISMATCH,
-    validationExpression: ConstraintType.EXPRESSION_MISMATCH
-});
-const defaultConstraintTypeMessages = Object.freeze({
-    [ConstraintType.PATTERN_MISMATCH]: 'Please match the format requested.',
-    [ConstraintType.TOO_SHORT]: 'Please lengthen this text to ${0} characters or more.',
-    [ConstraintType.TOO_LONG]: 'Please shorten this text to ${0} characters or less.',
-    [ConstraintType.RANGE_OVERFLOW]: 'Value must be less than or equal to ${0}.',
-    [ConstraintType.RANGE_UNDERFLOW]: 'Value must be greater than or equal to ${0}.',
-    [ConstraintType.TYPE_MISMATCH]: 'Please enter a valid value.',
-    [ConstraintType.VALUE_MISSING]: 'Please fill in this field.',
-    [ConstraintType.STEP_MISMATCH]: 'Please enter a valid value.',
-    [ConstraintType.FORMAT_MISMATCH]: 'Specify the value in allowed format : ${0}.',
-    [ConstraintType.ACCEPT_MISMATCH]: 'The specified file type not supported.',
-    [ConstraintType.FILE_SIZE_MISMATCH]: 'File too large. Reduce size and try again.',
-    [ConstraintType.UNIQUE_ITEMS_MISMATCH]: 'All the items must be unique.',
-    [ConstraintType.MIN_ITEMS_MISMATCH]: 'Specify a number of items equal to or greater than ${0}.',
-    [ConstraintType.MAX_ITEMS_MISMATCH]: 'Specify a number of items equal to or less than ${0}.',
-    [ConstraintType.EXPRESSION_MISMATCH]: 'Please enter a valid value.'
-});
-let customConstraintTypeMessages = {};
-const getConstraintTypeMessages = () => {
-    return {
-        ...defaultConstraintTypeMessages,
-        ...customConstraintTypeMessages
-    };
-};
-class ValidationError {
-    fieldName;
-    errorMessages;
-    constructor(fieldName = '', errorMessages = []) {
-        this.errorMessages = errorMessages;
-        this.fieldName = fieldName;
-    }
-}
-var FocusOption;
-(function (FocusOption) {
-    FocusOption["NEXT_ITEM"] = "nextItem";
-    FocusOption["PREVIOUS_ITEM"] = "previousItem";
-})(FocusOption || (FocusOption = {}));
 const objToMap = (o) => new Map(Object.entries(o));
 const stringViewTypes = objToMap({ 'date': 'date-input', 'data-url': 'file-input', 'binary': 'file-input' });
 const typeToViewTypes = objToMap({
@@ -167,19 +96,21 @@ const isButton = function (item) {
     return item?.fieldType === 'button';
 };
 function deepClone(obj, idGenerator) {
-    let result;
-    if (obj instanceof Array) {
-        result = [];
-        result = obj.map(x => deepClone(x, idGenerator));
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
     }
-    else if (typeof obj === 'object' && obj !== null) {
-        result = {};
-        Object.entries(obj).forEach(([key, value]) => {
-            result[key] = deepClone(value, idGenerator);
-        });
+    let result;
+    if (Array.isArray(obj)) {
+        result = new Array(obj.length);
+        for (let i = 0; i < obj.length; i++) {
+            result[i] = deepClone(obj[i], idGenerator);
+        }
     }
     else {
-        result = obj;
+        result = {};
+        for (const key of Object.keys(obj)) {
+            result[key] = deepClone(obj[key], idGenerator);
+        }
     }
     if (idGenerator && result && result.id) {
         result.id = idGenerator();
@@ -202,10 +133,12 @@ class DataValue {
     $_value;
     $_type;
     $_fields = [];
-    constructor($_name, $_value, $_type = typeof $_value) {
+    parent;
+    constructor($_name, $_value, $_type = typeof $_value, parent) {
         this.$_name = $_name;
         this.$_value = $_value;
         this.$_type = $_type;
+        this.parent = parent;
     }
     valueOf() {
         return this.$_value;
@@ -213,11 +146,11 @@ class DataValue {
     get $name() {
         return this.$_name;
     }
-    get $value() {
+    get disabled() {
         const enabled = this.$_fields.find(x => x.enabled !== false);
-        if (!enabled && this.$_fields.length) {
-            return undefined;
-        }
+        return (!enabled && this.$_fields.length);
+    }
+    get $value() {
         return this.$_value;
     }
     setValue(typedValue, originalValue, fromField) {
@@ -241,6 +174,9 @@ class DataValue {
     }
     get $isDataGroup() {
         return false;
+    }
+    $addDataNode(name, value, override = false) {
+        throw 'add Data Node is called on a data value';
     }
 }
 const value = Symbol('NullValue');
@@ -272,38 +208,34 @@ class NullDataValueClass extends DataValue {
 const NullDataValue = new NullDataValueClass();
 class DataGroup extends DataValue {
     $_items;
-    createEntry(key, value) {
-        const t = value instanceof Array ? 'array' : typeof value;
+    createEntry(key, value, parent) {
+        const t = Array.isArray(value) ? 'array' : typeof value;
         if (typeof value === 'object' && value != null) {
-            return new DataGroup(key, value, t);
+            return new DataGroup(key, value, t, parent);
         }
         else {
-            return new DataValue(key, value, t);
+            return new DataValue(key, value, t, parent);
         }
     }
-    constructor(_name, _value, _type = typeof _value) {
-        super(_name, _value, _type);
+    constructor(_name, _value, _type = typeof _value, parent) {
+        super(_name, _value, _type, parent);
         if (_value instanceof Array) {
             this.$_items = _value.map((value, index) => {
-                return this.createEntry(index, value);
+                return this.createEntry(index, value, this);
             });
         }
         else {
             this.$_items = Object.fromEntries(Object.entries(_value).map(([key, value]) => {
-                return [key, this.createEntry(key, value)];
+                return [key, this.createEntry(key, value, this)];
             }));
         }
     }
     get $value() {
-        const enabled = this.$_fields.find(x => x.enabled !== false);
-        if (!enabled && this.$_fields.length) {
-            return this.$type === 'array' ? [] : {};
-        }
-        else if (this.$type === 'array') {
-            return Object.values(this.$_items).filter(x => typeof x !== 'undefined').map(x => x.$value);
+        if (this.$type === 'array') {
+            return Object.values(this.$_items).filter(x => typeof x !== 'undefined' && !x.disabled).map(x => x.$value);
         }
         else {
-            return Object.fromEntries(Object.values(this.$_items).filter(x => typeof x !== 'undefined').map(x => {
+            return Object.fromEntries(Object.values(this.$_items).filter(x => typeof x !== 'undefined' && !x.disabled).map(x => {
                 return [x.$name, x.$value];
             }));
         }
@@ -312,7 +244,7 @@ class DataGroup extends DataValue {
         return Object.entries(this.$_items).length;
     }
     $convertToDataValue() {
-        return new DataValue(this.$name, this.$value, this.$type);
+        return new DataValue(this.$name, this.$value, this.$type, this.parent);
     }
     $addDataNode(name, value, override = false) {
         if (value !== NullDataValue) {
@@ -328,6 +260,7 @@ class DataGroup extends DataValue {
             else {
                 this.$_items[name] = value;
             }
+            value.parent = this;
         }
     }
     $removeDataNode(name) {
@@ -602,6 +535,9 @@ class FileObject {
     }
     get type() {
         return this.mediaType;
+    }
+    set type(type) {
+        this.mediaType = type;
     }
     toJSON() {
         return {
@@ -1221,6 +1157,7 @@ class BaseNode {
     _dependents = [];
     _jsonModel;
     _tokens = [];
+    _eventSource = EventSource.CODE;
     get isContainer() {
         return false;
     }
@@ -1305,6 +1242,9 @@ class BaseNode {
     }
     get name() {
         return this._jsonModel.name;
+    }
+    get screenReaderText() {
+        return this._jsonModel.screenReaderText;
     }
     get description() {
         return this._jsonModel.description;
@@ -1468,7 +1408,7 @@ class BaseNode {
         }
         return [];
     }
-    _bindToDataModel(contextualDataModel) {
+    bindToDataModel(contextualDataModel) {
         if (this.fieldType === 'form' || this.id === '$form') {
             this._data = contextualDataModel;
             return;
@@ -1530,6 +1470,7 @@ class BaseNode {
             _data?.$bindToField(this);
             this._data = _data;
         }
+        return this._data;
     }
     _data;
     getDataNode() {
@@ -1569,7 +1510,7 @@ class BaseNode {
                 dataNode = parent.getDataNode();
                 parent = parent.parent;
             } while (dataNode === undefined);
-            this._bindToDataModel(dataNode);
+            this.bindToDataModel(dataNode);
         }
     }
     _applyUpdates(propNames, updates) {
@@ -2025,7 +1966,7 @@ class Container extends Scriptable {
     _canHaveRepeatingChildren(mode = 'create') {
         const items = this._jsonModel.items;
         return this._jsonModel.type == 'array' && this.getDataNode() != null &&
-            (items.length === 1 || (items[0].repeatable == true && mode === 'restore'));
+            (items.length === 1 || (items.length > 0 && items[0].repeatable == true && mode === 'restore'));
     }
     _initialize(mode) {
         super._initialize(mode);
@@ -2170,12 +2111,36 @@ class Container extends Scriptable {
     dispatch(action) {
         super.dispatch(action);
     }
-    importData(contextualDataModel) {
-        this._bindToDataModel(contextualDataModel);
-        const dataNode = this.getDataNode() || contextualDataModel;
-        this.syncDataAndFormModel(dataNode);
+    importData(dataModel) {
+        if (typeof this._data !== 'undefined' && this.type === 'array' && Array.isArray(dataModel.items)) {
+            const dataGroup = new DataGroup(this._data.$name, dataModel.items, this._data.$type, this._data.parent);
+            try {
+                this._data.parent?.$addDataNode(dataGroup.$name, dataGroup, true);
+            }
+            catch (e) {
+                this.form.logger.error(`unable to setItems for ${this.qualifiedName} : ${e}`);
+                return;
+            }
+            this._data = dataGroup;
+            const result = this.syncDataAndFormModel(dataGroup);
+            const newLength = this.items.length;
+            result.added.forEach((item) => {
+                this.notifyDependents(propertyChange('items', item.getState(), null));
+                item.dispatch(new Initialize());
+            });
+            for (let i = 0; i < newLength; i += 1) {
+                this._children[i].dispatch(new ExecuteRule());
+            }
+            result.removed.forEach((item) => {
+                this.notifyDependents(propertyChange('items', null, item.getState()));
+            });
+        }
     }
     syncDataAndFormModel(contextualDataModel) {
+        const result = {
+            added: [],
+            removed: []
+        };
         if (contextualDataModel?.$type === 'array' && this._itemTemplate != null) {
             const dataLength = contextualDataModel?.$value.length;
             const itemsLength = this._children.length;
@@ -2185,19 +2150,26 @@ class Container extends Scriptable {
             const items2Remove = Math.min(itemsLength - dataLength, itemsLength - minItems);
             while (items2Add > 0) {
                 items2Add--;
-                const child = this._addChild(this._itemTemplate);
+                const child = this._addChild(this._itemTemplate, this.items.length, true);
                 child._initialize('create');
+                result.added.push(child);
             }
             if (items2Remove > 0) {
-                this._children.splice(dataLength, items2Remove);
                 for (let i = 0; i < items2Remove; i++) {
                     this._childrenReference.pop();
+                    this._children.pop();
                 }
+                result.removed.push(...this._children);
             }
         }
         this._children.forEach(x => {
-            x.importData(contextualDataModel);
+            let dataModel = x.bindToDataModel(contextualDataModel);
+            if (x.isContainer && !dataModel) {
+                dataModel = contextualDataModel;
+            }
+            x.syncDataAndFormModel(dataModel);
         });
+        return result;
     }
     get activeChild() {
         return this._activeChild;
@@ -2220,12 +2192,11 @@ class Container extends Scriptable {
         }
     }
     get enabled() {
-        if (this.parent?.enabled !== undefined) {
-            return !this.parent?.enabled ? false : this._jsonModel.enabled;
+        const parentEnabled = this.parent?.enabled;
+        if (parentEnabled !== undefined) {
+            return parentEnabled ? this._jsonModel.enabled : false;
         }
-        else {
-            return this._jsonModel.enabled;
-        }
+        return this._jsonModel.enabled;
     }
     set enabled(e) {
         this._setProperty('enabled', e, true, this.notifyChildren);
@@ -2552,6 +2523,24 @@ const urlEncoded = (data) => {
     });
     return formData;
 };
+const submit = async (context, success, error, submitAs = 'multipart/form-data', input_data = null, action = '', metadata = null) => {
+    const endpoint = action || context.form.action;
+    let data = input_data;
+    if (typeof data != 'object' || data == null) {
+        data = context.form.exportData();
+    }
+    const attachments = getAttachments(context.form, true);
+    let submitContentType = submitAs;
+    const submitDataAndMetaData = { 'data': data, ...metadata };
+    let formData = submitDataAndMetaData;
+    if (Object.keys(attachments).length > 0 || submitAs === 'multipart/form-data') {
+        formData = multipartFormData(submitDataAndMetaData, attachments);
+        submitContentType = 'multipart/form-data';
+    }
+    await request(context, endpoint, 'POST', formData, success, error, {
+        'Content-Type': submitContentType
+    });
+};
 const multipartFormData = (data, attachments) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
@@ -2583,24 +2572,6 @@ const multipartFormData = (data, attachments) => {
         }, []);
     }
     return formData;
-};
-const submit = async (context, success, error, submitAs = 'multipart/form-data', input_data = null, action = '', metadata = null) => {
-    const endpoint = action || context.form.action;
-    let data = input_data;
-    if (typeof data != 'object' || data == null) {
-        data = context.form.exportData();
-    }
-    const attachments = getAttachments(context.form, true);
-    let submitContentType = submitAs;
-    const submitDataAndMetaData = { 'data': data, ...metadata };
-    let formData = submitDataAndMetaData;
-    if (Object.keys(attachments).length > 0 || submitAs === 'multipart/form-data') {
-        formData = multipartFormData(submitDataAndMetaData, attachments);
-        submitContentType = 'multipart/form-data';
-    }
-    await request(context, endpoint, 'POST', formData, success, error, {
-        'Content-Type': submitContentType
-    });
 };
 const createAction = (name, payload = {}) => {
     switch (name) {
@@ -2664,8 +2635,8 @@ class FunctionRuntimeImpl {
                                     const args = [target];
                                     return FunctionRuntimeImpl.getInstance().getFunctions().validate._func.call(undefined, args, data, interpreter);
                                 },
-                                importData: (inputData) => {
-                                    const args = [inputData];
+                                importData: (inputData, qualifiedName) => {
+                                    const args = [inputData, qualifiedName];
                                     return FunctionRuntimeImpl.getInstance().getFunctions().importData._func.call(undefined, args, data, interpreter);
                                 },
                                 exportData: () => {
@@ -2698,6 +2669,21 @@ class FunctionRuntimeImpl {
                                 dispatchEvent: (target, eventName, payload) => {
                                     const args = [target, eventName, payload];
                                     return FunctionRuntimeImpl.getInstance().getFunctions().dispatchEvent._func.call(undefined, args, data, interpreter);
+                                },
+                                getFiles: (qualifiedName) => {
+                                    const filesMap = {};
+                                    if (!qualifiedName) {
+                                        interpreter.globals.form.visit(function callback(f) {
+                                            if (f.fieldType === 'file-input' && f.value) {
+                                                filesMap[f.qualifiedName] = f.serialize();
+                                            }
+                                        });
+                                    }
+                                    const field = interpreter.globals.form.resolveQualifiedName(qualifiedName);
+                                    if (field?.fieldType === 'file-input' && field?.value) {
+                                        filesMap[qualifiedName] = field.serialize();
+                                    }
+                                    return filesMap;
                                 }
                             }
                         };
@@ -2790,15 +2776,25 @@ class FunctionRuntimeImpl {
             importData: {
                 _func: (args, data, interpreter) => {
                     const inputData = args[0];
-                    if (typeof inputData === 'object' && inputData !== null) {
+                    const qualifiedName = args[1];
+                    if (typeof inputData === 'object' && inputData !== null && !qualifiedName) {
                         interpreter.globals.form.importData(inputData);
+                    }
+                    else {
+                        const field = interpreter.globals.form.resolveQualifiedName(qualifiedName);
+                        if (field?.isContainer) {
+                            field.importData(inputData, qualifiedName);
+                        }
+                        else {
+                            interpreter.globals.form.logger.error('Invalid argument passed in importData. A container is expected');
+                        }
                     }
                     return {};
                 },
                 _signature: []
             },
             submitForm: {
-                _func: (args, data, interpreter) => {
+                _func: async (args, data, interpreter) => {
                     let success = null;
                     let error = null;
                     let submit_data;
@@ -2816,6 +2812,24 @@ class FunctionRuntimeImpl {
                         submit_as = args.length > 2 ? toString(args[2]) : 'multipart/form-data';
                         submit_data = args.length > 3 ? valueOf(args[3]) : null;
                         validate_form = args.length > 4 ? valueOf(args[4]) : true;
+                    }
+                    const form = interpreter.globals.form;
+                    if (form.captcha && (form.captcha.captchaDisplayMode === CaptchaDisplayMode.INVISIBLE ||
+                        (form.captcha.properties['fd:captcha']?.config?.version === 'enterprise' && form.captcha.properties['fd:captcha']?.config?.keyType === 'score'))) {
+                        if (typeof interpreter.runtime.functionTable.fetchCaptchaToken?._func !== 'function') {
+                            interpreter.globals.form.logger.error('fetchCaptchaToken is not defined');
+                            interpreter.globals.form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenNotDefined' }));
+                            return {};
+                        }
+                        try {
+                            const token = await interpreter.runtime.functionTable.fetchCaptchaToken._func([], data, interpreter);
+                            form.captcha.value = token;
+                        }
+                        catch (e) {
+                            interpreter.globals.form.logger.error('Error while fetching captcha token');
+                            interpreter.globals.form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenFailed' }));
+                            return {};
+                        }
                     }
                     interpreter.globals.form.dispatch(new Submit({
                         success,
@@ -2978,6 +2992,7 @@ class Form extends Container {
     _fields = {};
     _ids;
     _invalidFields = [];
+    _captcha = null;
     constructor(n, fieldFactory, _ruleEngine, _eventQueue = new EventQueue(), logLevel = 'off', mode = 'create') {
         super(n, { fieldFactory: fieldFactory, mode });
         this._ruleEngine = _ruleEngine;
@@ -2994,7 +3009,7 @@ class Form extends Container {
             }
         }
         this._ids = IdGenerator();
-        this._bindToDataModel(new DataGroup('$form', {}));
+        this.bindToDataModel(new DataGroup('$form', {}));
         this._initialize(mode);
         if (mode === 'create') {
             this.queueEvent(new FormLoad());
@@ -3034,7 +3049,7 @@ class Form extends Container {
         return this._jsonModel.action;
     }
     importData(dataModel) {
-        this._bindToDataModel(new DataGroup('$form', dataModel));
+        this.bindToDataModel(new DataGroup('$form', dataModel));
         this.syncDataAndFormModel(this.getDataNode());
         this._eventQueue.runPendingQueue();
     }
@@ -3078,7 +3093,7 @@ class Form extends Container {
         const options = {
             lang: this.lang,
             captchaInfo: captchaInfoObj,
-            additionalSubmitMetadata: { ...this.additionalSubmitMetadata }
+            ...this.additionalSubmitMetadata
         };
         return new SubmitMetaData(options);
     }
@@ -3181,6 +3196,9 @@ class Form extends Container {
         return this._ids.next().value;
     }
     fieldAdded(field) {
+        if (field.fieldType === 'captcha' && !this._captcha) {
+            this._captcha = field;
+        }
         this._fields[field.id] = field;
         field.subscribe((action) => {
             if (this._invalidFields.indexOf(action.target.id) === -1) {
@@ -3214,7 +3232,7 @@ class Form extends Container {
                         prevValue: shallowClone(prevValue)
                     };
                 });
-                const fieldChangedAction = new FieldChanged(changes, field);
+                const fieldChangedAction = new FieldChanged(changes, field, action.payload.eventSource);
                 this.notifyDependents(fieldChangedAction);
             }
         });
@@ -3311,6 +3329,9 @@ class Form extends Container {
     }
     get title() {
         return this._jsonModel.title || '';
+    }
+    get captcha() {
+        return this._captcha;
     }
 }
 function stringToNumber(str, language) {
@@ -3418,7 +3439,7 @@ class Fieldset extends Container {
         return super.items ? super.items : [];
     }
     get value() {
-        return null;
+        return this.getDataNode()?.$value;
     }
     get fieldType() {
         return 'panel';
@@ -3531,6 +3552,9 @@ class Field extends Scriptable {
         if (['plain-text', 'image'].indexOf(this.fieldType) === -1) {
             this._jsonModel.value = undefined;
         }
+        else {
+            this._jsonModel.default = this._jsonModel.default || this._jsonModel.value;
+        }
         const value = this._jsonModel.value;
         if (value === undefined) {
             const typedRes = Constraints.type(this.getInternalType() || 'string', this._jsonModel.default);
@@ -3627,12 +3651,11 @@ class Field extends Scriptable {
         this._setProperty('readOnly', e);
     }
     get enabled() {
-        if (this.parent.enabled !== undefined) {
-            return this.parent.enabled === false ? false : this._jsonModel.enabled;
+        const parentEnabled = this.parent?.enabled;
+        if (parentEnabled !== undefined) {
+            return parentEnabled ? this._jsonModel.enabled : false;
         }
-        else {
-            return this._jsonModel.enabled;
-        }
+        return this._jsonModel.enabled;
     }
     set enabled(e) {
         this._setProperty('enabled', e);
@@ -3751,7 +3774,7 @@ class Field extends Scriptable {
     }
     updateDataNodeAndTypedValue(val) {
         const dataNode = this.getDataNode();
-        if (staticFields.indexOf(this.fieldType) > -1 && typeof dataNode !== 'undefined') {
+        if (staticFields.indexOf(this.fieldType) > -1 && typeof dataNode !== 'undefined' && dataNode !== NullDataValue) {
             return;
         }
         const Constraints = this._getConstraintObject();
@@ -3805,9 +3828,19 @@ class Field extends Scriptable {
             if (updates.valid) {
                 this.triggerValidationEvent(updates);
             }
-            const changeAction = new Change({ changes: changes.concat(Object.values(updates)) });
+            const changeAction = new Change({ changes: changes.concat(Object.values(updates)), eventSource: this._eventSource });
             this.dispatch(changeAction);
         }
+    }
+    uiChange(action) {
+        this._eventSource = EventSource.UI;
+        if ('value' in action.payload) {
+            this.value = action.payload.value;
+        }
+        else if ('checked' in action.payload) {
+            this.checked = action.payload.checked;
+        }
+        this._eventSource = EventSource.CODE;
     }
     reset() {
         const changes = this.updateDataNodeAndTypedValue(this.default);
@@ -3861,7 +3894,9 @@ class Field extends Scriptable {
         const afConstraintKey = constraint;
         const html5ConstraintType = constraintKeys[afConstraintKey];
         const constraintTypeMessages = getConstraintTypeMessages();
-        return this._jsonModel.constraintMessages?.[afConstraintKey]
+        return this._jsonModel.constraintMessages?.[afConstraintKey === 'exclusiveMaximum' ? 'maximum' :
+            afConstraintKey === 'exclusiveMinimum' ? 'minimum' :
+                afConstraintKey]
             || replaceTemplatePlaceholders(constraintTypeMessages[html5ConstraintType], [this._jsonModel[afConstraintKey]]);
     }
     get errorMessage() {
@@ -3870,9 +3905,6 @@ class Field extends Scriptable {
     set errorMessage(e) {
         this._setProperty('errorMessage', e);
         this._setProperty('validationMessage', e);
-    }
-    get screenReaderText() {
-        return this._jsonModel.screenReaderText;
     }
     _getConstraintObject() {
         return Constraints;
@@ -4099,6 +4131,9 @@ class Field extends Scriptable {
         if (this.visible === false) {
             return [];
         }
+        if (this.valid === false && this.errorMessage && this?.validity?.customConstraint) {
+            return [new ValidationError(this.id, [this._jsonModel.errorMessage])];
+        }
         const changes = this.evaluateConstraints();
         this.#triggerValidationEvent();
         if (changes.validity) {
@@ -4106,9 +4141,7 @@ class Field extends Scriptable {
         }
         return this.valid ? [] : [new ValidationError(this.id, [this._jsonModel.errorMessage])];
     }
-    importData(contextualDataModel) {
-        this._bindToDataModel(contextualDataModel);
-        const dataNode = this.getDataNode();
+    syncDataAndFormModel(dataNode) {
         if (dataNode !== undefined && dataNode !== NullDataValue && dataNode.$value !== this._jsonModel.value) {
             const changeAction = propertyChange('value', dataNode.$value, this._jsonModel.value);
             this._jsonModel.value = dataNode.$value;
@@ -4273,7 +4306,7 @@ class FileUpload extends Field {
         }
         return dataNodeValue;
     }
-    async _serialize() {
+    async serialize() {
         const val = this._jsonModel.value;
         if (val === undefined) {
             return null;
@@ -4281,9 +4314,7 @@ class FileUpload extends Field {
         const filesInfo = await processFiles(val instanceof Array ? val : [val]);
         return filesInfo;
     }
-    importData(dataModel) {
-        this._bindToDataModel(dataModel);
-        const dataNode = this.getDataNode();
+    syncDataAndFormModel(dataNode) {
         if (dataNode !== undefined && dataNode !== NullDataValue) {
             const value = dataNode?.$value;
             if (value != null) {
@@ -4407,9 +4438,6 @@ class DateField extends Field {
         if (!this._jsonModel.placeholder) {
             this._jsonModel.placeholder = parseDateSkeleton(this._jsonModel.editFormat, this.locale);
         }
-        if (!this._jsonModel.description) {
-            this._jsonModel.description = `To enter today's date use ${formatDate(new Date(), this.locale, this._jsonModel.editFormat)}`;
-        }
     }
     get value() {
         return super.value;
@@ -4422,7 +4450,18 @@ class DateField extends Field {
             }
         }
         else {
-            super.value = value;
+            if (this._jsonModel.editFormat !== 'short' && this._jsonModel.editFormat !== 'date|short') {
+                const parsedDate = parseDate(value, this.locale, this._jsonModel.editFormat) || parseDate(value, this.locale, 'yyyy-MM-dd');
+                if (parsedDate instanceof Date) {
+                    super.value = formatDate(parsedDate, this.locale, this._dataFormat);
+                }
+                else {
+                    super.value = value;
+                }
+            }
+            else {
+                super.value = value;
+            }
         }
     }
 }
@@ -4435,8 +4474,29 @@ class EmailInput extends Field {
     }
 }
 class Captcha extends Field {
+    _captchaDisplayMode;
+    _captchaProvider;
+    _captchaSiteKey;
+    constructor(params, _options) {
+        super(params, _options);
+        this._captchaDisplayMode = params.captchaDisplayMode;
+        this._captchaProvider = params.captchaProvider;
+        this._captchaSiteKey = params.siteKey;
+    }
     getDataNode() {
         return undefined;
+    }
+    custom_setProperty(action) {
+        this.applyUpdates(action.payload);
+    }
+    get captchaDisplayMode() {
+        return this._captchaDisplayMode;
+    }
+    get captchaProvider() {
+        return this._captchaProvider;
+    }
+    get captchaSiteKey() {
+        return this._captchaSiteKey;
     }
 }
 class Button extends Field {
@@ -4486,7 +4546,10 @@ class FormFieldFactoryImpl {
                     fieldType: child.fieldType,
                     type: 'array',
                     name: child.name,
-                    dataRef: child.dataRef
+                    dataRef: child.dataRef,
+                    events: {
+                        'custom:setProperty': '$event.payload'
+                    }
                 },
                 ...{
                     'items': [newChild]
@@ -4559,7 +4622,7 @@ const restoreFormInstance = (formModel, data = null, { logLevel } = defaultOptio
     try {
         const form = new Form({ ...formModel }, FormFieldFactory, new RuleEngine(), new EventQueue(new Logger(logLevel)), logLevel, 'restore');
         if (data) {
-            form._bindToDataModel(new DataGroup('$form', data));
+            form.bindToDataModel(new DataGroup('$form', data));
             form.syncDataAndFormModel(form.getDataNode());
         }
         form.getEventQueue().empty();
