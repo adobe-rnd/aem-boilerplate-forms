@@ -1,0 +1,114 @@
+{
+    "basicfields": [
+        {
+            "component": "text",
+            "name": "name",
+            "label": "Name",
+            "valueType": "string",
+            "required": true
+        },
+        {
+            "component": "text",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string"
+        },
+        {
+            "component": "boolean",
+            "name": "hideTitle",
+            "label": "Hide title",
+            "valueType": "boolean"
+        },
+        {
+            "component": "text",
+            "name": "dataRef",
+            "label": "Bind reference",
+            "valueType": "string"
+        },
+        {
+            "component": "boolean",
+            "name": "unboundFormElement",
+            "label": "Mark as Unbound Form Element",
+            "valueType": "boolean"
+        },
+        {
+            "component": "boolean",
+            "name": "visible",
+            "label": "Show Component",
+            "valueType": "boolean",
+            "value": true
+        },
+        {
+            "component": "boolean",
+            "name": "enabled",
+            "label": "Enable Component",
+            "valueType": "boolean",
+            "value": true
+        },
+        {
+            "component": "boolean",
+            "name": "readOnly",
+            "label": "Read-only",
+            "valueType": "boolean"
+        }
+    ],
+    "advancedfields" : [
+        {
+            "component": "text",
+            "name": "placeholder",
+            "label": "Placeholder text",
+            "valueType": "string"
+        },
+        {
+            "component": "text",
+            "name": "default",
+            "label": "Default Value",
+            "valueType": "string"
+        }
+    ],
+    "optionfields": [
+        {
+            "component": "text",
+            "name": "enum",
+            "label": "Options (Data Value)",
+            "valueType": "string",
+            "multi": true
+        },
+        {
+            "component": "text",
+            "name": "enumNames",
+            "label": "Options (Display Value)",
+            "valueType": "string",
+            "multi": true
+        }
+    ],
+    "helpfields": [
+        {
+            "component": "richtext",
+            "name": "description",
+            "label": "Help text",
+            "valueType": "string"
+        },
+        {
+            "component": "richtext",
+            "name": "tooltip",
+            "label": "Short description",
+            "valueType": "string"
+        }
+    ],
+    "validationfields": [
+        {
+            "component": "boolean",
+            "name": "required",
+            "label": "Required",
+            "valueType": "boolean"
+        },
+        {
+            "component": "text",
+            "name": "mandatoryMessage",
+            "label": "Error message",
+            "valueType": "string",
+            "description": "Error message shown when required field is left empty."
+        }
+    ]
+}

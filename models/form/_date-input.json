@@ -1,0 +1,137 @@
+{
+    "definitions": [
+        {
+            "title": "Date Picker",
+            "id": "date-input",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
+                        "template": {
+                            "jcr:title": "Date Input",
+                            "fieldType": "date-input",
+                            "enabled": true,
+                            "visible": true
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "date-input",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/basicfields"
+                        },
+                        {
+                            "...": "./_common.json#/advancedfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "help",
+                    "label": "Help Content",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/helpfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "validation",
+                    "label": "Validation",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/validationfields"
+                        },
+                        {
+                            "component": "date-time",
+                            "name": "minimumDate",
+                            "label": "Minimum date",
+                            "valueType": "date",
+                            "description": "Minimum date allowed in the field",
+                            "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
+                        },
+                        {
+                            "component": "text",
+                            "name": "minimumMessage",
+                            "valueType": "string",
+                            "label": "Minimum error message",
+                            "description": "Error message shown when the date entered is before the minimum date."
+                        },
+                        {
+                            "component": "date-time",
+                            "name": "maximumDate",
+                            "label": "Maximum date",
+                            "valueType": "date",
+                            "description": "Maximum date allowed in the field",
+                            "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
+                        },
+                        {
+                            "component": "text",
+                            "name": "maximumMessage",
+                            "valueType": "string",
+                            "label": "Maximum error message",
+                            "description": "Error message shown when the date entered is after the maximum date."
+                        },
+                        {
+                            "component": "text",
+                            "name": "validateExpMessage",
+                            "label": "Script validation message",
+                            "valueType": "string",
+                            "description": "Displayed when validation script fails."
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "formats",
+                    "label": "Formats",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "component": "select",
+                            "label": "Display Format",
+                            "name": "displayFormat",
+                            "valueType": "string",
+                            "options": [
+                                {
+                                    "name": "01 April, 2007",
+                                    "value": "d MMMM, y"
+                                },
+                                {
+                                    "name": "April 01, 2007",
+                                    "value": "MMMM d, y"
+                                },
+                                {
+                                    "name": "Sunday, 01 April, 2007",
+                                    "value": "EEEE, d MMMM, y"
+                                },
+                                {
+                                    "name": "Sunday, April 01, 2007",
+                                    "value": "EEEE, MMMM d, y"
+                                },
+                                {
+                                    "name": "1/4/2007",
+                                    "value": "d/M/y"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

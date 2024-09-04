@@ -1,0 +1,78 @@
+{
+    "definitions": [
+        {
+            "title": "Panel",
+            "id": "panel",
+            "plugins": {
+              "xwalk": {
+                "page": {
+                  "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                  "template": {
+                    "jcr:title": "Panel",
+                    "fieldType": "panel",
+                    "enabled": true,
+                    "visible": true
+                  }
+                }
+              }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "panel",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/basicfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "repeat",
+                    "label": "Repeat Panel",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "component": "boolean",
+                            "name": "repeatable",
+                            "label": "Make panel repeatable",
+                            "valueType": "boolean"
+                        },
+                        {
+                            "component": "number",
+                            "name": "minOccur",
+                            "label": "Minimum repetitions",
+                            "valueType": "number",
+                            "description": "Minimum number of times the panel appears on the form"
+                        },
+                        {
+                            "component": "number",
+                            "name": "maxOccur",
+                            "label": "Maximum repetitions",
+                            "valueType": "number",
+                            "description": "Maximum number of times the panel can appear on the form"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "help",
+                    "label": "Help Content",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/helpfields"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

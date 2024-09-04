@@ -1,0 +1,42 @@
+{
+    "definitions": [
+        {
+            "title": "Text",
+            "id": "plain-text",
+            "plugins": {
+              "xwalk": {
+                "page": {
+                  "resourceType": "core/fd/components/form/text/v1/text",
+                  "template": {
+                    "jcr:title": "Text",
+                    "fieldType": "plain-text",
+                    "visible": true,
+                    "textIsRich": true
+                  }
+                }
+              }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "plain-text",
+            "fields": [
+                {
+                    "component": "text",
+                    "name": "name",
+                    "label": "Name",
+                    "valueType": "string",
+                    "required": true
+                },
+                {
+                    "component": "boolean",
+                    "name": "visible",
+                    "label": "Show Component",
+                    "valueType": "boolean",
+                    "value": true
+                }
+            ]
+        }
+    ]
+}
