@@ -512,7 +512,10 @@
                     "textIsRich": true
                   },
                   "link": {
-                    "enum": ["dummy-link-1", "dummy-link-2"],
+                    "enum": [
+                      "dummy-link-1",
+                      "dummy-link-2"
+                    ],
                     "type": "string[]",
                     "fd:viewType": "toggleable-link",
                     "enabled": true,

@@ -63,6 +63,9 @@
     "...": "./form/_telephone-input.json#/models"
   },
   {
+    "...": "./form/_tnc.json#/models"
+  },
+  {
     "...": "./form/_text.json#/models"
   },
   {

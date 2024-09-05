@@ -68,6 +68,9 @@
           "...": "./form/_image.json#/definitions"
         },
         {
+          "...": "./form/_modal.json#/definitions"
+        },
+        {
           "...": "./form/_number-input.json#/definitions"
         },
         {
@@ -84,6 +87,9 @@
         },
         {
           "...": "./form/_telephone-input.json#/definitions"
+        },
+        {
+          "...": "./form/_tnc.json#/definitions"
         },
         {
           "...": "./form/_text.json#/definitions"
