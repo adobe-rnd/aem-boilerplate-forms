@@ -122,7 +122,7 @@ function annotateItems(items, formDefinition, formFieldMap) {
   try {
     for (let i = items.length - 1; i >= 0; i -= 1) {
       const fieldWrapper = items[i];
-      if (fieldWrapper.classList.contains('field-wrapper')) {
+      if (fieldWrapper.classList?.contains('field-wrapper')) {
         const { id } = fieldWrapper.dataset;
         const fd = getFieldById(formDefinition, id, formFieldMap);
         if (fd && fd.properties) {
@@ -290,7 +290,7 @@ export async function applyChanges(event) {
           }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
-          if (parent.classList.contains('panel-wrapper')) {
+          if (parent.classList?.contains('panel-wrapper') && parent.querySelector('legend')) {
             const panelLabel = parent.querySelector('legend');
             parent.replaceChildren(panelLabel);
           } else {
@@ -333,16 +333,19 @@ function attachEventListners(main) {
     });
   });
 
-  document.body.addEventListener('aue:ui-edit', () => {
+  const ueEditModeHandler = () => {
     window.currentMode = 'edit';
     const forms = document.querySelectorAll('form');
     annotateFormsForEditing(forms);
-  });
-}
+  };
 
-loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
-attachEventListners(document.querySelector('main'));
-const forms = document.querySelectorAll('form');
-annotateFormsForEditing(forms);
+  if (document.documentElement.classList.contains('adobe-ue-edit')) {
+    ueEditModeHandler();
+  } else {
+    document.body.addEventListener('aue:ui-edit', ueEditModeHandler);
+  }
+}
 const observer = new MutationObserver(instrumentForms);
 observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
+loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
+attachEventListners(document.querySelector('main'));
