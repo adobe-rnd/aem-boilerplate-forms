@@ -1,4 +1,4 @@
-function decorateTncLink(tncLink) {
+function decorateLink(tncLink) {
   const checkbox = tncLink.querySelector('input[type="checkbox"]');
   const label = tncLink.querySelector('label');
   const { value } = checkbox;
@@ -27,7 +27,7 @@ function decorateTncLink(tncLink) {
 export default async function decorate(fieldDiv) {
   const tncLinks = fieldDiv.querySelectorAll('.checkbox-wrapper');
   tncLinks.forEach((tncLink) => {
-    decorateTncLink(tncLink);
+    decorateLink(tncLink);
   });
   return fieldDiv;
 }

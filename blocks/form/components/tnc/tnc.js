@@ -48,8 +48,5 @@ class TermsAndConditions {
 }
 export default async function decorate(tncDiv, fieldJson) {
   const tnc = new TermsAndConditions(tncDiv, fieldJson);
-  subscribe(tncDiv, async (fieldDiv, formModel) => {
-    tnc.setFormModel(formModel);
-  });
   return tnc.getfieldDiv();
 }
