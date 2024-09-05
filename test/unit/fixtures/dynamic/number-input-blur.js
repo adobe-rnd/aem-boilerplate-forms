@@ -37,4 +37,11 @@ export function op(block) {
 
 export function expect(block) {
   assert.equal(getValue(block, '#numberinput-40db827550'), '$1,234.00');
+
+  // when the input field is out of focus and value is set via rule
+  // then the displayValue should be updated
+  const inputEle = block.querySelector('#numberinput-40db827550');
+  inputEle.value = '1234567';
+  inputEle.dispatchEvent(new Event('change', { bubbles: true }));
+  assert.equal(getValue(block, '#numberinput-40db827550'), '$1,234,567.00');
 }

@@ -86,6 +86,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
         if (['number', 'date', 'text', 'email'].includes(field.type) && (displayFormat || displayValueExpression)) {
           field.setAttribute('edit-value', currentValue);
           field.setAttribute('display-value', displayValue);
+          if (document.activeElement !== field) {
+            field.value = displayValue;
+          }
         } else if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
           field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
             const exists = (Array.isArray(currentValue)
