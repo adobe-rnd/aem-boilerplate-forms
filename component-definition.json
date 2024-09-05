@@ -370,6 +370,7 @@
                 "template": {
                   "jcr:title": "Modal",
                   "fieldType": "panel",
+                  "fd:viewType": "modal",
                   "enabled": true,
                   "visible": true
                 }
