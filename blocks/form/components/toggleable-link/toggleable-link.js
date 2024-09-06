@@ -1,6 +1,6 @@
-function decorateLink(tncLink) {
-  const checkbox = tncLink.querySelector('input[type="checkbox"]');
-  const label = tncLink.querySelector('label');
+function decorateLink(link) {
+  const checkbox = link.querySelector('input[type="checkbox"]');
+  const label = link.querySelector('label');
   const { value } = checkbox;
   const labelText = label.textContent;
   label.textContent = '';
@@ -21,13 +21,13 @@ function decorateLink(tncLink) {
   label.addEventListener('click', () => {
     checkbox.click();
   });
-  return tncLink;
+  return link;
 }
 
 export default async function decorate(fieldDiv) {
-  const tncLinks = fieldDiv.querySelectorAll('.checkbox-wrapper');
-  tncLinks.forEach((tncLink) => {
-    decorateLink(tncLink);
+  const links = fieldDiv.querySelectorAll('.checkbox-wrapper');
+  links.forEach((link) => {
+    decorateLink(link);
   });
   return fieldDiv;
 }
