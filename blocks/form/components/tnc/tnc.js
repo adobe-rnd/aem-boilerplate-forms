@@ -1,5 +1,3 @@
-import { subscribe } from '../../rules/index.js';
-
 const textIntersectionClass = 'tnc__text-intersect';
 const textDecorationClass = 'tnc__text-decoration';
 
