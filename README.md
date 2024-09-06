@@ -30,6 +30,29 @@ npm run lint
 - nodejs 18.3.x or newer
 - AEM Cloud Service release 2024.8 or newer (>= `17465`)
 
+## List of Form Components
+
+1. Button  
+2. Checkbox  
+3. Checkbox Group  
+4. Date Picker  
+5. Dropdown List  
+6. Email Input  
+7. File Input  
+8. Form Fragment  
+9. Image  
+10. Modal  
+11. Number Input  
+12. Panel  
+13. Radio Group  
+14. Reset  
+15. Submit  
+16. Telephone Input  
+17. Terms and Conditions  
+18. Text  
+19. Text Input  
+20. Wizard  
+
 ## Resources
 
 ### Documentation
