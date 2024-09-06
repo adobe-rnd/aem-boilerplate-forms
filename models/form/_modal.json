@@ -20,32 +20,32 @@
     }
   ],
   "models": [
-      {
-          "id": "modal",
+    {
+      "id": "modal",
+      "fields": [
+        {
+          "component": "container",
+          "name": "basic",
+          "label": "Basic",
+          "collapsible": false,
           "fields": [
-              {
-                  "component": "container",
-                  "name": "basic",
-                  "label": "Basic",
-                  "collapsible": false,
-                  "fields": [
-                      {
-                          "...": "./_common.json#/basicfields"
-                      }
-                  ]
-              },
-              {
-                  "component": "container",
-                  "name": "help",
-                  "label": "Help Content",
-                  "collapsible": true,
-                  "fields": [
-                      {
-                          "...": "./_common.json#/helpfields"
-                      }
-                  ]
-              }
+            {
+              "...": "./_common.json#/basicfields"
+            }
           ]
-      }
+        },
+        {
+          "component": "container",
+          "name": "help",
+          "label": "Help Content",
+          "collapsible": true,
+          "fields": [
+            {
+              "...": "./_common.json#/helpfields"
+            }
+          ]
+        }
+      ]
+    }
   ]
 }
