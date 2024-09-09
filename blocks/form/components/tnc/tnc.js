@@ -19,6 +19,9 @@ class TermsAndConditions {
 
   decorate() {
     const textWrapper = this.fieldDiv.querySelector('.plain-text-wrapper');
+    if (!textWrapper) {
+      return;
+    }
     textWrapper.classList.add(textDecorationClass);
     const intersection = document.createElement('div');
     intersection.classList.add(textIntersectionClass);

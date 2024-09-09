@@ -20,14 +20,13 @@
                 "textIsRich": true
               },
               "link": {
-                "enum": ["dummy-link-1", "dummy-link-2"],
+                "enum": ["dummy-link-1"],
                 "type": "string[]",
                 "fd:viewType": "toggleable-link",
                 "enabled": true,
                 "visible": true,
                 "title": "I agree to the terms & conditions",
                 "enumNames": [
-                  "Terms and conditions of the service.",
                   "Privacy policy."
                 ],
                 "sling:resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",

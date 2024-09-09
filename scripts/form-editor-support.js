@@ -96,7 +96,7 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
 }
 
 function getPropertyModel(fd) {
-  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard') {
+  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard' || fd[':type'] === 'toggleable-link') {
     return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
   }
   return fd[':type'];
