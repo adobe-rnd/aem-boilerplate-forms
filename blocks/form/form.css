@@ -266,10 +266,21 @@ main .file-wrapper .field-dropregion {
     text-align: center;
 }
 
-main .form form .item-remove {
-    padding: 0;
-    background: #fff;
-    padding-left: 10px;
+main .form form .item-add {
+    overflow: unset;
+    display: flex;
+    justify-content: center;
+}
+
+main .form form .item-remove span::after {
+    content: '--';
+    color: var(--form-button-color);
+    background: var(--form-button-background-color);
+    font-size: 1em;
+    letter-spacing: -0.1em;
+    padding: 0 6px;
+    border-radius: 3px;
+    display: inline-block;
 }
 
 main .form .file-description{
