@@ -22,6 +22,7 @@ import { loadCSS } from './aem.js';
 
 window.currentMode = 'preview';
 let activeWizardStep;
+const OOTBComponentsWithViewType = ['wizard', 'toggleable-link'];
 
 export function getItems(container) {
   if (container[':itemsOrder'] && container[':items']) {
@@ -96,7 +97,7 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
 }
 
 function getPropertyModel(fd) {
-  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard' || fd[':type'] === 'toggleable-link') {
+  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || OOTBComponentsWithViewType.includes(fd[':type'])) {
     return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
   }
   return fd[':type'];
