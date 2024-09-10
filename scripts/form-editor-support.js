@@ -341,9 +341,8 @@ function attachEventListners(main) {
 
   if (document.documentElement.classList.contains('adobe-ue-edit')) {
     ueEditModeHandler();
-  } else {
-    document.body.addEventListener('aue:ui-edit', ueEditModeHandler);
   }
+  document.body.addEventListener('aue:ui-edit', ueEditModeHandler);
 }
 const observer = new MutationObserver(instrumentForms);
 observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
