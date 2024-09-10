@@ -56,7 +56,8 @@ onmessage = (e) => {
   }
 
   if (!customFunctionRegistered) {
-    registerCustomFunctions().then(() => {
+    const { id } = e.data.payload;
+    registerCustomFunctions(id).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
     });

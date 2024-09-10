@@ -28,3 +28,8 @@ export function setSubmitBaseUrl(url) {
 export function getSubmitBaseUrl() {
   return submitBaseUrl;
 }
+
+export const formIdPathMapping = {
+  '/content/forms/af/rae/f1': '../../../myforms/f1/functions.js',
+  '/content/forms/af/rae/f2': '../../../myforms/f2/functions.js',
+};
