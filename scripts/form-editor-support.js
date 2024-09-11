@@ -22,7 +22,7 @@ import { loadCSS } from './aem.js';
 
 window.currentMode = 'preview';
 let activeWizardStep;
-const OOTBComponentsWithViewType = ['wizard', 'toggleable-link'];
+const OOTBViewTypeComponentsWithoutModel = ['wizard', 'toggleable-link'];
 
 export function getItems(container) {
   if (container[':itemsOrder'] && container[':items']) {
@@ -97,7 +97,7 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
 }
 
 function getPropertyModel(fd) {
-  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || OOTBComponentsWithViewType.includes(fd[':type'])) {
+  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || OOTBViewTypeComponentsWithoutModel.includes(fd[':type'])) {
     return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
   }
   return fd[':type'];
@@ -105,7 +105,7 @@ function getPropertyModel(fd) {
 
 function annotateContainer(fieldWrapper, fd) {
   fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-  fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
+  fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
   fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
   fieldWrapper.setAttribute('data-aue-type', 'container');
   fieldWrapper.setAttribute('data-aue-behavior', 'component');
