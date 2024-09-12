@@ -252,7 +252,6 @@ function colSpanDecorator(field, element) {
   }
 }
 
-
 const handleFocus = (input, field) => {
   const editValue = input.getAttribute('edit-value');
   input.type = field.type;
