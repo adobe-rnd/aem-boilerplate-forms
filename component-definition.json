@@ -221,7 +221,8 @@
                   "jcr:title": "Checkbox",
                   "fieldType": "checkbox",
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "checkedValue": "on"
                 }
               }
             }
