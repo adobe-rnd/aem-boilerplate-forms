@@ -252,6 +252,10 @@ function colSpanDecorator(field, element) {
   }
 }
 
+const handleTouchStart = (input, field) => {
+  input.type = field.type;
+};
+
 const handleFocus = (input, field) => {
   const editValue = input.getAttribute('edit-value');
   input.type = field.type;
@@ -285,6 +289,7 @@ function inputDecorator(field, element) {
       input.setAttribute('display-value', field.displayValue ?? '');
       input.type = 'text';
       input.value = field.displayValue ?? '';
+      input.addEventListener('touchstart', () => handleTouchStart(input, field)); // in mobile devices the input type needs to be toggled before focus
       input.addEventListener('focus', () => handleFocus(input, field));
       input.addEventListener('blur', () => handleFocusOut(input));
     } else if (input.type !== 'file') {
