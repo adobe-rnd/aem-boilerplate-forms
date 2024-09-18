@@ -346,11 +346,10 @@ function attachEventListners(main) {
   document.body.addEventListener('aue:ui-edit', ueEditModeHandler);
 }
 
-export function init() {
-  const observer = new MutationObserver(instrumentForms);
-  observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
-  loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
+export function attachFormListners() {
   attachEventListners(document.querySelector('main'));
 }
 
-init();
+const observer = new MutationObserver(instrumentForms);
+observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
+loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
