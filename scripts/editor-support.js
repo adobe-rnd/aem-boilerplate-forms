@@ -103,7 +103,7 @@ async function attachEventListners(main) {
     if (!applied) window.location.reload();
   }));
   const module = await import('./form-editor-support.js');
-  module.attachFormListners();
+  module.attachEventListners(main);
 }
 
 attachEventListners(document.querySelector('main'));

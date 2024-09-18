@@ -311,7 +311,7 @@ export async function applyChanges(event) {
   return true;
 }
 
-function attachEventListners(main) {
+export function attachEventListners(main) {
   [
     'aue:content-patch',
     'aue:content-update',
@@ -344,10 +344,6 @@ function attachEventListners(main) {
     ueEditModeHandler();
   }
   document.body.addEventListener('aue:ui-edit', ueEditModeHandler);
-}
-
-export function attachFormListners() {
-  attachEventListners(document.querySelector('main'));
 }
 
 const observer = new MutationObserver(instrumentForms);
