@@ -2088,7 +2088,7 @@
     ]
   },
   {
-    "id": "telephone",
+    "id": "tel",
     "fields": [
       {
         "component": "container",

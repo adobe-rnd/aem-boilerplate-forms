@@ -9,8 +9,7 @@
             "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
             "template": {
               "jcr:title": "Telephone Input",
-              "fieldType": "text-input",
-              "fd:viewType": "telephone",
+              "fieldType": "tel",
               "enabled": true,
               "visible": true
             }
@@ -21,7 +20,7 @@
   ],
   "models": [
     {
-      "id": "telephone",
+      "id": "tel",
       "fields": [
         {
           "component": "container",
