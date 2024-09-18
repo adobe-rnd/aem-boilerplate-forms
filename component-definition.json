@@ -486,6 +486,7 @@
                 "template": {
                   "jcr:title": "Telephone Input",
                   "fieldType": "text-input",
+                  "fd:viewType": "telephone",
                   "enabled": true,
                   "visible": true
                 }
