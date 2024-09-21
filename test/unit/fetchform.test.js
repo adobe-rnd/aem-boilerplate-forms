@@ -1,7 +1,6 @@
 import { describe, it, before } from 'mocha'; // Import the describe function from Mocha or the appropriate testing framework.
 import assert from 'assert';
 import nock from 'nock';
-import sinon from 'sinon';
 import { extractFormDefinition } from '../../blocks/form/lib/aemform.js';
 import { createBlockWithUrl } from './testUtils.js';
 import { buildBlock } from '../../scripts/aem.js';
@@ -63,19 +62,12 @@ const htmlContent = `
 describe('extractFormDefinition api for aem forms', () => {
   let scope;
   before(() => {
-    // const mock = sinon.fake.returns({ origin: 'http://abc.com' });
     global.window = Object.create(window);
     Object.defineProperty(global.window, 'location', {
       get() {
         return { origin: 'http://abc.com' };
       },
     });
-    scope = nock('http://abc.com')
-      .get('/adobe/forms/myform/jcr:content/root/section/form.html')
-      .reply(200, htmlContent, {
-        'Content-Type': 'text/html',
-      });
-
     scope = nock('http://abc.com')
       .get('/adobe/forms/myform/jcr:content/root/section/form.html')
       .reply(200, htmlContent, {
