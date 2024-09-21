@@ -96,15 +96,17 @@ async function submitForm(form, captcha) {
 export async function extractFormDefinition(block) {
   const container = block.querySelector('a[href]');
   if (container) {
-    const { pathname } = new URL(container.href);
-    const definition = await fetchForm(pathname);
-    if (definition && definition[':type'] === 'sheet') {
-      const transformer = new DocBasedFormToAF();
-      const formDef = transformer.transform(definition, pathname);
-      formDef.properties = { ...formDef.properties, source: 'sheet' };
-      return { container, formDef };
+    const path = container.href;
+    if (path.endsWith('.json')) {
+      const { pathname } = new URL(path);
+      const definition = await fetchForm(path);
+      if (definition && definition[':type'] === 'sheet') {
+        const transformer = new DocBasedFormToAF();
+        const formDef = transformer.transform(definition, pathname);
+        formDef.properties = { ...formDef.properties, source: 'sheet' };
+        return { container, formDef };
+      }
     }
-    return { container, definition };
   }
   return {};
 }
