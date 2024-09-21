@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { JSDOM } from 'jsdom';
 import { createBlockWithUrl } from '../../testUtils.js';
-import { fetchForm } from '../../../../blocks/form/form.js';
+import { fetchForm } from '../../../../blocks/form/lib/aemform.js';
 
 const data = {
   id: 'someid',

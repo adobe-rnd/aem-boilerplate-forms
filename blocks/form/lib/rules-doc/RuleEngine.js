@@ -20,7 +20,7 @@
 /* eslint-disable max-classes-per-file */
 import Formula from './parser/Formula.js';
 import transformRule from './RuleCompiler.js';
-import * as customFunctions from '../functions.js';
+import * as customFunctions from '../../functions.js';
 
 function stripTags(input, allowd) {
   const allowed = ((`${allowd || ''}`)

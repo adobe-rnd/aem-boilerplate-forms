@@ -114,4 +114,10 @@ export const fieldDef = {
       Name: 'input_2', Type: 'submit', Description: '', Placeholder: '', Label: 'Submit', 'Read Only': '', Mandatory: '', Pattern: '', Step: '', Min: '', Max: '', Value: '', Options: '', OptionNames: '', Fieldset: '',
     }],
   ':type': 'sheet',
+  action: '/adobe/forms/af/form1',
+  id: 'form',
 };
+
+export const bUrlMode = true;
+
+export const formPath = 'http://localhost:3000/adobe/forms/af/form1.json';
