@@ -23,7 +23,7 @@ export default async function initializeRuleEngineWorker(formDef, renderHTMLForm
     const form = ruleEngine.createFormInstance(formDef);
     return renderHTMLForm(form.getState(true), formDef.data);
   }
-  const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`, { type: 'module' });
+  const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/lib/rules/RuleEngineWorker.js`, { type: 'module' });
 
   myWorker.postMessage({
     name: 'init',
