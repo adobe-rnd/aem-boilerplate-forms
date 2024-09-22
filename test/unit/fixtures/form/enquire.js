@@ -29,4 +29,10 @@ export const fieldDef = {
     Name: 'submit', Type: 'submit', Description: '', Placeholder: '', Label: 'See Plans and Prices', 'Read Only': '', Mandatory: '', Pattern: '', Step: '', Min: '', Max: '', Value: '', Options: '', OptionNames: '', Fieldset: '', Repeatable: '',
   }],
   ':type': 'sheet',
+  id: 'form',
+  action: '/adobe/forms/af/form1',
 };
+
+export const bUrlMode = true;
+
+export const formPath = 'http://localhost:3000/adobe/forms/af/form1.json';

@@ -6,7 +6,7 @@ import {
   annotateFormForEditing, getItems, getFieldById, applyChanges, handleWizardNavigation,
   getContainerChildNodes,
 } from '../../scripts/form-editor-support.js';
-import { generateFormRendition } from '../../blocks/form/form.js';
+import { generateFormRendition } from '../../blocks/form/lib/forms-common.js';
 import { ueFormDef } from './forms/universaleditorform.js';
 import { ueAddEvent } from './fixtures/ue/events/event-add.js';
 import { ueAddEventForWizardNavigation } from './fixtures/ue/events/event-add-wizardnavigation.js';

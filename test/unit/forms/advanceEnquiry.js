@@ -29,4 +29,9 @@ export const advanceEnquiry = {
     Name: 'submit', Type: 'submit', Placeholder: '', Label: 'Submit', Mandatory: '', Value: '', Visible: '', Min: '', Max: '', Fieldset: '', Repeatable: '', Options: '', OptionNames: '', 'Value Expression': '', 'Visible Expression': '', 'Column Span': '', Checked: '', Step: '', ReadOnly: '', Describe: '',
   }],
   ':type': 'sheet',
+  action: '/enquiry',
+  id: 'form1',
 };
+
+export const formPath = 'http://localhost:3000/enquiry.json';
+export const bUrlMode = true;

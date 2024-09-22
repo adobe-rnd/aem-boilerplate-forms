@@ -17,7 +17,7 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import { submitSuccess, submitFailure } from '../submit.js';
+import { submitSuccess, submitFailure } from '../../submit.js';
 import {
   createHelpText, createLabel, updateOrCreateInvalidMsg, getCheckboxGroupValue,
 } from '../util.js';
@@ -209,7 +209,10 @@ function handleRuleEngineEvent(e, form, generateFormRendition) {
   } else if (type === 'change') {
     formChanged(payload, form);
   } else if (type === 'submitSuccess') {
-    submitSuccess(e, form);
+    submitSuccess(
+      e,
+      form,
+    );
   } else if (type === 'submitFailure') {
     submitFailure(e, form);
   }

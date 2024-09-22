@@ -17,7 +17,8 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import decorate, { generateFormRendition } from '../blocks/form/form.js';
+import decorate from '../blocks/form/form.js';
+import { generateFormRendition } from '../blocks/form/lib/forms-common.js';
 import { loadCSS } from './aem.js';
 
 window.currentMode = 'preview';

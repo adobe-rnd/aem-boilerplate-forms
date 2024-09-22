@@ -3,9 +3,11 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import * as dom from 'dom-compare';
-import decorate, { DELAY_MS, generateFormRendition } from '../../blocks/form/form.js';
+import { DELAY_MS } from '../../blocks/form/lib/aemform.js';
+import decorate from '../../blocks/form/form.js';
+import { generateFormRendition } from '../../blocks/form/lib/forms-common.js';
 import { annotateFormForEditing, getItems } from '../../scripts/form-editor-support.js';
-import { resetIds } from '../../blocks/form/util.js';
+import { resetIds } from '../../blocks/form/lib/util.js';
 import { getCustomComponents, setCustomComponents } from '../../blocks/form/mappings.js';
 
 function escapeHTML(str) {
@@ -27,10 +29,12 @@ export function createBlock(def) {
   return div;
 }
 
-export function createBlockWithUrl(def, url) {
-  global.fetch.mockData = {
-    [url]: def,
-  };
+export function createBlockWithUrl(def, url, mock = true) {
+  if (mock === true) {
+    global.fetch.mockData = {
+      [url]: def,
+    };
+  }
   const anchor = `<a href="${url}"></a>`;
   const div = document.createElement('div');
   div.innerHTML = anchor;
@@ -42,9 +46,9 @@ function createElementFromHTML(htmlString, fieldDef) {
   const source = fieldDef?.[':type'] || 'aem';
   const form = document.createElement('form');
   form.innerHTML = htmlString.trim();
-  form.dataset.action = action;
+  form.dataset.action = action || '';
   form.dataset.source = source;
-  form.dataset.rules = source === 'aem';
+  // form.dataset.rules = source === 'aem';
   form.dataset.redirectUrl = fieldDef.redirectUrl || '';
   form.dataset.thankYouMsg = fieldDef.thankYouMsg || '';
   form.dataset.id = fieldDef.id;
@@ -59,34 +63,36 @@ export function testBasicMarkup(filePath, bUrlMode = false, customComponents = [
     const module = await import(filePath);
     const {
       fieldDef, expectedDiffs = 0, extraChecks, formPath, ignore = false,
+      bUrlMode: bUrlModeInFile = false,
     } = module;
     if (ignore) {
       return;
     }
+    const urlMode = bUrlModeInFile || bUrlMode;
     let { markUp } = module;
     const htmlFile = `${filePath.substr(0, filePath.lastIndexOf('/') + 1)}${filePath?.substr(filePath.lastIndexOf('/') + 1).split('.').slice(0, -1).join('.')}.html`;
     // read html file async
     if (!markUp) {
       markUp = fs.readFileSync(htmlFile, 'utf8').replace(/\n\s+/g, ' ');
     }
-    if (bUrlMode && !formPath) {
+    if (urlMode && !formPath) {
       assert.equal(true, false, 'formpath is not defined');
     }
     const oldCustomComponents = getCustomComponents();
     window.hlx = { codeBasePath };
     setCustomComponents(customComponents);
-    const block = bUrlMode ? createBlockWithUrl(fieldDef, `${formPath}`) : createBlock(fieldDef);
+    const block = urlMode ? createBlockWithUrl(fieldDef, `${formPath}`) : createBlock(fieldDef);
     if (fieldDef && markUp) {
       await decorate(block);
       const form = block.querySelector('form');
-      console.log('----------Actual----------');
-      console.log(form.outerHTML);
-      console.log('----------Expected----------');
-      console.log(createElementFromHTML(markUp, fieldDef).outerHTML);
+      // console.log('----------Actual----------');
+      // console.log(form.outerHTML);
+      // console.log('----------Expected----------');
+      // console.log(createElementFromHTML(markUp, fieldDef).outerHTML);
       const result = dom.default.compare(createElementFromHTML(markUp, fieldDef), form);
       const differences = result.getDifferences();
-      console.log('---------diff--------');
-      console.log(differences);
+      // console.log('---------diff--------');
+      // console.log(differences);
       if (Array.isArray(expectedDiffs)) {
         assert.equal(differences.length, Array.isArray(expectedDiffs) ? expectedDiffs.length : expectedDiffs, 'Number of differences do not match expected differences');
         const computedDiffs = differences.map((d) => {
@@ -160,13 +166,25 @@ export async function testDynamism(filePath, bUrlMode = false) {
   const testName = `checking dynamic behaviour for ${filePath?.substr(filePath.lastIndexOf('/') + 1).split('.')[0]}`;
   it(testName, async () => {
     const {
-      sample, before, op, expect, opDelay, after, formPath, ignore = false, refresh = false,
+      sample, before, op, expect, opDelay, after,
+      formPath, ignore = false, refresh = false,
+      bUrlMode: bUrlModeInFile = false,
     } = await import(filePath);
     if (ignore) {
       return;
     }
     resetIds();
-    await test(sample, before, op, expect, opDelay, after, bUrlMode, formPath, refresh);
+    await test(
+      sample,
+      before,
+      op,
+      expect,
+      opDelay,
+      after,
+      bUrlModeInFile || bUrlMode,
+      formPath,
+      refresh,
+    );
   });
 }
 

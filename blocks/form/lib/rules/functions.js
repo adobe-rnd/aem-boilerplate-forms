@@ -17,7 +17,7 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import { getSubmitBaseUrl } from '../constant.js';
+import { getSubmitBaseUrl } from '../../constant.js';
 /**
  * Prefixes the URL with the context path.
  * @param {string} url - The URL to externalize.
