@@ -24,10 +24,10 @@ const expectedPayload = {
 const titles = ['Text Input', 'Check Box Group', 'Number Input', 'Radio Button', 'Telephone Input', 'Email Input', 'File Attachment', 'Dropdown', 'Date Input'];
 // eslint-disable-next-line no-unused-vars
 let requestPayload = null;
-const partialUrl = '/drafts/tests/doc-based/testsample';
+const partialUrl = '/drafts/tests/doc-based/submissionvalidation';
 
 test.describe('Form Rendering and Submission Validation', async () => {
-  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.hlx.page/drafts/tests/doc-based/testsample';
+  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.hlx.page/drafts/tests/doc-based/submissionvalidation';
 
   test('Validate Doc-Based Form components and submission payload @chromium-only', async ({ page }) => {
     await page.goto(testURL, { waitUntil: 'networkidle' });
