@@ -11,7 +11,7 @@ const componentName = 'Text Input';
 const component = 'textinput';
 
 test.describe.skip('Forms Authoring in Universal Editor tests', () => {
-  const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/componentValidationTestCollateral/index.html';
+  const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/componentsValidationTestCollateral/index.html';
   // eslint-disable-next-line no-shadow
   test.beforeEach(async ({ page }) => {
     await page.goto(testURL, { waitUntil: 'load' });
