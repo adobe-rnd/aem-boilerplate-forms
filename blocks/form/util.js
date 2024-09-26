@@ -93,6 +93,8 @@ export function createFieldWrapper(fd, tagName = 'div', labelFn = createLabel) {
   const fieldId = `${renderType}-wrapper${nameStyle}`;
   fieldWrapper.className = fieldId;
   fieldWrapper.dataset.id = fd.id;
+  // required for displaying error messages for radio and checkbox group in doc based
+  fieldWrapper.dataset.fieldset = fd.FieldSet;
   if (fd.visible === false) {
     fieldWrapper.dataset.visible = fd.visible;
   }
