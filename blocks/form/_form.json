@@ -162,6 +162,7 @@
         "panel",
         "plain-text",
         "radio-group",
+        "rating",
         "telephone-input",
         "text-input",
         "tnc",
