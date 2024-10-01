@@ -451,7 +451,6 @@
                   "jcr:title": "Rating",
                   "fieldType": "number-input",
                   "fd:viewType": "rating",
-                  "max": 5,
                   "enabled": true,
                   "visible": true
                 }
