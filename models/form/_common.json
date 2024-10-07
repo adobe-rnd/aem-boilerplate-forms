@@ -5,7 +5,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+                "regExp": "^[^$].*",
+                "customErrorMsg": "Name cannot start with $"
+            }
         },
         {
             "component": "text",
