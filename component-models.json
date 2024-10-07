@@ -660,14 +660,16 @@
             "name": "enum",
             "label": "Options (Data Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "text",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "select",
@@ -1032,14 +1034,16 @@
             "name": "enum",
             "label": "Options (Data Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "text",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "text",
@@ -2047,14 +2051,16 @@
             "name": "enum",
             "label": "Options (Data Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "text",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "select",
