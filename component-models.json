@@ -668,8 +668,7 @@
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
-            "multi": true,
-            "required": true
+            "multi": true
           },
           {
             "component": "select",
@@ -1042,8 +1041,7 @@
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
-            "multi": true,
-            "required": true
+            "multi": true
           },
           {
             "component": "text",
@@ -2059,8 +2057,7 @@
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
-            "multi": true,
-            "required": true
+            "multi": true
           },
           {
             "component": "select",
