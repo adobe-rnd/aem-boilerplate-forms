@@ -1,10 +1,13 @@
 import {
   createButton, createFieldWrapper, createLabel, getHTMLRenderType,
   createHelpText,
-  getId,
   stripTags,
   checkValidation,
-  toClassName,
+  createRadioOrCheckboxUsingEnum,
+  setPlaceholder,
+  createInput,
+  setConstraints,
+  createRadioOrCheckbox, createDropdownUsingEnum,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
@@ -23,42 +26,6 @@ const withFieldWrapper = (element) => (fd) => {
   return wrapper;
 };
 
-function setPlaceholder(element, fd) {
-  if (fd.placeholder) {
-    element.setAttribute('placeholder', fd.placeholder);
-  }
-}
-
-const constraintsDef = Object.entries({
-  'password|tel|email|text': [['maxLength', 'maxlength'], ['minLength', 'minlength'], 'pattern'],
-  'number|range|date': [['maximum', 'Max'], ['minimum', 'Min'], 'step'],
-  file: ['accept', 'Multiple'],
-  panel: [['maxOccur', 'data-max'], ['minOccur', 'data-min']],
-}).flatMap(([types, constraintDef]) => types.split('|')
-  .map((type) => [type, constraintDef.map((cd) => (Array.isArray(cd) ? cd : [cd, cd]))]));
-
-const constraintsObject = Object.fromEntries(constraintsDef);
-
-function setConstraints(element, fd) {
-  const renderType = getHTMLRenderType(fd);
-  const constraints = constraintsObject[renderType];
-  if (constraints) {
-    constraints
-      .filter(([nm]) => fd[nm])
-      .forEach(([nm, htmlNm]) => {
-        element.setAttribute(htmlNm, fd[nm]);
-      });
-  }
-}
-
-function createInput(fd) {
-  const input = document.createElement('input');
-  input.type = getHTMLRenderType(fd);
-  setPlaceholder(input, fd);
-  setConstraints(input, fd);
-  return input;
-}
-
 const createTextArea = withFieldWrapper((fd) => {
   const input = document.createElement('textarea');
   setPlaceholder(input, fd);
@@ -67,58 +34,7 @@ const createTextArea = withFieldWrapper((fd) => {
 
 const createSelect = withFieldWrapper((fd) => {
   const select = document.createElement('select');
-  select.required = fd.required;
-  select.title = fd.tooltip ? stripTags(fd.tooltip, '') : '';
-  select.readOnly = fd.readOnly;
-  select.multiple = fd.type === 'string[]' || fd.type === 'boolean[]' || fd.type === 'number[]';
-  let ph;
-  if (fd.placeholder) {
-    ph = document.createElement('option');
-    ph.textContent = fd.placeholder;
-    ph.setAttribute('disabled', '');
-    ph.setAttribute('value', '');
-    select.append(ph);
-  }
-  let optionSelected = false;
-
-  const addOption = (label, value) => {
-    const option = document.createElement('option');
-    option.textContent = label instanceof Object ? label?.value?.trim() : label?.trim();
-    option.value = value?.trim() || label?.trim();
-    if (fd.value === option.value || (Array.isArray(fd.value) && fd.value.includes(option.value))) {
-      option.setAttribute('selected', '');
-      optionSelected = true;
-    }
-    select.append(option);
-    return option;
-  };
-
-  const options = fd?.enum || [];
-  const optionNames = fd?.enumNames ?? options;
-
-  if (options.length === 1
-    && options?.[0]?.startsWith('https://')) {
-    const optionsUrl = new URL(options?.[0]);
-    // using async to avoid rendering
-    if (optionsUrl.hostname.endsWith('hlx.page')
-    || optionsUrl.hostname.endsWith('hlx.live')) {
-      fetch(`${optionsUrl.pathname}${optionsUrl.search}`)
-        .then(async (response) => {
-          const json = await response.json();
-          const values = [];
-          json.data.forEach((opt) => {
-            addOption(opt.Option, opt.Value);
-            values.push(opt.Value || opt.Option);
-          });
-        });
-    }
-  } else {
-    options.forEach((value, index) => addOption(optionNames?.[index], value));
-  }
-
-  if (ph && optionSelected === false) {
-    ph.setAttribute('selected', '');
-  }
+  createDropdownUsingEnum(fd, select);
   return select;
 });
 
@@ -129,18 +45,6 @@ function createHeading(fd) {
   heading.id = fd.id;
   wrapper.append(heading);
 
-  return wrapper;
-}
-
-function createRadioOrCheckbox(fd) {
-  const wrapper = createFieldWrapper(fd);
-  const input = createInput(fd);
-  const [value, uncheckedValue] = fd.enum || [];
-  input.value = value;
-  if (typeof uncheckedValue !== 'undefined') {
-    input.dataset.uncheckedValue = uncheckedValue;
-  }
-  wrapper.insertAdjacentElement('afterbegin', input);
   return wrapper;
 }
 
@@ -171,32 +75,7 @@ function setConstraintsMessage(field, messages = {}) {
 
 function createRadioOrCheckboxGroup(fd) {
   const wrapper = createFieldSet({ ...fd });
-  const type = fd.fieldType.split('-')[0];
-  fd.enum.forEach((value, index) => {
-    const label = (typeof fd.enumNames?.[index] === 'object' && fd.enumNames?.[index] !== null) ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
-    const id = getId(fd.name);
-    const field = createRadioOrCheckbox({
-      name: fd.name,
-      id,
-      label: { value: label },
-      fieldType: type,
-      enum: [value],
-      required: fd.required,
-    });
-    field.classList.remove('field-wrapper', `field-${toClassName(fd.name)}`);
-    const input = field.querySelector('input');
-    input.id = id;
-    input.dataset.fieldType = fd.fieldType;
-    input.name = fd.name;
-    input.checked = Array.isArray(fd.value) ? fd.value.includes(value) : value === fd.value;
-    if ((index === 0 && type === 'radio') || type === 'checkbox') {
-      input.required = fd.required;
-    }
-    if (fd.enabled === false || fd.readOnly === true) {
-      input.setAttribute('disabled', 'disabled');
-    }
-    wrapper.appendChild(field);
-  });
+  createRadioOrCheckboxUsingEnum(fd, wrapper);
   wrapper.dataset.required = fd.required;
   if (fd.tooltip) {
     wrapper.title = stripTags(fd.tooltip, '');
