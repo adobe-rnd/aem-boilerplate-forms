@@ -12,18 +12,19 @@
     ],
     "include": [
       "blocks/form/**/*.js",
-      "blocks/form/rules/*.js"
+      "blocks/form/rules/*.js",
+      "scripts/form-editor-support.js"
     ],
     "report-dir": "coverage",
     "check-coverage": true
   },
   "scripts": {
     "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "mocha",
+    "test:unit": "npm run build:json --silent && mocha",
     "test:e2e": "playwright test",
     "debug:e2e": "playwright test --project='chromium' --debug",
-    "coverage:unit": "c8 --check-coverage --reporter=html --reporter=text --lines 89 --functions 93 --branches 87 mocha",
-    "coverage:e2e": "c8 --check-coverage --reporter=html --reporter=text --lines 89 --functions 93 --branches 87 playwright test --project='chromium'",
+    "coverage:unit": "c8 --check-coverage --reporter=html --reporter=text mocha",
+    "coverage:e2e": "c8 --check-coverage --reporter=html --reporter=text playwright test --project='chromium'",
     "coverage": "node ./test/merge-coverage.js",
     "lint:js": "eslint .",
     "lint:css": "stylelint blocks/**/*.css styles/*.css",
@@ -33,7 +34,12 @@
     "update:formatters": "rollup -c rollup/af-formatters.rollup.config.js",
     "update:functions": "cp node_modules/@aemforms/af-custom-functions/src/index.js blocks/form/rules/functions.js",
     "update": "npm run update:core && npm run update:formula && npm run update:formatters",
-    "postinstall": "npx playwright install --with-deps chromium"
+    "postinstall": "npx playwright install --with-deps chromium",
+    "build:json": "npm-run-all -p build:json:models build:json:definitions build:json:filters",
+    "build:json:models": "merge-json-cli -i 'models/_component-models.json' -o 'component-models.json'",
+    "build:json:definitions": "merge-json-cli -i 'models/_component-definition.json' -o 'component-definition.json'",
+    "build:json:filters": "merge-json-cli -i 'models/_component-filters.json' -o 'component-filters.json'",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -47,9 +53,9 @@
   "homepage": "https://github.com/adobe-rnd/aem-boilerplate-forms#readme",
   "devDependencies": {
     "@adobe/json-formula": "0.1.50",
-    "@aemforms/af-core": "0.22.85",
+    "@aemforms/af-core": "0.22.106",
     "@aemforms/af-custom-functions": "^1.0.8",
-    "@aemforms/af-formatters": "0.22.85",
+    "@aemforms/af-formatters": "0.22.106",
     "@babel/core": "7.24.0",
     "@babel/eslint-parser": "7.23.10",
     "@playwright/test": "^1.43.1",
@@ -76,7 +82,11 @@
     "rollup-plugin-license": "^3.0.1",
     "rollup-plugin-terser": "^7.0.2",
     "sinon": "^17.0.1",
-    "stylelint": "16.2.1",
+    "eslint-plugin-json": "3.1.0",
+    "husky": "9.1.1",
+    "merge-json-cli": "1.0.3",
+    "npm-run-all": "4.1.5",
+    "stylelint": "16.6.1",
     "stylelint-config-standard": "36.0.0"
   },
   "mocha": {

@@ -55,6 +55,12 @@ jobs:
       - store_artifacts:
           path: test/e2e/reports
           destination: test-results
+      - store_artifacts:
+          path: ./videos
+          destination: videos
+      - store_artifacts:
+          path: ./error-screenshot.png
+          destination: screenshots
   check-coverage:
     executor: node/default
     steps:

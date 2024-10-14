@@ -1,0 +1,51 @@
+{
+    "definitions": [
+        {
+            "title": "Modal",
+            "id": "modal",
+            "plugins": {
+              "xwalk": {
+                "page": {
+                  "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                  "template": {
+                    "jcr:title": "Modal",
+                    "fieldType": "panel",
+                    "fd:viewType": "modal",
+                    "enabled": true,
+                    "visible": false
+                  }
+                }
+              }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "modal",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/basicfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "help",
+                    "label": "Help Content",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/helpfields"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

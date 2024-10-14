@@ -379,7 +379,6 @@ function parseDate(dateString, language, skeleton, timeZone, bUseUTC = false) {
     let hourCycle = 'h12';
     let _bUseUTC = bUseUTC;
     let _setFullYear = false;
-    const isSeparator = str => str.length === 1 &&  ':-/.'.includes(str);
     const monthNumber = str => getNumber(str) - 1;
     const getNumber = str => str.split('').reduce((total, digit) => (total * 10) + digits.indexOf(digit), 0);
     const yearNumber = templateDigits => str => {
@@ -396,8 +395,7 @@ function parseDate(dateString, language, skeleton, timeZone, bUseUTC = false) {
     const months = monthNames(language, Object.fromEntries(parsed));
     parsed.forEach(([option, value, len]) => {
         if (option === 'literal') {
-            if (isSeparator(value)) regexParts.push(`[^${digits[0]}-${digits[9]}]`);
-            else regexParts.push(value);
+            regexParts.push(value);
         } else if (option === 'month' && ['numeric', '2-digit'].includes(value)) {
             regexParts.push(twoDigit);
             lookups.push(['month', monthNumber]);
@@ -449,9 +447,9 @@ function parseDate(dateString, language, skeleton, timeZone, bUseUTC = false) {
         }
         return regexParts;
     }, []);
-    const regex = new RegExp(regexParts.join(''));
+    const regex = new RegExp(`^${regexParts.join('')}$`);
     const match = dateString.match(regex);
-    if (match === null) return dateString;
+    if (match === null) return null;
     const dateObj = {year: 1972, month: 0, day: 1, hour: 0, minute: 0, second: 0, fractionalSecondDigits: 0};
     match.slice(1).forEach((m, index) => {
         const [element, func] = lookups[index];

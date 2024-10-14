@@ -23,7 +23,9 @@
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/title/v1/title",
-                "template": {}
+                "template": {
+                  "model": "title"
+                }
               }
             }
           }
@@ -47,7 +49,9 @@
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/button/v1/button",
-                "template": {}
+                "template": {
+                  "model": "button"
+                }
               }
             }
           }
@@ -65,7 +69,120 @@
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/section/v1/section",
-                "template": {}
+                "template": {
+                  "model": "section"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Blocks",
+      "id": "blocks",
+      "components": [
+        {
+          "title": "Cards",
+          "id": "cards",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Cards",
+                  "filter": "cards"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Card",
+          "id": "card",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block/item",
+                "template": {
+                  "name": "Card",
+                  "model": "card"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Columns",
+          "id": "columns",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/columns/v1/columns",
+                "template": {
+                  "columns": "2",
+                  "rows": "1"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Adaptive Form - Embed",
+          "id": "form-embed",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Adaptive Form - Embed",
+                  "model": "form-embed"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Adaptive Form",
+          "id": "form",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "fd/franklin/components/form/v1/form",
+                "template": {
+                  "fieldType": "form",
+                  "fd:version": "2.1"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Fragment",
+          "id": "fragment",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Fragment",
+                  "model": "fragment"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Hero",
+          "id": "hero",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Hero",
+                  "model": "hero"
+                }
               }
             }
           }
@@ -104,7 +221,8 @@
                   "jcr:title": "Checkbox",
                   "fieldType": "checkbox",
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "checkedValue": "on"
                 }
               }
             }
@@ -127,7 +245,9 @@
                   "enumNames": [
                     "Item 1",
                     "Item 2"
-                  ]
+                  ],
+                  "enabled": true,
+                  "visible": true
                 }
               }
             }
@@ -196,7 +316,7 @@
                   "fieldType": "file-input",
                   "accept": [
                     "audio/*",
-                    " video/*",
+                    "video/*",
                     "image/*",
                     "text/*",
                     "application/pdf"
@@ -238,6 +358,24 @@
                   "jcr:title": "Image",
                   "fieldType": "image",
                   "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Modal",
+          "id": "modal",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Modal",
+                  "fieldType": "panel",
+                  "fd:viewType": "modal",
+                  "enabled": true,
+                  "visible": false
                 }
               }
             }
@@ -303,6 +441,24 @@
           }
         },
         {
+          "title": "Rating",
+          "id": "rating",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                "template": {
+                  "jcr:title": "Rating",
+                  "fieldType": "number-input",
+                  "fd:viewType": "rating",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Reset",
           "id": "form-reset-button",
           "plugins": {
@@ -356,6 +512,64 @@
           }
         },
         {
+          "title": "Terms and conditions",
+          "id": "tnc",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/termsandconditions/v1/termsandconditions",
+                "template": {
+                  "jcr:title": "Terms and conditions",
+                  "fieldType": "panel",
+                  "fd:viewType": "tnc",
+                  "enabled": true,
+                  "visible": true,
+                  "text": {
+                    "value": "Text related to the terms and conditions come here.",
+                    "sling:resourceType": "core/fd/components/form/text/v1/text",
+                    "fieldType": "plain-text",
+                    "textIsRich": true
+                  },
+                  "link": {
+                    "enum": [
+                      "dummy-link-1"
+                    ],
+                    "type": "string[]",
+                    "fd:viewType": "toggleable-link",
+                    "enabled": true,
+                    "visible": true,
+                    "title": "I agree to the terms & conditions",
+                    "enumNames": [
+                      "Privacy policy."
+                    ],
+                    "sling:resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                    "fieldType": "checkbox-group",
+                    "fd:rules": {
+                      "jcr:primaryType": "nt:unstructured",
+                      "validationStatus": "valid"
+                    },
+                    "fd:events": {
+                      "jcr:primaryType": "nt:unstructured",
+                      "change": [
+                        "if(length($field.$value) == length($field.$enum), dispatchEvent($parent.approvalcheckbox, 'custom:setProperty', {enabled : true()}), {})"
+                      ]
+                    }
+                  },
+                  "approvalcheckbox": {
+                    "name": "approvalcheckbox",
+                    "jcr:title": "I agree to the terms & conditions.",
+                    "sling:resourceType": "core/fd/components/form/checkbox/v1/checkbox",
+                    "fieldType": "checkbox",
+                    "required": true,
+                    "enabled": true,
+                    "visible": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Text",
           "id": "plain-text",
           "plugins": {
@@ -402,102 +616,6 @@
                   "fd:viewType": "wizard",
                   "enabled": true,
                   "visible": true
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "title": "Blocks",
-      "id": "blocks",
-      "components": [
-        {
-          "title": "Columns",
-          "id": "columns",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/columns/v1/columns",
-                "template": {
-                  "columns": "2",
-                  "rows": "1"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Hero",
-          "id": "hero",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Hero",
-                  "model": "hero"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Cards",
-          "id": "cards",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Cards",
-                  "filter": "cards"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Card",
-          "id": "card",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block/item",
-                "template": {
-                  "name": "Card",
-                  "model": "card"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Adaptive Form",
-          "id": "form",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "fd/franklin/components/form/v1/form",
-                "template": {
-                  "fieldType": "form",
-                  "fd:version": "2.1"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Adaptive Form - Embed",
-          "id": "form-embed",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Adaptive Form - Embed",
-                  "model": "form-embed"
                 }
               }
             }

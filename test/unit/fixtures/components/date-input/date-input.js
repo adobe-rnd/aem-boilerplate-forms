@@ -1,5 +1,3 @@
-import { formatDate } from '../../../../../blocks/form/rules/model/afb-formatters.min.js';
-
 export const fieldDef = {
   items: [{
     id: 'datepicker-6dd0c75352',
@@ -24,12 +22,7 @@ export const fieldDef = {
   ],
 };
 
-const { locale } = new Intl.DateTimeFormat().resolvedOptions();
-const today = formatDate(new Date(), locale, 'short');
-
 export const markUp = `
-<div class="date-wrapper field-dob field-wrapper" data-id="datepicker-6dd0c75352" data-description="To enter today's date use ${today}" data-required="false">
-<label for="datepicker-6dd0c75352" class="field-label">Date Of Birth</label>
-<input type="text" placeholder="2000-02-13" id="datepicker-6dd0c75352" name="dob" edit-value="" display-value="" autocomplete="off" aria-describedby="datepicker-6dd0c75352-description">
-<div class="field-description" aria-live="polite" id="datepicker-6dd0c75352-description">To enter today's date use ${today}</div>
-</div>`.replace(/\n/g, '');
+<form data-action="undefined" novalidate="" data-redirect-url="" data-thank-you-msg="" data-source="aem" data-rules="true" data-id="undefined">
+   <div class="date-wrapper field-dob field-wrapper" data-id="datepicker-6dd0c75352" data-required="false"><label for="datepicker-6dd0c75352" class="field-label">Date Of Birth</label><input type="text" placeholder="2000-02-13" id="datepicker-6dd0c75352" name="dob" autocomplete="off" edit-value="" display-value=""></div>
+</form>`.replace(/\n/g, '');

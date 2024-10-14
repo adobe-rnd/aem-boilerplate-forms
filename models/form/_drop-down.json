@@ -1,0 +1,74 @@
+{
+    "definitions": [
+        {
+            "title": "Dropdown List",
+            "id": "drop-down",
+            "plugins": {
+              "xwalk": {
+                "page": {
+                  "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
+                  "template": {
+                    "jcr:title": "Drop Down List",
+                    "fieldType": "drop-down",
+                    "enabled": true,
+                    "visible": true
+                  }
+                }
+              }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "drop-down",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/basicfields"
+                        },
+                        {
+                            "...": "./_common.json#/optionfields"
+                        },
+                        {
+                            "...": "./_common.json#/advancedfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "help",
+                    "label": "Help Content",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/helpfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "validation",
+                    "label": "Validation",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/validationfields"
+                        },
+                        {
+                            "component": "text",
+                            "name": "validateExpMessage",
+                            "label": "Script validation message",
+                            "valueType": "string",
+                            "description": "Displayed when validation script fails."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

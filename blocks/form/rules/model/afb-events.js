@@ -18,6 +18,11 @@
 * the terms of the Adobe license agreement accompanying it.
 *************************************************************************/
 
+var EventSource;
+(function (EventSource) {
+    EventSource["CODE"] = "code";
+    EventSource["UI"] = "ui";
+})(EventSource || (EventSource = {}));
 class ActionImpl {
     _metadata;
     _type;
@@ -67,6 +72,11 @@ class Change extends ActionImpl {
     }
     withAdditionalChange(change) {
         return new Change(this.payload.changes.concat(change.payload.changes), this.metadata);
+    }
+}
+class UIChange extends ActionImpl {
+    constructor(payload, dispatch = false) {
+        super(payload, 'uiChange', { dispatch });
     }
 }
 class Invalid extends ActionImpl {
@@ -156,10 +166,11 @@ class Reset extends ActionImpl {
     }
 }
 class FieldChanged extends ActionImpl {
-    constructor(changes, field) {
+    constructor(changes, field, eventSource = EventSource.CODE) {
         super({
             field,
-            changes
+            changes,
+            eventSource
         }, 'fieldChanged');
     }
 }
@@ -192,4 +203,4 @@ class RemoveInstance extends ActionImpl {
     }
 }
 
-export { AddInstance, AddItem, Blur, Change, Click, CustomEvent, ExecuteRule, FieldChanged, Focus, FormLoad, Initialize, Invalid, RemoveInstance, RemoveItem, Reset, Save, Submit, SubmitError, SubmitFailure, SubmitSuccess, Valid, ValidationComplete, propertyChange };
+export { AddInstance, AddItem, Blur, Change, Click, CustomEvent, ExecuteRule, FieldChanged, Focus, FormLoad, Initialize, Invalid, RemoveInstance, RemoveItem, Reset, Save, Submit, SubmitError, SubmitFailure, SubmitSuccess, UIChange, Valid, ValidationComplete, propertyChange };

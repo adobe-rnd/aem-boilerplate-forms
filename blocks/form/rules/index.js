@@ -25,6 +25,8 @@ import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
 import initializeRuleEngineWorker from './worker.js';
 
+const formModel = {};
+
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
   el.toggleAttribute('aria-readonly', value === true);
@@ -51,22 +53,23 @@ function handleActiveChild(id, form) {
 
 async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
+  const {
+    id, name, fieldType, readOnly, type, displayValue, displayFormat, displayValueExpression,
+    activeChild,
+  } = fieldModel;
+  const field = form.querySelector(`#${id}`);
+  if (!field) {
+    return;
+  }
+  const fieldWrapper = field?.closest('.field-wrapper');
   changes.forEach((change) => {
-    const {
-      id, fieldType, readOnly, type, displayValue, displayFormat, displayValueExpression,
-      activeChild,
-    } = fieldModel;
     const { propertyName, currentValue, prevValue } = change;
-    const field = form.querySelector(`#${id}`);
-    if (!field) {
-      return;
-    }
     switch (propertyName) {
       case 'required':
         if (currentValue === true) {
-          field.closest('.field-wrapper').dataset.required = '';
+          fieldWrapper.dataset.required = '';
         } else {
-          field.closest('.field-wrapper').removeAttribute('data-required');
+          fieldWrapper.removeAttribute('data-required');
         }
         break;
       case 'validationMessage':
@@ -83,8 +86,11 @@ async function fieldChanged(payload, form, generateFormRendition) {
         if (['number', 'date', 'text', 'email'].includes(field.type) && (displayFormat || displayValueExpression)) {
           field.setAttribute('edit-value', currentValue);
           field.setAttribute('display-value', displayValue);
+          if (document.activeElement !== field) {
+            field.value = displayValue;
+          }
         } else if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
-          field.querySelectorAll(`input[name=${id}]`).forEach((el) => {
+          field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
             const exists = (Array.isArray(currentValue)
               && currentValue.some((x) => compare(x, el.value, type.replace('[]', ''))))
               || compare(currentValue, el.value, type);
@@ -99,13 +105,13 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'visible':
-        field.closest('.field-wrapper').dataset.visible = currentValue;
+        fieldWrapper.dataset.visible = currentValue;
         break;
       case 'enabled':
         // If checkboxgroup/radiogroup/drop-down is readOnly then it should remain disabled.
         if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
           if (readOnly === false) {
-            field.querySelectorAll(`input[name=${id}]`).forEach((el) => {
+            field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
               disableElement(el, !currentValue);
             });
           }
@@ -119,7 +125,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'readOnly':
         if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
-          field.querySelectorAll(`input[name=${id}]`).forEach((el) => {
+          field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
             disableElement(el, currentValue);
           });
         } else if (fieldType === 'drop-down') {
@@ -129,8 +135,6 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'label':
-        // eslint-disable-next-line no-case-declarations
-        const fieldWrapper = field.closest('.field-wrapper');
         if (fieldWrapper) {
           let labelEl = fieldWrapper.querySelector('.field-label');
           if (labelEl) {
@@ -148,10 +152,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'description':
-        // eslint-disable-next-line no-case-declarations
-        const fieldContainer = field.closest('.field-wrapper');
-        if (fieldContainer) {
-          let descriptionEl = fieldContainer.querySelector('.field-description');
+        if (fieldWrapper) {
+          let descriptionEl = fieldWrapper.querySelector('.field-description');
           if (descriptionEl) {
             descriptionEl.innerHTML = currentValue;
           } else if (currentValue !== '') {
@@ -159,7 +161,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
               id,
               description: currentValue,
             });
-            fieldContainer.append(descriptionEl);
+            fieldWrapper.append(descriptionEl);
           }
         }
         break;
@@ -182,6 +184,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
     }
   });
+  if (fieldWrapper?.dataset?.subscribe) {
+    fieldWrapper.dataset.fieldModelChanged = JSON.stringify(Math.random());
+  }
 }
 
 function formChanged(payload, form) {
@@ -213,15 +218,14 @@ function handleRuleEngineEvent(e, form, generateFormRendition) {
 function applyRuleEngine(htmlForm, form, captcha) {
   htmlForm.addEventListener('change', (e) => {
     const field = e.target;
-    const {
-      id, value, name, checked,
-    } = field;
+    const { value, name, checked } = field;
+    const { id } = field.closest('.field-wrapper').dataset;
     if ((field.type === 'checkbox' && field.dataset.fieldType === 'checkbox-group')) {
       const val = getCheckboxGroupValue(name, htmlForm);
-      const el = form.getElement(name);
+      const el = form.getElement(id);
       el.value = val;
     } else if ((field.type === 'radio' && field.dataset.fieldType === 'radio-group')) {
-      const el = form.getElement(name);
+      const el = form.getElement(id);
       el.value = value;
     } else if (field.type === 'checkbox') {
       form.getElement(id).value = checked ? value : field.dataset.uncheckedValue;
@@ -260,7 +264,7 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data);
   window.myForm = form;
-
+  formModel[htmlForm.dataset?.id] = form;
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'fieldChanged');
@@ -305,4 +309,24 @@ export async function initAdaptiveForm(formDef, createForm) {
     data,
   }, createForm);
   return form;
+}
+
+/**
+ * Subscribes to changes in the specified field element and triggers a callback
+ * with access to formModel when changes occur.
+ * @param {HTMLElement} fieldDiv - The field element to observe for changes.
+ * @param {Function} callback - The callback function to execute when changes are detected.
+ */
+export function subscribe(fieldDiv, callback) {
+  if (callback) {
+    fieldDiv.dataset.subscribe = true;
+    const observer = new MutationObserver((mutationsList) => {
+      mutationsList?.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-field-model-changed') {
+          callback(fieldDiv, formModel[fieldDiv.closest('form')?.dataset?.id]);
+        }
+      });
+    });
+    observer.observe(fieldDiv, { attributes: true });
+  }
 }

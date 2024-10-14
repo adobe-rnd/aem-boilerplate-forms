@@ -1,0 +1,109 @@
+{
+  "groups": [
+    {
+      "title": "Default Content",
+      "id": "default",
+      "components": [
+        {
+          "...": "./_text.json#/definitions"
+        },
+        {
+          "...": "./_title.json#/definitions"
+        },
+        {
+          "...": "./_image.json#/definitions"
+        },
+        {
+          "...": "./_button.json#/definitions"
+        }
+      ]
+    },
+    {
+      "title": "Sections",
+      "id": "sections",
+      "components": [
+        {
+          "...": "./_section.json#/definitions"
+        }
+      ]
+    },
+    {
+      "title": "Blocks",
+      "id": "blocks",
+      "components": [
+        {
+          "...": "../blocks/*/_*.json#/definitions"
+        }
+      ]
+    },
+    {
+      "title": "Adaptive Form Components",
+      "id": "form-general",
+      "components": [
+        {
+          "...": "./form/_button.json#/definitions"
+        },
+        {
+          "...": "./form/_checkbox.json#/definitions"
+        },
+        {
+          "...": "./form/_checkbox-group.json#/definitions"
+        },
+        {
+          "...": "./form/_date-input.json#/definitions"
+        },
+        {
+          "...": "./form/_drop-down.json#/definitions"
+        },
+        {
+          "...": "./form/_email.json#/definitions"
+        },
+        {
+          "...": "./form/_file-input.json#/definitions"
+        },
+        {
+          "...": "./form/_fragment.json#/definitions"
+        },
+        {
+          "...": "./form/_image.json#/definitions"
+        },
+        {
+          "...": "./form/_modal.json#/definitions"
+        },
+        {
+          "...": "./form/_number-input.json#/definitions"
+        },
+        {
+          "...": "./form/_panel.json#/definitions"
+        },
+        {
+          "...": "./form/_radio-group.json#/definitions"
+        },
+        {
+          "...": "./form/_rating.json#/definitions"
+        },
+        {
+          "...": "./form/_reset-button.json#/definitions"
+        },
+        {
+          "...": "./form/_submit-button.json#/definitions"
+        },
+        {
+          "...": "./form/_telephone-input.json#/definitions"
+        },
+        {
+          "...": "./form/_tnc.json#/definitions"
+        },
+        {
+          "...": "./form/_text.json#/definitions"
+        },
+        {
+          "...": "./form/_text-input.json#/definitions"
+        },
+        {
+          "...": "./form/_wizard.json#/definitions"
+        }
+      ]
+    }
+  ]
+}

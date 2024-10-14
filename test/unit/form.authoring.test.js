@@ -3,21 +3,28 @@ import assert from 'assert';
 import path from 'path';
 import fs from 'fs';
 import {
-  annotateFormForEditing, getItems, getFieldById, applyChanges,
+  annotateFormForEditing, getItems, getFieldById, applyChanges, handleWizardNavigation,
+  getContainerChildNodes,
 } from '../../scripts/form-editor-support.js';
 import { generateFormRendition } from '../../blocks/form/form.js';
 import { ueFormDef } from './forms/universaleditorform.js';
 import { ueAddEvent } from './fixtures/ue/events/event-add.js';
+import { ueAddEventForWizardNavigation } from './fixtures/ue/events/event-add-wizardnavigation.js';
 import { uePatchEvent } from './fixtures/ue/events/event-patch.js';
+import { uePatchTitleEvent } from './fixtures/ue/events/event-patch-title.js';
+import { uePatchEmptyTitleEvent } from './fixtures/ue/events/event-patch-empty-title.js';
 import { ueFormDefForAddTest } from './fixtures/ue/events/formdefinition-add.js';
 import { ueFormDefForPatchTest } from './fixtures/ue/events/formdefinition-patch.js';
+import { ueFormDefForPatchTitleTest } from './fixtures/ue/events/formdefinition-patch-title.js';
+import { ueFormDefForPatchEmptyTitleTest } from './fixtures/ue/events/formdefinition-patch-empty-title.js';
+import { ueFormDefForWizardNavigationTest } from './fixtures/ue/events/formdefinition-wizardnavigation.js';
 import { renderForm } from './testUtils.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
   it('test form annotation for UE', async () => {
     document.documentElement.classList.add('adobe-ue-edit');
     const formEl = document.createElement('form');
-
+    window.hlx.codeBasePath = '../../';
     await generateFormRendition(ueFormDef, formEl, getItems);
 
     annotateFormForEditing(formEl, ueFormDef);
@@ -55,7 +62,7 @@ describe('Universal Editor Authoring Test Cases', () => {
             } else {
               testAnnotation(node, fd, 'container', fd.fieldType);
             }
-            testChildren(node.childNodes, formDef, fieldMap);
+            testChildren(getContainerChildNodes(node, fd), formDef, fieldMap);
           } else if (fd.properties['fd:fragment'] && node.classList.contains('edit-mode')) {
             testAnnotation(node, fd, 'component', 'form-fragment');
             const textNodeCount = Array.from(node.childNodes)
@@ -156,6 +163,55 @@ describe('Universal Editor Authoring Test Cases', () => {
     assert.equal(labelEl.textContent, 'Panel new');
     const wizardMenuItems = panel.querySelectorAll('.wizard-menu-item');
     assert.equal(wizardMenuItems.length, 1);
+    document.body.replaceChildren();
+  });
+
+  it('test UE patch event for panel title', async () => {
+    await renderForm(ueFormDefForPatchTitleTest);
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: uePatchTitleEvent });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    assert.equal(formEl.childNodes.length, 1); // only 1 panel is there
+    const panel = formEl.querySelector('.panel-wrapper');
+    // 1 legend + panel
+    assert.equal(panel.childNodes.length, 2);
+    const labelEl = panel.querySelector('legend[for="panelcontainer-5012648f84"]');
+    assert.equal(labelEl.textContent, 'Panel');
+    const textInputElLabel = panel.querySelector('label[for="textinput-3eb2e7d0b6"]');
+    assert.equal(textInputElLabel.textContent, 'Text Input new');
+    document.body.replaceChildren();
+  });
+
+  it('test UE patch event for panel empty title', async () => {
+    await renderForm(ueFormDefForPatchEmptyTitleTest);
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: uePatchEmptyTitleEvent });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    assert.equal(formEl.childNodes.length, 1); // only 1 panel is there
+    const panel = formEl.querySelector('.panel-wrapper');
+    // only 1 text-input (no panel legend)
+    assert.equal(panel.childNodes.length, 1);
+    const labelEl = panel.querySelector('legend[for="panelcontainer-5012648f84"]');
+    assert.equal(labelEl == null, true);
+    const textInputElLabel = panel.querySelector('label[for="textinput-3eb2e7d0b6"]');
+    assert.equal(textInputElLabel.textContent, 'Text Input new');
+    document.body.replaceChildren();
+  });
+
+  it('test UE wizard navigation on add', async () => {
+    await renderForm(ueFormDefForWizardNavigationTest);
+    const formElPrev = document.querySelector('form');
+    handleWizardNavigation(formElPrev.querySelector('.wizard'), formElPrev.querySelector('fieldset[data-id="panelcontainer-6a979252b1"]'));
+    window.hlx.codeBasePath = '../../';
+    const applied = await applyChanges({ detail: ueAddEventForWizardNavigation });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    const currentActiveStep = formEl.querySelector('.current-wizard-step');
+    assert.equal(currentActiveStep.dataset.id, 'panelcontainer-6a979252b1');
+    const currentActiveMenuItem = currentActiveStep.parentElement.querySelector(`li[data-index="${currentActiveStep.dataset.index}"]`);
+    assert.equal(currentActiveMenuItem.classList.contains('wizard-menu-active-item'), true);
     document.body.replaceChildren();
   });
 });

@@ -1,0 +1,121 @@
+{
+    "definitions": [
+        {
+            "title": "Checkbox group",
+            "id": "checkbox-group",
+            "plugins": {
+              "xwalk": {
+                "page": {
+                  "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                  "template": {
+                    "jcr:title": "Checkbox Group",
+                    "fieldType": "checkbox-group",
+                    "enum": [
+                      "0",
+                      "1"
+                    ],
+                    "enumNames": [
+                      "Item 1",
+                      "Item 2"
+                    ],
+                    "enabled": true,
+                    "visible": true
+                  }
+                }
+              }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "checkbox-group",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/basicfields"
+                        },
+                        {
+                            "...": "./_common.json#/optionfields"
+                        },
+                        {
+                            "component": "select",
+                            "label": "Data type of submitted value",
+                            "name": "type",
+                            "valueType": "string",
+                            "options": [
+                                {
+                                    "name": "String",
+                                    "value": "string"
+                                },
+                                {
+                                    "name": "Boolean",
+                                    "value": "boolean"
+                                },
+                                {
+                                    "name": "Number",
+                                    "value": "number"
+                                }
+                            ]
+                        },
+                        {
+                            "component": "text",
+                            "name": "default",
+                            "label": "Default option",
+                            "valueType": "string"
+                        },
+                        {
+                            "component": "radio-group",
+                            "label": "Display Options",
+                            "name": "orientation",
+                            "valueType": "string",
+                            "options": [
+                                {
+                                    "name": "Horizontally",
+                                    "value": "horizontal"
+                                },
+                                {
+                                    "name": "Vertically",
+                                    "value": "vertical"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "help",
+                    "label": "Help Content",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/helpfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "validation",
+                    "label": "Validation",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/validationfields"
+                        },
+                        {
+                            "component": "text",
+                            "name": "validateExpMessage",
+                            "label": "Script validation message",
+                            "valueType": "string",
+                            "description": "Displayed when validation script fails."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

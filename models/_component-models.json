@@ -1,0 +1,86 @@
+[
+  {
+    "...": "./_image.json#/models"
+  },
+  {
+    "...": "./_title.json#/models"
+  },
+  {
+    "...": "./_text.json#/models"
+  },
+  {
+    "...": "./_button.json#/models"
+  },
+  {
+    "...": "./_section.json#/models"
+  },
+  {
+    "...": "../blocks/*/_*.json#/models"
+  },
+  {
+    "...": "./form/_button.json#/models"
+  },
+  {
+    "...": "./form/_checkbox.json#/models"
+  },
+  {
+    "...": "./form/_checkbox-group.json#/models"
+  },
+  {
+    "...": "./form/_date-input.json#/models"
+  },
+  {
+    "...": "./form/_drop-down.json#/models"
+  },
+  {
+    "...": "./form/_email.json#/models"
+  },
+  {
+    "...": "./form/_file-input.json#/models"
+  },
+  {
+    "...": "./form/_fragment.json#/models"
+  },
+  {
+    "...": "./form/_image.json#/models"
+  },
+  {
+    "...": "./form/_modal.json#/models"
+  },
+  {
+    "...": "./form/_number-input.json#/models"
+  },
+  {
+    "...": "./form/_panel.json#/models"
+  },
+  {
+    "...": "./form/_radio-group.json#/models"
+  },
+  {
+    "...": "./form/_reset-button.json#/models"
+  },
+  {
+    "...": "./form/_submit-button.json#/models"
+  },
+  {
+    "...": "./form/_telephone-input.json#/models"
+  },
+  {
+    "...": "./form/_tnc.json#/models"
+  },
+  {
+    "...": "./form/_text.json#/models"
+  },
+  {
+    "...": "./form/_text-input.json#/models"
+  },
+  {
+    "...": "./form/_wizard.json#/models"
+  },
+  {
+    "...": "./form/_multiline-input.json#/models"
+  },
+  {
+    "...": "./form/_rating.json#/models"
+  }
+]
