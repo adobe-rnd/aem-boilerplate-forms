@@ -80,6 +80,9 @@
           "...": "./form/_radio-group.json#/definitions"
         },
         {
+          "...": "./form/_rating.json#/definitions"
+        },
+        {
           "...": "./form/_reset-button.json#/definitions"
         },
         {

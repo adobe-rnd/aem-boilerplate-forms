@@ -449,7 +449,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -599,7 +604,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -650,7 +660,8 @@
             "name": "enum",
             "label": "Options (Data Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "text",
@@ -767,7 +778,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -918,6 +934,10 @@
             "valueType": "string",
             "options": [
               {
+                "name": "No Pattern",
+                "value": ""
+              },
+              {
                 "name": "01 April, 2007",
                 "value": "d MMMM, y"
               },
@@ -957,7 +977,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -1008,7 +1033,8 @@
             "name": "enum",
             "label": "Options (Data Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "text",
@@ -1095,7 +1121,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -1261,7 +1292,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -1398,7 +1434,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -1553,7 +1594,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -1637,7 +1683,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -1786,6 +1837,10 @@
             "valueType": "string",
             "options": [
               {
+                "name": "No Pattern",
+                "value": ""
+              },
+              {
                 "name": "$1,234.21",
                 "value": "¤#,##0.00"
               },
@@ -1821,7 +1876,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -1933,7 +1993,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -1984,7 +2049,8 @@
             "name": "enum",
             "label": "Options (Data Value)",
             "valueType": "string",
-            "multi": true
+            "multi": true,
+            "required": true
           },
           {
             "component": "text",
@@ -2101,7 +2167,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -2210,7 +2281,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -2382,7 +2458,12 @@
             "name": "name",
             "label": "Name",
             "valueType": "string",
-            "required": true
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
           },
           {
             "component": "text",
@@ -2535,6 +2616,163 @@
             "valueType": "string",
             "label": "Pattern Error message",
             "description": "Error message shown when the pattern is not matched."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rating",
+    "fields": [
+      {
+        "component": "container",
+        "name": "basic",
+        "label": "Basic",
+        "collapsible": false,
+        "fields": [
+          {
+            "component": "text",
+            "name": "name",
+            "label": "Name",
+            "valueType": "string",
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
+          },
+          {
+            "component": "text",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string"
+          },
+          {
+            "component": "boolean",
+            "name": "hideTitle",
+            "label": "Hide title",
+            "valueType": "boolean"
+          },
+          {
+            "component": "text",
+            "name": "dataRef",
+            "label": "Bind reference",
+            "valueType": "string"
+          },
+          {
+            "component": "boolean",
+            "name": "unboundFormElement",
+            "label": "Mark as Unbound Form Element",
+            "valueType": "boolean"
+          },
+          {
+            "component": "boolean",
+            "name": "visible",
+            "label": "Show Component",
+            "valueType": "boolean",
+            "value": true
+          },
+          {
+            "component": "boolean",
+            "name": "enabled",
+            "label": "Enable Component",
+            "valueType": "boolean",
+            "value": true
+          },
+          {
+            "component": "boolean",
+            "name": "readOnly",
+            "label": "Read-only",
+            "valueType": "boolean"
+          },
+          {
+            "component": "text",
+            "name": "placeholder",
+            "label": "Placeholder text",
+            "valueType": "string"
+          },
+          {
+            "component": "text",
+            "name": "default",
+            "label": "Default Value",
+            "valueType": "string"
+          }
+        ]
+      },
+      {
+        "component": "container",
+        "name": "help",
+        "label": "Help Content",
+        "collapsible": true,
+        "fields": [
+          {
+            "component": "richtext",
+            "name": "description",
+            "label": "Help text",
+            "valueType": "string"
+          },
+          {
+            "component": "richtext",
+            "name": "tooltip",
+            "label": "Short description",
+            "valueType": "string"
+          }
+        ]
+      },
+      {
+        "component": "container",
+        "name": "validation",
+        "label": "Validation",
+        "collapsible": true,
+        "fields": [
+          {
+            "component": "boolean",
+            "name": "required",
+            "label": "Required",
+            "valueType": "boolean"
+          },
+          {
+            "component": "text",
+            "name": "mandatoryMessage",
+            "label": "Error message",
+            "valueType": "string",
+            "description": "Error message shown when required field is left empty."
+          },
+          {
+            "component": "number",
+            "name": "minimum",
+            "label": "Lowest number / Smallest number",
+            "valueType": "number",
+            "description": "Minimum rating allowed in the field"
+          },
+          {
+            "component": "text",
+            "name": "minimumMessage",
+            "valueType": "string",
+            "label": "Minimum error message",
+            "description": "Error message shown when the rating value is less than minimum."
+          },
+          {
+            "component": "number",
+            "name": "maximum",
+            "label": "Highest number / Largest number",
+            "valueType": "number",
+            "description": "Maximum rating allowed in the field"
+          },
+          {
+            "component": "text",
+            "name": "maximumMessage",
+            "valueType": "string",
+            "label": "Maximum error message",
+            "description": "Error message shown when the rating value is more than maximum."
+          },
+          {
+            "component": "text",
+            "name": "validateExpMessage",
+            "label": "Script validation message",
+            "valueType": "string",
+            "description": "Displayed when validation script fails."
           }
         ]
       }
