@@ -10,18 +10,18 @@ const selector = {
   emoji: '.rating.hover span.emoji',
 };
 
-const partialUrl = '/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VmFsaWRhdGlvbi9pbmRleC9qY3I6Y29udGVudC9yb290L3NlY3Rpb25fMC9mb3Jt';
+const partialUrl = '/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXgvamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uXzAvZm9ybQ==';
 const starsSelected = 'star hover selected';
 
 test.describe('custom component validation', () => {
-  const testURl = 'https://main--form-ue-range--pranay-tippa.hlx.live/content/ratingcomponentvalidation/';
+  const testURl = 'https://main--aem-boilerplate-forms--adobe-rnd.hlx.live/drafts/tests/x-walk/ratingvalidation';
 
-  test('rating custom component validation', async ({ page }) => {
+  test('rating custom component validation @chromium-only', async ({ page }) => {
     await page.goto(testURl, { waitUntil: 'networkidle' });
 
     await page.evaluate(async () => {
       // eslint-disable-next-line no-undef,no-underscore-dangle
-      myForm._jsonModel.action = 'https://publish-p133911-e1313554.adobeaemcloud.com/adobe/forms/af/submit/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VmFsaWRhdGlvbi9pbmRleC9qY3I6Y29udGVudC9yb290L3NlY3Rpb25fMC9mb3Jt';
+      myForm._jsonModel.action = 'https://main--aem-boilerplate-forms--adobe-rnd.hlx.live/adobe/forms/af/submit/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXgvamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uXzAvZm9ybQ==';
     });
 
     // listeners to fetch payload form submission.
