@@ -146,6 +146,7 @@
     {
       "id": "form",
       "components": [
+        "accordion",
         "checkbox",
         "checkbox-group",
         "date-input",
