@@ -18,6 +18,9 @@
     "...": "../blocks/*/_*.json#/models"
   },
   {
+    "...": "./form/_accordion.json#/models"
+  },
+  {
     "...": "./form/_button.json#/models"
   },
   {

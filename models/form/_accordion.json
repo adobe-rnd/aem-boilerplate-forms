@@ -1,0 +1,79 @@
+{
+    "definitions": [
+        {
+            "title": "Accordion",
+            "id": "accordion",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                        "template": {
+                            "jcr:title": "Accordion",
+                            "fieldType": "panel",
+                            "fd:viewType": "accordion",
+                            "enabled": true,
+                            "visible": true
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "accordion",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/basicfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "repeat",
+                    "label": "Repeat Accordion",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "component": "boolean",
+                            "name": "repeatable",
+                            "label": "Make accordion repeatable",
+                            "valueType": "boolean"
+                        },
+                        {
+                            "component": "number",
+                            "name": "minOccur",
+                            "label": "Minimum repetitions",
+                            "valueType": "number",
+                            "description": "Minimum number of times the accordion appears on the form"
+                        },
+                        {
+                            "component": "number",
+                            "name": "maxOccur",
+                            "label": "Maximum repetitions",
+                            "valueType": "number",
+                            "description": "Maximum number of times the accordion can appear on the form"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "help",
+                    "label": "Help Content",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/helpfields"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

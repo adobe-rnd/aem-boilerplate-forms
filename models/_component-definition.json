@@ -41,6 +41,9 @@
       "id": "form-general",
       "components": [
         {
+          "...": "./form/_accordion.json#/definitions"
+        },
+        {
           "...": "./form/_button.json#/definitions"
         },
         {

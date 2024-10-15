@@ -1,0 +1,54 @@
+/* Accordion styling */
+:root {
+    --color-accordion-legend-background: #F3F6FD;
+    --color-accordion-collapse-icon: #1c3fca;
+    --color-accordion-border: #ecedf3;
+}
+
+main .form fieldset legend.accordion-legend {
+    padding: 24px 32px 10px;
+    border-radius: 24px 24px 4px 4px;
+    background-color: var(--color-accordion-legend-background);
+    position: relative;
+}
+
+main .form fieldset legend.accordion-legend[data-visible='false'] {
+    display:block !important;
+    color:var(--color-accordion-legend-background);
+    user-select: none;
+}
+
+main .form fieldset legend::after {
+    content: '\221F';
+    color: var(--color-accordion-collapse-icon);
+    font-size: 19px;
+    display: inline;
+    position: absolute;
+    transition: transform 0s;
+    transform: rotate(-45deg);
+    margin-top: -5px;
+    right: 22px;
+    cursor: pointer;
+}
+
+main .form fieldset.accordion-collapse legend::after {
+    transform: rotate(-225deg);
+    margin-top: 0;
+}
+
+main .form fieldset.accordion-collapse > :not(legend) {
+    display: none;
+}
+
+
+main .form fieldset.accordion-wrapper > :not(legend) {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+main .form fieldset.accordion-wrapper {
+    padding: 15px 0;
+    border: 1px solid var(--color-accordion-border);
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+}
