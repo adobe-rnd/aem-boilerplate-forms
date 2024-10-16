@@ -22,6 +22,7 @@ import { loadCSS } from './aem.js';
 
 window.currentMode = 'preview';
 let activeWizardStep;
+const OOTBViewTypeComponentsWithoutModel = ['wizard', 'toggleable-link', 'modal'];
 
 export function getItems(container) {
   if (container[':itemsOrder'] && container[':items']) {
@@ -96,7 +97,7 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
 }
 
 function getPropertyModel(fd) {
-  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || fd[':type'] === 'wizard') {
+  if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || OOTBViewTypeComponentsWithoutModel.includes(fd[':type'])) {
     return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
   }
   return fd[':type'];
@@ -104,7 +105,7 @@ function getPropertyModel(fd) {
 
 function annotateContainer(fieldWrapper, fd) {
   fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
-  fieldWrapper.setAttribute('data-aue-model', fd.fieldType);
+  fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
   fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
   fieldWrapper.setAttribute('data-aue-type', 'container');
   fieldWrapper.setAttribute('data-aue-behavior', 'component');
@@ -290,8 +291,8 @@ export async function applyChanges(event) {
           }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
-          if (parent.classList?.contains('panel-wrapper') && parent.querySelector('legend')) {
-            const panelLabel = parent.querySelector('legend');
+          if (parent.classList?.contains('panel-wrapper') && parent.querySelector(`legend[for=${parent.dataset.id}]`)) {
+            const panelLabel = parent.querySelector(`legend[for=${parent.dataset.id}]`);
             parent.replaceChildren(panelLabel);
           } else {
             parent.replaceChildren();
@@ -310,7 +311,7 @@ export async function applyChanges(event) {
   return true;
 }
 
-function attachEventListners(main) {
+export function attachEventListners(main) {
   [
     'aue:content-patch',
     'aue:content-update',
@@ -341,11 +342,10 @@ function attachEventListners(main) {
 
   if (document.documentElement.classList.contains('adobe-ue-edit')) {
     ueEditModeHandler();
-  } else {
-    document.body.addEventListener('aue:ui-edit', ueEditModeHandler);
   }
+  document.body.addEventListener('aue:ui-edit', ueEditModeHandler);
 }
+
 const observer = new MutationObserver(instrumentForms);
 observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
 loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
-attachEventListners(document.querySelector('main'));

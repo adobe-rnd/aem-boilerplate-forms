@@ -19,6 +19,10 @@ class TermsAndConditions {
 
   decorate() {
     const textWrapper = this.fieldDiv.querySelector('.plain-text-wrapper');
+    if (!textWrapper) { // rendition does not have a plain-text-wrapper => link rendition of TnC
+      console.debug('No plain-text found in TnC field. Assuming Link based rendition and Skipping decoration.');
+      return;
+    }
     textWrapper.classList.add(textDecorationClass);
     const intersection = document.createElement('div');
     intersection.classList.add(textIntersectionClass);

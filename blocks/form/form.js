@@ -285,6 +285,7 @@ function inputDecorator(field, element) {
       input.setAttribute('display-value', field.displayValue ?? '');
       input.type = 'text';
       input.value = field.displayValue ?? '';
+      input.addEventListener('touchstart', () => { input.type = field.type; }); // in mobile devices the input type needs to be toggled before focus
       input.addEventListener('focus', () => handleFocus(input, field));
       input.addEventListener('blur', () => handleFocusOut(input));
     } else if (input.type !== 'file') {
@@ -479,7 +480,7 @@ export async function fetchForm(pathname) {
   // get the main form
   let data;
   let path = pathname;
-  if (path.startsWith(window.location.origin)) {
+  if (path.startsWith(window.location.origin) && !path.endsWith('.json')) {
     if (path.endsWith('.html')) {
       path = path.substring(0, path.lastIndexOf('.html'));
     }

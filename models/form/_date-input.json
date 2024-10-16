@@ -108,6 +108,10 @@
                             "valueType": "string",
                             "options": [
                                 {
+                                    "name": "No Pattern",
+                                    "value": ""
+                                },
+                                {
                                     "name": "01 April, 2007",
                                     "value": "d MMMM, y"
                                 },

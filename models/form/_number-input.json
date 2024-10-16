@@ -106,6 +106,10 @@
                             "valueType": "string",
                             "options": [
                                 {
+                                    "name": "No Pattern",
+                                    "value": ""
+                                },
+                                {
                                     "name": "$1,234.21",
                                     "value": "¤#,##0.00"
                                 },

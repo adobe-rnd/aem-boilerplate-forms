@@ -24,6 +24,13 @@ function decorateLink(link) {
   return link;
 }
 
+/**
+ * Toggleable-link is a component that wraps a checkbox and an anchor tag.
+ * When the anchor tag is clicked, the checkbox is toggled, marking that the link has been clicked.
+ * The anchor tag is styled to look like a link and the checkbox is hidden.
+ * @param {HTMLElement} fieldDiv - The div element that contains the fields to be decorated.
+ * @returns {Promise<HTMLElement>} - Returns a Promise that resolves with the decorated fieldDiv.
+ */
 export default async function decorate(fieldDiv) {
   const links = fieldDiv.querySelectorAll('.checkbox-wrapper');
   links.forEach((link) => {

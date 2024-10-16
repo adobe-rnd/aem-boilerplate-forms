@@ -76,5 +76,11 @@
   },
   {
     "...": "./form/_wizard.json#/models"
+  },
+  {
+    "...": "./form/_multiline-input.json#/models"
+  },
+  {
+    "...": "./form/_rating.json#/models"
   }
 ]

@@ -272,6 +272,12 @@ main .form form .item-remove {
     padding-left: 10px;
 }
 
+main .form form .item-add {
+    overflow: unset;
+    display: flex;
+    justify-content: center;
+}
+
 main .form .file-description{
   display: flex;
   gap: 20px;
@@ -289,7 +295,7 @@ main .form form .item-remove span {
     display: block;
     width: 20px;
     height: 20px;
-    background: url('/icons/delete.svg') no-repeat;
+    background: url('../../icons/delete.svg') no-repeat;
 }
 
 main .file-wrapper .file-description button {
