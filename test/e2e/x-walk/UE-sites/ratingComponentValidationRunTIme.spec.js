@@ -1,4 +1,5 @@
 import { test, expect } from '../../fixtures.js';
+import { openPage } from '../../utils.js';
 
 const emoji = ['😢', '😊'];
 let rating = null;
@@ -14,10 +15,10 @@ const partialUrl = '/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXg
 const starsSelected = 'star hover selected';
 
 test.describe('custom component validation', () => {
-  const testURl = 'https://main--aem-boilerplate-forms--adobe-rnd.hlx.live/drafts/tests/x-walk/ratingvalidation';
+  const testURl = '/drafts/tests/x-walk/ratingvalidation';
 
   test('rating custom component validation @chromium-only', async ({ page }) => {
-    await page.goto(testURl, { waitUntil: 'networkidle' });
+    await openPage(page, testURL);
 
     await page.evaluate(async () => {
       // eslint-disable-next-line no-undef,no-underscore-dangle
