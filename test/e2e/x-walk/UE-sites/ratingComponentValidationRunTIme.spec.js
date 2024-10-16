@@ -15,7 +15,7 @@ const partialUrl = '/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXg
 const starsSelected = 'star hover selected';
 
 test.describe('custom component validation', () => {
-  const testURl = '/drafts/tests/x-walk/ratingvalidation';
+  const testURL = '/drafts/tests/x-walk/ratingvalidation';
 
   test('rating custom component validation @chromium-only', async ({ page }) => {
     await openPage(page, testURL);
