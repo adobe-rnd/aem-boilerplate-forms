@@ -5,20 +5,20 @@
     --color-accordion-border: #ecedf3;
 }
 
-main .form fieldset legend.accordion-legend {
+main .form fieldset.accordion-wrapper legend.accordion-legend {
     padding: 24px 32px 10px;
     border-radius: 24px 24px 4px 4px;
     background-color: var(--color-accordion-legend-background);
     position: relative;
 }
 
-main .form fieldset legend.accordion-legend[data-visible='false'] {
+main .form fieldset.accordion-wrapper legend.accordion-legend[data-visible='false'] {
     display:block !important;
     color:var(--color-accordion-legend-background);
     user-select: none;
 }
 
-main .form fieldset legend::after {
+main .form fieldset.accordion-wrapper legend::after {
     content: '\221F';
     color: var(--color-accordion-collapse-icon);
     font-size: 19px;
@@ -31,7 +31,7 @@ main .form fieldset legend::after {
     cursor: pointer;
 }
 
-main .form fieldset.accordion-collapse legend::after {
+main .form fieldset.accordion-wrapper.accordion-collapse legend::after {
     transform: rotate(-225deg);
     margin-top: 0;
 }
