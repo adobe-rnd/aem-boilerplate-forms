@@ -61,6 +61,7 @@
       "plain-text",
       "radio-group",
       "rating",
+      "captcha",
       "telephone-input",
       "text-input",
       "tnc",

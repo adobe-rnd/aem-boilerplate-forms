@@ -96,6 +96,35 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
   }
 }
 
+function generateCaptchaRendition(captchaFieldWrapper, fragmentDefinition) {
+  const titleEl = document.createElement('div');
+  titleEl.classList.add('captcha-title');
+  titleEl.textContent = fragmentDefinition.label?.value || fragmentDefinition.name;
+  titleEl.id = 'recaptcha-title';
+  captchaFieldWrapper.appendChild(titleEl);
+}
+
+function annotateRecaptcha(captchaFieldWrapper, recaptchaDefinition) {
+  captchaFieldWrapper.classList.toggle('captcha-wrapper', true);
+  if (document.documentElement.classList.contains('adobe-ue-edit')) {
+    const newFieldWrapper = captchaFieldWrapper.cloneNode(true);
+    // newFieldWrapper.setAttribute('data-aue-type', 'component');
+    // newFieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${recaptchaDefinition.properties['fd:path']}`);
+    // newFieldWrapper.setAttribute('data-aue-model', 'captcha');
+    // newFieldWrapper.setAttribute('data-aue-label', recaptchaDefinition.label?.value || recaptchaDefinition.name);
+   // newFieldWrapper.classList.add('edit-mode');
+   captchaFieldWrapper.classList.add('edit-mode');
+   // newFieldWrapper.replaceChildren();
+   // captchaFieldWrapper.insertAdjacentElement('afterend', newFieldWrapper);
+   // generateCaptchaRendition(newFieldWrapper, recaptchaDefinition);
+    generateCaptchaRendition(captchaFieldWrapper, recaptchaDefinition);
+  }
+  // } else {
+  //   captchaFieldWrapper.replaceChildren();
+  //   generateCaptchaRendition(captchaFieldWrapper, recaptchaDefinition);
+  // }
+}
+
 function getPropertyModel(fd) {
   if (!fd[':type'] || fd[':type'].startsWith('core/fd/components') || OOTBViewTypeComponentsWithoutModel.includes(fd[':type'])) {
     return fd.fieldType === 'image' || fd.fieldType === 'button' ? `form-${fd.fieldType}` : fd.fieldType;
@@ -145,6 +174,8 @@ function annotateItems(items, formDefinition, formFieldMap) {
                 handleWizardNavigation(fieldWrapper.parentElement, fieldWrapper);
               }
             }
+          } else if (fd.fieldType === 'captcha') {
+            annotateRecaptcha(fieldWrapper, fd);
           } else {
             fieldWrapper.setAttribute('data-aue-type', 'component');
             fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);

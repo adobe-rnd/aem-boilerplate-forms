@@ -1,0 +1,61 @@
+{
+    "definitions": [
+        {
+            "title": "CAPTCHA",
+            "id": "captcha",
+            "plugins": {
+              "xwalk": {
+                "page": {
+                  "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
+                  "template": {
+                    "jcr:title": "CAPTCHA",
+                    "fieldType": "captcha",
+                    "enabled": true,
+                    "visible": true
+                  }
+                }
+              }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "captcha",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "...": "./_common.json#/basicfields"
+                        }
+                    ]
+                },
+                {
+                    "component": "container",
+                    "name": "validation",
+                    "label": "Validation",
+                    "collapsible": true,
+                    "fields": [
+                        {
+                            "component": "text",
+                            "name": "mandatoryMessage",
+                            "label": "Error message",
+                            "valueType": "string",
+                            "description": "Error message shown when required field is left empty."
+                        },
+                        {
+                            "component": "text",
+                            "name": "validateExpMessage",
+                            "label": "Script validation message",
+                            "valueType": "string",
+                            "description": "Displayed when validation script fails."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

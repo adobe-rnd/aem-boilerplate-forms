@@ -86,6 +86,20 @@ export function getHTMLRenderType(fd) {
   return fd?.fieldType?.replace('-input', '') ?? 'text';
 }
 
+export function createCaptchaWrapper(fd, tagName = 'div') {
+  const fieldWrapper = document.createElement(tagName);
+  const nameStyle = fd.name ? ` field-${toClassName(fd.name)}` : '';
+  const renderType = getHTMLRenderType(fd);
+  const fieldId = `${renderType}-wrapper${nameStyle}`;
+  fieldWrapper.className = fieldId;
+  fieldWrapper.dataset.id = fd.id;
+  if (fd.visible === false) {
+    fieldWrapper.dataset.visible = fd.visible;
+  }
+  fieldWrapper.classList.add('field-wrapper');
+  return fieldWrapper;
+}
+
 export function createFieldWrapper(fd, tagName = 'div', labelFn = createLabel) {
   const fieldWrapper = document.createElement(tagName);
   const nameStyle = fd.name ? ` field-${toClassName(fd.name)}` : '';

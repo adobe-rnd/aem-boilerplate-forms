@@ -459,6 +459,23 @@
           }
         },
         {
+          "title": "CAPTCHA",
+          "id": "captcha",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
+                "template": {
+                  "jcr:title": "CAPTCHA",
+                  "fieldType": "captcha",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Reset",
           "id": "form-reset-button",
           "plugins": {
