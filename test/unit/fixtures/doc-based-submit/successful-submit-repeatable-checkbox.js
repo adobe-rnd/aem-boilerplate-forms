@@ -2,9 +2,12 @@ import assert from 'assert';
 import nock from 'nock';
 
 const thankYouMessage = 'thank you for submitting the form';
+export function before() {
+  global.btoa = (a) => a;
+}
 
-const scope = nock('http://localhost:3000')
-  .post('/submit-success-repeatable-checkbox', function test(body) {
+const scope = nock('https://forms.adobe.com')
+  .post('/adobe/forms/af/submit//submit-success-repeatable-checkbox', function test(body) {
     // using a function syntax here instead of array because the this parameter is
     // set during the call
     const contentType = this.headers['content-type'];

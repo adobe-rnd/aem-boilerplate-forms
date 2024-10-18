@@ -2,8 +2,12 @@ import assert from 'assert';
 import nock from 'nock';
 import { fireEvent } from '@testing-library/dom';
 
-const scope = nock('http://localhost:3000')
-  .post('/adobe/forms/af/form1')
+export function before() {
+  global.btoa = (a) => a;
+}
+
+const scope = nock('https://forms.adobe.com')
+  .post('/adobe/forms/af/submit//adobe/forms/af/form1')
   .reply(500, {});
 
 export const formPath = 'http://localhost:3000/adobe/forms/af/form1.json';
