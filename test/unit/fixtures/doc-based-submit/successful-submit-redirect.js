@@ -3,8 +3,12 @@ import nock from 'nock';
 import sinon from 'sinon';
 import { fireEvent } from '@testing-library/dom';
 
-const scope = nock('http://localhost:3000')
-  .post('/submit-success-redirect', function test(body) {
+export function before() {
+  global.btoa = (a) => a;
+}
+
+const scope = nock('https://forms.adobe.com')
+  .post('/adobe/forms/af/submit//submit-success-redirect', function test(body) {
     // using a function syntax here instead of array because the this parameter is
     // set during the call
     const contentType = this.headers['content-type'];

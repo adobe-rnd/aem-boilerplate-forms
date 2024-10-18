@@ -81,7 +81,8 @@ async function prepareRequest(form) {
     'x-adobe-routing': `tier=${tier},bucket=${branch}--${site}--${org}`,
   };
   const body = { data: payload };
-  const url = getSubmitBaseUrl() + btoa(form.dataset.action);
+  const base = getSubmitBaseUrl() || 'https://forms.adobe.com/adobe/forms/af/submit/';
+  const url = base + btoa(form.dataset.action);
   return { headers, body, url };
 }
 

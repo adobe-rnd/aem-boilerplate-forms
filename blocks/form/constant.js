@@ -25,13 +25,13 @@ export function getRouting() {
       branch, site, org, tier,
     };
   }
-  return null;
+  return { };
 }
 
 // eslint-disable-next-line no-useless-escape
 export const emailPattern = '([A-Za-z0-9][._]?)+[A-Za-z0-9]@[A-Za-z0-9]+(\.?[A-Za-z0-9]){2}\.([A-Za-z0-9]{2,4})?';
 
-let submitBaseUrl = 'https://forms.adobe.com/adobe/forms/af/submit/';
+let submitBaseUrl = '';
 
 export function setSubmitBaseUrl(url) {
   submitBaseUrl = url;
