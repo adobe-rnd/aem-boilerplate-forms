@@ -503,9 +503,10 @@
                 "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
                 "template": {
                   "jcr:title": "Telephone Input",
-                  "fieldType": "text-input",
+                  "fieldType": "tel",
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "pattern": "^[+][0-9]{0,14}$"
                 }
               }
             }
