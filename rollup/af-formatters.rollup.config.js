@@ -1,27 +1,15 @@
-import cleanup from 'rollup-plugin-cleanup';
-import license from 'rollup-plugin-license';
 import path from 'path';
 import { terser } from 'rollup-plugin-terser';
+import {plugins} from './common.js';
 
-const directory = 'node_modules/@aemforms/af-formatters';
+const packageName = '@aemforms/af-formatters'
+const directory = `node_modules/${packageName}`;
 
 export default {
   input: {
     'afb-formatters': path.join(directory, 'esm/afb-formatters.js'),
   },
-  plugins: [
-    cleanup({
-      comments: 'none',
-    }),
-    license({
-      banner: {
-        content: {
-          file: path.join(directory, 'LICENSE'),
-          encoding: 'utf-8',
-        },
-      },
-    }),
-  ],
+  plugins: plugins(packageName),
   output: [{
     dir: 'blocks/form/rules/model',
     format: 'es',
