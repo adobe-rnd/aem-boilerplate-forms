@@ -10,5 +10,11 @@ export const fieldDef = {
   }, {
     Name: 'doc-age', Type: 'number', Description: '', Placeholder: '', Label: 'Age', 'Read Only': '', Mandatory: '', Pattern: '', Step: '', Min: '', Max: '', Value: '', Options: '', OptionNames: '', Fieldset: 'doc-traveler', Repeatable: '',
   }],
+  action: '/adobe/forms/af/form1',
+  id: 'form',
   ':type': 'sheet',
 };
+
+export const bUrlMode = true;
+
+export const formPath = 'http://localhost:3000/adobe/forms/af/form1.json';

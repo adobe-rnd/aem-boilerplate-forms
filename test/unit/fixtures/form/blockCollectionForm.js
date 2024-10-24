@@ -43,4 +43,10 @@ export const fieldDef = {
     Name: '', Type: 'confirmation', Label: '', Placeholder: '', Value: 'https://main--helix-block-collection--adobe.hlx.live/block-collection/form-thank-you', Options: '', Mandatory: '', Style: '', ID: '', Fieldset: '',
   }],
   ':type': 'sheet',
+  action: '/adobe/forms/af/form1',
+  id: 'form',
 };
+
+export const bUrlMode = true;
+
+export const formPath = 'http://localhost:3000/adobe/forms/af/form1.json';

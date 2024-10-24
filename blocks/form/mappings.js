@@ -7,10 +7,6 @@ export function setCustomComponents(components) {
   customComponents = components;
 }
 
-export function getOOTBComponents() {
-  return OOTBComponentDecorators;
-}
-
 export function getCustomComponents() {
   return customComponents;
 }
@@ -66,7 +62,7 @@ export default async function componentDecorator(element, fd, container) {
     await loadComponent('wizard', element, fd, container);
   }
 
-  if (getCustomComponents().includes(type) || getOOTBComponents().includes(type)) {
+  if (getCustomComponents().includes(type) || OOTBComponentDecorators.includes(type)) {
     await loadComponent(type, element, fd, container);
   }
 

@@ -1,8 +1,9 @@
 import assert from 'assert';
-import { advanceEnquiry } from '../../forms/advanceEnquiry.js';
+import { advanceEnquiry, formPath as fp, bUrlMode as urlMode } from '../../forms/advanceEnquiry.js';
 
 export const sample = advanceEnquiry;
-export const formPath = 'http://localhost:3000/enquiry.json';
+export const formPath = fp;
+export const bUrlMode = urlMode;
 
 export function op(block) {
   const startDate = block.querySelector('#startdate');

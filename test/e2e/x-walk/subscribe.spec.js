@@ -9,7 +9,7 @@ test.describe('Subscribe function validation', () => {
     await page.evaluate(async () => {
       /* eslint-disable import/no-absolute-path */
       // eslint-disable-next-line import/no-unresolved
-      await import('/blocks/form/rules/index.js').then((module) => {
+      await import('/blocks/form/lib/rules/index.js').then((module) => {
         // eslint-disable-next-line no-unused-vars
         module.subscribe(document.querySelector('.text-wrapper'), (field, model) => {
           window.document.querySelector('.email-wrapper input').value = 'newValue';

@@ -41,4 +41,10 @@ export const fieldDef = {
       Label: 'Submit',
     },
   ],
+  action: '/adobe/forms/af/form1',
+  id: 'form',
 };
+
+export const bUrlMode = true;
+
+export const formPath = 'http://localhost:3000/adobe/forms/af/form1.json';

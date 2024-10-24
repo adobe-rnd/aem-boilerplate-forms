@@ -1,8 +1,12 @@
 import assert from 'assert';
 
-import { fieldDef } from '../form/enquire.js';
+import { fieldDef, bUrlMode as urlMode, formPath as fp } from '../form/enquire.js';
 
 export const sample = fieldDef;
+
+export const bUrlMode = urlMode;
+
+export const formPath = fp;
 
 export function op(block) {
   const btn = block.querySelector('.repeat-wrapper > .item-add');
