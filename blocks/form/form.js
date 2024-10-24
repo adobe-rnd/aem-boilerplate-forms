@@ -5,6 +5,7 @@ import {
   stripTags,
   checkValidation,
   toClassName,
+  getSitePageName,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
@@ -337,7 +338,7 @@ function renderField(fd) {
     field.append(createHelpText(fd));
     field.dataset.description = fd.description; // In case overriden by error message
   }
-  if (fd.fieldType !== 'radio-group' && fd.fieldType !== 'checkbox-group') {
+  if (fd.fieldType !== 'radio-group' && fd.fieldType !== 'checkbox-group' && fd.fieldType !== 'captcha') {
     inputDecorator(fd, field);
   }
   return field;
@@ -350,20 +351,21 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
     const { fieldType } = field;
     if (fieldType === 'captcha') {
       captchaField = field;
-    } else {
-      const element = renderField(field);
-      if (field.appliedCssClassNames) {
-        element.className += ` ${field.appliedCssClassNames}`;
-      }
-      colSpanDecorator(field, element);
-      if (field?.fieldType === 'panel') {
-        await generateFormRendition(field, element, getItems);
-        return element;
-      }
-      await componentDecorator(element, field, container);
+      const element = createFieldWrapper(field);
+      element.textContent = field.label?.value || field.name;
       return element;
     }
-    return null;
+    const element = renderField(field);
+    if (field.appliedCssClassNames) {
+      element.className += ` ${field.appliedCssClassNames}`;
+    }
+    colSpanDecorator(field, element);
+    if (field?.fieldType === 'panel') {
+      await generateFormRendition(field, element, getItems);
+      return element;
+    }
+    await componentDecorator(element, field, container);
+    return element;
   });
 
   const children = await Promise.all(promises);
@@ -406,8 +408,16 @@ export async function createForm(formDef, data) {
 
   let captcha;
   if (captchaField) {
-    const siteKey = captchaField?.properties?.['fd:captcha']?.config?.siteKey || captchaField?.value;
-    captcha = new GoogleReCaptcha(siteKey, captchaField.id);
+    let config = captchaField?.properties?.['fd:captcha']?.config;
+    if (!config) {
+      config = {
+        siteKey: captchaField?.value,
+        uri: captchaField?.uri,
+        version: captchaField?.version,
+      };
+    }
+    const pageName = getSitePageName(captchaField?.properties?.['fd:path']);
+    captcha = new GoogleReCaptcha(config, captchaField.id, captchaField.name, pageName);
     captcha.loadCaptcha(form);
   }
 

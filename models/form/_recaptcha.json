@@ -1,0 +1,43 @@
+{
+    "definitions": [
+        {
+            "title": "CAPTCHA",
+            "id": "captcha",
+            "plugins": {
+              "xwalk": {
+                "page": {
+                  "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
+                  "template": {
+                    "jcr:title": "CAPTCHA",
+                    "fieldType": "captcha",
+                    "enabled": true,
+                    "visible": true
+                  }
+                }
+              }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "captcha",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "component": "text",
+                            "name": "name",
+                            "label": "Name",
+                            "valueType": "string",
+                            "required": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
