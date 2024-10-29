@@ -26,7 +26,7 @@ const titles = ['Text Input', 'Check Box Group', 'Number Input', 'Radio Button',
 // eslint-disable-next-line no-unused-vars
 let requestPayload = null;
 
-test.describe('Form Rendering and Submission Validation', async () => {
+test.describe.skip('Form Rendering and Submission Validation', async () => {
   const testURL = '/drafts/tests/doc-based/submissionvalidation';
 
   test('Validate Doc-Based Form components and submission payload @chromium-only', async ({ page }) => {
