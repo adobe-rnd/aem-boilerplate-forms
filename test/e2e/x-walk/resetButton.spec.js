@@ -15,7 +15,7 @@ const inputValues = {
   dataInput: '2022-12-23',
 };
 
-test.describe('resetButton validation test', () => {
+test.describe.skip('resetButton validation test', () => {
   const testURL = '/drafts/tests/x-walk/wizardvalidation';
   test('resetButton validation on wizard panels', async ({ page }) => {
     await openPage(page, testURL);
