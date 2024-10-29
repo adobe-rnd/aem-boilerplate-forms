@@ -295,7 +295,7 @@ function inputDecorator(field, element) {
         input.checked = field.value === input.value;
       }
     } else {
-      input.multiple = field.type === 'file[]';
+      input.multiple = field.type === 'file[]' || field.properties?.allowMultiple;
     }
     if (field.required) {
       input.setAttribute('required', 'required');
@@ -317,6 +317,9 @@ function inputDecorator(field, element) {
     }
     if (input.type === 'email') {
       input.pattern = emailPattern;
+    }
+    if (input.multiple) {
+      field.type = 'file[]';
     }
     setConstraintsMessage(element, field.constraintMessages);
     element.dataset.required = field.required;
