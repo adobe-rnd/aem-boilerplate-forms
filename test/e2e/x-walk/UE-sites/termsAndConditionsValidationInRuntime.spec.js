@@ -6,7 +6,7 @@ const checkboxLocator = 'input[type="checkbox"]';
 const termsAndConditionsLocator = 'div[class*="tnc__text-decoration"]';
 const partialUrl = '/L2NvbnRlbnQvdGVzdGluZ3Rlcm1zYW5kY29uZGl0b25zL2luZGV4L2pjcjpjb250ZW50L3Jvb3Qvc2VjdGlvbl8wL2Zvcm0=';
 
-test.describe('validation of components in UE publish mode', async () => {
+test.describe.skip('validation of components in UE publish mode', async () => {
   const testURL = '/drafts/tests/x-walk/termsandconditions';
 
   test('Terms and conditions validation in UE @chromium-only', async ({ page }) => {

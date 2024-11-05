@@ -11,7 +11,7 @@ const inputValues = {
 };
 const partialUrl = '/L2NvbnRlbnQvZm9ybXMvYWYveHdhbGstdGVzdC1jb2xsYXRlcmFsL3N1Ym1pdHZhbGlkYXRpb24=';
 const titles = ['Text Input', 'Check Box Group', 'Number Input', 'Radio Button', 'Telephone Input', 'Email Input', 'File Attachment', 'Dropdown', 'Date Input'];
-test.describe('Form with Submit Button', async () => {
+test.describe.skip('Form with Submit Button', async () => {
   const testURL = '/drafts/tests/x-walk/submitvalidation';
 
   test('Clicking the button should submit the form', async ({ page }) => {

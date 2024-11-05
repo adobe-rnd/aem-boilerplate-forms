@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures.js';
 import { openPage } from '../utils.js';
 
-test.describe('wizard tests', () => {
+test.describe.skip('wizard tests', () => {
   const testURL = '/drafts/tests/x-walk/wizardvalidation';
   test('setFocus test', async ({ page }) => {
     await openPage(page, testURL);

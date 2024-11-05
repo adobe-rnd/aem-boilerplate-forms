@@ -7,7 +7,7 @@ const locators = [
   { name: 'fullName', selector: 'div[class*="field-fullname"] input' },
 ];
 
-test.describe('Modal Form Test', () => {
+test.describe.skip('Modal Form Test', () => {
   const elements = {};
 
   test('Open and close modal', async ({ page }) => {

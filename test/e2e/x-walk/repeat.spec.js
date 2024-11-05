@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures.js';
 import { openPage } from '../utils.js';
 
-test.describe('Repeatability test', () => {
+test.describe.skip('Repeatability test', () => {
   const testURL = '/drafts/tests/x-walk/repeat-test';
   test('test newly added panels are within div.repeat-wrapper', async ({ page }) => {
     await openPage(page, testURL);

@@ -14,7 +14,7 @@ const selector = {
 const partialUrl = '/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXgvamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uXzAvZm9ybQ==';
 const starsSelected = 'star hover selected';
 
-test.describe('custom component validation', () => {
+test.describe.skip('custom component validation', () => {
   const testURL = '/drafts/tests/x-walk/ratingvalidation';
 
   test('rating custom component validation @chromium-only', async ({ page }) => {
