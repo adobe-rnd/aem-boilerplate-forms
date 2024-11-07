@@ -44,6 +44,7 @@
   {
     "id": "form",
     "components": [
+      "captcha",
       "checkbox",
       "checkbox-group",
       "date-input",

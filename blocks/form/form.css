@@ -562,3 +562,7 @@ main form .wizard > .current-wizard-step.panel-wrapper:first-of-type ~ .wizard-b
 main form .wizard > .current-wizard-step.panel-wrapper:last-of-type ~ .wizard-button-wrapper > .wizard-button-next {
     display: none;
 }
+
+main .form form:not(.edit-mode) .captcha-wrapper{
+    display: none ;
+}

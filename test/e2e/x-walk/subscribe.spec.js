@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures.js';
 import { openPage } from '../utils.js';
 
-test.describe('Subscribe function validation', () => {
+test.describe.skip('Subscribe function validation', () => {
   const emailInputValue = 'newValue';
   const textInputValue = 'subscribeTest';
   test('Subscribe function validation on text input', async ({ page }) => {

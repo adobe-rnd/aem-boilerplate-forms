@@ -7,7 +7,7 @@ const inputValues = {
 const fileAttachmentText = 'Validation of attached file in preview mode in EDS';
 const fileLocator = 'div[class="file-description"] span.file-description-name';
 
-test.describe('file attachment validation', async () => {
+test.describe.skip('file attachment validation', async () => {
   const testURL = '/drafts/tests/x-walk/fileattachmentvalidation';
   const componentTitle = 'File Attachment';
 

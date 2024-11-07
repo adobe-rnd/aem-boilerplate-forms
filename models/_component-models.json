@@ -21,6 +21,9 @@
     "...": "./form/_button.json#/models"
   },
   {
+    "...": "./form/_recaptcha.json#/models"
+  },
+  {
     "...": "./form/_checkbox.json#/models"
   },
   {

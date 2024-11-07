@@ -211,6 +211,21 @@
           }
         },
         {
+          "title": "Captcha (Invisible)",
+          "id": "captcha",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
+                "template": {
+                  "jcr:title": "Captcha (Invisible)",
+                  "fieldType": "captcha"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Checkbox",
           "id": "checkbox",
           "plugins": {

@@ -436,6 +436,18 @@
     ]
   },
   {
+    "id": "captcha",
+    "fields": [
+      {
+        "component": "text",
+        "name": "name",
+        "label": "Name",
+        "valueType": "string",
+        "required": true
+      }
+    ]
+  },
+  {
     "id": "checkbox",
     "fields": [
       {

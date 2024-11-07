@@ -65,3 +65,23 @@ form.edit-mode .modal dialog {
     display: inline-block;
     position: relative;
 }
+
+:root.adobe-ue-edit .grecaptcha-badge {
+    visibility: hidden ;
+}
+:root.adobe-ue-preview .grecaptcha-badge { 
+     visibility: visible ;
+} 
+ 
+main .form form.edit-mode .captcha-wrapper {
+    border-width: 1px;
+    padding: 15px;
+    font-weight: normal;
+    font-size: 15px;
+    text-align: left;
+    color: #4b4b4b; 
+    border-color: rgba(0 0 0 / 15%);
+    border-radius: 4px;
+    background: linear-gradient(180deg,rgba(0 0 0 / 5%),rgba(255 255 255 / 5%),rgba(0 0 0 / 5%)),
+                linear-gradient(90deg,rgba(0 0 0 / 5%),rgba(255 255 255 / 5%),rgba(0 0 0 / 5%));
+}

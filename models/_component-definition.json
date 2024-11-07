@@ -44,6 +44,9 @@
           "...": "./form/_button.json#/definitions"
         },
         {
+          "...": "./form/_recaptcha.json#/definitions"
+        },
+        {
           "...": "./form/_checkbox.json#/definitions"
         },
         {
