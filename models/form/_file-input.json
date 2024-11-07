@@ -39,6 +39,13 @@
                     "fields": [
                         {
                             "...": "./_common.json#/basicfields"
+                        },
+                        {
+                            "component": "boolean",
+                            "name": "allowMultiple",
+                            "label": "Allow multiple file attachments",
+                            "valueType": "boolean",
+                            "collapsible": false
                         }
                     ]
                 },
