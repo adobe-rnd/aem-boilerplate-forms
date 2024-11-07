@@ -1354,6 +1354,18 @@
             "name": "readOnly",
             "label": "Read-only",
             "valueType": "boolean"
+          },
+          {
+            "component": "text",
+            "name": "buttonText",
+            "label": "Button Title",
+            "valueType": "string"
+          },
+          {
+            "component": "richtext",
+            "name": "dragDropText",
+            "label": "Drag Drop Text",
+            "valueType": "string"
           }
         ]
       },
@@ -1374,6 +1386,12 @@
             "name": "tooltip",
             "label": "Short description",
             "valueType": "string"
+          },
+          {
+            "component": "boolean",
+            "name": "alwaysShowShortDescription",
+            "label": "Always show short description",
+            "valueType": "boolean"
           }
         ]
       },

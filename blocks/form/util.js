@@ -156,6 +156,15 @@ export function createHelpText(fd) {
   return div;
 }
 
+export function createShortDescription(fd) {
+  const div = document.createElement('div');
+  div.className = 'field-short-description';
+  div.setAttribute('aria-live', 'polite');
+  div.innerHTML = fd.tooltip ? fd.tooltip : '';
+  div.id = `${fd.id}-short-description`;
+  return div;
+}
+
 export function updateOrCreateInvalidMsg(fieldElement, msg) {
   const container = getFieldContainer(fieldElement);
   let element = container.querySelector(':scope > .field-description');

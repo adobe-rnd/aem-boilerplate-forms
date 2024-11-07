@@ -117,6 +117,16 @@ main .form form .field-invalid .field-description {
     font-weight: 700;
 }
 
+main .form .field-short-description {
+    color: var(--form-label-color);
+    font-size: var(--form-font-size-xs);
+}
+
+main .form form .field-invalid .field-short-description {
+    color: var(--form-error-color);
+    font-weight: 700;
+}
+
 main .form input,
 main .form textarea,
 main .form select {

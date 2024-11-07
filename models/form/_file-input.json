@@ -18,9 +18,11 @@
                                 "application/pdf"
                             ],
                             "buttonText": "Attach",
+                            "dragDropText": "Drag and Drop To Upload",
                             "type": "file",
                             "enabled": true,
-                            "visible": true
+                            "visible": true,
+                            "alwaysShowShortDescription": false
                         }
                     }
                 }
@@ -39,6 +41,18 @@
                     "fields": [
                         {
                             "...": "./_common.json#/basicfields"
+                        },
+                        {
+                            "component": "text",
+                            "name": "buttonText",
+                            "label": "Button Title",
+                            "valueType": "string"
+                        },
+                        {
+                        "component": "richtext",
+                        "name": "dragDropText",
+                        "label": "Drag Drop Text",
+                        "valueType": "string"
                         }
                     ]
                 },
@@ -50,6 +64,12 @@
                     "fields": [
                         {
                             "...": "./_common.json#/helpfields"
+                        },
+                        {
+                            "component": "boolean",
+                            "name": "alwaysShowShortDescription",
+                            "label": "Always show short description",
+                            "valueType": "boolean"
                         }
                     ]
                 },
