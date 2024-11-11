@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures.js';
-import { openPage } from '../../utils.js';
+import { openPage, openForm } from '../../utils.js';
 
 const emoji = ['😢', '😊'];
 let rating = null;
@@ -14,22 +14,24 @@ const selector = {
 const partialUrl = '/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXgvamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uXzAvZm9ybQ==';
 const starsSelected = 'star hover selected';
 
-test.describe.skip('custom component validation', () => {
-  const testURL = '/drafts/tests/x-walk/ratingvalidation';
+test.describe('custom component validation', () => {
+  // const testURL = '/drafts/tests/x-walk/ratingvalidation';
+  const testURL = 'https://main--aem-boilerplate-aem--ujjwal5.aem.live/content/test-site-ujj/';
 
   test('rating custom component validation @chromium-only', async ({ page }) => {
-    await openPage(page, testURL);
+    // await openPage(page, testURL);
+    await openForm(page, testURL);
 
     await page.evaluate(async () => {
       // eslint-disable-next-line no-undef,no-underscore-dangle
-      myForm._jsonModel.action = 'https://main--aem-boilerplate-forms--adobe-rnd.hlx.live/adobe/forms/af/submit/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXgvamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uXzAvZm9ybQ==';
+      myForm._jsonModel.action = 'https://main--aem-boilerplate-aem--ujjwal5.aem.live/adobe/forms/af/submit/L2NvbnRlbnQvdGVzdC1zaXRlLXVqai9pbmRleC9qY3I6Y29udGVudC9yb290L3NlY3Rpb25fMC9mb3Jt';
     });
 
     // listeners to fetch payload form submission.
     page.on('request', async (request) => {
-      if (request.url().includes(partialUrl)) {
-        requestPayload = request.postData();
-      }
+      // if (request.url().includes(partialUrl)) {
+      requestPayload = request.postData();
+      // }
     });
 
     const ratingLocator = page.locator(selector.ratingComponent);
