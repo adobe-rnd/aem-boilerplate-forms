@@ -2,10 +2,8 @@ import { chromium, expect } from '@playwright/test';
 
 const filePath = './LoginAuth.json';
 const baseUrl = 'https://author-p133911-e1313554.adobeaemcloud.com/aem/start.html';
-// const emailId = process.env.AEM_userName;
-// const password = process.env.AEM_password;
-const emailId = 'ptippa.test@outlook.com';
-const password = 'bqD_BsY2+m)32pV';
+const emailId = process.env.AEM_userName;
+const password = process.env.AEM_password;
 
 const selectors = {
   iFrame: 'iframe[id*="exc-app-sandbox"]',
