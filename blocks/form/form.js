@@ -98,11 +98,11 @@ const createSelect = withFieldWrapper((fd) => {
   const optionNames = fd?.enumNames ?? options;
 
   if (options.length === 1
-    && options?.[0]?.startsWith('https://')) {
+      && options?.[0]?.startsWith('https://')) {
     const optionsUrl = new URL(options?.[0]);
     // using async to avoid rendering
     if (optionsUrl.hostname.endsWith('hlx.page')
-    || optionsUrl.hostname.endsWith('hlx.live')) {
+        || optionsUrl.hostname.endsWith('hlx.live')) {
       fetch(`${optionsUrl.pathname}${optionsUrl.search}`)
         .then(async (response) => {
           const json = await response.json();
@@ -280,11 +280,15 @@ function inputDecorator(field, element) {
       input.disabled = true;
     }
     const fieldType = getHTMLRenderType(field);
-    if (['number', 'date', 'text', 'email'].includes(fieldType) && (field.displayFormat || field.displayValueExpression)) {
+    if (['number', 'date', 'text', 'email', 'tel'].includes(fieldType) && (field.displayFormat || field.displayValueExpression)) {
       field.type = fieldType;
       input.setAttribute('edit-value', field.value ?? '');
       input.setAttribute('display-value', field.displayValue ?? '');
-      input.type = 'text';
+      if (['tel', 'email'].includes(fieldType)) {
+        input.type = fieldType;
+      } else {
+        input.type = 'text';
+      }
       input.value = field.displayValue ?? '';
       input.addEventListener('touchstart', () => { input.type = field.type; }); // in mobile devices the input type needs to be toggled before focus
       input.addEventListener('focus', () => handleFocus(input, field));
