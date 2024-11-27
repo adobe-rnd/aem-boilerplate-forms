@@ -12,7 +12,7 @@
             "required": true
         },
         {
-            "component": "richtext",
+            "component": "text",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
