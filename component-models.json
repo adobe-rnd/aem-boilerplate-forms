@@ -385,7 +385,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -506,7 +506,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -614,7 +614,7 @@
             "required": true
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
@@ -736,7 +736,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -947,7 +947,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -1202,7 +1202,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -1310,7 +1310,7 @@
             "required": true
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
@@ -1416,7 +1416,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -1643,7 +1643,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -1848,7 +1848,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -2065,7 +2065,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -2296,7 +2296,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -2545,7 +2545,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -2718,7 +2718,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -2826,7 +2826,7 @@
             "required": true
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
@@ -2966,7 +2966,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -3087,7 +3087,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -3208,7 +3208,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -3421,7 +3421,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -3729,7 +3729,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -3874,7 +3874,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
@@ -4077,7 +4077,7 @@
                 }
               },
               {
-                "component": "text",
+                "component": "richtext",
                 "name": "jcr:title",
                 "label": "Title",
                 "valueType": "string"
@@ -4230,7 +4230,7 @@
             }
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
