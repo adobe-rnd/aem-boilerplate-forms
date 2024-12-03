@@ -614,7 +614,7 @@
             "required": true
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
@@ -1310,7 +1310,7 @@
             "required": true
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
@@ -2826,7 +2826,7 @@
             "required": true
           },
           {
-            "component": "text",
+            "component": "richtext",
             "name": "enumNames",
             "label": "Options (Display Value)",
             "valueType": "string",
