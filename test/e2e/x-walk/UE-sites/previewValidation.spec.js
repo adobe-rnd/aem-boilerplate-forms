@@ -7,12 +7,13 @@ const textInputValue = 'Adobe';
 const emailId = 'adobe@test.com';
 const componentNames = ['textinput', 'emailinput', 'button'];
 test.describe('Preview Validation in UE', async () => {
-  const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/rulesValidationInPreviewTestCollateral/index.html';
+  const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/aem-boilerplate-forms-xwalk-collaterals/ruleValidationInPreview.html';
 
   test('Rules validation in UE preview mode @chromium-only', async ({ page }) => {
     await page.goto(testURL);
     const frame = page.frameLocator(universalEditorBase.selectors.iFrame);
-    const componentPathInUE = await frame.locator(`${universalEditorBase.selectors.componentPath + componentNames[2]}"]`);
+    const iframeEditor = frame.frameLocator(universalEditorBase.selectors.iFrameEditor);
+    const componentPathInUE = await iframeEditor.locator(`${universalEditorBase.selectors.componentPath + componentNames[2]}"]`);
     // eslint-disable-next-line max-len
     await expect(frame.locator(universalEditorBase.selectors.propertyPagePath)).toBeVisible();
     await expect(componentPathInUE).toBeVisible({ timeout: 16000 });
