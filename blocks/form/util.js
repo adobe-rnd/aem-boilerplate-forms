@@ -66,11 +66,7 @@ export function createLabel(fd, tagName = 'label') {
     const label = document.createElement(tagName);
     label.setAttribute('for', fd.id);
     label.className = 'field-label';
-    if (fd.label.richText === true) {
-      label.innerHTML = stripTags(fd.label.value);
-    } else {
-      label.textContent = fd.label.value;
-    }
+    label.innerHTML = fd?.label?.value ? stripTags(fd.label?.value) : fd.name;
     if (fd.label.visible === false) {
       label.dataset.visible = 'false';
     }
