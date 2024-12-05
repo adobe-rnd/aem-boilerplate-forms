@@ -5,7 +5,7 @@ import { fieldDef } from '../form/enquire.js';
 export const sample = fieldDef;
 
 export function op(block) {
-  const btn = block.querySelector('.repeat-wrapper > .item-add');
+  const btn = block.querySelector('.repeat-wrapper > .repeat-actions > .item-add');
   btn.click();
 }
 
