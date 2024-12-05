@@ -19,6 +19,7 @@
  ************************************************************************ */
 import decorate, { generateFormRendition } from '../blocks/form/form.js';
 import { loadCSS } from './aem.js';
+import {stripTags} from "../blocks/form/util.js";
 
 window.currentMode = 'preview';
 let activeWizardStep;
@@ -85,7 +86,7 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
     newFieldWrapper.setAttribute('data-aue-type', 'component');
     newFieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fragmentDefinition.properties['fd:path']}`);
     newFieldWrapper.setAttribute('data-aue-model', 'form-fragment');
-    newFieldWrapper.setAttribute('data-aue-label', fragmentDefinition.label?.value || fragmentDefinition.name);
+    newFieldWrapper.setAttribute('data-aue-label', stripTags(fragmentDefinition.label?.value, []) || fragmentDefinition.name);
     newFieldWrapper.classList.add('edit-mode');
     newFieldWrapper.replaceChildren();
     fragmentFieldWrapper.insertAdjacentElement('afterend', newFieldWrapper);
@@ -106,7 +107,7 @@ function getPropertyModel(fd) {
 function annotateContainer(fieldWrapper, fd) {
   fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
   fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
-  fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
+  fieldWrapper.setAttribute('data-aue-label', stripTags(fd.label?.value, []) || fd.name);
   fieldWrapper.setAttribute('data-aue-type', 'container');
   fieldWrapper.setAttribute('data-aue-behavior', 'component');
   fieldWrapper.setAttribute('data-aue-filter', 'form');
@@ -149,7 +150,7 @@ function annotateItems(items, formDefinition, formFieldMap) {
             fieldWrapper.setAttribute('data-aue-type', 'component');
             fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);
             fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
-            fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
+            fieldWrapper.setAttribute('data-aue-label', stripTags(fd.label?.value, []) || fd.name);
           }
         } else {
           console.warn(`field ${id} not found in form definition`);
