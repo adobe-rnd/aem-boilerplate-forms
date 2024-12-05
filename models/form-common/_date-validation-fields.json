@@ -19,6 +19,12 @@
             "description": "Error message shown when the date entered is before the minimum date."
         },
         {
+            "component": "boolean",
+            "name": "excludeMinimum",
+            "label": "Exclude minimum value",
+            "valueType": "boolean"
+        },
+        {
             "component": "date-time",
             "name": "maximumDate",
             "label": "Maximum date",
@@ -32,6 +38,12 @@
             "valueType": "string",
             "label": "Maximum error message",
             "description": "Error message shown when the date entered is after the maximum date."
+        },
+        {
+            "component": "boolean",
+            "name": "excludeMaximum",
+            "label": "Exclude maximum value",
+            "valueType": "boolean"
         }
     ]
 }

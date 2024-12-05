@@ -18,6 +18,12 @@
             "description": "Error message shown when entered value is less than minimum."
         },
         {
+            "component": "boolean",
+            "name": "excludeMinimumCheck",
+            "label": "Exclude minimum value",
+            "valueType": "boolean"
+        },
+        {
             "component": "number",
             "name": "maximum",
             "label": "Highest number / Largest number",
@@ -30,6 +36,12 @@
             "valueType": "string",
             "label": "Maximum error message",
             "description": "Error message shown when the entered value is more than maximum."
+        },
+        {
+            "component": "boolean",
+            "name": "excludeMaximumCheck",
+            "label": "Exclude maximum value",
+            "valueType": "boolean"
         }
     ]
 }
