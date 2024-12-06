@@ -521,7 +521,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -752,7 +753,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -963,7 +965,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -1218,7 +1221,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -1432,7 +1436,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -1659,7 +1664,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -1864,7 +1870,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -2081,7 +2088,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -2312,7 +2320,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -2561,7 +2570,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -2734,7 +2744,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -3225,7 +3236,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -3438,7 +3450,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -3746,7 +3759,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -3891,7 +3905,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
@@ -4094,7 +4109,8 @@
                 "component": "text",
                 "name": "dataRef",
                 "label": "Bind reference",
-                "valueType": "string"
+                "valueType": "string",
+                "description": "Bind reference links a form field to data from an external source"
               },
               {
                 "component": "boolean",
@@ -4247,7 +4263,8 @@
             "component": "text",
             "name": "dataRef",
             "label": "Bind reference",
-            "valueType": "string"
+            "valueType": "string",
+            "description": "Bind reference links a form field to data from an external source"
           },
           {
             "component": "boolean",
