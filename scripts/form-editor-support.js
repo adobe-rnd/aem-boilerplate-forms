@@ -128,6 +128,7 @@ function annotateItems(items, formDefinition, formFieldMap) {
         const fd = getFieldById(formDefinition, id, formFieldMap);
         if (fd && fd.properties) {
           if (fd.fieldType === 'plain-text') {
+            fieldWrapper.classList.add('edit-mode');
             fieldWrapper.setAttribute('data-aue-type', 'richtext');
             fieldWrapper.setAttribute('data-aue-behavior', 'component');
             fieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fd.properties['fd:path']}`);

@@ -11,7 +11,8 @@
                             "jcr:title": "Panel",
                             "fieldType": "panel",
                             "enabled": true,
-                            "visible": true
+                            "visible": true,
+                            "minOccur": 1
                         }
                     }
                 }
@@ -53,7 +54,8 @@
                             "name": "maxOccur",
                             "label": "Maximum repetitions",
                             "valueType": "number",
-                            "description": "Maximum number of times the panel can appear on the form"
+                            "description": "Maximum number of times the panel can appear on the form, an empty value indicates no limit on repetitions",
+                            "placeholder": "No Limit"
                         }
                     ]
                 },

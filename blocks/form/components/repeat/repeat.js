@@ -69,7 +69,7 @@ const add = (wrapper, form) => (e) => {
   if (childCount >= +min) {
     insertRemoveButton(newFieldset, wrapper, form);
   }
-  if (+max <= childCount + 1) {
+  if (+max <= childCount + 1 && +max !== -1) {
     e.currentTarget.setAttribute('data-visible', 'false');
   }
   currentTarget.insertAdjacentElement('beforebegin', newFieldset);
