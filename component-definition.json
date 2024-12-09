@@ -262,7 +262,8 @@
                     "Item 2"
                   ],
                   "visible": true,
-                  "enabled": true
+                  "enabled": true,
+                  "orientation": "horizontal"
                 }
               }
             }
@@ -449,7 +450,8 @@
                     "Item 2"
                   ],
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "orientation": "horizontal"
                 }
               }
             }

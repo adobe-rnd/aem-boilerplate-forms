@@ -19,7 +19,8 @@
                                 "Item 2"
                             ],
                             "visible": true,
-                            "enabled": true
+                            "enabled": true,
+                            "orientation": "horizontal"
                         }
                     }
                 }
@@ -64,6 +65,7 @@
                             "label": "Display Options",
                             "name": "orientation",
                             "valueType": "string",
+                            "value": "horizontal",
                             "options": [
                                 {
                                     "name": "Horizontally",
