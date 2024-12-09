@@ -13,7 +13,7 @@
             }
         },
         {
-            "component": "text",
+            "component": "richtext",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string"
