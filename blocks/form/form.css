@@ -56,6 +56,7 @@
     --form-wizard-padding-bottom: 160px;
     --form-wizard-step-legend-padding: 10px;
     --form-wizard-step-legend-font-size: 1.1rem;
+    --form-field-gap: 5px;
 }
 
 * {
@@ -202,19 +203,19 @@ main .form form p {
 
 main .form form .checkbox-wrapper, main .form form .radio-wrapper {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     margin: 0;
     gap: 8px;
 }
 
-main .form form fieldset > .radio-wrapper:first-of-type,
-main .form form fieldset > .checkbox-wrapper:first-of-type {
-    margin: var(--form-field-gap);
+main .form form fieldset > .radio-wrapper,
+main .form form fieldset > .checkbox-wrapper {
+    margin-left: var(--form-field-gap);
 }
 
 main .form .radio-wrapper  label,
 main .form .checkbox-wrapper label {
-    flex-basis: calc(100% - 28px);
+    flex-basis: calc(100% - 24px);
 }
 
 input::file-selector-button {
@@ -458,7 +459,6 @@ main .form form .wizard.left .panel-wrapper{
 }
 
 @media (width >= 1200px) {
-    main .form form .checkbox-wrapper,
     main .form form .form-textarea-wrapper,
     main .form form .file-wrapper,
     main .form form .panel-wrapper {
@@ -565,4 +565,10 @@ main form .wizard > .current-wizard-step.panel-wrapper:last-of-type ~ .wizard-bu
 
 main .form form:not(.edit-mode) .captcha-wrapper{
     display: none ;
+}
+
+main .form form .horizontal {
+    display: flex;
+    flex-direction: row;
+    gap: inherit;
 }
