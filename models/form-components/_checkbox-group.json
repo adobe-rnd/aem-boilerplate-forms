@@ -4,25 +4,26 @@
             "title": "Checkbox group",
             "id": "checkbox-group",
             "plugins": {
-              "xwalk": {
-                "page": {
-                  "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
-                  "template": {
-                    "jcr:title": "Checkbox Group",
-                    "fieldType": "checkbox-group",
-                    "enum": [
-                      "0",
-                      "1"
-                    ],
-                    "enumNames": [
-                      "Item 1",
-                      "Item 2"
-                    ],
-                    "enabled": true,
-                    "visible": true
-                  }
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                        "template": {
+                            "jcr:title": "Checkbox Group",
+                            "fieldType": "checkbox-group",
+                            "enum": [
+                                "0",
+                                "1"
+                            ],
+                            "enumNames": [
+                                "Item 1",
+                                "Item 2"
+                            ],
+                            "visible": true,
+                            "enabled": true,
+                            "orientation": "horizontal"
+                        }
+                    }
                 }
-              }
             }
         }
     ],
@@ -37,10 +38,7 @@
                     "collapsible": false,
                     "fields": [
                         {
-                            "...": "./_common.json#/basicfields"
-                        },
-                        {
-                            "...": "./_common.json#/optionfields"
+                            "...": "../form-common/_basic-select-fields.json#/fields"
                         },
                         {
                             "component": "select",
@@ -63,16 +61,11 @@
                             ]
                         },
                         {
-                            "component": "text",
-                            "name": "default",
-                            "label": "Default option",
-                            "valueType": "string"
-                        },
-                        {
                             "component": "radio-group",
                             "label": "Display Options",
                             "name": "orientation",
                             "valueType": "string",
+                            "value": "horizontal",
                             "options": [
                                 {
                                     "name": "Horizontally",
@@ -87,33 +80,14 @@
                     ]
                 },
                 {
-                    "component": "container",
-                    "name": "help",
-                    "label": "Help Content",
-                    "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/helpfields"
-                        }
-                    ]
+                    "...": "../form-common/_help-container.json"
                 },
                 {
                     "component": "container",
                     "name": "validation",
                     "label": "Validation",
                     "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/validationfields"
-                        },
-                        {
-                            "component": "text",
-                            "name": "validateExpMessage",
-                            "label": "Script validation message",
-                            "valueType": "string",
-                            "description": "Displayed when validation script fails."
-                        }
-                    ]
+                    "...": "../form-common/_basic-validation-fields.json"
                 }
             ]
         }

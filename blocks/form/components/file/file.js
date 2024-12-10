@@ -77,6 +77,8 @@ function fileValidation(input, files) {
   const minItems = (parseInt(input.dataset.minItems, 10) || 1);
   const maxItems = (parseInt(input.dataset.maxItems, 10) || -1);
   const fileSize = `${input.dataset.maxFileSize || '2MB'}`;
+  const maxFilesMessage = `${input.dataset.maxFilesMessage || ''}`;
+  const minFilesMessage = `${input.dataset.minFilesMessage || ''}`;
   let constraint = '';
   let errorMessage = '';
   const wrapper = input.closest('.field-wrapper');
@@ -86,10 +88,18 @@ function fileValidation(input, files) {
     constraint = 'maxFileSize';
   } else if (multiple && maxItems !== -1 && files.length > maxItems) {
     constraint = 'maxItems';
-    errorMessage = defaultErrorMessages.maxItems.replace(/\$0/, maxItems);
+    if (maxFilesMessage.trim().length > 0) {
+      errorMessage = maxFilesMessage;
+    } else {
+      errorMessage = defaultErrorMessages.maxItems.replace(/\$0/, maxItems);
+    }
   } else if (multiple && minItems !== 1 && files.length < minItems) {
     constraint = 'minItems';
-    errorMessage = defaultErrorMessages.minItems.replace(/\$0/, minItems);
+    if (minFilesMessage.trim().length > 0) {
+      errorMessage = minFilesMessage;
+    } else {
+      errorMessage = defaultErrorMessages.minItems.replace(/\$0/, minItems);
+    }
   }
   if (constraint.length) {
     const finalMessage = wrapper.dataset[constraint]

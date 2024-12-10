@@ -85,7 +85,7 @@ const createSelect = withFieldWrapper((fd) => {
   const addOption = (label, value) => {
     const option = document.createElement('option');
     option.textContent = label instanceof Object ? label?.value?.trim() : label?.trim();
-    option.value = value?.trim() || label?.trim();
+    option.value = (typeof value === 'string' ? value.trim() : value) || label?.trim();
     if (fd.value === option.value || (Array.isArray(fd.value) && fd.value.includes(option.value))) {
       option.setAttribute('selected', '');
       optionSelected = true;
@@ -184,6 +184,13 @@ function createRadioOrCheckboxGroup(fd) {
       enum: [value],
       required: fd.required,
     });
+    const layout = fd.properties['afs:layout'];
+    if (layout?.orientation === 'horizontal') {
+      wrapper.classList.add('horizontal');
+    }
+    if (layout?.orientation === 'vertical') {
+      wrapper.classList.remove('horizontal');
+    }
     field.classList.remove('field-wrapper', `field-${toClassName(fd.name)}`);
     const input = field.querySelector('input');
     input.id = id;
@@ -321,6 +328,12 @@ function inputDecorator(field, element) {
     }
     if (input.multiple) {
       field.type = 'file[]';
+      if (field.properties?.maxFilesMessage) {
+        input.dataset.maxFilesMessage = field.properties.maxFilesMessage;
+      }
+      if (field.properties?.minFilesMessage) {
+        input.dataset.minFilesMessage = field.properties.minFilesMessage;
+      }
     }
     setConstraintsMessage(element, field.constraintMessages);
     element.dataset.required = field.required;

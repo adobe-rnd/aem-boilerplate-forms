@@ -26,7 +26,7 @@
     "coverage:unit": "c8 --check-coverage --reporter=html --reporter=text mocha",
     "coverage:e2e": "c8 --check-coverage --reporter=html --reporter=text playwright test --project='chromium'",
     "coverage": "node ./test/merge-coverage.js",
-    "lint:js": "eslint .",
+    "lint:js": "eslint . --fix",
     "lint:css": "stylelint blocks/**/*.css styles/*.css",
     "lint": "npm run lint:js && npm run lint:css",
     "update:formula": "rollup -c rollup/jsonformula.rollup.config.js",

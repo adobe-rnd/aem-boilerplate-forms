@@ -4,17 +4,17 @@
             "title": "Panel",
             "id": "panel",
             "plugins": {
-              "xwalk": {
-                "page": {
-                  "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
-                  "template": {
-                    "jcr:title": "Panel",
-                    "fieldType": "panel",
-                    "enabled": true,
-                    "visible": true
-                  }
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                        "template": {
+                            "jcr:title": "Panel",
+                            "fieldType": "panel",
+                            "enabled": true,
+                            "visible": true
+                        }
+                    }
                 }
-              }
             }
         }
     ],
@@ -27,11 +27,7 @@
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/basicfields"
-                        }
-                    ]
+                    "...": "../form-common/_basic-input-fields.json"
                 },
                 {
                     "component": "container",
@@ -62,15 +58,7 @@
                     ]
                 },
                 {
-                    "component": "container",
-                    "name": "help",
-                    "label": "Help Content",
-                    "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/helpfields"
-                        }
-                    ]
+                    "...": "../form-common/_help-container.json"
                 }
             ]
         }

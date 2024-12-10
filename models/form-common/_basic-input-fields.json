@@ -1,5 +1,5 @@
 {
-    "basicfields": [
+    "fields": [
         {
             "component": "text",
             "name": "name",
@@ -55,66 +55,62 @@
             "name": "readOnly",
             "label": "Read-only",
             "valueType": "boolean"
-        }
-    ],
-    "advancedfields" : [
-        {
-            "component": "text",
-            "name": "placeholder",
-            "label": "Placeholder text",
-            "valueType": "string"
         },
         {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
-        }
-    ],
-    "optionfields": [
-        {
-            "component": "text",
-            "name": "enum",
-            "label": "Options (Data Value)",
+            "component": "select",
+            "name": "colspan",
+            "label": "Columns",
             "valueType": "string",
-            "multi": true,
-            "required": true
-        },
-        {
-            "component": "text",
-            "name": "enumNames",
-            "label": "Options (Display Value)",
-            "valueType": "string",
-            "multi": true
-        }
-    ],
-    "helpfields": [
-        {
-            "component": "richtext",
-            "name": "description",
-            "label": "Help text",
-            "valueType": "string"
-        },
-        {
-            "component": "richtext",
-            "name": "tooltip",
-            "label": "Short description",
-            "valueType": "string"
-        }
-    ],
-    "validationfields": [
-        {
-            "component": "boolean",
-            "name": "required",
-            "label": "Required",
-            "valueType": "boolean"
-        },
-        {
-            "component": "text",
-            "name": "mandatoryMessage",
-            "label": "Error message",
-            "valueType": "string",
-            "description": "Error message shown when required field is left empty."
+            "options": [
+                {
+                    "name": "1 column",
+                    "value": "1"
+                },
+                {
+                    "name": "2 column",
+                    "value": "2"
+                },
+                {
+                    "name": "3 column",
+                    "value": "3"
+                },
+                {
+                    "name": "4 column",
+                    "value": "4"
+                },
+                {
+                    "name": "5 column",
+                    "value": "5"
+                },
+                {
+                    "name": "6 column",
+                    "value": "6"
+                },
+                {
+                    "name": "7 column",
+                    "value": "7"
+                },
+                {
+                    "name": "8 column",
+                    "value": "8"
+                },
+                {
+                    "name": "9 column",
+                    "value": "9"
+                },
+                {
+                    "name": "10 column",
+                    "value": "10"
+                },
+                {
+                    "name": "11 column",
+                    "value": "11"
+                },
+                {
+                    "name": "12 column",
+                    "value": "12"
+                }
+            ]
         }
     ]
 }

@@ -68,7 +68,7 @@
           "collapsible": false,
           "fields": [
             {
-              "...": "./_common.json#/basicfields"
+              "...": "../../../../models/form-common/_basic-input-fields.json"
             },
             {
               "component": "boolean",
@@ -79,15 +79,7 @@
           ]
         },
         {
-          "component": "container",
-          "name": "help",
-          "label": "Help Content",
-          "collapsible": true,
-          "fields": [
-            {
-              "...": "./_common.json#/helpfields"
-            }
-          ]
+        "...": "../../../../models/form-common/_help-container.json"
         }
       ]
     }

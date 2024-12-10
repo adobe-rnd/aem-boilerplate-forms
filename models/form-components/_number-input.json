@@ -27,71 +27,17 @@
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/basicfields"
-                        },
-                        {
-                            "...": "./_common.json#/advancedfields"
-                        }
-                    ]
+                    "...": "../form-common/_basic-input-placeholder-fields.json"
                 },
                 {
-                    "component": "container",
-                    "name": "help",
-                    "label": "Help Content",
-                    "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/helpfields"
-                        }
-                    ]
+                    "...": "../form-common/_help-container.json"
                 },
                 {
                     "component": "container",
                     "name": "validation",
                     "label": "Validation",
                     "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/validationfields"
-                        },
-                        {
-                            "component": "number",
-                            "name": "minimum",
-                            "label": "Lowest number / Smallest number",
-                            "valueType": "number",
-                            "description": "Minimum number allowed in the field"
-                        },
-                        {
-                            "component": "text",
-                            "name": "minimumMessage",
-                            "valueType": "string",
-                            "label": "Minimum error message",
-                            "description": "Error message shown when entered value is less than minimum."
-                        },
-                        {
-                            "component": "number",
-                            "name": "maximum",
-                            "label": "Highest number / Largest number",
-                            "valueType": "number",
-                            "description": "Maximum number allowed in the field"
-                        },
-                        {
-                            "component": "text",
-                            "name": "maximumMessage",
-                            "valueType": "string",
-                            "label": "Maximum error message",
-                            "description": "Error message shown when the entered value is more than maximum."
-                        },
-                        {
-                            "component": "text",
-                            "name": "validateExpMessage",
-                            "label": "Script validation message",
-                            "valueType": "string",
-                            "description": "Displayed when validation script fails."
-                        }
-                    ]
+                    "...": "../form-common/_number-validation-fields.json"
                 },
                 {
                     "component": "container",

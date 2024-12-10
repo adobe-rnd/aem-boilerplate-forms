@@ -19,5 +19,21 @@
       }
     }
   ],
-  "models": []
+  "models": [
+    {
+      "id": "form-submit-button",
+      "fields": [
+        {
+          "component": "container",
+          "name": "basic",
+          "label": "Basic",
+          "collapsible": false,
+          "...": "../form-common/_basic-fields.json"
+        },
+        {
+          "...": "../form-common/_help-container.json"
+        }
+      ]
+    }
+  ]
 }

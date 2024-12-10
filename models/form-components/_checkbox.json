@@ -4,18 +4,18 @@
             "title": "Checkbox",
             "id": "checkbox",
             "plugins": {
-              "xwalk": {
-                "page": {
-                  "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
-                  "template": {
-                    "jcr:title": "Checkbox",
-                    "fieldType": "checkbox",
-                    "enabled": true,
-                    "visible": true,
-                    "checkedValue": "on"
-                  }
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
+                        "template": {
+                            "jcr:title": "Checkbox",
+                            "fieldType": "checkbox",
+                            "checkedValue": "on",
+                            "enabled": true,
+                            "visible": true
+                        }
+                    }
                 }
-              }
             }
         }
     ],
@@ -30,7 +30,7 @@
                     "collapsible": false,
                     "fields": [
                         {
-                            "...": "./_common.json#/basicfields"
+                            "...": "../form-common/_basic-input-fields.json#/fields"
                         },
                         {
                             "component": "select",
@@ -73,33 +73,14 @@
                     ]
                 },
                 {
-                    "component": "container",
-                    "name": "help",
-                    "label": "Help Content",
-                    "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/helpfields"
-                        }
-                    ]
+                    "...": "../form-common/_help-container.json"
                 },
                 {
                     "component": "container",
                     "name": "validation",
                     "label": "Validation",
                     "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/validationfields"
-                        },
-                        {
-                            "component": "text",
-                            "name": "validateExpMessage",
-                            "label": "Script validation message",
-                            "valueType": "string",
-                            "description": "Displayed when validation script fails."
-                        }
-                    ]
+                    "...": "../form-common/_basic-validation-fields.json"
                 }
             ]
         }

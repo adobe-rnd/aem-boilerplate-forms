@@ -27,73 +27,17 @@
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/basicfields"
-                        },
-                        {
-                            "...": "./_common.json#/advancedfields"
-                        }
-                    ]
+                    "...": "../form-common/_basic-input-placeholder-fields.json"
                 },
                 {
-                    "component": "container",
-                    "name": "help",
-                    "label": "Help Content",
-                    "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/helpfields"
-                        }
-                    ]
+                    "...": "../form-common/_help-container.json"
                 },
                 {
                     "component": "container",
                     "name": "validation",
                     "label": "Validation",
                     "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "./_common.json#/validationfields"
-                        },
-                        {
-                            "component": "date-time",
-                            "name": "minimumDate",
-                            "label": "Minimum date",
-                            "valueType": "date",
-                            "description": "Minimum date allowed in the field",
-                            "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
-                        },
-                        {
-                            "component": "text",
-                            "name": "minimumMessage",
-                            "valueType": "string",
-                            "label": "Minimum error message",
-                            "description": "Error message shown when the date entered is before the minimum date."
-                        },
-                        {
-                            "component": "date-time",
-                            "name": "maximumDate",
-                            "label": "Maximum date",
-                            "valueType": "date",
-                            "description": "Maximum date allowed in the field",
-                            "valueFormat": "YYYY-MM-DD[T]HH:mm:ss.000-00:00"
-                        },
-                        {
-                            "component": "text",
-                            "name": "maximumMessage",
-                            "valueType": "string",
-                            "label": "Maximum error message",
-                            "description": "Error message shown when the date entered is after the maximum date."
-                        },
-                        {
-                            "component": "text",
-                            "name": "validateExpMessage",
-                            "label": "Script validation message",
-                            "valueType": "string",
-                            "description": "Displayed when validation script fails."
-                        }
-                    ]
+                    "...": "../form-common/_date-validation-fields.json"
                 },
                 {
                     "component": "container",
