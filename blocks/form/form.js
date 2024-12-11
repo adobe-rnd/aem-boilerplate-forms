@@ -303,7 +303,7 @@ function inputDecorator(field, element) {
         input.checked = field.value === input.value;
       }
     } else {
-      input.multiple = field.type === 'file[]' || field.properties?.allowMultiple;
+      input.multiple = field.type === 'file[]';
     }
     if (field.required) {
       input.setAttribute('required', 'required');
@@ -327,7 +327,6 @@ function inputDecorator(field, element) {
       input.pattern = emailPattern;
     }
     if (input.multiple) {
-      field.type = 'file[]';
       if (field.properties?.maxFilesMessage) {
         input.dataset.maxFilesMessage = field.properties.maxFilesMessage;
       }

@@ -40,7 +40,7 @@
                 },
                 {
                     "component": "boolean",
-                    "name": "allowMultiple",
+                    "name": "multiSelection",
                     "label": "Allow multiple file attachments",
                     "valueType": "boolean",
                     "collapsible": false
