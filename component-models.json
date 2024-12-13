@@ -1746,6 +1746,18 @@
         ]
       },
       {
+        "component": "text",
+        "name": "buttonText",
+        "label": "Button Title",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "dragDropText",
+        "label": "Drag Drop Text",
+        "valueType": "string"
+      },
+      {
         "component": "container",
         "name": "help",
         "label": "Help Content",

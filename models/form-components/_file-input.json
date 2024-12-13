@@ -18,6 +18,7 @@
                                 "application/pdf"
                             ],
                             "buttonText": "Attach",
+                            "dragDropText": "Drag and Drop To Upload",
                             "type": "file",
                             "enabled": true,
                             "visible": true
@@ -37,6 +38,18 @@
                     "label": "Basic",
                     "collapsible": false,
                     "...": "../form-common/_basic-input-fields.json"
+                },
+                {
+                    "component": "text",
+                    "name": "buttonText",
+                    "label": "Button Title",
+                    "valueType": "string"
+                },
+                {
+                "component": "richtext",
+                "name": "dragDropText",
+                "label": "Drag Drop Text",
+                "valueType": "string"
                 },
                 {
                     "...": "../form-common/_help-container.json"
