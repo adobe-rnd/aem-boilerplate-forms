@@ -23,6 +23,12 @@
             "name": "default",
             "label": "Default option",
             "valueType": "string"
+        },
+        {
+            "component": "text",
+            "name": "placeholder",
+            "label": "Placeholder text",
+            "valueType": "string"
         }
     ]
 }
