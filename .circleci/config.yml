@@ -45,7 +45,7 @@ jobs:
           name: Install Playwright
           command: |
               npm i -D @playwright/test
-              npx playwright install
+              npx playwright install --with-deps
       - run:
           name: Install browsers
           command: npx playwright install chrome
