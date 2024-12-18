@@ -2671,7 +2671,69 @@
             "name": "maxOccur",
             "label": "Maximum repetitions",
             "valueType": "number",
-            "description": "Maximum number of times the panel can appear on the form"
+            "description": "Maximum number of times the panel can appear on the form. No value indicates no limit.",
+            "condition": {
+              "!=": [
+                {
+                  "var": "variant"
+                },
+                "noButtons"
+              ]
+            }
+          },
+          {
+            "component": "select",
+            "name": "variant",
+            "label": "Variant",
+            "options": [
+              {
+                "name": "No Actions",
+                "value": "noButtons"
+              },
+              {
+                "name": "Add & Remove Buttons",
+                "value": "addRemoveButtons"
+              }
+            ],
+            "value": "addRemoveButtons",
+            "condition": {
+              "===": [
+                {
+                  "var": "repeatable"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "repeatAddButtonLabel",
+            "label": "Add Button Label",
+            "valueType": "string",
+            "value": "Add",
+            "condition": {
+              "===": [
+                {
+                  "var": "variant"
+                },
+                "addRemoveButtons"
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "repeatDeleteButtonLabel",
+            "label": "Delete Button Label",
+            "valueType": "string",
+            "value": "Delete",
+            "condition": {
+              "===": [
+                {
+                  "var": "variant"
+                },
+                "addRemoveButtons"
+              ]
+            }
           }
         ]
       },

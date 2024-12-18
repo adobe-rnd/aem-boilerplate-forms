@@ -267,18 +267,29 @@ main .file-wrapper .field-dropregion {
     text-align: center;
 }
 
-main .form form .item-remove {
-    padding: 0;
-    background: #fff;
-    padding-left: 10px;
+/* Repeatable Styling */
+main .form form .repeat-actions {
+    grid-column: span 12;
+    order: 2;
 }
 
+main .form form .item-remove,
 main .form form .item-add {
     overflow: unset;
-    display: flex;
-    justify-content: center;
 }
 
+main .form form .item-remove {
+    justify-self: end;
+    grid-column: span 12;
+    order: 1;
+}
+
+main .form form div[data-variant="addRemoveButtons"] .item-add,
+main .form form div[data-variant="addRemoveButtons"] .item-remove {
+    display: block;
+}
+
+/* End of Repeatable Styling */
 main .form .file-description{
   display: flex;
   gap: 20px;
@@ -290,13 +301,6 @@ main .form .file-description .file-description-name {
   cursor: pointer;
   text-decoration: underline;
   flex: 1;
-}
-
-main .form form .item-remove span {
-    display: block;
-    width: 20px;
-    height: 20px;
-    background: url('../../icons/delete.svg') no-repeat;
 }
 
 main .file-wrapper .file-description button {
