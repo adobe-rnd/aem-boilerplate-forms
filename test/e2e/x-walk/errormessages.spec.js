@@ -1,11 +1,11 @@
 import { test, expect } from '../fixtures.js';
-import { openPage } from '../utils.js';
+import { openForm } from '../utils.js';
 
-test.describe.skip('error messages test', () => {
-  const testURL = '/drafts/tests/x-walk/errormessages';
+test.describe('error messages test', () => {
+  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/error-messages';
 
   test('required OOTB error message ', async ({ page }) => {
-    await openPage(page, testURL);
+    await openForm(page, testURL);
     const submitButton = await page.getByRole('button', { name: 'Submit' });
     await submitButton.click();
     const f1 = await page.locator('input[name="f1"]').locator('..');
@@ -23,7 +23,7 @@ test.describe.skip('error messages test', () => {
   });
 
   test('custom required error message', async ({ page }) => {
-    await openPage(page, testURL);
+    await openForm(page, testURL);
     const submitButton = await page.getByRole('button', { name: 'Submit' });
     await submitButton.click();
     const f7 = await page.locator('input[name="f7"]').locator('..');
@@ -31,7 +31,7 @@ test.describe.skip('error messages test', () => {
   });
 
   test('minLength and maxLength error messages', async ({ page }) => {
-    await openPage(page, testURL);
+    await openForm(page, testURL);
     const f1 = await page.locator('input[name="f1"]');
     await f1.fill('a');
     await f1.press('Tab');
@@ -42,7 +42,7 @@ test.describe.skip('error messages test', () => {
   });
 
   test('pattern error message', async ({ page }) => {
-    await openPage(page, testURL);
+    await openForm(page, testURL);
     const f6 = await page.locator('input[name="f6"]');
     await f6.fill('abc');
     await f6.press('Tab');
@@ -50,7 +50,7 @@ test.describe.skip('error messages test', () => {
   });
 
   test('rangeOverflow and rangeUnderflow error messages', async ({ page }) => {
-    await openPage(page, testURL);
+    await openForm(page, testURL);
     const f2 = await page.locator('input[name="f2"]');
     await f2.fill('1');
     await f2.press('Tab');
@@ -61,7 +61,7 @@ test.describe.skip('error messages test', () => {
   });
 
   test('error message set via rule editor', async ({ page }) => {
-    await openPage(page, testURL);
+    await openForm(page, testURL);
     const f8 = await page.locator('input[name="f8"]');
     const button = await page.getByRole('button', { name: 'Button' });
     button.click();
@@ -69,7 +69,7 @@ test.describe.skip('error messages test', () => {
   });
 
   test('clear errormessage when field is valid', async ({ page }) => {
-    await openPage(page, testURL);
+    await openForm(page, testURL);
     const f1 = await page.locator('input[name="f1"]');
     await f1.fill('a');
     await f1.press('Tab');

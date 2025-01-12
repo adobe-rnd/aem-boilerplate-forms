@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures.js';
-import { fillField, openPage } from '../utils.js';
+import { fillField, openForm } from '../utils.js';
 
 const wizardCount = ".repeat-wrapper fieldset[class='panel-wrapper field-wrapper wizard']";
 const wizardPanelCount = 'ul.wizard-menu-items li.wizard-menu-item';
@@ -15,10 +15,10 @@ const inputValues = {
   dataInput: '2022-12-23',
 };
 
-test.describe.skip('resetButton validation test', () => {
-  const testURL = '/drafts/tests/x-walk/wizardvalidation';
+test.describe('resetButton validation test', () => {
+  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/wizard-validation';
   test('resetButton validation on wizard panels', async ({ page }) => {
-    await openPage(page, testURL);
+    await openForm(page, testURL);
     for (let i = 0; i < 4; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await page.getByText('Button').click();
@@ -29,9 +29,9 @@ test.describe.skip('resetButton validation test', () => {
   });
 
   test('resetButton validation on repeatable wizard', async ({ page }) => {
-    await openPage(page, testURL);
+    await page.goto(testURL);
     const count = await page.locator(wizardPanelCount).count();
-
+    await page.pause();
     for (let i = 0; i < count - 1; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await page.getByRole('button', { name: 'Next' }).click({ force: true });
@@ -46,8 +46,8 @@ test.describe.skip('resetButton validation test', () => {
   });
 
   test('Check for reset functionality', async ({ page }) => {
-    const testURL1 = '/drafts/tests/x-walk/resetvalidation';
-    await openPage(page, testURL1);
+    const testURL1 = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/reset-validation';
+    await page.goto(testURL1);
     // eslint-disable-next-line no-restricted-syntax
     for (const title of titles) {
       // eslint-disable-next-line no-await-in-loop,max-len
