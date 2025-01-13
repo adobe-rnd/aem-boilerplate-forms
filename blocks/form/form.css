@@ -229,7 +229,7 @@ main .form form .checkbox-wrapper.cards label {
     gap: 1rem;
     margin: 0 0 1rem;
     border: 1px solid #dad6d6;
-    padding: 1rem;
+    padding: 0.6rem;
     cursor: pointer;
     align-items: end;
 }
