@@ -34,7 +34,7 @@
     "update:formatters": "rollup -c rollup/af-formatters.rollup.config.js",
     "update:functions": "cp node_modules/@aemforms/af-custom-functions/src/index.js blocks/form/rules/functions.js",
     "update": "npm run update:core && npm run update:formula && npm run update:formatters",
-    "postinstall": "npx playwright install --with-deps chromium",
+    "postinstall": "if [ \"$CIRCLECI\" = \"true\" ]; then npx playwright install --with-deps chromium; fi",
     "build:json": "npm-run-all -p build:json:models build:json:definitions build:json:filters",
     "build:json:models": "merge-json-cli -i 'models/_component-models.json' -o 'component-models.json'",
     "build:json:definitions": "merge-json-cli -i 'models/_component-definition.json' -o 'component-definition.json'",
