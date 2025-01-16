@@ -19,6 +19,8 @@ import { ueFormDefForPatchTitleTest } from './fixtures/ue/events/formdefinition-
 import { ueFormDefForPatchEmptyTitleTest } from './fixtures/ue/events/formdefinition-patch-empty-title.js';
 import { ueFormDefForWizardNavigationTest } from './fixtures/ue/events/formdefinition-wizardnavigation.js';
 import { renderForm } from './testUtils.js';
+import { ueFormDefForAccordionNavigationTest } from './fixtures/ue/events/formdefinition-accordion-navigation.js';
+import { handleAccordionNavigation } from '../../blocks/form/components/accordion/accordion.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
   it('test form annotation for UE', async () => {
@@ -213,6 +215,15 @@ describe('Universal Editor Authoring Test Cases', () => {
     assert.equal(currentActiveStep.dataset.id, 'panelcontainer-6a979252b1');
     const currentActiveMenuItem = currentActiveStep.parentElement.querySelector(`li[data-index="${currentActiveStep.dataset.index}"]`);
     assert.equal(currentActiveMenuItem.classList.contains('wizard-menu-active-item'), true);
+    document.body.replaceChildren();
+  });
+
+  it('test UE accordion navigation', async () => {
+    await renderForm(ueFormDefForAccordionNavigationTest);
+    const formElPrev = document.querySelector('form');
+    handleAccordionNavigation(formElPrev.querySelector('.accordion'), formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]'));
+    const currentActiveTab = formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]');
+    assert.equal(currentActiveTab.classList.contains('accordion-collapse'), false);
     document.body.replaceChildren();
   });
 });

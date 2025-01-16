@@ -194,6 +194,38 @@
       "id": "form-general",
       "components": [
         {
+          "title": "Accordion",
+          "id": "form-accordion",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Accordion",
+                  "fieldType": "panel",
+                  "fd:viewType": "accordion",
+                  "enabled": true,
+                  "visible": true,
+                  "panel1": {
+                    "jcr:title": "Item 1",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  },
+                  "panel2": {
+                    "jcr:title": "Item 2",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Button",
           "id": "form-button",
           "plugins": {
@@ -381,7 +413,7 @@
         },
         {
           "title": "Modal",
-          "id": "modal",
+          "id": "form-modal",
           "plugins": {
             "xwalk": {
               "page": {
