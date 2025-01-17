@@ -1,12 +1,12 @@
 import { test, expect } from '../fixtures.js';
-import { openForm } from '../utils.js';
+import { openPage } from '../utils.js';
 
 test.describe('Subscribe function validation', () => {
   const emailInputValue = 'newValue';
   const textInputValue = 'subscribeTest';
-  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/subscribe-validation';
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/subscribe-validation';
   test('Subscribe function validation on text input', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     await page.evaluate(async () => {
       /* eslint-disable import/no-absolute-path */
       // eslint-disable-next-line import/no-unresolved

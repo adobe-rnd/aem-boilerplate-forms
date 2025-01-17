@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures.js';
-import { openForm } from '../utils.js';
+import { openPage } from '../utils.js';
 
 const locators = [
   { name: 'firstName', selector: 'div[class*="field-firstname"] input' },
@@ -9,9 +9,9 @@ const locators = [
 
 test.describe('Modal Form Test', () => {
   const elements = {};
-  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/model-validation';
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/model-validation';
   test('Open and close modal', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     const button = await page.getByText('Click to Open Modal');
     await button.click();
     const dialog = await page.locator('div.modal dialog');
@@ -22,7 +22,7 @@ test.describe('Modal Form Test', () => {
   });
 
   test('Test Rules inside Modal', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     const button = await page.getByText('Click to Open Modal');
     await button.click();
     const dialog = await page.locator('div.modal dialog');

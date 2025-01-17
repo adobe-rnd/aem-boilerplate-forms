@@ -47,8 +47,4 @@ const openPage = async (page, relativeURL) => {
   await page.goto(url, { waitUntil: 'networkidle' });
 };
 
-const openForm = async (page, formURL) => {
-  await page.goto(formURL, { waitUntil: 'networkidle' });
-};
-
-export { openPage, openForm, getCurrentBranch };
+export { openPage, getCurrentBranch };

@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures.js';
-import { openForm } from '../../utils.js';
+import { openPage } from '../../utils.js';
 
 const emoji = ['😢', '😊'];
 let rating = null;
@@ -18,7 +18,7 @@ test.describe('custom component validation', () => {
   const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/rating-component';
 
   test('rating custom component validation @chromium-only', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     await page.evaluate(async () => {
       // eslint-disable-next-line no-undef,no-underscore-dangle
       myForm._jsonModel.action = 'https://main--aem-boilerplate-forms--adobe-rnd.hlx.live/adobe/forms/af/submit/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXgvamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uXzAvZm9ybQ==';

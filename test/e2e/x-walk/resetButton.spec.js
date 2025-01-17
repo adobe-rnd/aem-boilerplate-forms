@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures.js';
-import { fillField, openForm } from '../utils.js';
+import { fillField, openPage } from '../utils.js';
 
 const wizardCount = ".repeat-wrapper fieldset[class='panel-wrapper field-wrapper wizard']";
 const wizardPanelCount = 'ul.wizard-menu-items li.wizard-menu-item';
@@ -16,9 +16,9 @@ const inputValues = {
 };
 
 test.describe('resetButton validation test', () => {
-  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/wizard-validation';
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/wizard-validation';
   test('resetButton validation on wizard panels', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     for (let i = 0; i < 4; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await page.getByText('Button').click();

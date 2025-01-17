@@ -1,16 +1,16 @@
 import { test, expect } from '../fixtures.js';
-import { openForm } from '../utils.js';
+import { openPage } from '../utils.js';
 
 test.describe('Repeatability test', () => {
-  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/repeat-panel';
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/repeat-panel';
   test('test newly added panels are within div.repeat-wrapper', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     const childCount = await page.locator('.repeat-wrapper').evaluate((el) => Array.from(el.children).filter((child) => child.classList.contains('panel-wrapper')).length);
     await expect(childCount).toBe(5);
   });
 
   test('test colspan for repeated panels', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     const elements = await page.$$('main .form form .field-wrapper.col-4');
     // eslint-disable-next-line no-restricted-syntax
     for (const element of elements) {
@@ -21,7 +21,7 @@ test.describe('Repeatability test', () => {
   });
 
   test('test the behaviour of radio button with same name for repeated panels', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     const radiobuttons = await page.$$('input[name*="radio"]');
     await radiobuttons[0].click();
     expect(await radiobuttons[0].isChecked()).toBe(true);
@@ -33,7 +33,7 @@ test.describe('Repeatability test', () => {
   });
 
   test('test the behaviour of checkbox with same name for repeated panels', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     const checkboxes = await page.$$('input[name*="checkbox"]');
     const n = checkboxes.length;
     await checkboxes[0].click();

@@ -1,5 +1,5 @@
 import { expect, test } from '../../fixtures.js';
-import { openForm } from '../../utils.js';
+import { openPage } from '../../utils.js';
 
 let requestPayload = null;
 const checkboxLocator = 'input[type="checkbox"]';
@@ -10,7 +10,7 @@ test.describe('validation of components in UE publish mode', async () => {
   const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/terms-and-condition';
 
   test('Terms and conditions validation in UE @chromium-only', async ({ page }) => {
-    await openForm(page, testURL);
+    await openPage(page, testURL);
     // listeners to fetch payload form submission.
     page.on('request', async (request) => {
       if (request.url().includes(partialUrl)) {
