@@ -7,7 +7,7 @@ const termsAndConditionsLocator = 'div[class*="tnc__text-decoration"]';
 const partialUrl = '/L2NvbnRlbnQvYWVtLWJvaWxlcnBsYXRlLWZvcm1zLXh3YWxrLWNvbGxhdGVyYWxzL3Rlcm1zLWFuZC1jb25kaXRpb24vamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uL2Zvcm0=';
 
 test.describe('validation of components in UE publish mode', async () => {
-  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/terms-and-condition';
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/terms-and-condition';
 
   test('Terms and conditions validation in UE @chromium-only', async ({ page }) => {
     await openPage(page, testURL);

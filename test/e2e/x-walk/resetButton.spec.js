@@ -29,7 +29,7 @@ test.describe('resetButton validation test', () => {
   });
 
   test('resetButton validation on repeatable wizard', async ({ page }) => {
-    await page.goto(testURL);
+    await openPage(page, testURL);
     const count = await page.locator(wizardPanelCount).count();
     await page.pause();
     for (let i = 0; i < count - 1; i += 1) {
@@ -46,8 +46,8 @@ test.describe('resetButton validation test', () => {
   });
 
   test('Check for reset functionality', async ({ page }) => {
-    const testURL1 = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/reset-validation';
-    await page.goto(testURL1);
+    const testURL1 = '/content/aem-boilerplate-forms-xwalk-collaterals/reset-validation';
+    await openPage(page, testURL1);
     // eslint-disable-next-line no-restricted-syntax
     for (const title of titles) {
       // eslint-disable-next-line no-await-in-loop,max-len

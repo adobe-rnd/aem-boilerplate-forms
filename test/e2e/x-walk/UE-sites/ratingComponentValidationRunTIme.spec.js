@@ -15,7 +15,7 @@ const partialUrl = '/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXg
 const starsSelected = 'star hover selected';
 
 test.describe('custom component validation', () => {
-  const testURL = 'https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/rating-component';
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/rating-component';
 
   test('rating custom component validation @chromium-only', async ({ page }) => {
     await openPage(page, testURL);
