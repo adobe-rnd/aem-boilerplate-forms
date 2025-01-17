@@ -29,7 +29,7 @@
                     "collapsible": false,
                     "fields": [
                         {
-                            "...": "../form-common/_basic-input-placeholder-fields.json"
+                            "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
                         },
                         {
                             "component": "select",
@@ -57,7 +57,7 @@
                     "name": "validation",
                     "label": "Validation",
                     "collapsible": true,
-                    "...": "../form-common/_number-validation-fields.json#/fields"
+                    "...": "../form-common/_number-validation-fields.json"
                 },
                 {
                     "component": "container",
