@@ -2451,60 +2451,58 @@
         ]
       },
       {
+        "0": {
+          "component": "boolean",
+          "name": "required",
+          "label": "Required",
+          "valueType": "boolean"
+        },
+        "1": {
+          "component": "text",
+          "name": "mandatoryMessage",
+          "label": "Error message",
+          "valueType": "string",
+          "description": "Error message shown when required field is left empty."
+        },
+        "2": {
+          "component": "text",
+          "name": "validateExpMessage",
+          "label": "Script validation message",
+          "valueType": "string",
+          "description": "Displayed when validation script fails."
+        },
+        "3": {
+          "component": "number",
+          "name": "minimum",
+          "label": "Lowest number / Smallest number",
+          "valueType": "number",
+          "description": "Minimum number allowed in the field"
+        },
+        "4": {
+          "component": "text",
+          "name": "minimumMessage",
+          "valueType": "string",
+          "label": "Minimum error message",
+          "description": "Error message shown when entered value is less than minimum."
+        },
+        "5": {
+          "component": "number",
+          "name": "maximum",
+          "label": "Highest number / Largest number",
+          "valueType": "number",
+          "description": "Maximum number allowed in the field"
+        },
+        "6": {
+          "component": "text",
+          "name": "maximumMessage",
+          "valueType": "string",
+          "label": "Maximum error message",
+          "description": "Error message shown when the entered value is more than maximum."
+        },
         "component": "container",
         "name": "validation",
         "label": "Validation",
-        "collapsible": true,
-        "fields": [
-          {
-            "component": "boolean",
-            "name": "required",
-            "label": "Required",
-            "valueType": "boolean"
-          },
-          {
-            "component": "text",
-            "name": "mandatoryMessage",
-            "label": "Error message",
-            "valueType": "string",
-            "description": "Error message shown when required field is left empty."
-          },
-          {
-            "component": "text",
-            "name": "validateExpMessage",
-            "label": "Script validation message",
-            "valueType": "string",
-            "description": "Displayed when validation script fails."
-          },
-          {
-            "component": "number",
-            "name": "minimum",
-            "label": "Lowest number / Smallest number",
-            "valueType": "number",
-            "description": "Minimum number allowed in the field"
-          },
-          {
-            "component": "text",
-            "name": "minimumMessage",
-            "valueType": "string",
-            "label": "Minimum error message",
-            "description": "Error message shown when entered value is less than minimum."
-          },
-          {
-            "component": "number",
-            "name": "maximum",
-            "label": "Highest number / Largest number",
-            "valueType": "number",
-            "description": "Maximum number allowed in the field"
-          },
-          {
-            "component": "text",
-            "name": "maximumMessage",
-            "valueType": "string",
-            "label": "Maximum error message",
-            "description": "Error message shown when the entered value is more than maximum."
-          }
-        ]
+        "collapsible": true
       },
       {
         "component": "container",

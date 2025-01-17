@@ -57,7 +57,7 @@
                     "name": "validation",
                     "label": "Validation",
                     "collapsible": true,
-                    "...": "../form-common/_number-validation-fields.json"
+                    "...": "../form-common/_number-validation-fields.json#/fields"
                 },
                 {
                     "component": "container",
