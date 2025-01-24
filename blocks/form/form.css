@@ -208,6 +208,10 @@ main .form form .checkbox-wrapper, main .form form .radio-wrapper {
     gap: 8px;
 }
 
+main .form form fieldset.cards.horizontal {
+    column-gap: 0;
+}
+
 main .form form fieldset > .radio-wrapper,
 main .form form fieldset > .checkbox-wrapper {
     margin-left: var(--form-field-gap);
@@ -216,6 +220,29 @@ main .form form fieldset > .checkbox-wrapper {
 main .form .radio-wrapper  label,
 main .form .checkbox-wrapper label {
     flex-basis: calc(100% - 24px);
+}
+
+main .form form fieldset.cards > .radio-wrapper > label,
+main .form form fieldset.cards > .checkbox-wrapper > label {
+    display: flex;
+    gap: 1rem;
+    margin: 0 0 1rem;
+    border: 1px solid #dad6d6;
+    padding: 0.6rem;
+    cursor: pointer;
+    align-items: end;
+}
+
+main .form form fieldset.cards.horizontal > .radio-wrapper > label,
+main .form form fieldset.cards.horizontal > .checkbox-wrapper > label
+{
+    min-width: fit-content;
+}
+
+main .form form fieldset.cards > .radio-wrapper > input:checked ~ label,
+main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label{
+    border: 1px solid #1c3fca;
+    background-color: #F3F6FD;
 }
 
 input::file-selector-button {
@@ -252,6 +279,11 @@ main .form textarea:disabled,
 main .form select:disabled,
 main .form button:disabled {
     background-color: var(--form-input-disable-color);
+}
+
+main .form form fieldset.cards > .radio-wrapper > input,
+main .form form fieldset.cards > .checkbox-wrapper > input{
+    width: 0;
 }
 
 main .file-wrapper.decorated input[type="file"] {

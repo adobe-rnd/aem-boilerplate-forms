@@ -1,8 +1,8 @@
 import { test, expect } from '../fixtures.js';
 import { openPage } from '../utils.js';
 
-test.describe.skip('Repeatability test', () => {
-  const testURL = '/drafts/tests/x-walk/repeat-test';
+test.describe('Repeatability test', () => {
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/repeat-panel';
   test('test newly added panels are within div.repeat-wrapper', async ({ page }) => {
     await openPage(page, testURL);
     const childCount = await page.locator('.repeat-wrapper').evaluate((el) => Array.from(el.children).filter((child) => child.classList.contains('panel-wrapper')).length);
@@ -22,7 +22,7 @@ test.describe.skip('Repeatability test', () => {
 
   test('test the behaviour of radio button with same name for repeated panels', async ({ page }) => {
     await openPage(page, testURL);
-    const radiobuttons = await page.$$('input[name="radio"]');
+    const radiobuttons = await page.$$('input[name*="radio"]');
     await radiobuttons[0].click();
     expect(await radiobuttons[0].isChecked()).toBe(true);
     // eslint-disable-next-line no-plusplus
@@ -34,7 +34,7 @@ test.describe.skip('Repeatability test', () => {
 
   test('test the behaviour of checkbox with same name for repeated panels', async ({ page }) => {
     await openPage(page, testURL);
-    const checkboxes = await page.$$('input[name="checkbox"]');
+    const checkboxes = await page.$$('input[name*="checkbox"]');
     const n = checkboxes.length;
     await checkboxes[0].click();
     await checkboxes[n - 1].click();

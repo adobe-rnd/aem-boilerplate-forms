@@ -199,7 +199,12 @@ function createRadioOrCheckboxGroup(fd) {
       enum: [value],
       required: fd.required,
     });
-    const layout = fd.properties['afs:layout'];
+    const { variant, 'afs:layout': layout } = fd.properties;
+    if (variant === 'cards') {
+      wrapper.classList.add(variant);
+    } else {
+      wrapper.classList.remove('cards');
+    }
     if (layout?.orientation === 'horizontal') {
       wrapper.classList.add('horizontal');
     }

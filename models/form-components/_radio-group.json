@@ -14,7 +14,7 @@
                                 "0",
                                 "1"
                             ],
-                            "enumNumes": [
+                            "enumNames": [
                                 "Item 1",
                                 "Item 2"
                             ],
@@ -39,6 +39,22 @@
                     "fields": [
                         {
                             "...": "../form-common/_basic-select-fields.json#/fields"
+                        },
+                        {
+                            "component": "select",
+                            "name": "variant",
+                            "label": "Variant",
+                            "options": [
+                                {
+                                    "name": "Default",
+                                    "value": "default"
+                                },
+                                {
+                                    "name": "Cards",
+                                    "value": "cards"
+                                }
+                            ],
+                            "value": "default"
                         },
                         {
                             "component": "select",
