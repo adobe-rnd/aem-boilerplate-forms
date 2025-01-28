@@ -248,7 +248,8 @@ function createPlainText(fd) {
 
 function createImage(fd) {
   const field = createFieldWrapper(fd);
-  const imagePath = fd.source || fd.properties['fd:repoPath'] || '';
+  field.id = fd?.id;
+  const imagePath = fd.source || fd.properties['fd:repoPath'] || fd.value || '';
   const image = `
   <picture>
     <source srcset="${imagePath}?width=2000&optimize=medium" media="(min-width: 600px)">
