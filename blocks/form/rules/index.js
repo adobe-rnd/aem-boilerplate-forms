@@ -24,6 +24,7 @@ import {
 import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
 import initializeRuleEngineWorker from './worker.js';
+import { createOptimizedPicture } from '../../../scripts/aem.js';
 
 const formModel = {};
 
@@ -101,13 +102,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
         } else if (fieldType === 'plain-text') {
           field.innerHTML = currentValue;
         } else if (fieldType === 'image') {
-          const picture = field.querySelector(':scope > picture');
-          const sources = picture?.querySelectorAll('source');
-          const image = picture?.querySelector('img');
-          sources?.forEach((source) => {
-            source.srcset = currentValue + source.srcset;
-          });
-          image.src = currentValue + image.src;
+          const altText = field?.querySelector('img')?.alt || '';
+          field.querySelector('picture')?.replaceWith(createOptimizedPicture(field, currentValue, altText));
         } else if (field.type !== 'file') {
           field.value = currentValue;
         }

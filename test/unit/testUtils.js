@@ -3,6 +3,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import * as dom from 'dom-compare';
+import jsdom from 'jsdom';
 import decorate, { DELAY_MS, generateFormRendition } from '../../blocks/form/form.js';
 import { annotateFormForEditing, getItems } from '../../scripts/form-editor-support.js';
 import { resetIds } from '../../blocks/form/util.js';
@@ -73,6 +74,7 @@ export function testBasicMarkup(filePath, bUrlMode = false, customComponents = [
       assert.equal(true, false, 'formpath is not defined');
     }
     const oldCustomComponents = getCustomComponents();
+    global.window = new jsdom.JSDOM('', { url: 'http://localhost:2000/test/path' }).window;
     window.hlx = { codeBasePath };
     setCustomComponents(customComponents);
     const block = bUrlMode ? createBlockWithUrl(fieldDef, `${formPath}`) : createBlock(fieldDef);
