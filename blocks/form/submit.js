@@ -1,4 +1,4 @@
-import { DEFAULT_THANK_YOU_MESSAGE, getRouting, getSubmitBaseUrl } from './constant.js';
+import { DEFAULT_THANK_YOU_MESSAGE, getSubmitBaseUrl } from './constant.js';
 
 export function submitSuccess(e, form) {
   const { payload } = e;
@@ -73,22 +73,15 @@ function constructPayload(form) {
 
 async function prepareRequest(form) {
   const { payload } = constructPayload(form);
-  const {
-    branch, site, org, tier,
-  } = getRouting();
-  const headers = {
-    'Content-Type': 'application/json',
-    'x-adobe-routing': `tier=${tier},bucket=${branch}--${site}--${org}`,
-  };
+  const headers = JSON.parse(form.dataset.submitHeaders);
   const body = { data: payload };
   let url;
   let baseUrl = getSubmitBaseUrl();
-  if (!baseUrl && org && site) {
+  if (!baseUrl) {
     baseUrl = 'https://forms.adobe.com/adobe/forms/af/submit/';
-    headers['x-adobe-routing'] = `tier=${tier},bucket=${branch}--${site}--${org}`;
     url = baseUrl + btoa(form.dataset.action);
   } else {
-    url = form.dataset.action;
+    headers.url = form.dataset.action;
   }
   return { headers, body, url };
 }

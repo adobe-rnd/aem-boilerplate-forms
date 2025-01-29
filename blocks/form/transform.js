@@ -28,7 +28,7 @@ function extractRules(field) {
   return entries;
 }
 
-function initFormDef(name) {
+function initFormDef(name, submitHeaders) {
   return {
     name,
     adaptiveform: '0.10.0',
@@ -38,6 +38,7 @@ function initFormDef(name) {
     },
     properties: {},
     items: [],
+    submitHeaders,
   };
 }
 
@@ -202,7 +203,7 @@ export default class DocBasedFormToAF {
     if (!exData || !exData.data) {
       throw new Error('Unable to retrieve the form details from json');
     }
-    const formDef = initFormDef(name);
+    const formDef = initFormDef(name, exData.submitHeaders);
 
     this.panelMap.set('root', formDef);
     const fieldIdMap = {};
