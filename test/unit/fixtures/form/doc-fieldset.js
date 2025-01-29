@@ -4,6 +4,10 @@ export const fieldDef = {
   offset: 0,
   limit: 11,
   ':type': 'sheet',
+  submitHeaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined'
+  },
   data: [
     {
       Type: 'fieldset',

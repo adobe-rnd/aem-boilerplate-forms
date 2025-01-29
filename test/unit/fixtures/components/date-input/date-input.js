@@ -1,4 +1,8 @@
 export const fieldDef = {
+  submitHeaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined'
+  },
   items: [{
     id: 'datepicker-6dd0c75352',
     fieldType: 'date-input',

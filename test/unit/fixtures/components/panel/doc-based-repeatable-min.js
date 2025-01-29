@@ -1,5 +1,9 @@
 // eslint-disable-next-line import/prefer-default-export
 export const fieldDef = {
+  submitHeaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined'
+  },
   total: 12,
   offset: 0,
   limit: 12,

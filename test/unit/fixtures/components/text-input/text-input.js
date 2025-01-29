@@ -1,6 +1,10 @@
 import assert from 'assert';
 
 export const fieldDef = {
+  submitHeaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined'
+  },
   action: '/adobe/forms/af/form1.json',
   items: [{
     id: 'textinput-4e4f61cad9',

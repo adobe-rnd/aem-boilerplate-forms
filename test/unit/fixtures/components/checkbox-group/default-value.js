@@ -1,6 +1,10 @@
 import assert from 'assert';
 
 export const fieldDef = {
+  submitHeaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined'
+  },
   items: [{
     id: 'default-checkbox-group-id',
     fieldType: 'checkbox-group',
