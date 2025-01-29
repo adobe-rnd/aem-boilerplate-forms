@@ -48,6 +48,7 @@ function handleActiveChild(id, form) {
   if (field) {
     field.closest('.field-wrapper').dataset.active = true;
     field.focus();
+    field.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
