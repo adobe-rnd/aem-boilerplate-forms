@@ -9,7 +9,7 @@ const PanelClass = /accordion-collapse/;
 test.describe('Accordion Validation', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/accordion-component-validation';
 
-  test('Accordion Panel Validation @chromium-only', async ({ page }) => {
+  test('Accordion Panel Validation', async ({ page }) => {
     await openPage(page, testURL);
     const panelOneBaseLocator = page.locator(panelOneLocator);
     const panelTwoBaseLocator = page.locator(panelTwoLocator);
