@@ -48,6 +48,7 @@ function createElementFromHTML(htmlString, fieldDef) {
   form.dataset.redirectUrl = fieldDef.redirectUrl || '';
   form.dataset.thankYouMsg = fieldDef.thankYouMsg || '';
   form.dataset.id = fieldDef.id;
+  form.dataset.submitHeaders = JSON.stringify(fieldDef.submitHeaders || {});
   form.noValidate = true;
   // Change this to div.childNodes to support multiple top-level nodes.
   return form;

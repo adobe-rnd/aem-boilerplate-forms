@@ -1,5 +1,9 @@
 // eslint-disable-next-line import/prefer-default-export
 export const fieldDef = {
+  submitHeaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined'
+  },
   items: [{
     id: 'checkbox-7b8a92de4e',
     fieldType: 'checkbox',

@@ -1,18 +1,21 @@
 import {
-  createButton, createFieldWrapper, createLabel, getHTMLRenderType,
-  createHelpText,
-  getId,
-  stripTags,
   checkValidation,
-  toClassName,
+  createButton,
+  createFieldWrapper,
+  createHelpText,
+  createLabel,
+  getHTMLRenderType,
+  getId,
   getSitePageName,
+  stripTags,
+  toClassName,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
 import DocBasedFormToAF from './transform.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { handleSubmit } from './submit.js';
-import { getSubmitBaseUrl, emailPattern } from './constant.js';
+import { emailPattern, getRouting, getSubmitBaseUrl } from './constant.js';
 
 export const DELAY_MS = 0;
 let captchaField;
@@ -559,7 +562,15 @@ export default async function decorate(block) {
   let rules = true;
   let form;
   if (formDef) {
+    const {
+      branch, site, org, tier,
+    } = getRouting();
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-adobe-routing': `tier=${tier},bucket=${branch}--${site}--${org}`,
+    };
     formDef.action = getSubmitBaseUrl() + (formDef.action || '');
+    formDef.submitHeaders = formDef.submitHeaders || headers;
     if (isDocumentBasedForm(formDef)) {
       const transform = new DocBasedFormToAF();
       formDef = transform.transform(formDef);
@@ -579,6 +590,7 @@ export default async function decorate(block) {
     form.dataset.redirectUrl = formDef.redirectUrl || '';
     form.dataset.thankYouMsg = formDef.thankYouMsg || '';
     form.dataset.action = formDef.action || pathname?.split('.json')[0];
+    form.dataset.submitHeaders = JSON.stringify(formDef.submitHeaders);
     form.dataset.source = source;
     form.dataset.rules = rules;
     form.dataset.id = formDef.id;

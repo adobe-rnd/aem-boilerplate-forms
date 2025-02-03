@@ -5,6 +5,10 @@ export const fieldDef = {
   title: 'Claims Form',
   lang: 'en',
   action: '/adobe/forms/af/submit/L2NvbnRlbnQvZm9ybXMvYWYvQ2xhaW1zX0Zvcm0xNzAxOTMyNDE5MjIw',
+  submitHeaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined'
+  },
   events: {
     'custom:setProperty': [
       '$event.payload',
