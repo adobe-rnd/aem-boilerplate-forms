@@ -77,12 +77,6 @@
                             ]
                         },
                         {
-                            "component": "text",
-                            "name": "default",
-                            "label": "Default option",
-                            "valueType": "string"
-                        },
-                        {
                             "component": "radio-group",
                             "label": "Display Options",
                             "name": "orientation",
