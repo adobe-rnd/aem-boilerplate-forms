@@ -614,8 +614,7 @@ main .form form:not(.edit-mode) .captcha-wrapper{
 main .form form .radio-group-wrapper.horizontal,
 main .form form .checkbox-group-wrapper.horizontal {
     display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
+    flex-flow: row wrap;
     gap: inherit;
 }
 
