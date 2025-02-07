@@ -49,7 +49,11 @@
                 "fieldType": "checkbox",
                 "required": true,
                 "enabled": true,
-                "visible": true
+                "visible": true,
+                "type": "string",
+                "enum": [
+                  "true"
+                ]
               }
             }
           }
