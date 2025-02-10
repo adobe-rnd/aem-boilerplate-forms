@@ -182,9 +182,10 @@ main .form fieldset.radio-group-wrapper legend {
     color: var(--form-label-color);
 }
 
-main .form fieldset.checkbox-group-wrapper,
-main .form fieldset.radio-group-wrapper {
+main .form form fieldset.checkbox-group-wrapper,
+main .form form fieldset.radio-group-wrapper {
     padding-left: 0;
+    margin-left:0;
 }
 
 main .form label.required::after {
