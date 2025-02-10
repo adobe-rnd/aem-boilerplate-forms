@@ -250,7 +250,7 @@ function createPlainText(fd) {
 function createImage(fd) {
   const field = createFieldWrapper(fd);
   field.id = fd?.id;
-  const imagePath = fd.value || fd.source || fd.properties['fd:repoPath'] || '';
+  const imagePath = fd.value || fd.properties['fd:repoPath'] || '';
   const altText = fd.altText || fd.name;
   field.append(createOptimizedPicture(imagePath, altText));
   return field;
