@@ -19,6 +19,10 @@ class TermsAndConditions {
 
   decorate() {
     const textWrapper = this.fieldDiv.querySelector('.plain-text-wrapper');
+    const helpText = this.fieldDiv.querySelector('.field-description');
+    if (helpText) {
+      this.fieldDiv.append(helpText);
+    }
     if (!textWrapper) { // rendition does not have a plain-text-wrapper => link rendition of TnC
       console.debug('No plain-text found in TnC field. Assuming Link based rendition and Skipping decoration.');
       return;
