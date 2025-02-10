@@ -25,6 +25,7 @@ class TermsAndConditions {
     }
     if (!textWrapper) { // rendition does not have a plain-text-wrapper => link rendition of TnC
       console.debug('No plain-text found in TnC field. Assuming Link based rendition and Skipping decoration.');
+      this.fieldDiv.classList.add('link');
       return;
     }
     textWrapper.classList.add(textDecorationClass);
