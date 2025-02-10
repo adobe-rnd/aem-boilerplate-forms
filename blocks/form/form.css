@@ -182,10 +182,20 @@ main .form fieldset.radio-group-wrapper legend {
     color: var(--form-label-color);
 }
 
+main .form form .wizard > legend{
+    float: left;
+    width: 100%;
+}
+
 main .form form fieldset.checkbox-group-wrapper,
 main .form form fieldset.radio-group-wrapper {
     padding-left: 0;
     margin-left:0;
+}
+
+main .form form fieldset.checkbox-group-wrapper > legend,
+main .form form fieldset.radio-group-wrapper > legend {
+    padding-left: 0;
 }
 
 main .form label.required::after {
@@ -395,11 +405,6 @@ main .form form .wizard  {
   background-color: var( --form-wizard-background-color);
   gap: unset;
   padding: 20px var(--form-wizard-padding);
-}
-
-main .form form .wizard > legend{
-    float: left;
-    width: 100%;
 }
 
 main .form form .wizard > .field-description{
