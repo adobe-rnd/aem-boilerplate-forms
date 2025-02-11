@@ -44,6 +44,11 @@ jobs:
           mv package-prod.json package.json
           mv package-prod-lock.json package-lock.json
 
+      - name: Update fstab with owner and repo name
+        run: |
+          sed -i.bak "s/aem-boilerplate-forms/$(basename ${{ github.repository }})/g" fstab.yaml
+          sed -i.bak "s/adobe-rnd/$(dirname ${{ github.repository }})/g" fstab.yaml
+
       - name: Initialize README
         # replace {repo} and {owner} with the actual values
         run: |
