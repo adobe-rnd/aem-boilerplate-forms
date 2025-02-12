@@ -2750,11 +2750,23 @@
             "valueType": "string",
             "value": "Add",
             "condition": {
-              "===": [
+              "and": [
                 {
-                  "var": "variant"
+                  "===": [
+                    {
+                      "var": "variant"
+                    },
+                    "addRemoveButtons"
+                  ]
                 },
-                "addRemoveButtons"
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                }
               ]
             }
           },
@@ -2765,11 +2777,23 @@
             "valueType": "string",
             "value": "Delete",
             "condition": {
-              "===": [
+              "and": [
                 {
-                  "var": "variant"
+                  "===": [
+                    {
+                      "var": "variant"
+                    },
+                    "addRemoveButtons"
+                  ]
                 },
-                "addRemoveButtons"
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                }
               ]
             }
           }
