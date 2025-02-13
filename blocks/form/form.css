@@ -634,3 +634,14 @@ main .form form .checkbox-group-wrapper.horizontal .field-description {
     order: 1;
     margin-top: 0.5rem;
 }
+
+main .form form .placeholder-text{
+    color: grey; 
+    font-size: 0.9em; 
+    opacity: 0.7;
+    user-select: none;
+}
+
+main .form form:not(.edit-mode) .placeholder-text{
+    display: none ;
+}
