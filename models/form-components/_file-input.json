@@ -59,6 +59,62 @@
                         },
                         {
                             "component": "number",
+                            "name": "minItems",
+                            "label": "Minimum number of files",
+                            "valueType": "string",
+                            "condition": {
+                                "==": [
+                                    {
+                                        "var": "multiSelection"
+                                    },
+                                    true
+                                ]
+                            }
+                        },
+                        {
+                            "component": "text",
+                            "name": "minItemsMessage",
+                            "label": "Minimum files error message",
+                            "valueType": "string",
+                            "condition": {
+                                "==": [
+                                    {
+                                        "var": "multiSelection"
+                                    },
+                                    true
+                                ]
+                            }
+                        },
+                        {
+                            "component": "number",
+                            "name": "maxItems",
+                            "label": "Maximum number of files",
+                            "valueType": "string",
+                            "condition": {
+                                "==": [
+                                    {
+                                        "var": "multiSelection"
+                                    },
+                                    true
+                                ]
+                            }
+                            },
+                        {
+                            "component": "text",
+                            "name": "maxItemsMessage",
+                            "label": "Maximum files error message",
+                            "valueType": "string",
+                            "condition": {
+                                "==": [
+                                    {
+                                        "var": "multiSelection"
+                                    },
+                                    true
+                                ]
+                            }
+                        },
+                        {
+                            "component": "number",
                             "name": "maxFileSize",
                             "label": "Maximum file size (MB)",
                             "valueType": "string"
@@ -80,30 +136,6 @@
                             "component": "text",
                             "name": "acceptMessage",
                             "label": "File type error message",
-                            "valueType": "string"
-                        },
-                        {
-                            "component": "number",
-                            "name": "minItems",
-                            "label": "Minimum number of files",
-                            "valueType": "string"
-                        },
-                        {
-                            "component": "text",
-                            "name": "minFilesMessage",
-                            "label": "Minimum files error message",
-                            "valueType": "string"
-                        },
-                        {
-                            "component": "number",
-                            "name": "maxItems",
-                            "label": "Maximum number of files",
-                            "valueType": "string"
-                        },
-                        {
-                            "component": "text",
-                            "name": "maxFilesMessage",
-                            "label": "Maximum files error message",
                             "valueType": "string"
                         }
                     ]
