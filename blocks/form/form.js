@@ -241,6 +241,12 @@ function createPlainText(fd) {
   } else {
     paragraph.textContent = fd.value;
   }
+  if (!paragraph.textContent) {
+    const placeholder = document.createElement('p');
+    placeholder.classList.add('placeholder-text');
+    placeholder.textContent = 'Text...';
+    paragraph.appendChild(placeholder);
+  }
   const wrapper = createFieldWrapper(fd);
   wrapper.id = fd.id;
   wrapper.replaceChildren(paragraph);
