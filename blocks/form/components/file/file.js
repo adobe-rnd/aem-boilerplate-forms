@@ -78,21 +78,26 @@ function fileValidation(input, files) {
   const maxItems = (parseInt(input.dataset.maxItems, 10) || -1);
   const fileSize = `${input.dataset.maxFileSize || '2MB'}`;
   let constraint = '';
+  let constraintErrorMessage = '';
   let errorMessage = '';
   const wrapper = input.closest('.field-wrapper');
   if (!checkAccept(acceptedFile, files)) {
     constraint = 'accept';
+    constraintErrorMessage = 'acceptErrorMessage';
   } else if (!checkMaxFileSize(fileSize, files)) {
     constraint = 'maxFileSize';
+    constraintErrorMessage = 'maxFileSizeErrorMessage';
   } else if (multiple && maxItems !== -1 && files.length > maxItems) {
     constraint = 'maxItems';
+    constraintErrorMessage = 'maxItemsErrorMessage';
     errorMessage = defaultErrorMessages.maxItems.replace(/\$0/, maxItems);
   } else if (multiple && minItems !== 1 && files.length < minItems) {
     constraint = 'minItems';
+    constraintErrorMessage = 'minItemsErrorMessage';
     errorMessage = defaultErrorMessages.minItems.replace(/\$0/, minItems);
   }
   if (constraint.length) {
-    const finalMessage = wrapper.dataset[constraint]
+    const finalMessage = wrapper.dataset[constraintErrorMessage]
     || errorMessage
     || defaultErrorMessages[constraint];
     input.setCustomValidity(finalMessage);
