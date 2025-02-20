@@ -576,6 +576,7 @@ export default async function decorate(block) {
       formDef = transform.transform(formDef);
       source = 'sheet';
       form = await createForm(formDef);
+      form.dataset.submitHeaders = JSON.stringify(formDef.submitHeaders);
       const docRuleEngine = await import('./rules-doc/index.js');
       docRuleEngine.default(formDef, form);
       rules = false;
@@ -590,7 +591,6 @@ export default async function decorate(block) {
     form.dataset.redirectUrl = formDef.redirectUrl || '';
     form.dataset.thankYouMsg = formDef.thankYouMsg || '';
     form.dataset.action = formDef.action || pathname?.split('.json')[0];
-    form.dataset.submitHeaders = JSON.stringify(formDef.submitHeaders);
     form.dataset.source = source;
     form.dataset.rules = rules;
     form.dataset.id = formDef.id;
