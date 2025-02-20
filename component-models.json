@@ -886,6 +886,21 @@
           },
           {
             "component": "text",
+            "name": "uncheckedValue",
+            "label": "When Unchecked, return value",
+            "valueType": "string",
+            "value": "off",
+            "condition": {
+              "===": [
+                {
+                  "var": "enableUncheckedValue"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "text",
             "name": "default",
             "label": "Default Value",
             "valueType": "string"
