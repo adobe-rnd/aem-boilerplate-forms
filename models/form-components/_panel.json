@@ -46,7 +46,15 @@
                             "name": "minOccur",
                             "label": "Minimum repetitions",
                             "valueType": "number",
-                            "description": "Minimum number of times the panel appears on the form"
+                            "description": "Minimum number of times the panel appears on the form",
+                            "condition": {
+                                "===": [
+                                    {
+                                        "var": "repeatable"
+                                    },
+                                    true
+                                ]
+                            }
                         },
                         {
                             "component": "number",
@@ -55,11 +63,23 @@
                             "valueType": "number",
                             "description": "Maximum number of times the panel can appear on the form. No value indicates no limit.",
                             "condition": {
-                                "!=": [
+                                "and": [
                                     {
-                                        "var": "variant"
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
                                     },
-                                    "noButtons"
+                                    {
+                                        "!==": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "noButtons"
+                                        ]
+                                    }
                                 ]
                             }
                         },
