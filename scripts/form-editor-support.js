@@ -19,6 +19,7 @@
  ************************************************************************ */
 import decorate, { generateFormRendition } from '../blocks/form/form.js';
 import { loadCSS } from './aem.js';
+import { handleAccordionNavigation } from '../blocks/form/components/accordion/accordion.js';
 
 window.currentMode = 'preview';
 let activeWizardStep;
@@ -174,25 +175,32 @@ export function annotateFormForEditing(formEl, formDefinition) {
   annotateItems(formEl.childNodes, formDefinition, formFieldMap);
 }
 
+function handleNavigation(container, resource, navigationHandler) {
+  const el = container.querySelector(`[data-aue-resource='${resource}']`);
+  if (el.hasAttribute('data-index')) {
+    // if selected element is the direct child of wizard
+    navigationHandler(container, el);
+  } else {
+    Array.from(container.children).forEach((child) => {
+      const isElPresentUnderChild = child.querySelector(`[data-aue-resource='${resource}']`);
+      if (isElPresentUnderChild) {
+        navigationHandler(container, child);
+      }
+    });
+  }
+}
+
 /**
  * Event listener for aue:ui-select, selection of a component
  */
 function handleEditorSelect(event) {
-  if (event.target.closest('.wizard') && event.detail.selected && !event.target.classList.contains('wizard')) {
-    const wizardEl = event.target.closest('.wizard');
-    const { resource } = event.detail;
-    const el = wizardEl.querySelector(`[data-aue-resource='${resource}']`);
-    if (el.hasAttribute('data-index')) {
-      // if selected element is the direct child of wizard
-      handleWizardNavigation(wizardEl, el);
-    } else {
-      Array.from(wizardEl.children).forEach((child) => {
-        const isElPresentUnderChild = child.querySelector(`[data-aue-resource='${resource}']`);
-        if (isElPresentUnderChild) {
-          handleWizardNavigation(wizardEl, child);
-        }
-      });
-    }
+  const { target, detail } = event;
+  const { selected, resource } = detail;
+
+  if (selected && target.closest('.wizard') && !target.classList.contains('wizard')) {
+    handleNavigation(target.closest('.wizard'), resource, handleWizardNavigation);
+  } else if (selected && target.closest('.accordion')) {
+    handleNavigation(target.closest('.accordion'), resource, handleAccordionNavigation);
   }
 }
 

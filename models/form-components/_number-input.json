@@ -27,7 +27,27 @@
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "...": "../form-common/_basic-input-placeholder-fields.json"
+                    "fields": [
+                        {
+                            "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                        },
+                        {
+                            "component": "select",
+                            "name": "type",
+                            "label": "Number type",
+                            "valueType": "string",
+                            "options": [
+                                {
+                                    "name": "Integer (1234)",
+                                    "value": "integer"
+                                },
+                                {
+                                    "name": "Decimal (1234.000)",
+                                    "value": "number"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
                     "...": "../form-common/_help-container.json"

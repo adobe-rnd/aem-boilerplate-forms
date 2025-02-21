@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures.js';
-import { fillField, openPage } from '../../utils.js';
+import { fillField } from '../../utils.js';
 
 const inputValues = {
   textInput: 'adobe',
@@ -26,18 +26,16 @@ const titles = ['Text Input', 'Check Box Group', 'Number Input', 'Radio Button',
 // eslint-disable-next-line no-unused-vars
 let requestPayload = null;
 
-test.describe.skip('Form Rendering and Submission Validation', async () => {
-  const testURL = '/drafts/tests/doc-based/submissionvalidation';
+test.describe('Form Rendering and Submission Validation', async () => {
+  const testURL = 'https://main--aem-boilerplate-forms-doc-based--adobe-rnd.aem.page/submissionvalidation';
 
   test('Validate Doc-Based Form components and submission payload @chromium-only', async ({ page }) => {
-    await openPage(page, testURL);
+    await page.goto(testURL, { waitUntil: 'load' });
     await expect(page.getByLabel('Text Input')).toBeVisible();
 
     // listeners to fetch payload form submission.
     page.on('request', async (request) => {
-      if (request.url().includes(testURL)) {
-        requestPayload = request.postData();
-      }
+      requestPayload = request.postData();
     });
 
     // eslint-disable-next-line no-restricted-syntax

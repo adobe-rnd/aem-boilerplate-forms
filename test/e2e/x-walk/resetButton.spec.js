@@ -15,8 +15,8 @@ const inputValues = {
   dataInput: '2022-12-23',
 };
 
-test.describe.skip('resetButton validation test', () => {
-  const testURL = '/drafts/tests/x-walk/wizardvalidation';
+test.describe('resetButton validation test', () => {
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/wizard-validation';
   test('resetButton validation on wizard panels', async ({ page }) => {
     await openPage(page, testURL);
     for (let i = 0; i < 4; i += 1) {
@@ -31,7 +31,7 @@ test.describe.skip('resetButton validation test', () => {
   test('resetButton validation on repeatable wizard', async ({ page }) => {
     await openPage(page, testURL);
     const count = await page.locator(wizardPanelCount).count();
-
+    await page.pause();
     for (let i = 0; i < count - 1; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await page.getByRole('button', { name: 'Next' }).click({ force: true });
@@ -46,7 +46,7 @@ test.describe.skip('resetButton validation test', () => {
   });
 
   test('Check for reset functionality', async ({ page }) => {
-    const testURL1 = '/drafts/tests/x-walk/resetvalidation';
+    const testURL1 = '/content/aem-boilerplate-forms-xwalk-collaterals/reset-validation';
     await openPage(page, testURL1);
     // eslint-disable-next-line no-restricted-syntax
     for (const title of titles) {

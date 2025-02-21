@@ -2,7 +2,7 @@
     "definitions": [
         {
             "title": "Modal",
-            "id": "modal",
+            "id": "form-modal",
             "plugins": {
               "xwalk": {
                 "page": {

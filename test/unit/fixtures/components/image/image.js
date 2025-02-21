@@ -5,7 +5,6 @@ export const fieldDef = {
     fieldType: 'image',
     name: 'image-name',
     value: '/content/forms/af/grid/jcr:content/guideContainer/image.img.png/1709790619048.png',
-    source: '/content/dam/images/aaa.png',
     visible: true,
     altText: 'alt',
   },

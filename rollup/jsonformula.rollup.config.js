@@ -2,9 +2,11 @@ import cleanup from 'rollup-plugin-cleanup';
 import license from 'rollup-plugin-license';
 import path from 'path';
 import { terser } from 'rollup-plugin-terser';
+import { readLicenseFile } from './common';
 
-const directory = 'node_modules/@adobe/json-formula';
-
+const pkgname = '@adobe/json-formula'
+const directory = `node_modules/${pkgname}`;
+const licenseContent = readLicenseFile(pkgname, false)
 export default {
   input: {
     'json-formula': path.join(directory, 'src/json-formula.js'),
@@ -12,12 +14,7 @@ export default {
   plugins: [
     cleanup(),
     license({
-      banner: {
-        content: {
-          file: path.join(directory, 'LICENSE'),
-          encoding: 'utf-8',
-        },
-      },
+      banner: licenseContent
     }),
   ],
   output: [{

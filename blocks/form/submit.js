@@ -44,10 +44,12 @@ function getFieldValue(fe, payload) {
   if (fe.type === 'radio') {
     return fe.form.elements[fe.name].value;
   } if (fe.type === 'checkbox') {
-    if (fe.checked) {
-      if (payload[fe.name]) {
+    if (payload[fe.name]) {
+      if (fe.checked) {
         return `${payload[fe.name]},${fe.value}`;
       }
+      return payload[fe.name];
+    } if (fe.checked) {
       return fe.value;
     }
   } else if (fe.type !== 'file') {

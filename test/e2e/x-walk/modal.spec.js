@@ -7,11 +7,11 @@ const locators = [
   { name: 'fullName', selector: 'div[class*="field-fullname"] input' },
 ];
 
-test.describe.skip('Modal Form Test', () => {
+test.describe('Modal Form Test', () => {
   const elements = {};
-
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/model-validation';
   test('Open and close modal', async ({ page }) => {
-    await openPage(page, '/drafts/tests/x-walk/modal');
+    await openPage(page, testURL);
     const button = await page.getByText('Click to Open Modal');
     await button.click();
     const dialog = await page.locator('div.modal dialog');
@@ -22,7 +22,7 @@ test.describe.skip('Modal Form Test', () => {
   });
 
   test('Test Rules inside Modal', async ({ page }) => {
-    await openPage(page, '/drafts/tests/x-walk/modal');
+    await openPage(page, testURL);
     const button = await page.getByText('Click to Open Modal');
     await button.click();
     const dialog = await page.locator('div.modal dialog');
