@@ -4,10 +4,10 @@ import { openPage } from '../../utils.js';
 let requestPayload = null;
 const checkboxLocator = 'input[type="checkbox"]';
 const termsAndConditionsLocator = 'div[class*="tnc__text-decoration"]';
-const partialUrl = '/L2NvbnRlbnQvdGVzdGluZ3Rlcm1zYW5kY29uZGl0b25zL2luZGV4L2pjcjpjb250ZW50L3Jvb3Qvc2VjdGlvbl8wL2Zvcm0=';
+const partialUrl = '/L2NvbnRlbnQvYWVtLWJvaWxlcnBsYXRlLWZvcm1zLXh3YWxrLWNvbGxhdGVyYWxzL3Rlcm1zLWFuZC1jb25kaXRpb24vamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uL2Zvcm0=';
 
-test.describe.skip('validation of components in UE publish mode', async () => {
-  const testURL = '/drafts/tests/x-walk/termsandconditions';
+test.describe('validation of components in UE publish mode', async () => {
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/terms-and-condition';
 
   test('Terms and conditions validation in UE @chromium-only', async ({ page }) => {
     await openPage(page, testURL);

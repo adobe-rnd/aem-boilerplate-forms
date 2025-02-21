@@ -12,6 +12,7 @@ export const fieldDef = {
       id: 'termsandconditions-a3e8065f4f',
       fieldType: 'panel',
       name: 'termsandconditions1725421129697',
+      description: '<p>This is a help text.</p>',
       visible: true,
       enabled: true,
       properties: {

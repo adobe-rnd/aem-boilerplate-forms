@@ -24,6 +24,7 @@ import {
 import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
 import initializeRuleEngineWorker from './worker.js';
+import { createOptimizedPicture } from '../../../scripts/aem.js';
 
 const formModel = {};
 
@@ -48,6 +49,9 @@ function handleActiveChild(id, form) {
   if (field) {
     field.closest('.field-wrapper').dataset.active = true;
     field.focus();
+    if (document.activeElement !== field) {
+      field.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 }
 
@@ -100,6 +104,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
           field.checked = compare(currentValue, field.value, type);
         } else if (fieldType === 'plain-text') {
           field.innerHTML = currentValue;
+        } else if (fieldType === 'image') {
+          const altText = field?.querySelector('img')?.alt || '';
+          field.querySelector('picture')?.replaceWith(createOptimizedPicture(field, currentValue, altText));
         } else if (field.type !== 'file') {
           field.value = currentValue;
         }

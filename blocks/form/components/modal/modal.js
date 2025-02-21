@@ -29,12 +29,12 @@ export class Modal {
     });
     dialog.querySelector('.close-button').addEventListener('click', () => {
       dialog.close();
-      if (this.formModel) {
-        this.formModel.getElement(panel?.id).visible = false;
-      }
     });
     dialog.addEventListener('close', () => {
       document.body.classList.remove('modal-open');
+      if (this.formModel) {
+        this.formModel.getElement(panel?.id).visible = false;
+      }
     });
     return dialog;
   }

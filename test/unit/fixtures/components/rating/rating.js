@@ -9,6 +9,7 @@ export const fieldDef = {
     required: false,
     enabled: true,
     readOnly: false,
+    description: '<p>This is a help text.</p>',
     label: {
       visible: true,
       value: 'Rating',

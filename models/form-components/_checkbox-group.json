@@ -42,6 +42,22 @@
                         },
                         {
                             "component": "select",
+                            "name": "variant",
+                            "label": "Variant",
+                            "options": [
+                                {
+                                    "name": "Default",
+                                    "value": "default"
+                                },
+                                {
+                                    "name": "Cards",
+                                    "value": "cards"
+                                }
+                            ],
+                            "value": "default"
+                        },
+                        {
+                            "component": "select",
                             "label": "Data type of submitted value",
                             "name": "type",
                             "valueType": "string",

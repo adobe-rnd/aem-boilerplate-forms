@@ -164,7 +164,7 @@ main .form input:hover, main .form select:hover {
     border-color: rgb(90 92 96);
 }
 
-main .form fieldset legend {
+main .form fieldset:not(.checkbox-group-wrapper, .radio-group-wrapper) legend {
     font-weight: var(--form-fieldset-legend-font-weight);
     font-size: var(--form-fieldset-legend-font-size);
     color: var(--form-fieldset-legend-color);
@@ -174,10 +174,28 @@ main .form fieldset legend {
     margin-bottom: 10px;
 }
 
-main .form label {
+main .form label,
+main .form fieldset.checkbox-group-wrapper legend,
+main .form fieldset.radio-group-wrapper legend {
     font-weight: var(--form-label-font-weight);
     font-size: var(--form-label-font-size);
     color: var(--form-label-color);
+}
+
+main .form form .wizard > legend{
+    float: left;
+    width: 100%;
+}
+
+main .form form fieldset.checkbox-group-wrapper,
+main .form form fieldset.radio-group-wrapper {
+    padding-left: 0;
+    margin-left:0;
+}
+
+main .form form fieldset.checkbox-group-wrapper > legend,
+main .form form fieldset.radio-group-wrapper > legend {
+    padding-left: 0;
 }
 
 main .form label.required::after {
@@ -203,9 +221,14 @@ main .form form p {
 
 main .form form .checkbox-wrapper, main .form form .radio-wrapper {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     margin: 0;
     gap: 8px;
+}
+
+main .form form fieldset.cards.horizontal {
+    column-gap: 0;
 }
 
 main .form form fieldset > .radio-wrapper,
@@ -216,6 +239,33 @@ main .form form fieldset > .checkbox-wrapper {
 main .form .radio-wrapper  label,
 main .form .checkbox-wrapper label {
     flex-basis: calc(100% - 24px);
+}
+
+main .form fieldset.link .checkbox-wrapper label {
+    flex-basis: unset;
+}
+
+main .form form fieldset.cards > .radio-wrapper > label,
+main .form form fieldset.cards > .checkbox-wrapper > label {
+    display: flex;
+    gap: 1rem;
+    margin: 0 0 1rem;
+    border: 1px solid #dad6d6;
+    padding: 0.6rem;
+    cursor: pointer;
+    align-items: end;
+}
+
+main .form form fieldset.cards.horizontal > .radio-wrapper > label,
+main .form form fieldset.cards.horizontal > .checkbox-wrapper > label
+{
+    min-width: fit-content;
+}
+
+main .form form fieldset.cards > .radio-wrapper > input:checked ~ label,
+main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label{
+    border: 1px solid #1c3fca;
+    background-color: #F3F6FD;
 }
 
 input::file-selector-button {
@@ -254,6 +304,11 @@ main .form button:disabled {
     background-color: var(--form-input-disable-color);
 }
 
+main .form form fieldset.cards > .radio-wrapper > input,
+main .form form fieldset.cards > .checkbox-wrapper > input{
+    width: 0;
+}
+
 main .file-wrapper.decorated input[type="file"] {
     display: none;
 }
@@ -267,18 +322,29 @@ main .file-wrapper .field-dropregion {
     text-align: center;
 }
 
-main .form form .item-remove {
-    padding: 0;
-    background: #fff;
-    padding-left: 10px;
+/* Repeatable Styling */
+main .form form .repeat-actions {
+    grid-column: span 12;
+    order: 2;
 }
 
+main .form form .item-remove,
 main .form form .item-add {
     overflow: unset;
-    display: flex;
-    justify-content: center;
 }
 
+main .form form .item-remove {
+    justify-self: end;
+    grid-column: span 12;
+    order: 1;
+}
+
+main .form form div[data-variant="addRemoveButtons"] .item-add,
+main .form form div[data-variant="addRemoveButtons"] .item-remove {
+    display: block;
+}
+
+/* End of Repeatable Styling */
 main .form .file-description{
   display: flex;
   gap: 20px;
@@ -290,13 +356,6 @@ main .form .file-description .file-description-name {
   cursor: pointer;
   text-decoration: underline;
   flex: 1;
-}
-
-main .form form .item-remove span {
-    display: block;
-    width: 20px;
-    height: 20px;
-    background: url('../../icons/delete.svg') no-repeat;
 }
 
 main .file-wrapper .file-description button {
@@ -350,11 +409,6 @@ main .form form .wizard  {
   background-color: var( --form-wizard-background-color);
   gap: unset;
   padding: 20px var(--form-wizard-padding);
-}
-
-main .form form .wizard > legend{
-    float: left;
-    width: 100%;
 }
 
 main .form form .wizard > .field-description{
@@ -567,8 +621,16 @@ main .form form:not(.edit-mode) .captcha-wrapper{
     display: none ;
 }
 
-main .form form .horizontal {
+main .form form .radio-group-wrapper.horizontal,
+main .form form .checkbox-group-wrapper.horizontal {
     display: flex;
-    flex-direction: row;
+    flex-flow: row wrap;
     gap: inherit;
+}
+
+main .form form .radio-group-wrapper.horizontal .field-description,
+main .form form .checkbox-group-wrapper.horizontal .field-description {
+    width: 100%;
+    order: 1;
+    margin-top: 0.5rem;
 }
