@@ -169,9 +169,8 @@ async function test(
 export async function testDynamism(filePath, bUrlMode = false) {
   const testName = `checking dynamic behaviour for ${filePath?.substr(filePath.lastIndexOf('/') + 1).split('.')[0]}`;
   it(testName, async () => {
-    let btoaStub;
     if (!(global.btoa.restore && global.btoa.restore.sinon)) {
-      btoaStub = sinon.stub(global, 'btoa').returns('abc');
+      sinon.stub(global, 'btoa').returns('abc');
     }
     const {
       sample, before, op, expect, opDelay, after, formPath, ignore = false, refresh = false,

@@ -81,11 +81,7 @@ async function prepareRequest(form) {
   let baseUrl = getSubmitBaseUrl();
   if (!baseUrl) {
     baseUrl = 'https://forms.adobe.com/adobe/forms/af/submit/';
-    try {
-      url = baseUrl + btoa(form.dataset.action);
-    } catch (ex) {
-      console.log(`failure in btoa ${ex}`);
-    }
+    url = baseUrl + btoa(form.dataset.action);
   } else {
     url = form.dataset.action;
   }
