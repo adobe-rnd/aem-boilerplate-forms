@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import * as dom from 'dom-compare';
 import jsdom from 'jsdom';
+import sinon from 'sinon';
 import decorate, { DELAY_MS, generateFormRendition } from '../../blocks/form/form.js';
 import { annotateFormForEditing, getItems } from '../../scripts/form-editor-support.js';
 import { resetIds } from '../../blocks/form/util.js';
@@ -39,6 +40,10 @@ export function createBlockWithUrl(def, url) {
 }
 
 function createElementFromHTML(htmlString, fieldDef) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined',
+  };
   const { action } = fieldDef;
   const source = fieldDef?.[':type'] || 'aem';
   const form = document.createElement('form');
@@ -50,6 +55,9 @@ function createElementFromHTML(htmlString, fieldDef) {
   form.dataset.thankYouMsg = fieldDef.thankYouMsg || '';
   form.dataset.id = fieldDef.id;
   form.noValidate = true;
+  if (source === 'sheet') {
+    form.dataset.submitHeaders = JSON.stringify(headers);
+  }
   // Change this to div.childNodes to support multiple top-level nodes.
   return form;
 }
@@ -161,6 +169,10 @@ async function test(
 export async function testDynamism(filePath, bUrlMode = false) {
   const testName = `checking dynamic behaviour for ${filePath?.substr(filePath.lastIndexOf('/') + 1).split('.')[0]}`;
   it(testName, async () => {
+    let btoaStub;
+    if (!(global.btoa.restore && global.btoa.restore.sinon)) {
+      btoaStub = sinon.stub(global, 'btoa').returns('abc');
+    }
     const {
       sample, before, op, expect, opDelay, after, formPath, ignore = false, refresh = false,
     } = await import(filePath);
