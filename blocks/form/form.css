@@ -241,6 +241,10 @@ main .form .checkbox-wrapper label {
     flex-basis: calc(100% - 24px);
 }
 
+main .form fieldset.link .checkbox-wrapper label {
+    flex-basis: unset;
+}
+
 main .form form fieldset.cards > .radio-wrapper > label,
 main .form form fieldset.cards > .checkbox-wrapper > label {
     display: flex;

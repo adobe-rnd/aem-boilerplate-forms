@@ -86,7 +86,26 @@
                             "label": "Add Button Label",
                             "valueType": "string",
                             "value": "Add",
-                            "condition": { "===": [{"var" : "variant"}, "addRemoveButtons"] }
+                            "condition": {
+                                "and": [
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "addRemoveButtons"
+                                        ]
+                                    },
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
+                                    }
+                                ]
+                            }
                         },
                         {
                             "component": "text",
@@ -94,7 +113,26 @@
                             "label": "Delete Button Label",
                             "valueType": "string",
                             "value": "Delete",
-                            "condition": { "===": [{"var" : "variant"}, "addRemoveButtons"] }
+                            "condition": {
+                                "and": [
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "addRemoveButtons"
+                                        ]
+                                    },
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
+                                    }
+                                ]
+                            }
                         }
                     ]
                 },
