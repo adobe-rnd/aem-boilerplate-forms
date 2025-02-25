@@ -2058,6 +2058,12 @@
         "label": "Alternate text"
       },
       {
+        "component": "text",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
+      },
+      {
         "component": "boolean",
         "name": "visible",
         "label": "Show Component",
@@ -3777,6 +3783,12 @@
         "label": "Name",
         "valueType": "string",
         "required": true
+      },
+      {
+        "component": "text",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
       },
       {
         "component": "boolean",
