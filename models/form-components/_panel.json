@@ -27,7 +27,17 @@
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "...": "../form-common/_basic-input-fields.json"
+                    "fields": [
+                        {
+                            "...": "../form-common/_basic-input-fields.json"
+                        },
+                        {
+                            "component": "boolean",
+                            "name": "wrapData",
+                            "label": "Group child components' data on form submission",
+                            "valueType": "boolean"
+                        }
+                    ]
                 },
                 {
                     "component": "container",
