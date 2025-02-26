@@ -1345,7 +1345,6 @@
             "label": "Data type of submitted value",
             "name": "type",
             "valueType": "string",
-            "value": "string",
             "options": [
               {
                 "name": "String",
