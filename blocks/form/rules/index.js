@@ -49,7 +49,8 @@ function handleActiveChild(id, form) {
   if (field) {
     field.closest('.field-wrapper').dataset.active = true;
     field.focus();
-    if (document.activeElement !== field) {
+    // prevent scroll into view when user clicks on a field.
+    if (document.activeElement !== field && !field.contains(document.activeElement)) {
       field.scrollIntoView({ behavior: 'smooth' });
     }
   }
