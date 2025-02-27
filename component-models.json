@@ -1139,6 +1139,12 @@
             "description": "Error message shown when the date entered is before the minimum date."
           },
           {
+            "component": "boolean",
+            "name": "excludeMinimum",
+            "label": "Exclude minimum value",
+            "valueType": "boolean"
+          },
+          {
             "component": "date-time",
             "name": "maximumDate",
             "label": "Maximum date",
@@ -1152,6 +1158,12 @@
             "valueType": "string",
             "label": "Maximum error message",
             "description": "Error message shown when the date entered is after the maximum date."
+          },
+          {
+            "component": "boolean",
+            "name": "excludeMaximum",
+            "label": "Exclude maximum value",
+            "valueType": "boolean"
           }
         ]
       },
@@ -2515,6 +2527,12 @@
             "description": "Error message shown when entered value is less than minimum."
           },
           {
+            "component": "boolean",
+            "name": "excludeMinimumCheck",
+            "label": "Exclude minimum value",
+            "valueType": "boolean"
+          },
+          {
             "component": "number",
             "name": "maximum",
             "label": "Highest number / Largest number",
@@ -2527,6 +2545,12 @@
             "valueType": "string",
             "label": "Maximum error message",
             "description": "Error message shown when the entered value is more than maximum."
+          },
+          {
+            "component": "boolean",
+            "name": "excludeMaximumCheck",
+            "label": "Exclude maximum value",
+            "valueType": "boolean"
           }
         ]
       },
@@ -3544,6 +3568,12 @@
             "description": "Error message shown when entered value is less than minimum."
           },
           {
+            "component": "boolean",
+            "name": "excludeMinimumCheck",
+            "label": "Exclude minimum value",
+            "valueType": "boolean"
+          },
+          {
             "component": "number",
             "name": "maximum",
             "label": "Highest number / Largest number",
@@ -3556,6 +3586,12 @@
             "valueType": "string",
             "label": "Maximum error message",
             "description": "Error message shown when the entered value is more than maximum."
+          },
+          {
+            "component": "boolean",
+            "name": "excludeMaximumCheck",
+            "label": "Exclude maximum value",
+            "valueType": "boolean"
           }
         ]
       }
@@ -4385,6 +4421,12 @@
             "description": "Error message shown when entered value is less than minimum."
           },
           {
+            "component": "boolean",
+            "name": "excludeMinimumCheck",
+            "label": "Exclude minimum value",
+            "valueType": "boolean"
+          },
+          {
             "component": "number",
             "name": "maximum",
             "label": "Highest number / Largest number",
@@ -4397,6 +4439,12 @@
             "valueType": "string",
             "label": "Maximum error message",
             "description": "Error message shown when the entered value is more than maximum."
+          },
+          {
+            "component": "boolean",
+            "name": "excludeMaximumCheck",
+            "label": "Exclude maximum value",
+            "valueType": "boolean"
           }
         ]
       }
