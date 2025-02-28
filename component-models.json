@@ -647,19 +647,19 @@
             "label": "Data type of submitted value",
             "name": "type",
             "valueType": "string",
-            "value": "number[]",
+            "value": "number",
             "options": [
               {
                 "name": "String",
-                "value": "string[]"
+                "value": "string"
               },
               {
                 "name": "Boolean",
-                "value": "boolean[]"
+                "value": "boolean"
               },
               {
                 "name": "Number",
-                "value": "number[]"
+                "value": "number"
               }
             ]
           },
@@ -1345,7 +1345,6 @@
             "label": "Data type of submitted value",
             "name": "type",
             "valueType": "string",
-            "value": "string",
             "options": [
               {
                 "name": "String",

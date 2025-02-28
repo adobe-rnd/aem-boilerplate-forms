@@ -295,7 +295,8 @@
                   ],
                   "visible": true,
                   "enabled": true,
-                  "orientation": "horizontal"
+                  "orientation": "horizontal",
+                  "type": "number[]"
                 }
               }
             }
