@@ -2059,6 +2059,12 @@
         "label": "Alternate text"
       },
       {
+        "component": "text",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
+      },
+      {
         "component": "boolean",
         "name": "visible",
         "label": "Show Component",
@@ -2703,7 +2709,15 @@
             "name": "minOccur",
             "label": "Minimum repetitions",
             "valueType": "number",
-            "description": "Minimum number of times the panel appears on the form"
+            "description": "Minimum number of times the panel appears on the form",
+            "condition": {
+              "===": [
+                {
+                  "var": "repeatable"
+                },
+                true
+              ]
+            }
           },
           {
             "component": "number",
@@ -2712,11 +2726,23 @@
             "valueType": "number",
             "description": "Maximum number of times the panel can appear on the form. No value indicates no limit.",
             "condition": {
-              "!=": [
+              "and": [
                 {
-                  "var": "variant"
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
                 },
-                "noButtons"
+                {
+                  "!==": [
+                    {
+                      "var": "variant"
+                    },
+                    "noButtons"
+                  ]
+                }
               ]
             }
           },
@@ -2751,11 +2777,23 @@
             "valueType": "string",
             "value": "Add",
             "condition": {
-              "===": [
+              "and": [
                 {
-                  "var": "variant"
+                  "===": [
+                    {
+                      "var": "variant"
+                    },
+                    "addRemoveButtons"
+                  ]
                 },
-                "addRemoveButtons"
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                }
               ]
             }
           },
@@ -2766,11 +2804,23 @@
             "valueType": "string",
             "value": "Delete",
             "condition": {
-              "===": [
+              "and": [
                 {
-                  "var": "variant"
+                  "===": [
+                    {
+                      "var": "variant"
+                    },
+                    "addRemoveButtons"
+                  ]
                 },
-                "addRemoveButtons"
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                }
               ]
             }
           }
@@ -3754,6 +3804,12 @@
         "label": "Name",
         "valueType": "string",
         "required": true
+      },
+      {
+        "component": "text",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
       },
       {
         "component": "boolean",
