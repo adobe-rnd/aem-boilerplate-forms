@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  // globalSetup: './test/e2e/global-setup.js',
+  globalSetup: './test/e2e/global-setup.js',
   testDir: './test/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
