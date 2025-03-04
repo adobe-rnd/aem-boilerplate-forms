@@ -25,12 +25,10 @@
             "label": "Title",
             "valueType": "string",
             "condition": {
-              "===": [
-                {
-                  "var": "isTitleRichText"
-                },
-                true
-              ]
+                "===": [
+                    {"var": "isTitleRichText"},
+                    true
+                ]
             }
         },
         {
@@ -39,19 +37,11 @@
             "label": "Title",
             "valueType": "string",
             "condition": {
-              "===": [
-                {
-                  "var": "isTitleRichText"
-                },
-                false
-              ]
+                "===": [
+                    {"var": "isTitleRichText"},
+                    false
+                ]
             }
-        },
-        {
-            "component": "text",
-            "name": "jcr:title",
-            "label": "Title",
-            "valueType": "string"
         },
         {
             "component": "boolean",
