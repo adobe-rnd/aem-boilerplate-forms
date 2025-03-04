@@ -386,7 +386,7 @@
           },
           {
             "component": "boolean",
-            "name": "richText",
+            "name": "isTitleRichText",
             "label": "Allow Rich Text for Title",
             "valueType": "boolean",
             "value": false
@@ -399,7 +399,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "richText"
+                  "var": "isTitleRichText"
                 },
                 true
               ]
@@ -413,7 +413,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "richText"
+                  "var": "isTitleRichText"
                 },
                 false
               ]
@@ -3132,7 +3132,7 @@
           },
           {
             "component": "boolean",
-            "name": "richText",
+            "name": "isTitleRichText",
             "label": "Allow Rich Text for Title",
             "valueType": "boolean",
             "value": false
@@ -3145,7 +3145,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "richText"
+                  "var": "isTitleRichText"
                 },
                 true
               ]
@@ -3159,7 +3159,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "richText"
+                  "var": "isTitleRichText"
                 },
                 false
               ]
@@ -3282,7 +3282,7 @@
           },
           {
             "component": "boolean",
-            "name": "richText",
+            "name": "isTitleRichText",
             "label": "Allow Rich Text for Title",
             "valueType": "boolean",
             "value": false
@@ -3295,7 +3295,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "richText"
+                  "var": "isTitleRichText"
                 },
                 true
               ]
@@ -3309,7 +3309,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "richText"
+                  "var": "isTitleRichText"
                 },
                 false
               ]

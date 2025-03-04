@@ -14,7 +14,7 @@
         },
         {
             "component": "boolean",
-            "name": "richText",
+            "name": "isTitleRichText",
             "label": "Allow Rich Text for Title",
             "valueType": "boolean",
             "value": false
@@ -24,14 +24,14 @@
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string",
-            "condition": { "===": [{"var": "richText"}, true] }
+            "condition": { "===": [{"var": "isTitleRichText"}, true] }
         },
         {
             "component": "text",
             "name": "jcr:title",
             "label": "Title",
             "valueType": "string",
-            "condition": { "===": [{"var": "richText"}, false] }
+            "condition": { "===": [{"var": "isTitleRichText"}, false] }
         },
         {
             "component": "boolean",
