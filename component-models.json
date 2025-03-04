@@ -385,6 +385,41 @@
             }
           },
           {
+            "component": "boolean",
+            "name": "isTitleRichText",
+            "label": "Allow Rich Text for Title",
+            "valueType": "boolean",
+            "value": false
+          },
+          {
+            "component": "richtext",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string",
+            "condition": {
+              "===": [
+                {
+                  "var": "isTitleRichText"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string",
+            "condition": {
+              "===": [
+                {
+                  "var": "isTitleRichText"
+                },
+                false
+              ]
+            }
+          },
+          {
             "component": "text",
             "name": "jcr:title",
             "label": "Title",
@@ -3128,6 +3163,41 @@
             }
           },
           {
+            "component": "boolean",
+            "name": "isTitleRichText",
+            "label": "Allow Rich Text for Title",
+            "valueType": "boolean",
+            "value": false
+          },
+          {
+            "component": "richtext",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string",
+            "condition": {
+              "===": [
+                {
+                  "var": "isTitleRichText"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string",
+            "condition": {
+              "===": [
+                {
+                  "var": "isTitleRichText"
+                },
+                false
+              ]
+            }
+          },
+          {
             "component": "text",
             "name": "jcr:title",
             "label": "Title",
@@ -3246,6 +3316,41 @@
             "validation": {
               "regExp": "^[^$].*",
               "customErrorMsg": "Name cannot start with $"
+            }
+          },
+          {
+            "component": "boolean",
+            "name": "isTitleRichText",
+            "label": "Allow Rich Text for Title",
+            "valueType": "boolean",
+            "value": false
+          },
+          {
+            "component": "richtext",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string",
+            "condition": {
+              "===": [
+                {
+                  "var": "isTitleRichText"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string",
+            "condition": {
+              "===": [
+                {
+                  "var": "isTitleRichText"
+                },
+                false
+              ]
             }
           },
           {
