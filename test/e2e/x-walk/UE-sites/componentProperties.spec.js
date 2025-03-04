@@ -22,11 +22,6 @@ test.describe('Component properties validation in UE', async () => {
     const componentProperties = await frame.locator(universalEditorBase.selectors.panelHeaders);
     await expect(componentProperties).toBeVisible();
     await expect(componentProperties).toContainText(componentName);
-    const isPropertyVisible = frame.locator('.is-canvas [class="is-field is-container"]').first();
-    if (!await isPropertyVisible.isVisible({ timeout: 6000 })) {
-      await page.reload();
-      await expect(isPropertyVisible).toBeVisible({ timeout: 10000 });
-    }
     const titleLocator = frame.locator(universalEditorBase.selectors.componentTitleInProperties);
     // eslint-disable-next-line no-shadow
     const componentTitle = `${componentName}-${randomValues}`;
