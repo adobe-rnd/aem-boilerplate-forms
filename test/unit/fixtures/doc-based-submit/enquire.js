@@ -4,8 +4,13 @@ import { fieldDef } from '../form/enquire.js';
 
 const thankYouMessage = 'Thanks for your submission';
 
-const scope = nock('http://localhost:3000')
-  .post('/enquire', function test(body) {
+const scope = nock('https://forms.adobe.com', {
+  reqheaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined',
+  },
+})
+  .post('/adobe/forms/af/submit/abc', function test(body) {
     // using a function syntax here instead of array because the this parameter is
     // set during the call
     const contentType = this.headers['content-type'];

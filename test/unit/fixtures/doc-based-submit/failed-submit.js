@@ -2,8 +2,13 @@ import assert from 'assert';
 import nock from 'nock';
 import { fireEvent } from '@testing-library/dom';
 
-const scope = nock('http://localhost:3000')
-  .post('/adobe/forms/af/form1')
+const scope = nock('https://forms.adobe.com', {
+  reqheaders: {
+    'Content-Type': 'application/json',
+    'x-adobe-routing': 'tier=undefined,bucket=undefined--undefined--undefined',
+  },
+})
+  .post('/adobe/forms/af/submit/abc')
   .reply(500, {});
 
 export const formPath = 'http://localhost:3000/adobe/forms/af/form1.json';

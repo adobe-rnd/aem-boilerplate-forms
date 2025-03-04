@@ -12,7 +12,7 @@ import componentDecorator from './mappings.js';
 import DocBasedFormToAF from './transform.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { handleSubmit } from './submit.js';
-import { getSubmitBaseUrl, emailPattern } from './constant.js';
+import { getSubmitBaseUrl, emailPattern, getRouting } from './constant.js';
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
 export const DELAY_MS = 0;
@@ -556,12 +556,21 @@ export default async function decorate(block) {
   let rules = true;
   let form;
   if (formDef) {
+    const {
+      branch, site, org, tier,
+    } = getRouting();
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-adobe-routing': `tier=${tier},bucket=${branch}--${site}--${org}`,
+    };
     formDef.action = getSubmitBaseUrl() + (formDef.action || '');
+    formDef.submitHeaders = formDef.submitHeaders || headers;
     if (isDocumentBasedForm(formDef)) {
       const transform = new DocBasedFormToAF();
       formDef = transform.transform(formDef);
       source = 'sheet';
       form = await createForm(formDef);
+      form.dataset.submitHeaders = JSON.stringify(formDef.submitHeaders);
       const docRuleEngine = await import('./rules-doc/index.js');
       docRuleEngine.default(formDef, form);
       rules = false;
