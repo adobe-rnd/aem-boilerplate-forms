@@ -1770,6 +1770,13 @@
         ]
       },
       {
+        "component": "boolean",
+        "name": "multiSelection",
+        "label": "Allow multiple file attachments",
+        "valueType": "boolean",
+        "collapsible": false
+      },
+      {
         "component": "container",
         "name": "help",
         "label": "Help Content",
@@ -1821,6 +1828,62 @@
             "label": "Script validation message",
             "valueType": "string",
             "description": "Displayed when validation script fails."
+          },
+          {
+            "component": "number",
+            "name": "minItems",
+            "label": "Minimum number of files",
+            "valueType": "string",
+            "condition": {
+              "==": [
+                {
+                  "var": "multiSelection"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "minItemsMessage",
+            "label": "Minimum files error message",
+            "valueType": "string",
+            "condition": {
+              "==": [
+                {
+                  "var": "multiSelection"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "number",
+            "name": "maxItems",
+            "label": "Maximum number of files",
+            "valueType": "string",
+            "condition": {
+              "==": [
+                {
+                  "var": "multiSelection"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "maxItemsMessage",
+            "label": "Maximum files error message",
+            "valueType": "string",
+            "condition": {
+              "==": [
+                {
+                  "var": "multiSelection"
+                },
+                true
+              ]
+            }
           },
           {
             "component": "number",

@@ -34,7 +34,7 @@ function setPlaceholder(element, fd) {
 const constraintsDef = Object.entries({
   'password|tel|email|text': [['maxLength', 'maxlength'], ['minLength', 'minlength'], 'pattern'],
   'number|range|date': [['maximum', 'Max'], ['minimum', 'Min'], 'step'],
-  file: ['accept', 'Multiple'],
+  file: ['accept', 'Multiple', 'maxItems', 'minItems'],
   panel: [['maxOccur', 'data-max'], ['minOccur', 'data-min']],
 }).flatMap(([types, constraintDef]) => types.split('|')
   .map((type) => [type, constraintDef.map((cd) => (Array.isArray(cd) ? cd : [cd, cd]))]));
