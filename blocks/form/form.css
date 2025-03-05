@@ -633,3 +633,8 @@ main .form form .checkbox-group-wrapper.horizontal .field-description {
     order: 1;
     margin-top: 0.5rem;
 }
+
+
+form fieldset .repeat-actions {
+  display: none;
+}

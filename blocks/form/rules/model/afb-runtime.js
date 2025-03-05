@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.116
+ *  Version: 0.22.117-SNAPSHOT
  */
 import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, SubmitError, SubmitFailure, Submit, Save, Reset, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
@@ -2659,6 +2659,22 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
         method: httpVerb
     };
     let inputPayload;
+    let encryptOutput = {};
+    try {
+        if (payload instanceof Promise) {
+            payload = await payload;
+        }
+    }
+    catch (error) {
+        console.error('Error resolving payload Promise:', error);
+        throw error;
+    }
+    if (payload.body && payload.headers) {
+        encryptOutput = { ...payload };
+        headers = { ...payload.headers };
+        payload = payload.body;
+        inputPayload = payload;
+    }
     if (payload && payload instanceof FileObject && payload.data instanceof File) {
         const formData = new FormData();
         formData.append(payload.name, payload.data);
@@ -2667,7 +2683,7 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
     else if (payload instanceof FormData) {
         inputPayload = payload;
     }
-    else if (payload && typeof payload === 'object' && Object.keys(payload).length > 0) {
+    else if (payload && (typeof payload === 'string' || (typeof payload === 'object' && Object.keys(payload).length > 0))) {
         const headerNames = Object.keys(headers);
         if (headerNames.length > 0) {
             requestOptions.headers = {
@@ -2679,35 +2695,45 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
             requestOptions.headers = { 'Content-Type': 'application/json' };
         }
         const contentType = requestOptions?.headers?.['Content-Type'] || 'application/json';
-        if (contentType === 'application/json') {
-            inputPayload = JSON.stringify(payload);
+        if (typeof payload === 'object') {
+            if (contentType === 'application/json') {
+                inputPayload = JSON.stringify(payload);
+            }
+            else if (contentType.indexOf('multipart/form-data') > -1) {
+                inputPayload = multipartFormData(payload);
+            }
+            else if (contentType.indexOf('application/x-www-form-urlencoded') > -1) {
+                inputPayload = urlEncoded(payload);
+            }
         }
-        else if (contentType.indexOf('multipart/form-data') > -1) {
-            inputPayload = multipartFormData(payload);
-        }
-        else if (contentType.indexOf('application/x-www-form-urlencoded') > -1) {
-            inputPayload = urlEncoded(payload);
+        if (contentType === 'text/plain') {
+            inputPayload = String(payload);
         }
     }
-    const result = await request$1(endpoint, inputPayload, requestOptions);
-    if (result?.status >= 200 && result?.status <= 299) {
+    const response = await request$1(endpoint, inputPayload, requestOptions);
+    response.originalRequest = {
+        url: endpoint,
+        method: httpVerb,
+        ...encryptOutput
+    };
+    if (response?.status >= 200 && response?.status <= 299) {
         const eName = getCustomEventName(success);
         if (success === 'submitSuccess') {
-            context.form.dispatch(new SubmitSuccess(result, true));
+            context.form.dispatch(new SubmitSuccess(response, true));
         }
         else {
-            context.form.dispatch(new CustomEvent(eName, result, true));
+            context.form.dispatch(new CustomEvent(eName, response, true));
         }
     }
     else {
         context.form.logger.error('Error invoking a rest API');
         const eName = getCustomEventName(error);
         if (error === 'submitError') {
-            context.form.dispatch(new SubmitError(result, true));
-            context.form.dispatch(new SubmitFailure(result, true));
+            context.form.dispatch(new SubmitError(response, true));
+            context.form.dispatch(new SubmitFailure(response, true));
         }
         else {
-            context.form.dispatch(new CustomEvent(eName, result, true));
+            context.form.dispatch(new CustomEvent(eName, response, true));
         }
     }
 };
@@ -3064,17 +3090,29 @@ class FunctionRuntimeImpl {
                 _func: (args, data, interpreter) => {
                     const uri = toString(args[0]);
                     const httpVerb = toString(args[1]);
-                    const payload = valueOf(args[2]);
-                    let success, error, headers = {};
-                    if (typeof (args[3]) === 'string') {
-                        interpreter.globals.form.logger.warn('This usage of request is deprecated. Please see the documentation and update');
+                    let payload;
+                    let success;
+                    let error;
+                    let headers = {};
+                    if (args[2] && typeof args[2] === 'object' && !args[2].then && ('data' in args[2] || 'headers' in args[2])) {
+                        const payloadObj = valueOf(args[2]);
+                        payload = payloadObj.data;
+                        headers = payloadObj.headers || {};
                         success = valueOf(args[3]);
                         error = valueOf(args[4]);
                     }
                     else {
-                        headers = valueOf(args[3]);
-                        success = valueOf(args[4]);
-                        error = valueOf(args[5]);
+                        payload = valueOf(args[2]);
+                        if (typeof (args[3]) === 'string') {
+                            interpreter.globals.form.logger.warn('This usage of request is deprecated. Please see the documentation and update');
+                            success = valueOf(args[3]);
+                            error = valueOf(args[4]);
+                        }
+                        else {
+                            headers = valueOf(args[3]);
+                            success = valueOf(args[4]);
+                            error = valueOf(args[5]);
+                        }
                     }
                     return request(interpreter.globals, uri, httpVerb, payload, success, error, headers);
                 },
@@ -3169,6 +3207,20 @@ class FunctionRuntimeImpl {
                         }
                     }
                     return {};
+                },
+                _signature: []
+            },
+            encrypt: {
+                _func: async (args, data, interpreter) => {
+                    const payload = valueOf(args[0]);
+                    return payload;
+                },
+                _signature: []
+            },
+            decrypt: {
+                _func: async (args, data, interpreter) => {
+                    const encData = valueOf(args[0]);
+                    return encData;
                 },
                 _signature: []
             }
@@ -4704,14 +4756,21 @@ class DateField extends Field {
             this._jsonModel.placeholder = parseDateSkeleton(this._jsonModel.editFormat, this.locale);
         }
     }
+    #convertNumberToDate(value) {
+        const coercedValue = numberToDatetime(value);
+        if (!isNaN(coercedValue)) {
+            return formatDate(coercedValue, this.locale, this._dataFormat);
+        }
+        return null;
+    }
     get value() {
         return super.value;
     }
     set value(value) {
         if (typeof value === 'number') {
-            const coercedValue = numberToDatetime(value);
-            if (!isNaN(coercedValue)) {
-                super.value = formatDate(coercedValue, this.locale, this._dataFormat);
+            const coercedValue = this.#convertNumberToDate(value);
+            if (coercedValue) {
+                super.value = coercedValue;
             }
         }
         else {
@@ -4727,6 +4786,34 @@ class DateField extends Field {
             else {
                 super.value = value;
             }
+        }
+    }
+    get minimum() {
+        return super.minimum;
+    }
+    set minimum(value) {
+        if (typeof value === 'number') {
+            const coercedValue = this.#convertNumberToDate(value);
+            if (coercedValue) {
+                super.minimum = coercedValue;
+            }
+        }
+        else if (typeof value === 'string') {
+            super.minimum = value;
+        }
+    }
+    get maximum() {
+        return super.maximum;
+    }
+    set maximum(value) {
+        if (typeof value === 'number') {
+            const coercedValue = this.#convertNumberToDate(value);
+            if (coercedValue) {
+                super.maximum = coercedValue;
+            }
+        }
+        else if (typeof value === 'string') {
+            super.maximum = value;
         }
     }
 }

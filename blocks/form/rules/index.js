@@ -67,6 +67,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
     return;
   }
   const fieldWrapper = field?.closest('.field-wrapper');
+  const { validity } = payload.field;
   changes.forEach((change) => {
     const { propertyName, currentValue, prevValue } = change;
     switch (propertyName) {
@@ -78,13 +79,10 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'validationMessage':
-        {
-          const { validity } = payload.field;
-          if (field.setCustomValidity
+        if (field.setCustomValidity
           && (validity?.expressionMismatch || validity?.customConstraint)) {
-            field.setCustomValidity(currentValue);
-            updateOrCreateInvalidMsg(field, currentValue);
-          }
+          field.setCustomValidity(currentValue);
+          updateOrCreateInvalidMsg(field, currentValue);
         }
         break;
       case 'value':
@@ -114,9 +112,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'visible':
         fieldWrapper.dataset.visible = currentValue;
-        if(fieldType === 'panel' && fieldWrapper.querySelector('dialog')) {
+        if (fieldType === 'panel' && fieldWrapper.querySelector('dialog')) {
           const dialog = fieldWrapper.querySelector('dialog');
-          if(currentValue === false && dialog.open) {
+          if (currentValue === false && dialog.open) {
             dialog.close(); // close triggers the event listener that removes the dialog overlay
           }
         }
@@ -187,10 +185,14 @@ async function fieldChanged(payload, form, generateFormRendition) {
           generateFormRendition({ items: [currentValue] }, field?.querySelector('.repeat-wrapper'));
         }
         break;
-      case 'activeChild': handleActiveChild(activeChild, form);
+      case 'activeChild':
+        handleActiveChild(activeChild, form);
         break;
       case 'valid':
         if (currentValue === true) {
+          if (field.validity.customError) {
+            field.setCustomValidity('');
+          }
           updateOrCreateInvalidMsg(field, '');
         }
         break;
