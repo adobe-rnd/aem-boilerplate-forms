@@ -635,7 +635,7 @@ main .form form .checkbox-group-wrapper.horizontal .field-description {
 }
 
 /* Responsive adjustments for mobile */
-@media (max-width: 599px) {
+@media (width <= 599px) {
     :root {
         --form-field-horz-gap: 10px;
     }
@@ -644,6 +644,7 @@ main .form form .checkbox-group-wrapper.horizontal .field-description {
         .wizard-menu-items {
             gap: 20px;
         }
+
         margin: 0;
     }
 }
