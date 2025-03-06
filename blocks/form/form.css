@@ -633,3 +633,17 @@ main .form form .checkbox-group-wrapper.horizontal .field-description {
     order: 1;
     margin-top: 0.5rem;
 }
+
+
+form fieldset > .repeat-wrapper > .repeat-actions {
+  display: none;
+}
+
+form fieldset > .repeat-wrapper > fieldset[data-visible="true"] ~ .repeat-actions {
+    display: block;
+}
+
+form fieldset > .repeat-wrapper > fieldset:not([data-visible="false"]) ~ .repeat-actions {
+    display: block;
+}
+

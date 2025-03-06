@@ -166,11 +166,10 @@ export function updateOrCreateInvalidMsg(fieldElement, msg) {
     element = createHelpText({ id: fieldElement.id });
     container.append(element);
   }
+  container.classList.toggle('field-invalid', msg);
   if (msg) {
-    container.classList.add('field-invalid');
     element.textContent = msg;
   } else if (container.dataset.description) {
-    container.classList.remove('field-invalid');
     element.innerHTML = container.dataset.description;
   } else if (element) {
     element.remove();

@@ -7,13 +7,20 @@ import license from 'rollup-plugin-license';
 export function readLicenseFile(packageName, includeComments = true) {
   const directory =`node_modules/${packageName}`;
   const licensePath = path.join(directory, 'LICENSE');
+  const packageJsonPath = path.join(directory, 'package.json');
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+  const packageVersion = packageJson.version;
+  let version = pkg.devDependencies[packageName];
+  if (version.startsWith('file:')) {
+    version = packageVersion + "-SNAPSHOT"
+  }
   try {
     let content = fs.readFileSync(licensePath, 'utf-8');
     if (includeComments) {
     content += `
 /*
  *  Package: ${packageName}
- *  Version: ${pkg.devDependencies[packageName]}
+ *  Version: ${version}
  */`
     } else {
       content += `
