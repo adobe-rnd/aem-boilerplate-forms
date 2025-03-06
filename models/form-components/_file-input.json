@@ -48,7 +48,7 @@
                     "collapsible": true,
                     "fields": [
                         {
-                            "...": "../form-common/_script-validation-fields.json#/fields"
+                            "...": "../form-common/_basic-validation-fields.json#/fields"
                         },
                         {
                             "component": "number",
