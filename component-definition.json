@@ -295,7 +295,8 @@
                   ],
                   "visible": true,
                   "enabled": true,
-                  "orientation": "horizontal"
+                  "orientation": "horizontal",
+                  "type": "number[]"
                 }
               }
             }
@@ -328,8 +329,17 @@
                 "template": {
                   "jcr:title": "Drop Down List",
                   "fieldType": "drop-down",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Item 1",
+                    "Item 2"
+                  ],
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "type": "number"
                 }
               }
             }
@@ -457,7 +467,8 @@
                   "jcr:title": "Panel",
                   "fieldType": "panel",
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "minOccur": 1
                 }
               }
             }
@@ -611,7 +622,11 @@
                     "fieldType": "checkbox",
                     "required": true,
                     "enabled": true,
-                    "visible": true
+                    "visible": true,
+                    "type": "string",
+                    "enum": [
+                      "true"
+                    ]
                   }
                 }
               }
@@ -629,7 +644,8 @@
                   "jcr:title": "Text",
                   "fieldType": "plain-text",
                   "visible": true,
-                  "textIsRich": true
+                  "textIsRich": true,
+                  "value": "Adaptive Form Text Component"
                 }
               }
             }
@@ -664,7 +680,21 @@
                   "fieldType": "panel",
                   "fd:viewType": "wizard",
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "panel1": {
+                    "jcr:title": "Item 1",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  },
+                  "panel2": {
+                    "jcr:title": "Item 2",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  }
                 }
               }
             }

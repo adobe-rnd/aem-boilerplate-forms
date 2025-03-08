@@ -48,6 +48,12 @@
                     "label": "Alternate text"
                 },
                 {
+                    "component": "text",
+                    "name": "dataRef",
+                    "label": "Bind reference",
+                    "valueType": "string"
+                },
+                {
                     "component": "boolean",
                     "name": "visible",
                     "label": "Show Component",

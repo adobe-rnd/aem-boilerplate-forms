@@ -61,6 +61,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
                 {
                     "name": "1 column",

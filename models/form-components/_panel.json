@@ -11,7 +11,8 @@
                             "jcr:title": "Panel",
                             "fieldType": "panel",
                             "enabled": true,
-                            "visible": true
+                            "visible": true,
+                            "minOccur": 1
                         }
                     }
                 }
@@ -46,20 +47,41 @@
                             "name": "minOccur",
                             "label": "Minimum repetitions",
                             "valueType": "number",
-                            "description": "Minimum number of times the panel appears on the form"
+                            "description": "Minimum number of times the panel appears on the form",
+                            "condition": {
+                                "===": [
+                                    {
+                                        "var": "repeatable"
+                                    },
+                                    true
+                                ]
+                            }
                         },
                         {
                             "component": "number",
                             "name": "maxOccur",
                             "label": "Maximum repetitions",
                             "valueType": "number",
+                            "placeholder": "No Limit",
                             "description": "Maximum number of times the panel can appear on the form. No value indicates no limit.",
                             "condition": {
-                                "!=": [
+                                "and": [
                                     {
-                                        "var": "variant"
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
                                     },
-                                    "noButtons"
+                                    {
+                                        "!==": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "noButtons"
+                                        ]
+                                    }
                                 ]
                             }
                         },
@@ -86,7 +108,26 @@
                             "label": "Add Button Label",
                             "valueType": "string",
                             "value": "Add",
-                            "condition": { "===": [{"var" : "variant"}, "addRemoveButtons"] }
+                            "condition": {
+                                "and": [
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "addRemoveButtons"
+                                        ]
+                                    },
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
+                                    }
+                                ]
+                            }
                         },
                         {
                             "component": "text",
@@ -94,7 +135,26 @@
                             "label": "Delete Button Label",
                             "valueType": "string",
                             "value": "Delete",
-                            "condition": { "===": [{"var" : "variant"}, "addRemoveButtons"] }
+                            "condition": {
+                                "and": [
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "addRemoveButtons"
+                                        ]
+                                    },
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
+                                    }
+                                ]
+                            }
                         }
                     ]
                 },

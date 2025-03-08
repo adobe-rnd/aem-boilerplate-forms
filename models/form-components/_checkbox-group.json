@@ -20,7 +20,8 @@
                             ],
                             "visible": true,
                             "enabled": true,
-                            "orientation": "horizontal"
+                            "orientation": "horizontal",
+                            "type": "number[]"
                         }
                     }
                 }
@@ -61,18 +62,19 @@
                             "label": "Data type of submitted value",
                             "name": "type",
                             "valueType": "string",
+                            "value": "number[]",
                             "options": [
                                 {
                                     "name": "String",
-                                    "value": "string"
+                                    "value": "string[]"
                                 },
                                 {
                                     "name": "Boolean",
-                                    "value": "boolean"
+                                    "value": "boolean[]"
                                 },
                                 {
                                     "name": "Number",
-                                    "value": "number"
+                                    "value": "number[]"
                                 }
                             ]
                         },

@@ -43,7 +43,7 @@ export async function fillField(page, componentTitle, inputValues) {
 
 const getCurrentBranch = () => executeGitCommand('git rev-parse --abbrev-ref HEAD');
 const openPage = async (page, relativeURL) => {
-  const url = `https://${getCurrentBranch()}--aem-boilerplate-forms--adobe-rnd.hlx.live${relativeURL}`;
+  const url = `https://${getCurrentBranch()}--aem-boilerplate-forms--adobe-rnd.aem.live${relativeURL}`;
   await page.goto(url, { waitUntil: 'networkidle' });
 };
 

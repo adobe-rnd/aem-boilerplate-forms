@@ -102,5 +102,9 @@ export default function decorate(fieldDiv) {
   // hide the input element
   input.style.display = 'none';
   // return the fieldDiv with the rating component
+  const helpText = fieldDiv.querySelector('.field-description');
+  if (helpText) {
+    fieldDiv.append(helpText);
+  }
   return fieldDiv;
 }

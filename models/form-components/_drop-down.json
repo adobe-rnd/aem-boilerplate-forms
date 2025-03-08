@@ -10,8 +10,17 @@
             "template": {
               "jcr:title": "Drop Down List",
               "fieldType": "drop-down",
+              "enum": [
+                "0",
+                "1"
+              ],
+              "enumNames": [
+                "Item 1",
+                "Item 2"
+              ],
               "enabled": true,
-              "visible": true
+              "visible": true,
+              "type": "number"
             }
           }
         }
@@ -36,6 +45,7 @@
               "label": "Data type of submitted value",
               "name": "type",
               "valueType": "string",
+              "value": "number",
               "options": [
                 {
                   "name": "String",
@@ -50,6 +60,12 @@
                   "value": "number"
                 }
               ]
+            },
+            {
+              "component": "text",
+              "name": "placeholder",
+              "label": "Placeholder text",
+              "valueType": "string"
             }
           ]
         },

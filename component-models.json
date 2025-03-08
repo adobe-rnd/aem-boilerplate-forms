@@ -409,6 +409,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -554,6 +555,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -647,18 +649,19 @@
             "label": "Data type of submitted value",
             "name": "type",
             "valueType": "string",
+            "value": "number[]",
             "options": [
               {
                 "name": "String",
-                "value": "string"
+                "value": "string[]"
               },
               {
                 "name": "Boolean",
-                "value": "boolean"
+                "value": "boolean[]"
               },
               {
                 "name": "Number",
-                "value": "number"
+                "value": "number[]"
               }
             ]
           },
@@ -801,6 +804,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -1012,6 +1016,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -1267,6 +1272,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -1344,6 +1350,7 @@
             "label": "Data type of submitted value",
             "name": "type",
             "valueType": "string",
+            "value": "number",
             "options": [
               {
                 "name": "String",
@@ -1358,6 +1365,12 @@
                 "value": "number"
               }
             ]
+          },
+          {
+            "component": "text",
+            "name": "placeholder",
+            "label": "Placeholder text",
+            "valueType": "string"
           }
         ]
       },
@@ -1481,6 +1494,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -1708,6 +1722,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -1913,6 +1928,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -2052,6 +2068,12 @@
         "label": "Alternate text"
       },
       {
+        "component": "text",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
+      },
+      {
         "component": "boolean",
         "name": "visible",
         "label": "Show Component",
@@ -2130,6 +2152,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -2361,6 +2384,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -2423,6 +2447,22 @@
             "name": "default",
             "label": "Default Value",
             "valueType": "string"
+          },
+          {
+            "component": "select",
+            "name": "type",
+            "label": "Number type",
+            "valueType": "string",
+            "options": [
+              {
+                "name": "Integer (1234)",
+                "value": "integer"
+              },
+              {
+                "name": "Decimal (1234.000)",
+                "value": "number"
+              }
+            ]
           }
         ]
       },
@@ -2610,6 +2650,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -2680,20 +2721,41 @@
             "name": "minOccur",
             "label": "Minimum repetitions",
             "valueType": "number",
-            "description": "Minimum number of times the panel appears on the form"
+            "description": "Minimum number of times the panel appears on the form",
+            "condition": {
+              "===": [
+                {
+                  "var": "repeatable"
+                },
+                true
+              ]
+            }
           },
           {
             "component": "number",
             "name": "maxOccur",
             "label": "Maximum repetitions",
             "valueType": "number",
+            "placeholder": "No Limit",
             "description": "Maximum number of times the panel can appear on the form. No value indicates no limit.",
             "condition": {
-              "!=": [
+              "and": [
                 {
-                  "var": "variant"
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
                 },
-                "noButtons"
+                {
+                  "!==": [
+                    {
+                      "var": "variant"
+                    },
+                    "noButtons"
+                  ]
+                }
               ]
             }
           },
@@ -2728,11 +2790,23 @@
             "valueType": "string",
             "value": "Add",
             "condition": {
-              "===": [
+              "and": [
                 {
-                  "var": "variant"
+                  "===": [
+                    {
+                      "var": "variant"
+                    },
+                    "addRemoveButtons"
+                  ]
                 },
-                "addRemoveButtons"
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                }
               ]
             }
           },
@@ -2743,11 +2817,23 @@
             "valueType": "string",
             "value": "Delete",
             "condition": {
-              "===": [
+              "and": [
                 {
-                  "var": "variant"
+                  "===": [
+                    {
+                      "var": "variant"
+                    },
+                    "addRemoveButtons"
+                  ]
                 },
-                "addRemoveButtons"
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                }
               ]
             }
           }
@@ -2845,6 +2931,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -2952,12 +3039,6 @@
                 "value": "number"
               }
             ]
-          },
-          {
-            "component": "text",
-            "name": "default",
-            "label": "Default option",
-            "valueType": "string"
           },
           {
             "component": "radio-group",
@@ -3086,6 +3167,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -3207,6 +3289,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -3352,6 +3435,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -3565,6 +3649,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -3739,6 +3824,12 @@
         "required": true
       },
       {
+        "component": "text",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
+      },
+      {
         "component": "boolean",
         "name": "visible",
         "label": "Show Component",
@@ -3750,6 +3841,7 @@
         "name": "colspan",
         "label": "Columns",
         "valueType": "string",
+        "value": "12",
         "options": [
           {
             "name": "1 column",
@@ -3873,6 +3965,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -4054,6 +4147,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -4199,6 +4293,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
@@ -4340,118 +4435,115 @@
         "collapsible": false,
         "fields": [
           {
-            "fields": [
+            "component": "text",
+            "name": "name",
+            "label": "Name",
+            "valueType": "string",
+            "required": true,
+            "valueFormat": "regexp",
+            "validation": {
+              "regExp": "^[^$].*",
+              "customErrorMsg": "Name cannot start with $"
+            }
+          },
+          {
+            "component": "text",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string"
+          },
+          {
+            "component": "boolean",
+            "name": "hideTitle",
+            "label": "Hide title",
+            "valueType": "boolean"
+          },
+          {
+            "component": "text",
+            "name": "dataRef",
+            "label": "Bind reference",
+            "valueType": "string"
+          },
+          {
+            "component": "boolean",
+            "name": "unboundFormElement",
+            "label": "Mark as Unbound Form Element",
+            "valueType": "boolean"
+          },
+          {
+            "component": "boolean",
+            "name": "visible",
+            "label": "Show Component",
+            "valueType": "boolean",
+            "value": true
+          },
+          {
+            "component": "boolean",
+            "name": "enabled",
+            "label": "Enable Component",
+            "valueType": "boolean",
+            "value": true
+          },
+          {
+            "component": "boolean",
+            "name": "readOnly",
+            "label": "Read-only",
+            "valueType": "boolean"
+          },
+          {
+            "component": "select",
+            "name": "colspan",
+            "label": "Columns",
+            "valueType": "string",
+            "value": "12",
+            "options": [
               {
-                "component": "text",
-                "name": "name",
-                "label": "Name",
-                "valueType": "string",
-                "required": true,
-                "valueFormat": "regexp",
-                "validation": {
-                  "regExp": "^[^$].*",
-                  "customErrorMsg": "Name cannot start with $"
-                }
+                "name": "1 column",
+                "value": "1"
               },
               {
-                "component": "text",
-                "name": "jcr:title",
-                "label": "Title",
-                "valueType": "string"
+                "name": "2 column",
+                "value": "2"
               },
               {
-                "component": "boolean",
-                "name": "hideTitle",
-                "label": "Hide title",
-                "valueType": "boolean"
+                "name": "3 column",
+                "value": "3"
               },
               {
-                "component": "text",
-                "name": "dataRef",
-                "label": "Bind reference",
-                "valueType": "string"
+                "name": "4 column",
+                "value": "4"
               },
               {
-                "component": "boolean",
-                "name": "unboundFormElement",
-                "label": "Mark as Unbound Form Element",
-                "valueType": "boolean"
+                "name": "5 column",
+                "value": "5"
               },
               {
-                "component": "boolean",
-                "name": "visible",
-                "label": "Show Component",
-                "valueType": "boolean",
-                "value": true
+                "name": "6 column",
+                "value": "6"
               },
               {
-                "component": "boolean",
-                "name": "enabled",
-                "label": "Enable Component",
-                "valueType": "boolean",
-                "value": true
+                "name": "7 column",
+                "value": "7"
               },
               {
-                "component": "boolean",
-                "name": "readOnly",
-                "label": "Read-only",
-                "valueType": "boolean"
+                "name": "8 column",
+                "value": "8"
               },
               {
-                "component": "select",
-                "name": "colspan",
-                "label": "Columns",
-                "valueType": "string",
-                "options": [
-                  {
-                    "name": "1 column",
-                    "value": "1"
-                  },
-                  {
-                    "name": "2 column",
-                    "value": "2"
-                  },
-                  {
-                    "name": "3 column",
-                    "value": "3"
-                  },
-                  {
-                    "name": "4 column",
-                    "value": "4"
-                  },
-                  {
-                    "name": "5 column",
-                    "value": "5"
-                  },
-                  {
-                    "name": "6 column",
-                    "value": "6"
-                  },
-                  {
-                    "name": "7 column",
-                    "value": "7"
-                  },
-                  {
-                    "name": "8 column",
-                    "value": "8"
-                  },
-                  {
-                    "name": "9 column",
-                    "value": "9"
-                  },
-                  {
-                    "name": "10 column",
-                    "value": "10"
-                  },
-                  {
-                    "name": "11 column",
-                    "value": "11"
-                  },
-                  {
-                    "name": "12 column",
-                    "value": "12"
-                  }
-                ]
+                "name": "9 column",
+                "value": "9"
+              },
+              {
+                "name": "10 column",
+                "value": "10"
+              },
+              {
+                "name": "11 column",
+                "value": "11"
+              },
+              {
+                "name": "12 column",
+                "value": "12"
               }
             ]
           },
@@ -4555,6 +4647,7 @@
             "name": "colspan",
             "label": "Columns",
             "valueType": "string",
+            "value": "12",
             "options": [
               {
                 "name": "1 column",
