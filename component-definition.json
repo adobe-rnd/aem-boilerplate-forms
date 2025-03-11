@@ -561,8 +561,7 @@
                 "resourceType": "core/fd/components/form/textinput/v1/textinput",
                 "template": {
                   "jcr:title": "Password",
-                  "fieldType": "text-input",
-                  "fd:viewType": "password",
+                  "fieldType": "password",
                   "enabled": true,
                   "visible": true
                 }
