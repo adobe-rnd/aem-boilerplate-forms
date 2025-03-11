@@ -310,6 +310,7 @@ function inputDecorator(field, element) {
       input.setAttribute('display-value', field.displayValue ?? '');
       if (['tel', 'email'].includes(fieldType)) {
         input.type = fieldType;
+        input.inputMode = fieldType;
       } else {
         input.type = 'text';
       }
