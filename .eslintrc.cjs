@@ -1,6 +1,10 @@
 module.exports = {
   root: true,
-  extends: 'airbnb-base',
+  extends: [
+    'airbnb-base',
+    'plugin:json/recommended',
+    'plugin:xwalk/recommended',
+  ],
   env: {
     browser: true,
   },
@@ -11,12 +15,38 @@ module.exports = {
     requireConfigFile: false,
   },
   rules: {
-    // allow reassigning param
-    'no-param-reassign': [2, { props: false }],
-    'linebreak-style': ['error', 'unix'],
-    'import/extensions': ['error', {
-      js: 'always',
+    'import/extensions': ['error', { js: 'always' }], // require js file extensions in imports
+    'linebreak-style': ['error', 'unix'], // enforce unix linebreaks
+    'no-param-reassign': [2, { props: false }], // allow modifying properties of param
+    'import/no-extraneous-dependencies': ['error', {
+      devDependencies: ['**/*.test.js', '**/*.spec.js', 'playwright.config.js'],
     }],
-    'import/no-extraneous-dependencies': ['error', {'devDependencies': ['test/**/**.js', '**/*.config.js']}]
+    'xwalk/max-cells': ['error', {
+      '*': 4, // default limit for all models
+      form: 14,
+      wizard: 12,
+      'form-button': 7,
+      'checkbox-group': 20,
+      checkbox: 18,
+      'date-input': 21,
+      'drop-down': 19,
+      email: 22,
+      'file-input': 18,
+      'form-fragment': 15,
+      'form-image': 7,
+      'multiline-input': 23,
+      'number-input': 22,
+      panel: 17,
+      'radio-group': 20,
+      'form-reset-button': 7,
+      'form-submit-button': 7,
+      'telephone-input': 20,
+      'text-input': 23,
+      accordion: 14,
+      modal: 11,
+      rating: 18,
+      tnc: 12,
+    }],
+    'xwalk/no-orphan-collapsible-fields': 'off', // Disable until enhancement is done for Forms properties
   },
 };

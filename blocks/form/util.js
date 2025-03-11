@@ -92,6 +92,9 @@ export function createFieldWrapper(fd, tagName = 'div', labelFn = createLabel) {
   const renderType = getHTMLRenderType(fd);
   const fieldId = `${renderType}-wrapper${nameStyle}`;
   fieldWrapper.className = fieldId;
+  if (fd.Fieldset) {
+    fieldWrapper.dataset.fieldset = fd.Fieldset;
+  }
   fieldWrapper.dataset.id = fd.id;
   if (fd.visible === false) {
     fieldWrapper.dataset.visible = fd.visible;
@@ -232,4 +235,15 @@ export function checkValidation(fieldElement) {
 
   const message = getValidationMessage(fieldElement, wrapper);
   updateOrCreateInvalidMsg(fieldElement, message);
+}
+
+export function getSitePageName(path) {
+  if (path == null) return '';
+  const index = path.lastIndexOf('/jcr:content');
+  if (index === -1) {
+    return '';
+  }
+  const mpath = path.substring(0, index);
+  const pathArray = mpath.split('/');
+  return pathArray[pathArray.length - 1].replaceAll('-', '_');
 }

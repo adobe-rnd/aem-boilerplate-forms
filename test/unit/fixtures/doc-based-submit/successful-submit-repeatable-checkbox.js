@@ -64,7 +64,7 @@ export function op(block) {
   global.window = Object.create(window);
 
   // repeat panel
-  const btn = block.querySelector('.repeat-wrapper > .item-add');
+  const btn = block.querySelector('.repeat-wrapper > .repeat-actions > .item-add');
   btn.click();
   const f1Repeat = block.querySelectorAll('input[name="f1"]');
   f1Repeat[0].value = '10';

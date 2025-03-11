@@ -44,3 +44,5 @@ To debug a specific test file, use the following command
 ```sh
 npm run debug:e2e <name-of-the-test-file>
 ```
+
+**NOTE**: _To debug your e2e test locally comment the ``globalSetup`` in the ``playwright.config.js``_

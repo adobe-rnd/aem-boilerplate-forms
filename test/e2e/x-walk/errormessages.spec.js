@@ -2,7 +2,7 @@ import { test, expect } from '../fixtures.js';
 import { openPage } from '../utils.js';
 
 test.describe('error messages test', () => {
-  const testURL = '/drafts/tests/x-walk/errormessages';
+  const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/error-messages';
 
   test('required OOTB error message ', async ({ page }) => {
     await openPage(page, testURL);
