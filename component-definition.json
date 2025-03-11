@@ -553,6 +553,24 @@
           }
         },
         {
+          "title": "Password",
+          "id": "password",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Password",
+                  "fieldType": "text-input",
+                  "fd:viewType": "password",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Rating",
           "id": "rating",
           "plugins": {

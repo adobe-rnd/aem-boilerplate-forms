@@ -1,7 +1,7 @@
 import { loadCSS } from '../../scripts/aem.js';
 
 let customComponents = [];
-const OOTBComponentDecorators = ['file-input', 'wizard', 'modal', 'tnc', 'toggleable-link', 'rating', 'datetime', 'list', 'location', 'accordion'];
+const OOTBComponentDecorators = ['file-input', 'wizard', 'modal', 'tnc', 'toggleable-link', 'rating', 'datetime', 'list', 'location', 'accordion', 'password'];
 
 export function setCustomComponents(components) {
   customComponents = components;
