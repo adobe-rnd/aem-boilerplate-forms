@@ -5,13 +5,15 @@ import {
   stripTags,
   checkValidation,
   toClassName,
+  getSitePageName,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
 import DocBasedFormToAF from './transform.js';
-import transferRepeatableDOM from './components/repeat/repeat.js';
+import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { handleSubmit } from './submit.js';
 import { getSubmitBaseUrl, emailPattern } from './constant.js';
+import { createOptimizedPicture } from '../../scripts/aem.js';
 
 export const DELAY_MS = 0;
 let captchaField;
@@ -84,7 +86,7 @@ const createSelect = withFieldWrapper((fd) => {
   const addOption = (label, value) => {
     const option = document.createElement('option');
     option.textContent = label instanceof Object ? label?.value?.trim() : label?.trim();
-    option.value = value?.trim() || label?.trim();
+    option.value = (typeof value === 'string' ? value.trim() : value) || label?.trim();
     if (fd.value === option.value || (Array.isArray(fd.value) && fd.value.includes(option.value))) {
       option.setAttribute('selected', '');
       optionSelected = true;
@@ -148,6 +150,23 @@ function createLegend(fd) {
   return createLabel(fd, 'legend');
 }
 
+function createRepeatablePanel(wrapper, fd) {
+  setConstraints(wrapper, fd);
+  wrapper.dataset.repeatable = true;
+  wrapper.dataset.index = fd.index || 0;
+  if (fd.properties) {
+    Object.keys(fd.properties).forEach((key) => {
+      if (!key.startsWith('fd:')) {
+        wrapper.dataset[key] = fd.properties[key];
+      }
+    });
+  }
+  if ((!fd.index || fd?.index === 0) && fd.properties?.variant !== 'noButtons') {
+    insertAddButton(wrapper, wrapper);
+    insertRemoveButton(wrapper, wrapper);
+  }
+}
+
 function createFieldSet(fd) {
   const wrapper = createFieldWrapper(fd, 'fieldset', createLegend);
   wrapper.id = fd.id;
@@ -156,9 +175,7 @@ function createFieldSet(fd) {
     wrapper.classList.add('panel-wrapper');
   }
   if (fd.repeatable === true) {
-    setConstraints(wrapper, fd);
-    wrapper.dataset.repeatable = true;
-    wrapper.dataset.index = fd.index || 0;
+    createRepeatablePanel(wrapper, fd);
   }
   return wrapper;
 }
@@ -172,8 +189,8 @@ function setConstraintsMessage(field, messages = {}) {
 function createRadioOrCheckboxGroup(fd) {
   const wrapper = createFieldSet({ ...fd });
   const type = fd.fieldType.split('-')[0];
-  fd.enum.forEach((value, index) => {
-    const label = (typeof fd.enumNames?.[index] === 'object' && fd.enumNames?.[index] !== null) ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
+  fd?.enum?.forEach((value, index) => {
+    const label = (typeof fd?.enumNames?.[index] === 'object' && fd?.enumNames?.[index] !== null) ? fd?.enumNames[index].value : fd?.enumNames?.[index] || value;
     const id = getId(fd.name);
     const field = createRadioOrCheckbox({
       name: fd.name,
@@ -183,6 +200,18 @@ function createRadioOrCheckboxGroup(fd) {
       enum: [value],
       required: fd.required,
     });
+    const { variant, 'afs:layout': layout } = fd.properties;
+    if (variant === 'cards') {
+      wrapper.classList.add(variant);
+    } else {
+      wrapper.classList.remove('cards');
+    }
+    if (layout?.orientation === 'horizontal') {
+      wrapper.classList.add('horizontal');
+    }
+    if (layout?.orientation === 'vertical') {
+      wrapper.classList.remove('horizontal');
+    }
     field.classList.remove('field-wrapper', `field-${toClassName(fd.name)}`);
     const input = field.querySelector('input');
     input.id = id;
@@ -220,14 +249,10 @@ function createPlainText(fd) {
 
 function createImage(fd) {
   const field = createFieldWrapper(fd);
-  const imagePath = fd.source || fd.properties['fd:repoPath'] || '';
-  const image = `
-  <picture>
-    <source srcset="${imagePath}?width=2000&optimize=medium" media="(min-width: 600px)">
-    <source srcset="${imagePath}?width=750&optimize=medium">
-    <img alt="${fd.altText || fd.name}" src="${imagePath}?width=750&optimize=medium">
-  </picture>`;
-  field.innerHTML = image;
+  field.id = fd?.id;
+  const imagePath = fd.value || fd.properties['fd:repoPath'] || '';
+  const altText = fd.altText || fd.name;
+  field.append(createOptimizedPicture(imagePath, altText));
   return field;
 }
 
@@ -341,7 +366,7 @@ function renderField(fd) {
     field.append(createHelpText(fd));
     field.dataset.description = fd.description; // In case overriden by error message
   }
-  if (fd.fieldType !== 'radio-group' && fd.fieldType !== 'checkbox-group') {
+  if (fd.fieldType !== 'radio-group' && fd.fieldType !== 'checkbox-group' && fd.fieldType !== 'captcha') {
     inputDecorator(fd, field);
   }
   return field;
@@ -354,20 +379,21 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
     const { fieldType } = field;
     if (fieldType === 'captcha') {
       captchaField = field;
-    } else {
-      const element = renderField(field);
-      if (field.appliedCssClassNames) {
-        element.className += ` ${field.appliedCssClassNames}`;
-      }
-      colSpanDecorator(field, element);
-      if (field?.fieldType === 'panel') {
-        await generateFormRendition(field, element, getItems);
-        return element;
-      }
-      await componentDecorator(element, field, container);
+      const element = createFieldWrapper(field);
+      element.textContent = 'CAPTCHA';
       return element;
     }
-    return null;
+    const element = renderField(field);
+    if (field.appliedCssClassNames) {
+      element.className += ` ${field.appliedCssClassNames}`;
+    }
+    colSpanDecorator(field, element);
+    if (field?.fieldType === 'panel') {
+      await generateFormRendition(field, element, getItems);
+      return element;
+    }
+    await componentDecorator(element, field, container);
+    return element;
   });
 
   const children = await Promise.all(promises);
@@ -410,8 +436,16 @@ export async function createForm(formDef, data) {
 
   let captcha;
   if (captchaField) {
-    const siteKey = captchaField?.properties?.['fd:captcha']?.config?.siteKey || captchaField?.value;
-    captcha = new GoogleReCaptcha(siteKey, captchaField.id);
+    let config = captchaField?.properties?.['fd:captcha']?.config;
+    if (!config) {
+      config = {
+        siteKey: captchaField?.value,
+        uri: captchaField?.uri,
+        version: captchaField?.version,
+      };
+    }
+    const pageName = getSitePageName(captchaField?.properties?.['fd:path']);
+    captcha = new GoogleReCaptcha(config, captchaField.id, captchaField.name, pageName);
     captcha.loadCaptcha(form);
   }
 

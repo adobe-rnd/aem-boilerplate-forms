@@ -158,42 +158,6 @@
           }
         },
         {
-          "title": "Fragment",
-          "id": "fragment",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Fragment",
-                  "model": "fragment"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Hero",
-          "id": "hero",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Hero",
-                  "model": "hero"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "title": "Adaptive Form Components",
-      "id": "form-general",
-      "components": [
-        {
           "title": "Button",
           "id": "form-button",
           "plugins": {
@@ -205,24 +169,6 @@
                   "fieldType": "button",
                   "enabled": true,
                   "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Checkbox",
-          "id": "checkbox",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
-                "template": {
-                  "jcr:title": "Checkbox",
-                  "fieldType": "checkbox",
-                  "enabled": true,
-                  "visible": true,
-                  "checkedValue": "on"
                 }
               }
             }
@@ -246,6 +192,26 @@
                     "Item 1",
                     "Item 2"
                   ],
+                  "visible": true,
+                  "enabled": true,
+                  "orientation": "horizontal",
+                  "type": "string[]"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Checkbox",
+          "id": "checkbox",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
+                "template": {
+                  "jcr:title": "Checkbox",
+                  "fieldType": "checkbox",
+                  "checkedValue": "on",
                   "enabled": true,
                   "visible": true
                 }
@@ -280,8 +246,17 @@
                 "template": {
                   "jcr:title": "Drop Down List",
                   "fieldType": "drop-down",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Item 1",
+                    "Item 2"
+                  ],
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "type": "string"
                 }
               }
             }
@@ -364,24 +339,6 @@
           }
         },
         {
-          "title": "Modal",
-          "id": "modal",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
-                "template": {
-                  "jcr:title": "Modal",
-                  "fieldType": "panel",
-                  "fd:viewType": "modal",
-                  "enabled": true,
-                  "visible": false
-                }
-              }
-            }
-          }
-        },
-        {
           "title": "Number Input",
           "id": "number-input",
           "plugins": {
@@ -409,7 +366,8 @@
                   "jcr:title": "Panel",
                   "fieldType": "panel",
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "minOccur": 1
                 }
               }
             }
@@ -429,12 +387,28 @@
                     "0",
                     "1"
                   ],
-                  "enumNumes": [
+                  "enumNames": [
                     "Item 1",
                     "Item 2"
                   ],
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "orientation": "horizontal"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Captcha (Invisible)",
+          "id": "captcha",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
+                "template": {
+                  "jcr:title": "Captcha (Invisible)",
+                  "fieldType": "captcha"
                 }
               }
             }
@@ -485,10 +459,112 @@
                 "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
                 "template": {
                   "jcr:title": "Telephone Input",
-                  "fieldType": "tel",
+                  "fieldType": "text-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Text Input",
+          "id": "text-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Text Input",
+                  "fieldType": "text-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Text",
+          "id": "plain-text",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/text/v1/text",
+                "template": {
+                  "jcr:title": "Text",
+                  "fieldType": "plain-text",
+                  "visible": true,
+                  "textIsRich": true,
+                  "value": "Adaptive Form Text Component"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Accordion",
+          "id": "form-accordion",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Accordion",
+                  "fieldType": "panel",
+                  "fd:viewType": "accordion",
                   "enabled": true,
                   "visible": true,
-                  "pattern": "^[+][0-9]{0,14}$"
+                  "panel1": {
+                    "jcr:title": "Item 1",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  },
+                  "panel2": {
+                    "jcr:title": "Item 2",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Modal",
+          "id": "form-modal",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Modal",
+                  "fieldType": "panel",
+                  "fd:viewType": "modal",
+                  "enabled": true,
+                  "visible": false
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Rating",
+          "id": "rating",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                "template": {
+                  "jcr:title": "Rating",
+                  "fieldType": "number-input",
+                  "fd:viewType": "rating",
+                  "enabled": true,
+                  "visible": true
                 }
               }
             }
@@ -545,42 +621,12 @@
                     "fieldType": "checkbox",
                     "required": true,
                     "enabled": true,
-                    "visible": true
+                    "visible": true,
+                    "type": "string",
+                    "enum": [
+                      "true"
+                    ]
                   }
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Text",
-          "id": "plain-text",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/text/v1/text",
-                "template": {
-                  "jcr:title": "Text",
-                  "fieldType": "plain-text",
-                  "visible": true,
-                  "textIsRich": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Text Input",
-          "id": "text-input",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/textinput/v1/textinput",
-                "template": {
-                  "jcr:title": "Text Input",
-                  "fieldType": "text-input",
-                  "enabled": true,
-                  "visible": true
                 }
               }
             }
@@ -598,7 +644,51 @@
                   "fieldType": "panel",
                   "fd:viewType": "wizard",
                   "enabled": true,
-                  "visible": true
+                  "visible": true,
+                  "panel1": {
+                    "jcr:title": "Item 1",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  },
+                  "panel2": {
+                    "jcr:title": "Item 2",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Fragment",
+          "id": "fragment",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Fragment",
+                  "model": "fragment"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Hero",
+          "id": "hero",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Hero",
+                  "model": "hero"
                 }
               }
             }

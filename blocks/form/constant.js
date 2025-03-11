@@ -16,6 +16,18 @@ export const defaultErrorMessages = {
   required: 'Please fill in this field.',
 };
 
+export function getRouting() {
+  const regex = /(.*?)--(.*?)--(.*?)\.(hlx|aem)\.(.*)/;
+  const match = window?.location?.host?.match(regex);
+  if (match) {
+    const [, branch, site, org, , tier] = match;
+    return {
+      branch, site, org, tier,
+    };
+  }
+  return { };
+}
+
 // eslint-disable-next-line no-useless-escape
 export const emailPattern = '([A-Za-z0-9][._]?)+[A-Za-z0-9]@[A-Za-z0-9]+(\.?[A-Za-z0-9]){2}\.([A-Za-z0-9]{2,4})?';
 

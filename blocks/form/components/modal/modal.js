@@ -5,13 +5,25 @@ export class Modal {
   constructor() {
     this.dialog = null;
     this.formModel = null;
+    this.panel = null;
+    this.modalWrapper = null;
+    this.originalContent = null; // Store original content
   }
 
   createDialog(panel) {
     const dialog = document.createElement('dialog');
     const dialogContent = document.createElement('div');
     dialogContent.classList.add('modal-content');
-    dialogContent.append(...panel.childNodes);
+    // First time initialization - store original content
+    if (!this.originalContent) {
+      this.originalContent = [...panel.childNodes];
+    }
+
+    // Move the original nodes to the dialog content
+    // This preserves all event listeners and attached logic
+    this.originalContent.forEach((node) => {
+      dialogContent.appendChild(node);
+    });
     dialog.append(dialogContent);
     const closeButton = document.createElement('button');
     closeButton.classList.add('close-button');
@@ -29,21 +41,39 @@ export class Modal {
     });
     dialog.querySelector('.close-button').addEventListener('click', () => {
       dialog.close();
-      if (this.formModel) {
-        this.formModel.getElement(panel?.id).visible = false;
-      }
     });
     dialog.addEventListener('close', () => {
       document.body.classList.remove('modal-open');
+      // Move the content back to the panel when dialog closes
+      const modalContent = dialog.querySelector('.modal-content');
+      while (modalContent.firstChild) {
+        this.panel.appendChild(modalContent.firstChild);
+      }
+
+      dialog.remove();
+      if (this.formModel) {
+        this.formModel.getElement(panel?.id).visible = false;
+      }
     });
     return dialog;
   }
 
   showModal() {
-    this.dialog.showModal();
-    setTimeout(() => {
-      this.dialog.querySelector('.modal-content').scrollTop = 0;
-    }, 0);
+    // If dialog was previously removed, recreate it
+    if (!this.dialog || !this.dialog.isConnected) {
+      this.dialog = this.createDialog(this.panel);
+      if (this.modalWrapper) {
+        this.modalWrapper.appendChild(this.dialog);
+      }
+    }
+
+    if (this.dialog.isConnected) {
+      this.dialog.showModal();
+      document.body.classList.add('modal-open');
+      setTimeout(() => {
+        this.dialog.querySelector('.modal-content').scrollTop = 0;
+      }, 0);
+    }
   }
 
   setFormModel(model) {
@@ -54,10 +84,12 @@ export class Modal {
     const wrapper = document.createElement('div');
     wrapper.classList.add('modal');
     wrapper.appendChild(this.dialog);
-    panel.replaceChildren(wrapper);
+    panel.appendChild(wrapper);
+    this.modalWrapper = wrapper;
   }
 
   decorate(panel) {
+    this.panel = panel;
     this.dialog = this.createDialog(panel);
     this.wrapDialog(panel);
   }

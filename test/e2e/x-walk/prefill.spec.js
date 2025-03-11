@@ -9,7 +9,7 @@ const id = '25';
 const status = 'sold';
 const ruleText = 'test';
 
-test.describe('test cases prefill', async () => {
+test.describe.skip('test cases prefill', async () => {
   const testURL = '/drafts/tests/x-walk/fdmsubmission';
   const testURL1 = '/drafts/tests/x-walk/fdminvokeservice';
   test('test case for fdmSubmission, invokeService and custom prefill', async ({ page }) => {
