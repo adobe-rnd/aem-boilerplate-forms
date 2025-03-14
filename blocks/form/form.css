@@ -57,6 +57,18 @@
     --form-wizard-step-legend-padding: 10px;
     --form-wizard-step-legend-font-size: 1.1rem;
     --form-field-gap: 5px;
+    
+    /* Card styling variables */
+    --form-card-border-color: #e0e0e0;
+    --form-card-border-radius: 4px;
+    --form-card-padding: 0.6rem 0.8rem;
+    --form-card-background: var(--background-color-primary);
+    --form-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    --form-card-hover-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --form-card-selected-border-color: var(--button-primary-color);
+    --form-card-selected-background: #F5F9FF;
+    --form-card-selected-shadow: 0 0 0 1px var(--button-primary-color);
+    --form-card-transition: all 0.15s ease-in-out;
 }
 
 * {
@@ -81,7 +93,6 @@ main .form-container {
     background-color: var(--form-background-color);
     padding: var(--form-padding);
     width: var(--form-width);
-    margin: var(--nav-height) auto;
 }
 
 main .form {
@@ -117,6 +128,37 @@ main .form form .field-invalid .field-description {
     color: var(--form-error-color);
     font-weight: 700;
 }
+
+
+/**
+ * Required field indicator
+ */
+ [data-required="true"] > label::after {
+    content: "*";
+    color: var(--form-error-color);
+    padding-inline-start: 5px;
+  }
+  
+  /**
+   * Required field indicator not required for checkboxes and radio buttons
+   */
+  .radio-wrapper > label::after,
+  .checkbox-wrapper > label::after {
+      content: none;
+  }
+  
+  main .form form .checkbox-wrapper.field-invalid {
+      flex-wrap: wrap;
+  }
+  
+  main .form form .checkbox-wrapper.field-invalid > .field-description {
+      order: 1;
+  }
+  
+  main .form form .radio-wrapper.field-invalid > input,
+  main .form form .checkbox-wrapper.field-invalid > input {
+      outline: 1px solid var(--form-error-color);
+  }
 
 main .form input,
 main .form textarea,
@@ -244,27 +286,124 @@ main .form fieldset.link .checkbox-wrapper label {
     flex-basis: unset;
 }
 
+main .form form fieldset.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+main .form form fieldset.cards > .radio-wrapper,
+main .form form fieldset.cards > .checkbox-wrapper {
+    margin: 0;
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 180px;
+    max-width: 300px;
+}
+
 main .form form fieldset.cards > .radio-wrapper > label,
 main .form form fieldset.cards > .checkbox-wrapper > label {
     display: flex;
-    gap: 1rem;
-    margin: 0 0 1rem;
-    border: 1px solid #dad6d6;
-    padding: 0.6rem;
+    gap: 0.5rem;
+    margin: 0;
+    border: 1px solid var(--form-card-border-color);
+    border-radius: var(--form-card-border-radius);
+    padding: var(--form-card-padding);
+    background-color: var(--form-card-background);
     cursor: pointer;
-    align-items: end;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    box-shadow: var(--form-card-shadow);
+    transition: var(--form-card-transition);
+    font-weight: normal;
+    color: var(--form-label-color);
+    font-size: 0.95em;
+}
+
+main .form form fieldset.cards > .radio-wrapper > label:hover,
+main .form form fieldset.cards > .checkbox-wrapper > label:hover {
+    box-shadow: var(--form-card-hover-shadow);
+    border-color: #ccc;
+    transform: translateY(-1px);
+}
+
+main .form form fieldset.cards.horizontal {
+    flex-direction: row;
+    column-gap: 0.75rem;
+}
+
+main .form form fieldset.cards.horizontal > .radio-wrapper,
+main .form form fieldset.cards.horizontal > .checkbox-wrapper {
+    flex: 0 1 auto;
+    max-width: none;
 }
 
 main .form form fieldset.cards.horizontal > .radio-wrapper > label,
-main .form form fieldset.cards.horizontal > .checkbox-wrapper > label
-{
+main .form form fieldset.cards.horizontal > .checkbox-wrapper > label {
     min-width: fit-content;
+    min-width: -webkit-fill-available; /* Fix for Samsung Internet */
+    white-space: nowrap;
+}
+
+main .form form fieldset.cards > .radio-wrapper > input,
+main .form form fieldset.cards > .checkbox-wrapper > input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 main .form form fieldset.cards > .radio-wrapper > input:checked ~ label,
-main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label{
-    border: 1px solid #1c3fca;
-    background-color: #F3F6FD;
+main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label {
+    border: 1px solid var(--form-card-selected-border-color);
+    background-color: var(--form-card-selected-background);
+    box-shadow: var(--form-card-selected-shadow);
+    transform: translateY(0);
+    font-weight: 500;
+}
+
+main .form form fieldset.cards > .radio-wrapper > input:checked ~ label::after,
+main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label::after {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--button-primary-color);
+    border-radius: 50%;
+    margin-left: auto;
+}
+
+main .form form fieldset.cards > .radio-wrapper > input:focus ~ label,
+main .form form fieldset.cards > .checkbox-wrapper > input:focus ~ label {
+    outline: none;
+    box-shadow: 0 0 0 1px var(--button-primary-color);
+}
+
+/* For cards with icons or images */
+main .form form fieldset.cards > .radio-wrapper > label > img,
+main .form form fieldset.cards > .checkbox-wrapper > label > img {
+    max-width: 18px;
+    max-height: 18px;
+    object-fit: contain;
+}
+
+/* Responsive adjustments for cards */
+@media (max-width: 768px) {
+    main .form form fieldset.cards > .radio-wrapper,
+    main .form form fieldset.cards > .checkbox-wrapper {
+        min-width: 100%;
+    }
+    
+    main .form form fieldset.cards.horizontal {
+        flex-wrap: wrap;
+    }
+    
+    main .form form fieldset.cards.horizontal > .radio-wrapper,
+    main .form form fieldset.cards.horizontal > .checkbox-wrapper {
+        min-width: 100%;
+    }
 }
 
 input::file-selector-button {
@@ -632,6 +771,13 @@ main .form form .checkbox-group-wrapper.horizontal .field-description {
     width: 100%;
     order: 1;
     margin-top: 0.5rem;
+}
+
+main div.form-wrapper {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* Responsive adjustments for mobile */
