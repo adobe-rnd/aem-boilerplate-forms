@@ -1,7 +1,11 @@
 {
   "mappings": [
-    "/:/",
+    "/content/showcase/:/",
     "/content/showcase/configuration:/.helix/config.json",
     "/content/showcase/metadata:/metadata.json"
+  ],
+  "includes": [
+    "/content/",
+    "/content/dam/"
   ]
 }
