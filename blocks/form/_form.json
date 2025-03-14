@@ -58,6 +58,10 @@
                   {
                       "name": "Send email",
                       "value": "fd/af/components/guidesubmittype/email"
+                  },
+                  {
+                      "name": "Persist to Spreadsheet",
+                      "value": "spreadsheet"
                   }
               ],
               "value" : ""
@@ -75,6 +79,13 @@
               "label": "URL For POST request",
               "valueType": "string",
               "condition": { "==": [{ "var": "actionType" }, "fd/af/components/guidesubmittype/restendpoint"] }
+          },
+          {
+              "condition": { "==": [{ "var": "actionType" }, "spreadsheet"] },
+              "component": "text",
+              "name": "spreadsheetUrl",
+              "label": "Spreadsheet Url",
+              "valueType": "string" 
           },
           {
               "component": "container",
