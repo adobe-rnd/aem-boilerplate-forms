@@ -20,7 +20,7 @@ function submitFormArrayToString(globals) {
       data[key] = data[key].join(',');
     }
   });
-  globals.functions.functions.submitForm(data, true, 'application/json');
+  globals.functions.submitForm(data, true, 'application/json');
 }
 
 /**
