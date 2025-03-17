@@ -342,9 +342,7 @@ main .form form fieldset.cards.horizontal > .checkbox-wrapper {
 
 main .form form fieldset.cards.horizontal > .radio-wrapper > label,
 main .form form fieldset.cards.horizontal > .checkbox-wrapper > label {
-    min-width: fit-content;
-    min-width: -webkit-fill-available; /* Fix for Samsung Internet */
-    white-space: nowrap;
+    min-width: -webkit-fill-available; 
 }
 
 main .form form fieldset.cards > .radio-wrapper > input,
