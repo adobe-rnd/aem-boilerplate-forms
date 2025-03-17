@@ -10,6 +10,20 @@ function getFullName(firstname, lastname) {
 }
 
 /**
+ * Custom submit function
+ * @param {scope} globals
+ */
+function submitFormArrayToString(globals) {
+  const data = globals.functions.exportData();
+  Object.keys(data).forEach((key) => {
+    if (Array.isArray(data[key])) {
+      data[key] = data[key].join(',');
+    }
+  });
+  globals.functions.functions.submitForm(data, true, 'application/json');
+}
+
+/**
  * Calculate the number of days between two dates.
  * @param {*} endDate
  * @param {*} startDate
@@ -29,4 +43,4 @@ function days(endDate, startDate) {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export { getFullName, days };
+export { getFullName, days, submitFormArrayToString };
