@@ -4,10 +4,7 @@ import { openPage } from '../utils.js';
 test.describe('error messages test', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/error-messages';
 
-  test('required OOTB error message ', async ({ page }) => {
-    await openPage(page, testURL);
-    const submitButton = await page.getByRole('button', { name: 'Submit' });
-    await submitButton.click();
+  const validateErrorMessages = async (page) => {
     const f1 = await page.locator('input[name="f1"]').locator('..');
     expect(await f1.locator('.field-description').innerText()).toBe('Please fill in this field.');
     const f2 = await page.locator('input[name="f2"]').locator('..');
@@ -20,6 +17,20 @@ test.describe('error messages test', () => {
     expect(await f5.locator('.field-description').innerText()).toBe('Please fill in this field.');
     const f6 = await page.locator('input[name="f6"]').locator('..');
     expect(await f6.locator('.field-description').innerText()).toBe('Please fill in this field.');
+  }
+
+  test('required OOTB error message ', async ({ page }) => {
+    await openPage(page, testURL);
+    const submitButton = await page.getByRole('button', { name: 'Submit' });
+    await submitButton.click();
+    await validateErrorMessages(page);
+  });
+
+  test('validate form displays error messages ', async ({ page }) => {
+    await openPage(page, testURL);
+    const validateBtn = await page.getByRole('button', { name: 'Validate Form' });
+    await validateBtn.click();
+    await validateErrorMessages(page);
   });
 
   test('custom required error message', async ({ page }) => {
