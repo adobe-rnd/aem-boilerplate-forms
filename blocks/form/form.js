@@ -304,18 +304,15 @@ function inputDecorator(field, element) {
       input.disabled = true;
     }
     const fieldType = getHTMLRenderType(field);
-    if (['number', 'date', 'text', 'email', 'tel'].includes(fieldType)) {
-      if (field.displayFormat || field.displayValueExpression) {
-        field.type = fieldType;
-        input.setAttribute('edit-value', field.value ?? '');
-        input.setAttribute('display-value', field.displayValue ?? '');
-      }
-      if (['tel', 'email'].includes(fieldType)) {
-        input.type = fieldType;
-        input.inputMode = fieldType;
-      } else {
-        input.type = 'text';
-      }
+    if (['tel', 'email'].includes(fieldType)) {
+      input.type = fieldType;
+      input.inputMode = fieldType;
+    }
+    if (['number', 'date', 'text', 'email'].includes(fieldType) && (field.displayFormat || field.displayValueExpression)) {
+      field.type = fieldType;
+      input.setAttribute('edit-value', field.value ?? '');
+      input.setAttribute('display-value', field.displayValue ?? '');
+      input.type = 'text';
       input.value = field.displayValue ?? '';
       input.addEventListener('touchstart', () => { input.type = field.type; }); // in mobile devices the input type needs to be toggled before focus
       input.addEventListener('focus', () => handleFocus(input, field));
