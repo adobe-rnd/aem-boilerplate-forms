@@ -17,7 +17,7 @@
       "columns",
       "fragment",
       "form",
-      "form-embed"
+      "embed-adaptive-form"
     ]
   },
   {
@@ -60,6 +60,7 @@
       "form-submit-button",
       "number-input",
       "panel",
+      "password",
       "plain-text",
       "radio-group",
       "rating",
