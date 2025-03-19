@@ -11,6 +11,7 @@
                             "jcr:title": "Accordion",
                             "fieldType": "panel",
                             "fd:viewType": "accordion",
+                            "minOccur": 1,
                             "enabled": true,
                             "visible": true,
                             "panel1": {
@@ -61,7 +62,7 @@
                             "name": "minOccur",
                             "label": "Minimum repetitions",
                             "valueType": "number",
-                            "description": "Minimum number of times the accordion appears on the form",
+                            "description": "Minimum number of times the accordion appears on the form. No value indicates no limit.",
                             "condition": {
                                 "===": [
                                     {
@@ -77,7 +78,7 @@
                             "label": "Maximum repetitions",
                             "valueType": "number",
                             "placeholder": "No Limit",
-                            "description": "Maximum number of times the accordion can appear on the form",
+                            "description": "Maximum number of times the accordion can appear on the form, No value indicates no limit.",
                             "condition": {
                                 "and": [
                                     {
