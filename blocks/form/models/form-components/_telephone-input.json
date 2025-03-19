@@ -27,13 +27,17 @@
           "name": "basic",
           "label": "Basic",
           "collapsible": false,
-          "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
-        },
-        {
-          "component": "text",
-          "name": "default",
-          "label": "Default Value",
-          "valueType": "string"
+          "fields": [
+            {
+              "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+            },
+            {
+              "component": "text",
+              "name": "default",
+              "label": "Default Value",
+              "valueType": "string"
+            }
+          ]
         },
         {
           "...": "../form-common/_help-container.json"
