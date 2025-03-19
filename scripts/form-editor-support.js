@@ -307,7 +307,7 @@ export async function applyChanges(event) {
           const isRepeatable = parent.dataset.repeatable === 'true';
           if (isRepeatable) {
             const repeatActions = parent.querySelector('.repeat-actions');
-            const removeButton = parent.querySelector('.item-remove');            
+            const removeButton = parent.querySelector('.item-remove');
             if (repeatActions) elementsToKeep.push(repeatActions);
             if (removeButton) elementsToKeep.push(removeButton);
           }
