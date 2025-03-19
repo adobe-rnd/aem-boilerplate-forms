@@ -27,7 +27,7 @@
           "name": "basic",
           "label": "Basic",
           "collapsible": false,
-          "...": "../form-common/_basic-input-placeholder-fields.json"
+          "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
         },
         {
           "component": "text",
