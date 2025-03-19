@@ -14,6 +14,12 @@
               "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
             },
             {
+              "component": "text",
+              "name": "default",
+              "label": "Default Value",
+              "valueType": "string"
+            },
+            {
               "component": "boolean",
               "name": "multiLine",
               "label": "Allow multiple lines",

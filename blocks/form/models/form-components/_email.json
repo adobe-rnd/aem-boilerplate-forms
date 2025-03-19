@@ -30,6 +30,12 @@
                     "...": "../form-common/_basic-input-placeholder-fields.json"
                 },
                 {
+                    "component": "text",
+                    "name": "default",
+                    "label": "Default Value",
+                    "valueType": "string"
+                },
+                {
                     "...": "../form-common/_help-container.json"
                 },
                 {

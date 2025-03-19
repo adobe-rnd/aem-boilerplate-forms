@@ -1040,14 +1040,14 @@
             "name": "placeholder",
             "label": "Placeholder text",
             "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
           }
         ]
+      },
+      {
+        "component": "date-time",
+        "name": "default",
+        "label": "Default Value",
+        "valueType": "date"
       },
       {
         "component": "container",
@@ -1518,14 +1518,14 @@
             "name": "placeholder",
             "label": "Placeholder text",
             "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
           }
         ]
+      },
+      {
+        "component": "text",
+        "name": "default",
+        "label": "Default Value",
+        "valueType": "string"
       },
       {
         "component": "container",
@@ -2473,10 +2473,10 @@
             "valueType": "string"
           },
           {
-            "component": "text",
+            "component": "number",
             "name": "default",
             "label": "Default Value",
-            "valueType": "string"
+            "valueType": "number"
           },
           {
             "component": "select",
@@ -3522,14 +3522,14 @@
             "name": "placeholder",
             "label": "Placeholder text",
             "valueType": "string"
-          },
-          {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
           }
         ]
+      },
+      {
+        "component": "text",
+        "name": "default",
+        "label": "Default Value",
+        "valueType": "string"
       },
       {
         "component": "container",
