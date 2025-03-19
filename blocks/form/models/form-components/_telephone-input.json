@@ -9,7 +9,7 @@
             "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
             "template": {
               "jcr:title": "Telephone Input",
-              "fieldType": "text-input",
+              "fieldType": "tel",
               "enabled": true,
               "visible": true
             }
