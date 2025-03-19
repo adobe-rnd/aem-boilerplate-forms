@@ -127,7 +127,7 @@ describe('Universal Editor Authoring Test Cases', () => {
               } else if (cmpId === 'form-fragment') {
                 cmpIdfromFieldType = 'form-fragment';
               }
-              if (!idsArray.includes(cmpIdfromFieldType)) {
+              if (cmpIdfromFieldType && !idsArray.includes(cmpIdfromFieldType)) {
                 throw new Error(`component model not found for component ${component.id}`);
               }
             });

@@ -10,7 +10,6 @@
             "template": {
               "jcr:title": "Submit",
               "buttonType": "submit",
-              "fieldType": "button",
               "enabled": true,
               "visible": true
             }
