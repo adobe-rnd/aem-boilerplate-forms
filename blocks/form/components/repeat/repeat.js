@@ -39,7 +39,7 @@ function createButton(label, icon) {
 }
 
 export function insertRemoveButton(fieldset, wrapper, form) {
-  const label = fieldset.dataset?.repeatDeleteButtonLabel || 'Remove';
+  const label = fieldset.dataset?.repeatDeleteButtonLabel || 'Delete';
   const removeButton = createButton(label, 'remove');
   removeButton.addEventListener('click', () => {
     fieldset.remove();
