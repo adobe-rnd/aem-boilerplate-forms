@@ -299,12 +299,19 @@ export async function applyChanges(event) {
           }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
+          const elementsToKeep = [];
           if (parent.classList?.contains('panel-wrapper') && parent.querySelector(`legend[for=${parent.dataset.id}]`)) {
             const panelLabel = parent.querySelector(`legend[for=${parent.dataset.id}]`);
-            parent.replaceChildren(panelLabel);
-          } else {
-            parent.replaceChildren();
+            elementsToKeep.push(panelLabel);
           }
+          const isRepeatable = parent.dataset.repeatable === 'true';
+          if (isRepeatable) {
+            const repeatActions = parent.querySelector('.repeat-actions');
+            const removeButton = parent.querySelector('.item-remove');            
+            if (repeatActions) elementsToKeep.push(repeatActions);
+            if (removeButton) elementsToKeep.push(removeButton);
+          }
+          parent.replaceChildren(...elementsToKeep);
           if (parent.hasAttribute('data-component-status')) {
             parent.removeAttribute('data-component-status');
           }
