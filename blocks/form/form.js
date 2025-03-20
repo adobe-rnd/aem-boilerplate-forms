@@ -394,7 +394,26 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
 
   const children = await Promise.all(promises);
   container.append(...children.filter((_) => _ != null));
+  decoratePanelContainer(container, panel);
   await componentDecorator(container, panel);
+}
+
+function decoratePanelContainer(container, panel) {
+  if (container.classList?.contains('panel-wrapper')) {
+    if (panel.label && !container.querySelector(`legend[for=${container.dataset.id}]`)) {
+      const legend = createLegend(panel);
+      container.insertAdjacentElement('afterbegin', legend);
+    }
+    
+    if (container.dataset?.repeatable === 'true') {
+      if (!container.querySelector('.repeat-actions')) {
+        insertAddButton(container, container);
+      }
+      if (!container.querySelector('.item-remove')) {
+        insertRemoveButton(container, container);
+      }
+    }
+  }
 }
 
 function enableValidation(form) {
