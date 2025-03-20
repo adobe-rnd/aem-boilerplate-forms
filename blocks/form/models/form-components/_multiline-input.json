@@ -14,10 +14,7 @@
               "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
             },
             {
-              "component": "text",
-              "name": "default",
-              "label": "Default Value",
-              "valueType": "string"
+              "...": "../form-common/_basic-input-default-value-fields.json#/fields"
             },
             {
               "component": "boolean",

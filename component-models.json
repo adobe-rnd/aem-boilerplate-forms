@@ -1520,10 +1520,10 @@
             "valueType": "string"
           },
           {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
+            "component": "boolean",
+            "name": "multiLine",
+            "label": "Allow multiple lines",
+            "valueType": "boolean"
           }
         ]
       },
@@ -2239,10 +2239,10 @@
             "valueType": "string"
           },
           {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
+            "component": "boolean",
+            "name": "multiLine",
+            "label": "Allow multiple lines",
+            "valueType": "boolean"
           },
           {
             "component": "boolean",
@@ -3524,10 +3524,10 @@
             "valueType": "string"
           },
           {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
+            "component": "boolean",
+            "name": "multiLine",
+            "label": "Allow multiple lines",
+            "valueType": "boolean"
           }
         ]
       },
@@ -3738,10 +3738,10 @@
             "valueType": "string"
           },
           {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
+            "component": "boolean",
+            "name": "multiLine",
+            "label": "Allow multiple lines",
+            "valueType": "boolean"
           },
           {
             "component": "boolean",
