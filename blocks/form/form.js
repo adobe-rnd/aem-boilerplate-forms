@@ -408,7 +408,7 @@ function decoratePanelContainer(container, panel) {
       }
     }
 
-    if (container.dataset?.repeatable === 'true') {
+    if (container.dataset?.repeatable === 'true' && container.dataset?.variant !== 'noButtons') {
       if (!container.querySelector(':scope > .repeat-actions')) {
         insertAddButton(container, container);
       }
