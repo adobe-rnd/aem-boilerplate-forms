@@ -1,0 +1,10 @@
+{
+  "fields": [
+    {
+      "component": "boolean",
+      "name": "multiLine",
+      "label": "Allow multiple lines",
+      "valueType": "boolean"
+    }
+  ]
+}
