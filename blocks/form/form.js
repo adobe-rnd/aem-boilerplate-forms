@@ -409,10 +409,10 @@ function decoratePanelContainer(container, panel) {
     }
 
     if (container.dataset?.repeatable === 'true') {
-      if (!container.querySelector('.repeat-actions')) {
+      if (!container.querySelector(':scope > .repeat-actions')) {
         insertAddButton(container, container);
       }
-      if (!container.querySelector('.item-remove')) {
+      if (!container.querySelector(':scope > .item-remove')) {
         insertRemoveButton(container, container);
       }
     }
