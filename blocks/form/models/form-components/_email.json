@@ -9,9 +9,7 @@
                         "resourceType": "core/fd/components/form/emailinput/v1/emailinput",
                         "template": {
                             "jcr:title": "Email Input",
-                            "fieldType": "email",
-                            "enabled": true,
-                            "visible": true
+                            "fieldType": "email"
                         }
                     }
                 }

@@ -9,9 +9,7 @@
                         "resourceType": "core/fd/components/form/textinput/v1/textinput",
                         "template": {
                             "jcr:title": "Text Input",
-                            "fieldType": "text-input",
-                            "enabled": true,
-                            "visible": true
+                            "fieldType": "text-input"
                         }
                     }
                 }

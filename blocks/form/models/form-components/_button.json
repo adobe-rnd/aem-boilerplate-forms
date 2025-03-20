@@ -9,9 +9,7 @@
             "resourceType": "core/fd/components/form/button/v1/button",
             "template": {
               "jcr:title": "Button",
-              "fieldType": "button",
-              "enabled": true,
-              "visible": true
+              "fieldType": "button"
             }
           }
         }
