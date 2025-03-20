@@ -399,12 +399,15 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
 }
 
 function decoratePanelContainer(container, panel) {
+  if(!container || !panel) return;
   if (container.classList?.contains('panel-wrapper')) {
     if (panel.label && !container.querySelector(`legend[for=${container.dataset.id}]`)) {
       const legend = createLegend(panel);
-      container.insertAdjacentElement('afterbegin', legend);
+      if(legend) {
+        container.insertAdjacentElement('afterbegin', legend);
+      }
     }
-    
+
     if (container.dataset?.repeatable === 'true') {
       if (!container.querySelector('.repeat-actions')) {
         insertAddButton(container, container);
