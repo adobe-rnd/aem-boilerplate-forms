@@ -18,9 +18,9 @@
 export default function decorate(fieldDiv, fieldJson) {
   // get the input element from the fieldDiv
   const input = fieldDiv.querySelector('input[type="number"]');
-  const enabled = fieldJson?.enabled !== false; // Default to true if not specified
-  const readOnly = fieldJson?.readOnly === true; // Default to false if not specified
-  
+  const enabled = fieldJson?.enabled;
+  const readOnly = fieldJson?.readOnly;
+
   // get the max attribute from the input element
   let max = input.getAttribute('max');
   if (!max) {

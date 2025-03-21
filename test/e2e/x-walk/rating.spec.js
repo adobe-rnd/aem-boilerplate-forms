@@ -1,5 +1,5 @@
-import { test, expect } from '../../fixtures.js';
-import { openPage } from '../../utils.js';
+import { test, expect } from '../fixtures.js';
+import { openPage } from '../utils.js';
 
 const emoji = ['😢', '😊'];
 let rating = null;
@@ -14,7 +14,7 @@ const selector = {
 const partialUrl = '/L2NvbnRlbnQvcmF0aW5nQ29tcG9uZW50VGVzdENvbGxhdGVyYWwvaW5kZXgvamNyOmNvbnRlbnQvcm9vdC9zZWN0aW9uXzAvZm9ybQ==';
 const starsSelected = 'star hover selected';
 
-test.describe('custom component validation', () => {
+test.describe('rating component validation', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/rating-component';
 
   test('rating custom component validation @chromium-only', async ({ page }) => {
@@ -52,5 +52,64 @@ test.describe('custom component validation', () => {
     }
     await page.getByRole('button', { name: 'Submit' }).click();
     expect(requestPayload.includes(rating)).toBeTruthy();
+  });
+
+  test('test enable disable', async ({page}) => {
+    await openPage(page, testURL);
+
+    // Test initial state (enabled)
+    const ratingComponent = page.locator('.rating');
+    await expect(ratingComponent).not.toHaveClass(/disabled/);
+
+    // Click on the third star
+    const stars = page.locator('.star');
+    await stars.nth(2).click();
+
+    // Verify the first three stars have the 'selected' class
+    for (let i = 0; i < 3; i++) {
+      await expect(stars.nth(i)).toHaveClass(/selected/);
+    }
+
+    // Verify the remaining stars don't have the 'selected' class
+    const totalStars = await stars.count();
+    for (let i = 3; i < totalStars; i++) {
+      await expect(stars.nth(i)).not.toHaveClass(/selected/);
+    }
+
+    // Disable the rating component
+    const disableBtn = await page.getByRole('button', { name: 'disable' });
+    await disableBtn.click();
+
+    // Verify the component has the 'disabled' class
+    await expect(ratingComponent).toHaveClass(/disabled/);
+
+    // Try to click on a different star (should not change the selection)
+    await stars.nth(4).click();
+
+    // Verify the selection hasn't changed (still only first three stars selected)
+    for (let i = 0; i < 3; i++) {
+      await expect(stars.nth(i)).toHaveClass(/selected/);
+    }
+    for (let i = 3; i < totalStars; i++) {
+      await expect(stars.nth(i)).not.toHaveClass(/selected/);
+    }
+
+    // Re-enable the component
+    const enableBtn = await page.getByRole('button', { name: 'enable' });
+    await enableBtn.click();
+
+    // Verify the component doesn't have the 'disabled' class
+    await expect(ratingComponent).not.toHaveClass(/disabled/);
+
+    // Click on a different star
+    await stars.nth(4).click();
+
+    // Verify the selection has changed
+    for (let i = 0; i < 5; i++) {
+      await expect(stars.nth(i)).toHaveClass(/selected/);
+    }
+    for (let i = 5; i < totalStars; i++) {
+      await expect(stars.nth(i)).not.toHaveClass(/selected/);
+    }
   });
 });
