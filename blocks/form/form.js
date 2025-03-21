@@ -348,6 +348,27 @@ function inputDecorator(field, element) {
   }
 }
 
+function decoratePanelContainer(container, panel) {
+  if (!container || !panel) return;
+  if (container.classList?.contains('panel-wrapper')) {
+    if (panel.label && !container.querySelector(`legend[for=${container.dataset.id}]`)) {
+      const legend = createLegend(panel);
+      if (legend) {
+        container.insertAdjacentElement('afterbegin', legend);
+      }
+    }
+
+    if (container.dataset?.repeatable === 'true' && container.dataset?.variant !== 'noButtons') {
+      if (!container.querySelector(':scope > .repeat-actions')) {
+        insertAddButton(container, container);
+      }
+      if (!container.querySelector(':scope > .item-remove')) {
+        insertRemoveButton(container, container);
+      }
+    }
+  }
+}
+
 function renderField(fd) {
   const fieldType = fd?.fieldType?.replace('-input', '') ?? 'text';
   const renderer = fieldRenderers[fieldType];
@@ -396,27 +417,6 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
   container.append(...children.filter((_) => _ != null));
   decoratePanelContainer(container, panel);
   await componentDecorator(container, panel);
-}
-
-function decoratePanelContainer(container, panel) {
-  if(!container || !panel) return;
-  if (container.classList?.contains('panel-wrapper')) {
-    if (panel.label && !container.querySelector(`legend[for=${container.dataset.id}]`)) {
-      const legend = createLegend(panel);
-      if(legend) {
-        container.insertAdjacentElement('afterbegin', legend);
-      }
-    }
-
-    if (container.dataset?.repeatable === 'true' && container.dataset?.variant !== 'noButtons') {
-      if (!container.querySelector(':scope > .repeat-actions')) {
-        insertAddButton(container, container);
-      }
-      if (!container.querySelector(':scope > .item-remove')) {
-        insertRemoveButton(container, container);
-      }
-    }
-  }
 }
 
 function enableValidation(form) {
