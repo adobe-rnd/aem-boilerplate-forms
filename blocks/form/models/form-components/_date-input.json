@@ -1,7 +1,7 @@
 {
     "definitions": [
         {
-            "title": "Date Picker",
+            "title": "Date Input",
             "id": "date-input",
             "plugins": {
                 "xwalk": {

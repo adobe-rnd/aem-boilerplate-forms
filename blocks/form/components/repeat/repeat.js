@@ -39,7 +39,7 @@ function createButton(label, icon) {
 }
 
 export function insertRemoveButton(fieldset, wrapper, form) {
-  const label = fieldset.dataset?.repeatDeleteButtonLabel || 'Remove';
+  const label = fieldset.dataset?.repeatDeleteButtonLabel || 'Delete';
   const removeButton = createButton(label, 'remove');
   removeButton.addEventListener('click', () => {
     fieldset.remove();
@@ -109,8 +109,8 @@ export default function transferRepeatableDOM(form) {
     wrapper.dataset.repeatDeleteButtonLabel = el.dataset?.repeatDeleteButtonLabel ? el.dataset.repeatDeleteButtonLabel : 'Remove';
     el.insertAdjacentElement('beforebegin', wrapper);
     wrapper.append(...instances);
-    wrapper.querySelector('.item-remove')?.remove();
-    wrapper.querySelector('.repeat-actions')?.remove();
+    wrapper.querySelectorAll('.item-remove').forEach((element) => element.remove());
+    wrapper.querySelectorAll('.repeat-actions').forEach((element) => element.remove());
     const cloneNode = el.cloneNode(true);
     cloneNode.removeAttribute('id');
     wrapper['#repeat-template'] = cloneNode;
