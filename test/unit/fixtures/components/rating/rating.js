@@ -7,7 +7,7 @@ export const fieldDef = {
     visible: true,
     type: 'number',
     required: false,
-    enabled: true,
+    enabled: false,
     readOnly: false,
     description: '<p>This is a help text.</p>',
     label: {
