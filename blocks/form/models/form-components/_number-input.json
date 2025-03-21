@@ -9,9 +9,7 @@
                         "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                         "template": {
                             "jcr:title": "Number Input",
-                            "fieldType": "number-input",
-                            "enabled": true,
-                            "visible": true
+                            "fieldType": "number-input"
                         }
                     }
                 }

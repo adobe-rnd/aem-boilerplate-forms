@@ -9,9 +9,7 @@
                         "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
                         "template": {
                             "jcr:title": "Date Input",
-                            "fieldType": "date-input",
-                            "enabled": true,
-                            "visible": true
+                            "fieldType": "date-input"
                         }
                     }
                 }

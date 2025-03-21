@@ -11,20 +11,14 @@
                             "jcr:title": "Accordion",
                             "fieldType": "panel",
                             "fd:viewType": "accordion",
-                            "enabled": true,
-                            "visible": true,
                             "panel1": {
                                 "jcr:title": "Item 1",
                                 "fieldType": "panel",
-                                "visible": true,
-                                "enabled": true,
                                 "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                             },
                             "panel2": {
                                 "jcr:title": "Item 2",
                                 "fieldType": "panel",
-                                "visible": true,
-                                "enabled": true,
                                 "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                             }
                         }
