@@ -316,8 +316,7 @@
                 "resourceType": "core/fd/components/form/image/v1/image",
                 "template": {
                   "jcr:title": "Image",
-                  "fieldType": "image",
-                  "visible": true
+                  "fieldType": "image"
                 }
               }
             }
@@ -465,7 +464,6 @@
                 "template": {
                   "jcr:title": "Text",
                   "fieldType": "plain-text",
-                  "visible": true,
                   "textIsRich": true,
                   "value": "Adaptive Form Text Component"
                 }
