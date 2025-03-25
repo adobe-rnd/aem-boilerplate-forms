@@ -16,3 +16,7 @@ main .form .rating .star.selected {
 main .form .rating:hover .star.hover {
     color: #ecba24;
 }
+
+main .form .rating.disabled .star.selected {
+    color: #ccc;
+}
