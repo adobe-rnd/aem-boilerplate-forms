@@ -11,7 +11,6 @@
                             "jcr:title": "Accordion",
                             "fieldType": "panel",
                             "fd:viewType": "accordion",
-                            "minOccur": 1,
                             "enabled": true,
                             "visible": true,
                             "panel1": {

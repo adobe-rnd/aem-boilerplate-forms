@@ -204,7 +204,6 @@
                   "jcr:title": "Accordion",
                   "fieldType": "panel",
                   "fd:viewType": "accordion",
-                  "minOccur": 1,
                   "enabled": true,
                   "visible": true,
                   "panel1": {
@@ -680,7 +679,6 @@
                   "jcr:title": "Wizard",
                   "fieldType": "panel",
                   "fd:viewType": "wizard",
-                  "minOccur": 1,
                   "enabled": true,
                   "visible": true,
                   "panel1": {
