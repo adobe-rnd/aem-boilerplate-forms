@@ -42,7 +42,7 @@
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "...": "../../../../models/form-common/_basic-input-fields.json"
+                    "...": "../../models/form-common/_basic-input-fields.json"
                 },
                 {
                     "component": "container",
@@ -181,15 +181,7 @@
                     ]
                 },
                 {
-                    "component": "container",
-                    "name": "help",
-                    "label": "Help Content",
-                    "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "../../../../models/form-common/_help-container.json"
-                        }
-                    ]
+                    "...": "../../models/form-common/_help-container.json"
                 }
             ]
         }

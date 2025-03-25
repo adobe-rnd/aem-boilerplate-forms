@@ -128,15 +128,15 @@
           }
         },
         {
-          "title": "Adaptive Form - Embed",
-          "id": "form-embed",
+          "title": "Embed Adaptive Form",
+          "id": "embed-adaptive-form",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/franklin/components/block/v1/block",
                 "template": {
-                  "name": "Adaptive Form - Embed",
-                  "model": "form-embed"
+                  "name": "Embed Adaptive Form",
+                  "model": "embed-adaptive-form"
                 }
               }
             }
@@ -158,74 +158,6 @@
           }
         },
         {
-          "title": "Fragment",
-          "id": "fragment",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Fragment",
-                  "model": "fragment"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Hero",
-          "id": "hero",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/franklin/components/block/v1/block",
-                "template": {
-                  "name": "Hero",
-                  "model": "hero"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "title": "Adaptive Form Components",
-      "id": "form-general",
-      "components": [
-        {
-          "title": "Accordion",
-          "id": "form-accordion",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
-                "template": {
-                  "jcr:title": "Accordion",
-                  "fieldType": "panel",
-                  "fd:viewType": "accordion",
-                  "enabled": true,
-                  "visible": true,
-                  "panel1": {
-                    "jcr:title": "Item 1",
-                    "fieldType": "panel",
-                    "visible": true,
-                    "enabled": true,
-                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
-                  },
-                  "panel2": {
-                    "jcr:title": "Item 2",
-                    "fieldType": "panel",
-                    "visible": true,
-                    "enabled": true,
-                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
           "title": "Button",
           "id": "form-button",
           "plugins": {
@@ -235,39 +167,6 @@
                 "template": {
                   "jcr:title": "Button",
                   "fieldType": "button",
-                  "enabled": true,
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Captcha (Invisible)",
-          "id": "captcha",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
-                "template": {
-                  "jcr:title": "Captcha (Invisible)",
-                  "fieldType": "captcha"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Checkbox",
-          "id": "checkbox",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
-                "template": {
-                  "jcr:title": "Checkbox",
-                  "fieldType": "checkbox",
-                  "checkedValue": "on",
                   "enabled": true,
                   "visible": true
                 }
@@ -296,7 +195,25 @@
                   "visible": true,
                   "enabled": true,
                   "orientation": "horizontal",
-                  "type": "number[]"
+                  "type": "string[]"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Checkbox",
+          "id": "checkbox",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
+                "template": {
+                  "jcr:title": "Checkbox",
+                  "fieldType": "checkbox",
+                  "checkedValue": "on",
+                  "enabled": true,
+                  "visible": true
                 }
               }
             }
@@ -339,7 +256,7 @@
                   ],
                   "enabled": true,
                   "visible": true,
-                  "type": "number"
+                  "type": "string"
                 }
               }
             }
@@ -380,6 +297,7 @@
                     "application/pdf"
                   ],
                   "buttonText": "Attach",
+                  "dragDropText": "Drag and Drop To Upload",
                   "type": "file",
                   "enabled": true,
                   "visible": true
@@ -416,24 +334,6 @@
                   "jcr:title": "Image",
                   "fieldType": "image",
                   "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Modal",
-          "id": "form-modal",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
-                "template": {
-                  "jcr:title": "Modal",
-                  "fieldType": "panel",
-                  "fd:viewType": "modal",
-                  "enabled": true,
-                  "visible": false
                 }
               }
             }
@@ -501,18 +401,15 @@
           }
         },
         {
-          "title": "Rating",
-          "id": "rating",
+          "title": "Captcha (Invisible)",
+          "id": "captcha",
           "plugins": {
             "xwalk": {
               "page": {
-                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
                 "template": {
-                  "jcr:title": "Rating",
-                  "fieldType": "number-input",
-                  "fd:viewType": "rating",
-                  "enabled": true,
-                  "visible": true
+                  "jcr:title": "Captcha (Invisible)",
+                  "fieldType": "captcha"
                 }
               }
             }
@@ -564,6 +461,125 @@
                 "template": {
                   "jcr:title": "Telephone Input",
                   "fieldType": "text-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Text Input",
+          "id": "text-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Text Input",
+                  "fieldType": "text-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Text",
+          "id": "plain-text",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/text/v1/text",
+                "template": {
+                  "jcr:title": "Text",
+                  "fieldType": "plain-text",
+                  "visible": true,
+                  "textIsRich": true,
+                  "value": "Adaptive Form Text Component"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Accordion",
+          "id": "form-accordion",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Accordion",
+                  "fieldType": "panel",
+                  "fd:viewType": "accordion",
+                  "enabled": true,
+                  "visible": true,
+                  "panel1": {
+                    "jcr:title": "Item 1",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  },
+                  "panel2": {
+                    "jcr:title": "Item 2",
+                    "fieldType": "panel",
+                    "visible": true,
+                    "enabled": true,
+                    "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Modal",
+          "id": "form-modal",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Modal",
+                  "fieldType": "panel",
+                  "fd:viewType": "modal",
+                  "enabled": true,
+                  "visible": false
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Password",
+          "id": "password",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Password",
+                  "fieldType": "text-input",
+                  "fd:viewType": "password"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Rating",
+          "id": "rating",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                "template": {
+                  "jcr:title": "Rating",
+                  "fieldType": "number-input",
+                  "fd:viewType": "rating",
                   "enabled": true,
                   "visible": true
                 }
@@ -634,41 +650,6 @@
           }
         },
         {
-          "title": "Text",
-          "id": "plain-text",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/text/v1/text",
-                "template": {
-                  "jcr:title": "Text",
-                  "fieldType": "plain-text",
-                  "visible": true,
-                  "textIsRich": true,
-                  "value": "Adaptive Form Text Component"
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Text Input",
-          "id": "text-input",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/textinput/v1/textinput",
-                "template": {
-                  "jcr:title": "Text Input",
-                  "fieldType": "text-input",
-                  "enabled": true,
-                  "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
           "title": "Wizard",
           "id": "wizard",
           "plugins": {
@@ -695,6 +676,36 @@
                     "enabled": true,
                     "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                   }
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Fragment",
+          "id": "fragment",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Fragment",
+                  "model": "fragment"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Hero",
+          "id": "hero",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/franklin/components/block/v1/block",
+                "template": {
+                  "name": "Hero",
+                  "model": "hero"
                 }
               }
             }

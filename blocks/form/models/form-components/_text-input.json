@@ -1,15 +1,15 @@
 {
     "definitions": [
         {
-            "title": "Email",
-            "id": "email",
+            "title": "Text Input",
+            "id": "text-input",
             "plugins": {
                 "xwalk": {
                     "page": {
-                        "resourceType": "core/fd/components/form/emailinput/v1/emailinput",
+                        "resourceType": "core/fd/components/form/textinput/v1/textinput",
                         "template": {
-                            "jcr:title": "Email Input",
-                            "fieldType": "email",
+                            "jcr:title": "Text Input",
+                            "fieldType": "text-input",
                             "enabled": true,
                             "visible": true
                         }
@@ -20,14 +20,27 @@
     ],
     "models": [
         {
-            "id": "email",
+            "id": "text-input",
             "fields": [
                 {
                     "component": "container",
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "...": "../form-common/_basic-input-placeholder-fields.json"
+                    "fields": [
+                        {
+                            "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                        },
+                        {
+                            "...": "../form-common/_basic-input-default-value-fields.json#/fields"
+                        },
+                        {
+                            "component": "boolean",
+                            "name": "multiLine",
+                            "label": "Allow multiple lines",
+                            "valueType": "boolean"
+                        }
+                    ]
                 },
                 {
                     "...": "../form-common/_help-container.json"

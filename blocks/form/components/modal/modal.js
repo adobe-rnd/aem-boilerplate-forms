@@ -14,21 +14,16 @@ export class Modal {
     const dialog = document.createElement('dialog');
     const dialogContent = document.createElement('div');
     dialogContent.classList.add('modal-content');
-    
-    // Use the stored original content instead of panel.childNodes
-    if (this.originalContent) {
-      // Clone the nodes to avoid reference issues
-      this.originalContent.forEach(node => {
-        dialogContent.appendChild(node.cloneNode(true));
-      });
-    } else {
-      // First time initialization - store original content
+    // First time initialization - store original content
+    if (!this.originalContent) {
       this.originalContent = [...panel.childNodes];
-      this.originalContent.forEach(node => {
-        dialogContent.appendChild(node.cloneNode(true));
-      });
     }
-    
+
+    // Move the original nodes to the dialog content
+    // This preserves all event listeners and attached logic
+    this.originalContent.forEach((node) => {
+      dialogContent.appendChild(node);
+    });
     dialog.append(dialogContent);
     const closeButton = document.createElement('button');
     closeButton.classList.add('close-button');
@@ -49,6 +44,12 @@ export class Modal {
     });
     dialog.addEventListener('close', () => {
       document.body.classList.remove('modal-open');
+      // Move the content back to the panel when dialog closes
+      const modalContent = dialog.querySelector('.modal-content');
+      while (modalContent.firstChild) {
+        this.panel.appendChild(modalContent.firstChild);
+      }
+
       dialog.remove();
       if (this.formModel) {
         this.formModel.getElement(panel?.id).visible = false;
@@ -65,7 +66,7 @@ export class Modal {
         this.modalWrapper.appendChild(this.dialog);
       }
     }
-    
+
     if (this.dialog.isConnected) {
       this.dialog.showModal();
       document.body.classList.add('modal-open');
@@ -83,8 +84,6 @@ export class Modal {
     const wrapper = document.createElement('div');
     wrapper.classList.add('modal');
     wrapper.appendChild(this.dialog);
-    // Clear panel before adding wrapper
-    panel.innerHTML = '';
     panel.appendChild(wrapper);
     this.modalWrapper = wrapper;
   }

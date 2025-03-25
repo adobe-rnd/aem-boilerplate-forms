@@ -21,7 +21,7 @@
                             "visible": true,
                             "enabled": true,
                             "orientation": "horizontal",
-                            "type": "number[]"
+                            "type": "string[]"
                         }
                     }
                 }
@@ -62,7 +62,7 @@
                             "label": "Data type of submitted value",
                             "name": "type",
                             "valueType": "string",
-                            "value": "number[]",
+                            "value": "string[]",
                             "options": [
                                 {
                                     "name": "String",

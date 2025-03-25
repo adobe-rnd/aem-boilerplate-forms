@@ -72,7 +72,7 @@
           "collapsible": false,
           "fields": [
             {
-              "...": "../../../../models/form-common/_basic-input-fields.json#/fields"
+              "...": "../../models/form-common/_basic-input-fields.json#/fields"
             },
             {
               "component": "boolean",
@@ -83,7 +83,7 @@
           ]
         },
         {
-        "...": "../../../../models/form-common/_help-container.json"
+        "...": "../../models/form-common/_help-container.json"
         }
       ]
     }

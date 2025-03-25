@@ -27,7 +27,17 @@
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "...": "../form-common/_basic-input-placeholder-fields.json"
+                    "fields": [
+                        {
+                            "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                        },
+                        {
+                            "component": "date-time",
+                            "name": "default",
+                            "label": "Default Value",
+                            "valueType": "date"
+                        }
+                    ]
                 },
                 {
                     "...": "../form-common/_help-container.json"

@@ -1,4 +1,5 @@
 import { test, expect } from '../../fixtures.js';
+import {openPage} from "../../utils.js";
 
 let requestPayload = null;
 const expectedPayload = {
@@ -49,10 +50,10 @@ async function validateCheckboxOption(page, option) {
 }
 
 test.describe('Checkbox Group Validation in Doc-based Form', () => {
-  const testURL = 'https://main--aem-boilerplate-forms-doc-based--adobe-rnd.aem.live/checkboxgroupoptionvalidation';
+  const testURL = '/checkboxgroupoptionvalidation';
 
   test('Verify Payload Accuracy with Last Checkbox Option Selection', async ({ page }) => {
-    await page.goto(testURL, { waitUntil: 'load' });
+    await openPage(page, testURL, 'docbased');
     page.on('request', (request) => {
       requestPayload = request.postData();
     });
@@ -62,7 +63,7 @@ test.describe('Checkbox Group Validation in Doc-based Form', () => {
   });
 
   test('Verify Payload Accuracy with multiple Checkbox Option Selection including last option', async ({ page }) => {
-    await page.goto(testURL, { waitUntil: 'load' });
+    await openPage(page, testURL, 'docbased');
     page.on('request', (request) => {
       requestPayload = request.postData();
     });
@@ -74,7 +75,7 @@ test.describe('Checkbox Group Validation in Doc-based Form', () => {
   });
 
   test('Verify Payload Accuracy with first Checkbox Option Selection', async ({ page }) => {
-    await page.goto(testURL, { waitUntil: 'load' });
+    await openPage(page, testURL, 'docbased');
     page.on('request', (request) => {
       requestPayload = request.postData();
     });

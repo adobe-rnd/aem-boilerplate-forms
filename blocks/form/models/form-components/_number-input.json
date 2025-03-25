@@ -32,6 +32,12 @@
                             "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
                         },
                         {
+                            "component": "number",
+                            "name": "default",
+                            "label": "Default Value",
+                            "valueType": "number"
+                        },
+                        {
                             "component": "select",
                             "name": "type",
                             "label": "Number type",

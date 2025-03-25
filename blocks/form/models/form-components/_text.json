@@ -1,65 +1,52 @@
 {
-    "fields": [
-        {
-            "component": "text",
-            "name": "name",
-            "label": "Name",
-            "valueType": "string",
-            "required": true,
-            "valueFormat": "regexp",
-            "validation": {
-                "regExp": "^[^$].*",
-                "customErrorMsg": "Name cannot start with $"
+  "definitions": [
+    {
+      "title": "Text",
+      "id": "plain-text",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/text/v1/text",
+            "template": {
+              "jcr:title": "Text",
+              "fieldType": "plain-text",
+              "visible": true,
+              "textIsRich": true,
+              "value": "Adaptive Form Text Component"
             }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "plain-text",
+      "fields": [
+        {
+          "component": "text",
+          "name": "name",
+          "label": "Name",
+          "valueType": "string",
+          "required": true
         },
         {
-            "component": "text",
-            "name": "jcr:title",
-            "label": "Title",
-            "valueType": "string"
+          "component": "text",
+          "name": "dataRef",
+          "label": "Bind reference",
+          "valueType": "string"
         },
         {
-            "component": "boolean",
-            "name": "hideTitle",
-            "label": "Hide title",
-            "valueType": "boolean"
-        },
-        {
-            "component": "text",
-            "name": "dataRef",
-            "label": "Bind reference",
-            "valueType": "string"
-        },
-        {
-            "component": "boolean",
-            "name": "unboundFormElement",
-            "label": "Mark as Unbound Form Element",
-            "valueType": "boolean"
-        },
-        {
-            "component": "boolean",
-            "name": "visible",
-            "label": "Show Component",
-            "valueType": "boolean",
-            "value": true
-        },
-        {
-            "component": "boolean",
-            "name": "enabled",
-            "label": "Enable Component",
-            "valueType": "boolean",
-            "value": true
-        },
-        {
-            "component": "boolean",
-            "name": "readOnly",
-            "label": "Read-only",
-            "valueType": "boolean"
+          "component": "boolean",
+          "name": "visible",
+          "label": "Show Component",
+          "valueType": "boolean",
+          "value": true
         },
         {
             "component": "select",
             "name": "colspan",
-            "label": "Columns",
+            "label": "Column Span",
             "valueType": "string",
             "value": "12",
             "options": [
@@ -113,5 +100,7 @@
                 }
             ]
         }
-    ]
+      ]
+    }
+  ]
 }

@@ -114,9 +114,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'visible':
         fieldWrapper.dataset.visible = currentValue;
-        if(fieldType === 'panel' && fieldWrapper.querySelector('dialog')) {
+        if (fieldType === 'panel' && fieldWrapper.querySelector('dialog')) {
           const dialog = fieldWrapper.querySelector('dialog');
-          if(currentValue === false && dialog.open) {
+          if (currentValue === false && dialog.open) {
             dialog.close(); // close triggers the event listener that removes the dialog overlay
           }
         }

@@ -37,7 +37,7 @@ main .form .accordion > fieldset.accordion-collapse > legend::after {
 }
 
 main .form fieldset.accordion-collapse > :not(legend) {
-    display: none!important;
+    display: none !important;
 }
 
 

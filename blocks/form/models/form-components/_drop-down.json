@@ -20,7 +20,7 @@
               ],
               "enabled": true,
               "visible": true,
-              "type": "number"
+              "type": "string"
             }
           }
         }

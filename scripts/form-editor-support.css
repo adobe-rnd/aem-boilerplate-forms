@@ -69,6 +69,7 @@ form.edit-mode .modal dialog {
 :root.adobe-ue-edit .grecaptcha-badge {
     visibility: hidden ;
 }
+
 :root.adobe-ue-preview .grecaptcha-badge {
     visibility: visible ;
 }
@@ -84,4 +85,16 @@ main .form form.edit-mode .captcha-wrapper {
     border-radius: 4px;
     background: linear-gradient(180deg,rgba(0 0 0 / 5%),rgba(255 255 255 / 5%),rgba(0 0 0 / 5%)),
                 linear-gradient(90deg,rgba(0 0 0 / 5%),rgba(255 255 255 / 5%),rgba(0 0 0 / 5%));
+}
+
+.adobe-ue-edit .embed-adaptive-form-wrapper:not(:has(form, a)) > div {
+    display: flex !important;
+    justify-content: center;
+    padding: 15px;
+    background: linear-gradient(180deg,rgba(0 0 0 / 5%),rgba(255 255 255 / 5%),rgba(0 0 0 / 5%)),
+    linear-gradient(90deg,rgba(0 0 0 / 5%),rgba(255 255 255 / 5%),rgba(0 0 0 / 5%));
+}
+
+.adobe-ue-edit .embed-adaptive-form-wrapper:not(:has(form, a)) > div::before {
+    content: "Select an Adaptive Form";
 }

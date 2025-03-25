@@ -189,8 +189,8 @@ function setConstraintsMessage(field, messages = {}) {
 function createRadioOrCheckboxGroup(fd) {
   const wrapper = createFieldSet({ ...fd });
   const type = fd.fieldType.split('-')[0];
-  fd.enum.forEach((value, index) => {
-    const label = (typeof fd.enumNames?.[index] === 'object' && fd.enumNames?.[index] !== null) ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
+  fd?.enum?.forEach((value, index) => {
+    const label = (typeof fd?.enumNames?.[index] === 'object' && fd?.enumNames?.[index] !== null) ? fd?.enumNames[index].value : fd?.enumNames?.[index] || value;
     const id = getId(fd.name);
     const field = createRadioOrCheckbox({
       name: fd.name,
@@ -456,7 +456,7 @@ export async function createForm(formDef, data) {
 
   form.addEventListener('reset', async () => {
     const newForm = await createForm(formDef);
-    document.querySelector(`[data-action="${formDef.action}"]`).replaceWith(newForm);
+    document.querySelector(`[data-action="${form?.dataset?.action}"]`).replaceWith(newForm);
   });
 
   form.addEventListener('submit', (e) => {

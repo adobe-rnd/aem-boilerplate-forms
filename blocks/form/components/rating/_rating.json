@@ -28,17 +28,17 @@
           "name": "basic",
           "label": "Basic",
           "collapsible": false,
-          "...": "../../../../models/form-common/_basic-input-fields.json"
+          "...": "../../models/form-common/_basic-input-fields.json"
         },
         {
-        "...": "../../../../models/form-common/_help-container.json"
+        "...": "../../models/form-common/_help-container.json"
         },
         {
           "component": "container",
           "name": "validation",
           "label": "Validation",
           "collapsible": true,
-          "...": "../../../../models/form-common/_number-validation-fields.json"
+          "...": "../../models/form-common/_number-validation-fields.json"
         }
       ]
     }

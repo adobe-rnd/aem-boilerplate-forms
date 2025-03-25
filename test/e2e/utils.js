@@ -42,8 +42,14 @@ export async function fillField(page, componentTitle, inputValues) {
 }
 
 const getCurrentBranch = () => executeGitCommand('git rev-parse --abbrev-ref HEAD');
-const openPage = async (page, relativeURL) => {
-  const url = `https://${getCurrentBranch()}--aem-boilerplate-forms--adobe-rnd.aem.live${relativeURL}`;
+const openPage = async (page, relativeURL, type='xwalk') => {
+  let site = null
+  if(type === 'docbased') {
+    site = '--aem-boilerplate-forms-doc-based--adobe-rnd.aem.live'
+  } else if(type === 'xwalk') {
+    site = '--aem-boilerplate-forms--adobe-rnd.aem.live';
+  }
+  const url = `https://${getCurrentBranch()}${site}${relativeURL}`;
   await page.goto(url, { waitUntil: 'networkidle' });
 };
 
