@@ -33,7 +33,7 @@ export default function decorate(fieldDiv, fieldJson) {
   ratingDiv.classList.add('hover');
 
   // Add disabled class if the component is not enabled or is readonly
-  if (!enabled || readOnly) {
+  if (enabled === false || readOnly === true) {
     ratingDiv.classList.add('disabled');
   }
 
