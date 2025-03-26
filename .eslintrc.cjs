@@ -42,7 +42,7 @@ module.exports = {
       'form-submit-button': 7,
       'telephone-input': 20,
       'text-input': 23,
-      accordion: 14,
+      accordion: 17,
       modal: 11,
       rating: 18,
       password: 20,
