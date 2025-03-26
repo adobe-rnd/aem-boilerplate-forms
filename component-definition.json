@@ -166,7 +166,6 @@
                 "resourceType": "core/fd/components/form/button/v1/button",
                 "template": {
                   "jcr:title": "Button",
-                  "fieldType": "button",
                   "enabled": true,
                   "visible": true
                 }
@@ -226,7 +225,6 @@
                 "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
                 "template": {
                   "jcr:title": "Date Input",
-                  "fieldType": "date-input",
                   "enabled": true,
                   "visible": true
                 }
@@ -243,7 +241,6 @@
                 "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
                 "template": {
                   "jcr:title": "Drop Down List",
-                  "fieldType": "drop-down",
                   "enum": [
                     "0",
                     "1"
@@ -269,7 +266,6 @@
                 "resourceType": "core/fd/components/form/emailinput/v1/emailinput",
                 "template": {
                   "jcr:title": "Email Input",
-                  "fieldType": "email",
                   "enabled": true,
                   "visible": true
                 }
@@ -327,7 +323,6 @@
                 "resourceType": "core/fd/components/form/image/v1/image",
                 "template": {
                   "jcr:title": "Image",
-                  "fieldType": "image",
                   "visible": true
                 }
               }
@@ -359,7 +354,6 @@
                 "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                 "template": {
                   "jcr:title": "Panel",
-                  "fieldType": "panel",
                   "enabled": true,
                   "visible": true,
                   "minOccur": 1
@@ -401,8 +395,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
                 "template": {
-                  "jcr:title": "Captcha (Invisible)",
-                  "fieldType": "captcha"
+                  "jcr:title": "Captcha (Invisible)"
                 }
               }
             }
@@ -451,7 +444,6 @@
                 "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
                 "template": {
                   "jcr:title": "Telephone Input",
-                  "fieldType": "text-input",
                   "enabled": true,
                   "visible": true
                 }
@@ -468,7 +460,6 @@
                 "resourceType": "core/fd/components/form/textinput/v1/textinput",
                 "template": {
                   "jcr:title": "Text Input",
-                  "fieldType": "text-input",
                   "enabled": true,
                   "visible": true
                 }
@@ -485,7 +476,6 @@
                 "resourceType": "core/fd/components/form/text/v1/text",
                 "template": {
                   "jcr:title": "Text",
-                  "fieldType": "plain-text",
                   "visible": true,
                   "textIsRich": true,
                   "value": "Adaptive Form Text Component"

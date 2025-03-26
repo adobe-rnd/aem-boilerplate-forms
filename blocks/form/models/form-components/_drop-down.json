@@ -9,7 +9,6 @@
             "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
             "template": {
               "jcr:title": "Drop Down List",
-              "fieldType": "drop-down",
               "enum": [
                 "0",
                 "1"
