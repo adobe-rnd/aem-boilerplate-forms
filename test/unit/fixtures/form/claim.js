@@ -299,7 +299,7 @@ export const fieldDef = {
             },
             {
               id: 'textinput-93659472e1',
-              fieldType: 'number-input',
+              fieldType: 'text-input',
               name: 'Your_E_mail_Address1701932419752',
               type: 'string',
               label: {
