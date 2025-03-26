@@ -494,7 +494,6 @@
                 "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                 "template": {
                   "jcr:title": "Accordion",
-                  "fieldType": "panel",
                   "fd:viewType": "accordion",
                   "enabled": true,
                   "visible": true,
@@ -543,7 +542,6 @@
                 "resourceType": "core/fd/components/form/textinput/v1/textinput",
                 "template": {
                   "jcr:title": "Password",
-                  "fieldType": "text-input",
                   "fd:viewType": "password"
                 }
               }
@@ -559,7 +557,6 @@
                 "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                 "template": {
                   "jcr:title": "Rating",
-                  "fieldType": "number-input",
                   "fd:viewType": "rating",
                   "enabled": true,
                   "visible": true
@@ -583,7 +580,6 @@
                   "text": {
                     "value": "Text related to the terms and conditions come here.",
                     "sling:resourceType": "core/fd/components/form/text/v1/text",
-                    "fieldType": "plain-text",
                     "textIsRich": true
                   },
                   "link": {
@@ -636,20 +632,17 @@
                 "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                 "template": {
                   "jcr:title": "Wizard",
-                  "fieldType": "panel",
                   "fd:viewType": "wizard",
                   "enabled": true,
                   "visible": true,
                   "panel1": {
                     "jcr:title": "Item 1",
-                    "fieldType": "panel",
                     "visible": true,
                     "enabled": true,
                     "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                   },
                   "panel2": {
                     "jcr:title": "Item 2",
-                    "fieldType": "panel",
                     "visible": true,
                     "enabled": true,
                     "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
