@@ -9,8 +9,6 @@
                         "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                         "template": {
                             "jcr:title": "Panel",
-                            "enabled": true,
-                            "visible": true,
                             "minOccur": 1
                         }
                     }
