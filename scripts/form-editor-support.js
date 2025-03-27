@@ -66,7 +66,8 @@ export function handleWizardNavigation(wizardEl, navigateTo) {
 }
 
 export function handleAccordionNavigationInEditor(accordionEl, navigateTo) {
-  handleAccordionNavigation(accordionEl, navigateTo);
+  // Use the shared function with forceOpen=true
+  handleAccordionNavigation(accordionEl, navigateTo, true);
   activeAccordionPanel = navigateTo.dataset.id;
 }
 
@@ -152,10 +153,8 @@ function annotateItems(items, formDefinition, formFieldMap) {
                 handleWizardNavigation(fieldWrapper.parentElement, fieldWrapper);
               }
               // Check if this panel is in an accordion and should be expanded
-              if (activeAccordionPanel === fieldWrapper.dataset.id && 
-                  fieldWrapper.parentElement.classList.contains('accordion')) {
-                // Use the imported handleAccordionNavigation function
-                handleAccordionNavigation(fieldWrapper.parentElement, fieldWrapper);
+              if (activeAccordionPanel === fieldWrapper.dataset.id && fieldWrapper.parentElement.classList.contains('accordion')) {
+                handleAccordionNavigationInEditor(fieldWrapper.parentElement, fieldWrapper);
               }
             }
           } else {
