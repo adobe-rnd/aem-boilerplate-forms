@@ -165,8 +165,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/button/v1/button",
                 "template": {
-                  "jcr:title": "Button",
-                  "fieldType": "button"
+                  "jcr:title": "Button"
                 }
               }
             }
@@ -181,7 +180,6 @@
                 "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
                 "template": {
                   "jcr:title": "Checkbox Group",
-                  "fieldType": "checkbox-group",
                   "enum": [
                     "0",
                     "1"
@@ -206,7 +204,6 @@
                 "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
                 "template": {
                   "jcr:title": "Checkbox",
-                  "fieldType": "checkbox",
                   "checkedValue": "on"
                 }
               }
@@ -221,8 +218,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
                 "template": {
-                  "jcr:title": "Date Input",
-                  "fieldType": "date-input"
+                  "jcr:title": "Date Input"
                 }
               }
             }
@@ -237,7 +233,6 @@
                 "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
                 "template": {
                   "jcr:title": "Drop Down List",
-                  "fieldType": "drop-down",
                   "enum": [
                     "0",
                     "1"
@@ -260,8 +255,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/emailinput/v1/emailinput",
                 "template": {
-                  "jcr:title": "Email Input",
-                  "fieldType": "email"
+                  "jcr:title": "Email Input"
                 }
               }
             }
@@ -276,7 +270,6 @@
                 "resourceType": "core/fd/components/form/fileinput/v2/fileinput",
                 "template": {
                   "jcr:title": "File Attachment",
-                  "fieldType": "file-input",
                   "accept": [
                     "audio/*",
                     "video/*",
@@ -300,8 +293,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/fragment/v1/fragment",
                 "template": {
-                  "jcr:title": "Fragment",
-                  "fieldType": "panel"
+                  "jcr:title": "Fragment"
                 }
               }
             }
@@ -315,8 +307,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/image/v1/image",
                 "template": {
-                  "jcr:title": "Image",
-                  "fieldType": "image"
+                  "jcr:title": "Image"
                 }
               }
             }
@@ -330,8 +321,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                 "template": {
-                  "jcr:title": "Number Input",
-                  "fieldType": "number-input"
+                  "jcr:title": "Number Input"
                 }
               }
             }
@@ -346,7 +336,6 @@
                 "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                 "template": {
                   "jcr:title": "Panel",
-                  "fieldType": "panel",
                   "minOccur": 1
                 }
               }
@@ -362,7 +351,6 @@
                 "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
                 "template": {
                   "jcr:title": "Radio Group",
-                  "fieldType": "radio-group",
                   "enum": [
                     "0",
                     "1"
@@ -385,8 +373,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
                 "template": {
-                  "jcr:title": "Captcha (Invisible)",
-                  "fieldType": "captcha"
+                  "jcr:title": "Captcha (Invisible)"
                 }
               }
             }
@@ -401,8 +388,7 @@
                 "resourceType": "core/fd/components/form/actions/reset/v1/reset",
                 "template": {
                   "jcr:title": "Reset",
-                  "buttonType": "reset",
-                  "fieldType": "button"
+                  "buttonType": "reset"
                 }
               }
             }
@@ -417,8 +403,7 @@
                 "resourceType": "core/fd/components/form/actions/submit/v1/submit",
                 "template": {
                   "jcr:title": "Submit",
-                  "buttonType": "submit",
-                  "fieldType": "button"
+                  "buttonType": "submit"
                 }
               }
             }
@@ -432,8 +417,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
                 "template": {
-                  "jcr:title": "Telephone Input",
-                  "fieldType": "text-input"
+                  "jcr:title": "Telephone Input"
                 }
               }
             }
@@ -447,8 +431,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/textinput/v1/textinput",
                 "template": {
-                  "jcr:title": "Text Input",
-                  "fieldType": "text-input"
+                  "jcr:title": "Text Input"
                 }
               }
             }
@@ -463,7 +446,6 @@
                 "resourceType": "core/fd/components/form/text/v1/text",
                 "template": {
                   "jcr:title": "Text",
-                  "fieldType": "plain-text",
                   "textIsRich": true,
                   "value": "Adaptive Form Text Component"
                 }
@@ -480,7 +462,6 @@
                 "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                 "template": {
                   "jcr:title": "Accordion",
-                  "fieldType": "panel",
                   "fd:viewType": "accordion",
                   "minOccur": 1,
                   "panel1": {
@@ -507,7 +488,6 @@
                 "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                 "template": {
                   "jcr:title": "Modal",
-                  "fieldType": "panel",
                   "fd:viewType": "modal"
                 }
               }
@@ -523,7 +503,6 @@
                 "resourceType": "core/fd/components/form/textinput/v1/textinput",
                 "template": {
                   "jcr:title": "Password",
-                  "fieldType": "text-input",
                   "fd:viewType": "password"
                 }
               }
@@ -539,7 +518,6 @@
                 "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                 "template": {
                   "jcr:title": "Rating",
-                  "fieldType": "number-input",
                   "fd:viewType": "rating"
                 }
               }
@@ -555,12 +533,10 @@
                 "resourceType": "core/fd/components/form/termsandconditions/v1/termsandconditions",
                 "template": {
                   "jcr:title": "Terms and conditions",
-                  "fieldType": "panel",
                   "fd:viewType": "tnc",
                   "text": {
                     "value": "Text related to the terms and conditions come here.",
                     "sling:resourceType": "core/fd/components/form/text/v1/text",
-                    "fieldType": "plain-text",
                     "textIsRich": true
                   },
                   "link": {
@@ -574,7 +550,6 @@
                       "Privacy policy."
                     ],
                     "sling:resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
-                    "fieldType": "checkbox-group",
                     "fd:rules": {
                       "jcr:primaryType": "nt:unstructured",
                       "validationStatus": "valid"
@@ -590,7 +565,6 @@
                     "name": "approvalcheckbox",
                     "jcr:title": "I agree to the terms & conditions.",
                     "sling:resourceType": "core/fd/components/form/checkbox/v1/checkbox",
-                    "fieldType": "checkbox",
                     "required": true,
                     "type": "string",
                     "enum": [
@@ -611,17 +585,14 @@
                 "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                 "template": {
                   "jcr:title": "Wizard",
-                  "fieldType": "panel",
                   "fd:viewType": "wizard",
                   "minOccur": 1,
                   "panel1": {
                     "jcr:title": "Item 1",
-                    "fieldType": "panel",
                     "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                   },
                   "panel2": {
                     "jcr:title": "Item 2",
-                    "fieldType": "panel",
                     "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                   }
                 }

@@ -9,7 +9,6 @@
                   "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                   "template": {
                     "jcr:title": "Modal",
-                    "fieldType": "panel",
                     "fd:viewType": "modal"
                   }
                 }
