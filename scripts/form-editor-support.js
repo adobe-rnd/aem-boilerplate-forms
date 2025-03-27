@@ -23,6 +23,7 @@ import { handleAccordionNavigation } from '../blocks/form/components/accordion/a
 
 window.currentMode = 'preview';
 let activeWizardStep;
+let activeAccordionPanel;
 const OOTBViewTypeComponentsWithoutModel = ['wizard', 'toggleable-link', 'modal'];
 
 export function getItems(container) {
@@ -144,6 +145,12 @@ function annotateItems(items, formDefinition, formFieldMap) {
               // retain wizard step selection
               if (activeWizardStep === fieldWrapper.dataset.id) {
                 handleWizardNavigation(fieldWrapper.parentElement, fieldWrapper);
+              }
+              // Check if this panel is in an accordion and should be expanded
+              if (activeAccordionPanel === fieldWrapper.dataset.id && 
+                  fieldWrapper.parentElement.classList.contains('accordion')) {
+                // Use the imported handleAccordionNavigation function
+                handleAccordionNavigation(fieldWrapper.parentElement, fieldWrapper);
               }
             }
           } else {
