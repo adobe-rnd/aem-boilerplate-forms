@@ -6,17 +6,6 @@ export function handleAccordionNavigation(panel, tab) {
     }
   });
   tab.classList.toggle('accordion-collapse');
-  
-  // Track the active panel state
-  if (window.activeAccordionPanel === undefined) {
-    window.activeAccordionPanel = null;
-  }
-  
-  if (!tab.classList.contains('accordion-collapse')) {
-    window.activeAccordionPanel = tab.dataset.id;
-  } else if (window.activeAccordionPanel === tab.dataset.id) {
-    window.activeAccordionPanel = null;
-  }
 }
 
 export default function decorate(panel) {

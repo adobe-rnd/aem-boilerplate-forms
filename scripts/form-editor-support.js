@@ -65,6 +65,11 @@ export function handleWizardNavigation(wizardEl, navigateTo) {
   navigateToMenuItem.classList.add('wizard-menu-active-item');
 }
 
+export function handleAccordionNavigationInEditor(accordionEl, navigateTo) {
+  handleAccordionNavigation(accordionEl, navigateTo);
+  activeAccordionPanel = navigateTo.dataset.id;
+}
+
 function generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition) {
   const titleEl = document.createElement('div');
   titleEl.classList.add('fragment-title');
@@ -207,7 +212,7 @@ function handleEditorSelect(event) {
   if (selected && target.closest('.wizard') && !target.classList.contains('wizard')) {
     handleNavigation(target.closest('.wizard'), resource, handleWizardNavigation);
   } else if (selected && target.closest('.accordion')) {
-    handleNavigation(target.closest('.accordion'), resource, handleAccordionNavigation);
+    handleNavigation(target.closest('.accordion'), resource, handleAccordionNavigationInEditor);
   }
 }
 
