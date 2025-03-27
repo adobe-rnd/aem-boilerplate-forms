@@ -23,6 +23,7 @@ import { handleAccordionNavigation } from '../blocks/form/components/accordion/a
 
 window.currentMode = 'preview';
 let activeWizardStep;
+let activeAccordionPanel;
 const OOTBViewTypeComponentsWithoutModel = ['wizard', 'toggleable-link', 'modal'];
 
 export function getItems(container) {
@@ -62,6 +63,12 @@ export function handleWizardNavigation(wizardEl, navigateTo) {
   const currentMenuItem = wizardEl.querySelector('.wizard-menu-active-item');
   currentMenuItem.classList.remove('wizard-menu-active-item');
   navigateToMenuItem.classList.add('wizard-menu-active-item');
+}
+
+export function handleAccordionNavigationInEditor(accordionEl, navigateTo) {
+  // Use the shared function with forceOpen=true
+  handleAccordionNavigation(accordionEl, navigateTo, true);
+  activeAccordionPanel = navigateTo.dataset.id;
 }
 
 function generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition) {
@@ -145,6 +152,10 @@ function annotateItems(items, formDefinition, formFieldMap) {
               if (activeWizardStep === fieldWrapper.dataset.id) {
                 handleWizardNavigation(fieldWrapper.parentElement, fieldWrapper);
               }
+              // Check if this panel is in an accordion and should be expanded
+              if (activeAccordionPanel === fieldWrapper.dataset.id && fieldWrapper.parentElement.classList.contains('accordion')) {
+                handleAccordionNavigationInEditor(fieldWrapper.parentElement, fieldWrapper);
+              }
             }
           } else {
             fieldWrapper.setAttribute('data-aue-type', 'component');
@@ -200,7 +211,7 @@ function handleEditorSelect(event) {
   if (selected && target.closest('.wizard') && !target.classList.contains('wizard')) {
     handleNavigation(target.closest('.wizard'), resource, handleWizardNavigation);
   } else if (selected && target.closest('.accordion')) {
-    handleNavigation(target.closest('.accordion'), resource, handleAccordionNavigation);
+    handleNavigation(target.closest('.accordion'), resource, handleAccordionNavigationInEditor);
   }
 }
 
