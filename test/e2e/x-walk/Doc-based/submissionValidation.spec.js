@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures.js';
-import { fillField } from '../../utils.js';
+import {fillField, openPage} from '../../utils.js';
 
 const inputValues = {
   textInput: 'adobe',
@@ -27,10 +27,10 @@ const titles = ['Text Input', 'Check Box Group', 'Number Input', 'Radio Button',
 let requestPayload = null;
 
 test.describe('Form Rendering and Submission Validation', async () => {
-  const testURL = 'https://main--aem-boilerplate-forms-doc-based--adobe-rnd.aem.page/submissionvalidation';
+  const testURL = '/submissionvalidation';
 
   test('Validate Doc-Based Form components and submission payload @chromium-only', async ({ page }) => {
-    await page.goto(testURL, { waitUntil: 'load' });
+    await openPage(page, testURL, 'docbased');
     await expect(page.getByLabel('Text Input')).toBeVisible();
 
     // listeners to fetch payload form submission.

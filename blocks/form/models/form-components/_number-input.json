@@ -9,9 +9,7 @@
                         "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                         "template": {
                             "jcr:title": "Number Input",
-                            "fieldType": "number-input",
-                            "enabled": true,
-                            "visible": true
+                            "fieldType": "number-input"
                         }
                     }
                 }
@@ -30,6 +28,12 @@
                     "fields": [
                         {
                             "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                        },
+                        {
+                            "component": "number",
+                            "name": "default",
+                            "label": "Default Value",
+                            "valueType": "number"
                         },
                         {
                             "component": "select",
@@ -81,7 +85,7 @@
                                 },
                                 {
                                     "name": "$1234.21",
-                                    "value": "()¤####0.00"
+                                    "value": "¤####0.00"
                                 },
                                 {
                                     "name": "1,234.210",

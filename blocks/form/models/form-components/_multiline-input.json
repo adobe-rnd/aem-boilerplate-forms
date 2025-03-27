@@ -14,6 +14,9 @@
               "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
             },
             {
+              "...": "../form-common/_basic-input-default-value-fields.json#/fields"
+            },
+            {
               "component": "boolean",
               "name": "multiLine",
               "label": "Allow multiple lines",

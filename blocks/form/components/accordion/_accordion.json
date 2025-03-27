@@ -11,20 +11,15 @@
                             "jcr:title": "Accordion",
                             "fieldType": "panel",
                             "fd:viewType": "accordion",
-                            "enabled": true,
-                            "visible": true,
+                            "minOccur": 1,
                             "panel1": {
                                 "jcr:title": "Item 1",
                                 "fieldType": "panel",
-                                "visible": true,
-                                "enabled": true,
                                 "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                             },
                             "panel2": {
                                 "jcr:title": "Item 2",
                                 "fieldType": "panel",
-                                "visible": true,
-                                "enabled": true,
                                 "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                             }
                         }
@@ -61,15 +56,123 @@
                             "name": "minOccur",
                             "label": "Minimum repetitions",
                             "valueType": "number",
-                            "description": "Minimum number of times the accordion appears on the form"
+                            "description": "Minimum number of times the accordion appears on the form. No value indicates no limit.",
+                            "condition": {
+                                "===": [
+                                    {
+                                        "var": "repeatable"
+                                    },
+                                    true
+                                ]
+                            }
                         },
                         {
                             "component": "number",
                             "name": "maxOccur",
                             "label": "Maximum repetitions",
                             "valueType": "number",
-                            "description": "Maximum number of times the accordion can appear on the form"
+                            "placeholder": "No Limit",
+                            "description": "Maximum number of times the accordion can appear on the form, No value indicates no limit.",
+                            "condition": {
+                                "and": [
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
+                                    },
+                                    {
+                                        "!==": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "noButtons"
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "component": "select",
+                            "name": "variant",
+                            "label": "Variant",
+                            "options": [
+                                {
+                                    "name": "No Actions",
+                                    "value": "noButtons"
+                                },
+                                {
+                                    "name": "Add & Remove Buttons",
+                                    "value": "addRemoveButtons"
+                                }
+                            ],
+                            "value": "addRemoveButtons",
+                            "condition": {
+                                "===": [
+                                    {
+                                        "var": "repeatable"
+                                    },
+                                    true
+                                ]
+                            }
+                        },
+                        {
+                            "component": "text",
+                            "name": "repeatAddButtonLabel",
+                            "label": "Add Button Label",
+                            "valueType": "string",
+                            "value": "Add",
+                            "condition": {
+                                "and": [
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "addRemoveButtons"
+                                        ]
+                                    },
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "component": "text",
+                            "name": "repeatDeleteButtonLabel",
+                            "label": "Delete Button Label",
+                            "valueType": "string",
+                            "value": "Delete",
+                            "condition": {
+                                "and": [
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "variant"
+                                            },
+                                            "addRemoveButtons"
+                                        ]
+                                    },
+                                    {
+                                        "===": [
+                                            {
+                                                "var": "repeatable"
+                                            },
+                                            true
+                                        ]
+                                    }
+                                ]
+                            }
                         }
+
                     ]
                 },
                 {

@@ -1042,10 +1042,10 @@
             "valueType": "string"
           },
           {
-            "component": "text",
+            "component": "date-time",
             "name": "default",
             "label": "Default Value",
-            "valueType": "string"
+            "valueType": "date"
           }
         ]
       },
@@ -1742,6 +1742,18 @@
             ]
           }
         ]
+      },
+      {
+        "component": "text",
+        "name": "buttonText",
+        "label": "Button Title",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "dragDropText",
+        "label": "Drag Drop Text",
+        "valueType": "string"
       },
       {
         "component": "container",
@@ -2461,10 +2473,10 @@
             "valueType": "string"
           },
           {
-            "component": "text",
+            "component": "number",
             "name": "default",
             "label": "Default Value",
-            "valueType": "string"
+            "valueType": "number"
           },
           {
             "component": "select",
@@ -2582,7 +2594,7 @@
               },
               {
                 "name": "$1234.21",
-                "value": "()¤####0.00"
+                "value": "¤####0.00"
               },
               {
                 "name": "1,234.210",
@@ -4054,14 +4066,121 @@
             "name": "minOccur",
             "label": "Minimum repetitions",
             "valueType": "number",
-            "description": "Minimum number of times the accordion appears on the form"
+            "description": "Minimum number of times the accordion appears on the form. No value indicates no limit.",
+            "condition": {
+              "===": [
+                {
+                  "var": "repeatable"
+                },
+                true
+              ]
+            }
           },
           {
             "component": "number",
             "name": "maxOccur",
             "label": "Maximum repetitions",
             "valueType": "number",
-            "description": "Maximum number of times the accordion can appear on the form"
+            "placeholder": "No Limit",
+            "description": "Maximum number of times the accordion can appear on the form, No value indicates no limit.",
+            "condition": {
+              "and": [
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                },
+                {
+                  "!==": [
+                    {
+                      "var": "variant"
+                    },
+                    "noButtons"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "component": "select",
+            "name": "variant",
+            "label": "Variant",
+            "options": [
+              {
+                "name": "No Actions",
+                "value": "noButtons"
+              },
+              {
+                "name": "Add & Remove Buttons",
+                "value": "addRemoveButtons"
+              }
+            ],
+            "value": "addRemoveButtons",
+            "condition": {
+              "===": [
+                {
+                  "var": "repeatable"
+                },
+                true
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "repeatAddButtonLabel",
+            "label": "Add Button Label",
+            "valueType": "string",
+            "value": "Add",
+            "condition": {
+              "and": [
+                {
+                  "===": [
+                    {
+                      "var": "variant"
+                    },
+                    "addRemoveButtons"
+                  ]
+                },
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "component": "text",
+            "name": "repeatDeleteButtonLabel",
+            "label": "Delete Button Label",
+            "valueType": "string",
+            "value": "Delete",
+            "condition": {
+              "and": [
+                {
+                  "===": [
+                    {
+                      "var": "variant"
+                    },
+                    "addRemoveButtons"
+                  ]
+                },
+                {
+                  "===": [
+                    {
+                      "var": "repeatable"
+                    },
+                    true
+                  ]
+                }
+              ]
+            }
           }
         ]
       },

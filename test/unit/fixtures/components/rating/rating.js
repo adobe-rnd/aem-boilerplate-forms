@@ -5,9 +5,9 @@ export const fieldDef = {
     fieldType: 'number-input',
     name: 'numberinput_13917802541727686782114',
     visible: true,
-    type: 'number',
+    type: 'integer',
     required: false,
-    enabled: true,
+    enabled: false,
     readOnly: false,
     description: '<p>This is a help text.</p>',
     label: {

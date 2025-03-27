@@ -72,6 +72,18 @@ export const sample = {
       },
     },
     {
+      id: 'f7',
+      fieldType: 'number-input',
+      name: 'f7_number',
+      type: 'number',
+    },
+    {
+      id: 'f8',
+      fieldType: 'number-input',
+      name: 'f8_number',
+      type: 'integer',
+    },
+    {
       fieldType: 'button',
       id: 'button',
       buttonType: 'submit',
@@ -84,6 +96,8 @@ export const sample = {
 
 export function op(block) {
   const btn = block.querySelector('#button');
+  setValue(block, '#f7', 123.123);
+  setValue(block, '#f8', 123.123);
   btn.click();
   const form = block.querySelector('form');
   form.dispatchEvent(new Event('submit'));
@@ -148,6 +162,17 @@ export function expect(block) {
   assert.equal(f6Message.textContent, 'Please fill in this field.', 'Required error message for file input');
   setValue(block, '#f6', 'abc');
   assert.equal(f6.querySelector('.field-invalid .field-description').textContent, 'Specify the value in allowed format : email.', 'Invalid email error message');
+
+  //number input with type number(decimal) shouldn't display stepMismatch error message
+  const f7 = block.querySelector('#f7').closest('.field-wrapper');
+  const f7Message = f7.querySelector('.field-invalid .field-description');
+  assert.equal(f7Message, undefined, 'Error message shouldn\'t trigger for decimal values');
+
+  // number input with integer type should trigger stepMismatch error
+  const f8 = block.querySelector('#f8').closest('.field-wrapper');
+  const f8Message = f8.querySelector('.field-invalid .field-description');
+  assert.equal(f8Message.textContent, "Constraints not satisfied", 'Error message should trigger for decimal values');
+
 }
 
 export const opDelay = 100;
