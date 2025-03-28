@@ -8,12 +8,6 @@
             "name": "placeholder",
             "label": "Placeholder text",
             "valueType": "string"
-        },
-        {
-            "component": "text",
-            "name": "default",
-            "label": "Default Value",
-            "valueType": "string"
         }
     ]
 }

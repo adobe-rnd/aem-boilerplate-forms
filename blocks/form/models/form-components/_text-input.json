@@ -9,9 +9,7 @@
                         "resourceType": "core/fd/components/form/textinput/v1/textinput",
                         "template": {
                             "jcr:title": "Text Input",
-                            "fieldType": "text-input",
-                            "enabled": true,
-                            "visible": true
+                            "fieldType": "text-input"
                         }
                     }
                 }
@@ -30,6 +28,9 @@
                     "fields": [
                         {
                             "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                        },
+                        {
+                            "...": "../form-common/_basic-input-default-value-fields.json#/fields"
                         },
                         {
                             "component": "boolean",

@@ -10,9 +10,7 @@
             "template": {
               "jcr:title": "Reset",
               "buttonType": "reset",
-              "fieldType": "button",
-              "enabled": true,
-              "visible": true
+              "fieldType": "button"
             }
           }
         }

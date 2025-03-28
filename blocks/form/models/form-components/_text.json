@@ -10,7 +10,6 @@
             "template": {
               "jcr:title": "Text",
               "fieldType": "plain-text",
-              "visible": true,
               "textIsRich": true,
               "value": "Adaptive Form Text Component"
             }
