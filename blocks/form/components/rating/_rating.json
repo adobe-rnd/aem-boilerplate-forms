@@ -10,9 +10,7 @@
             "template": {
               "jcr:title": "Rating",
               "fieldType": "number-input",
-              "fd:viewType": "rating",
-              "enabled": true,
-              "visible": true
+              "fd:viewType": "rating"
             }
           }
         }
