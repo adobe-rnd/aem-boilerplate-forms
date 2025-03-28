@@ -11,8 +11,6 @@
               "jcr:title": "Terms and conditions",
               "fieldType": "panel",
               "fd:viewType": "tnc",
-              "enabled": true,
-              "visible": true,
               "text": {
                 "value": "Text related to the terms and conditions come here.",
                 "sling:resourceType": "core/fd/components/form/text/v1/text",
@@ -23,8 +21,6 @@
                 "enum": ["dummy-link-1"],
                 "type": "string[]",
                 "fd:viewType": "toggleable-link",
-                "enabled": true,
-                "visible": true,
                 "title": "I agree to the terms & conditions",
                 "enumNames": [
                   "Privacy policy."
@@ -48,8 +44,6 @@
                 "sling:resourceType": "core/fd/components/form/checkbox/v1/checkbox",
                 "fieldType": "checkbox",
                 "required": true,
-                "enabled": true,
-                "visible": true,
                 "type": "string",
                 "enum": [
                   "true"
