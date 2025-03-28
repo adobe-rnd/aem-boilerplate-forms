@@ -9,9 +9,7 @@
                         "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
                         "template": {
                             "jcr:title": "Date Input",
-                            "fieldType": "date-input",
-                            "enabled": true,
-                            "visible": true
+                            "fieldType": "date-input"
                         }
                     }
                 }
@@ -27,7 +25,17 @@
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,
-                    "...": "../form-common/_basic-input-placeholder-fields.json"
+                    "fields": [
+                        {
+                            "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                        },
+                        {
+                            "component": "date-time",
+                            "name": "default",
+                            "label": "Default Value",
+                            "valueType": "date"
+                        }
+                    ]
                 },
                 {
                     "...": "../form-common/_help-container.json"
