@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.3.0",
   "description": "Starter project for Adobe Helix",
+  "type": "module",
   "scripts": {
     "lint:js": "eslint . --ext .json,.js,.mjs",
     "lint:css": "stylelint blocks/**/*.css styles/*.css",
@@ -11,7 +12,23 @@
     "build:json:models": "merge-json-cli -i \"models/_component-models.json\" -o \"component-models.json\"",
     "build:json:definitions": "merge-json-cli -i \"models/_component-definition.json\" -o \"component-definition.json\"",
     "build:json:filters": "merge-json-cli -i \"models/_component-filters.json\" -o \"component-filters.json\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:unit": "npm run build:json --silent && mocha"
+  },
+  "c8": {
+    "exclude": [
+      "blocks/form/rules/model/*.js",
+      "blocks/form/rules/formula/*.js",
+      "blocks/form/rules/worker.js",
+      "blocks/form/rules-doc/parser/*.js"
+    ],
+    "include": [
+      "blocks/form/**/*.js",
+      "blocks/form/rules/*.js",
+      "scripts/form-editor-support.js"
+    ],
+    "report-dir": "coverage",
+    "check-coverage": true
   },
   "repository": {
     "type": "git",
@@ -34,6 +51,27 @@
     "merge-json-cli": "1.0.4",
     "npm-run-all": "4.1.5",
     "stylelint": "16.12.0",
-    "stylelint-config-standard": "36.0.1"
+    "stylelint-config-standard": "36.0.1",
+    "@testing-library/dom": "9.3.4",
+    "@testing-library/user-event": "14.3.0",
+    "@types/node": "20.12.7",
+    "c8": "9.0.0",
+    "chai": "5.1.0",
+    "dom-compare": "0.6.0",
+    "fs-extra": "11.2.0",
+    "jsdom": "24.0.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "10.2.0",
+    "mutationobserver-shim": "0.3.7",
+    "nock": "13.5.4",
+    "node-fetch": "^3.3.2",
+    "nyc": "^15.1.0",
+    "parse-multipart-data": "^1.5.0",
+    "sinon": "^17.0.1"
+  },
+  "mocha": {
+    "spec": "test/**/*.test.js",
+    "require": "test/unit/setup-env.js",
+    "recursive": "true"
   }
 }
