@@ -20,9 +20,9 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.116
+ *  Version: 0.22.121
  */
-import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, SubmitError, SubmitFailure, Submit, Save, Reset, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
+import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, SubmitError, SubmitFailure, Submit, Save, Reset, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
@@ -2060,7 +2060,6 @@ class Container extends Scriptable {
         return {
             ...super.getState(forRestore),
             ...(forRestore ? {
-                initialItems: this.items.length,
                 ':items': undefined,
                 ':itemsOrder': undefined
             } : {}),
@@ -2186,7 +2185,8 @@ class Container extends Scriptable {
             if (typeof (this._jsonModel.initialItems) !== 'number') {
                 this._jsonModel.initialItems = Math.max(1, this._jsonModel.minItems);
             }
-            for (let i = 0; i < this._jsonModel.initialItems; i++) {
+            const itemsLength = mode === 'restore' ? this._jsonModel.items.length : this._jsonModel.initialItems;
+            for (let i = 0; i < itemsLength; i++) {
                 let child;
                 if (mode === 'restore') {
                     let itemTemplate = this._itemTemplate;
@@ -2417,7 +2417,10 @@ class Container extends Scriptable {
             for (const change of action.payload.changes) {
                 if (change.propertyName !== undefined && notifyChildrenAttributes.includes(change.propertyName)) {
                     this.items.forEach((child) => {
-                        this.notifyDependents.call(child, propertyChange(change.propertyName, child.getState()[change.propertyName], null));
+                        if (change.currentValue !== child.getState()[change.propertyName]) {
+                            child._jsonModel[change.propertyName] = change.currentValue;
+                            this.notifyDependents.call(child, propertyChange(change.propertyName, child.getState()[change.propertyName], null));
+                        }
                         if (child.fieldType === 'panel') {
                             this.notifyChildren.call(child, action);
                         }
@@ -2659,6 +2662,22 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
         method: httpVerb
     };
     let inputPayload;
+    let encryptOutput = {};
+    try {
+        if (payload instanceof Promise) {
+            payload = await payload;
+        }
+    }
+    catch (error) {
+        console.error('Error resolving payload Promise:', error);
+        throw error;
+    }
+    if (payload.body && payload.headers) {
+        encryptOutput = { ...payload };
+        headers = { ...payload.headers };
+        payload = payload.body;
+        inputPayload = payload;
+    }
     if (payload && payload instanceof FileObject && payload.data instanceof File) {
         const formData = new FormData();
         formData.append(payload.name, payload.data);
@@ -2667,7 +2686,7 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
     else if (payload instanceof FormData) {
         inputPayload = payload;
     }
-    else if (payload && typeof payload === 'object' && Object.keys(payload).length > 0) {
+    else if (payload && (typeof payload === 'string' || (typeof payload === 'object' && Object.keys(payload).length > 0))) {
         const headerNames = Object.keys(headers);
         if (headerNames.length > 0) {
             requestOptions.headers = {
@@ -2679,35 +2698,45 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
             requestOptions.headers = { 'Content-Type': 'application/json' };
         }
         const contentType = requestOptions?.headers?.['Content-Type'] || 'application/json';
-        if (contentType === 'application/json') {
-            inputPayload = JSON.stringify(payload);
+        if (typeof payload === 'object') {
+            if (contentType === 'application/json') {
+                inputPayload = JSON.stringify(payload);
+            }
+            else if (contentType.indexOf('multipart/form-data') > -1) {
+                inputPayload = multipartFormData(payload);
+            }
+            else if (contentType.indexOf('application/x-www-form-urlencoded') > -1) {
+                inputPayload = urlEncoded(payload);
+            }
         }
-        else if (contentType.indexOf('multipart/form-data') > -1) {
-            inputPayload = multipartFormData(payload);
-        }
-        else if (contentType.indexOf('application/x-www-form-urlencoded') > -1) {
-            inputPayload = urlEncoded(payload);
+        if (contentType === 'text/plain') {
+            inputPayload = String(payload);
         }
     }
-    const result = await request$1(endpoint, inputPayload, requestOptions);
-    if (result?.status >= 200 && result?.status <= 299) {
+    const response = await request$1(endpoint, inputPayload, requestOptions);
+    response.originalRequest = {
+        url: endpoint,
+        method: httpVerb,
+        ...encryptOutput
+    };
+    if (response?.status >= 200 && response?.status <= 299) {
         const eName = getCustomEventName(success);
         if (success === 'submitSuccess') {
-            context.form.dispatch(new SubmitSuccess(result, true));
+            context.form.dispatch(new SubmitSuccess(response, true));
         }
         else {
-            context.form.dispatch(new CustomEvent(eName, result, true));
+            context.form.dispatch(new CustomEvent(eName, response, true));
         }
     }
     else {
         context.form.logger.error('Error invoking a rest API');
         const eName = getCustomEventName(error);
         if (error === 'submitError') {
-            context.form.dispatch(new SubmitError(result, true));
-            context.form.dispatch(new SubmitFailure(result, true));
+            context.form.dispatch(new SubmitError(response, true));
+            context.form.dispatch(new SubmitFailure(response, true));
         }
         else {
-            context.form.dispatch(new CustomEvent(eName, result, true));
+            context.form.dispatch(new CustomEvent(eName, response, true));
         }
     }
 };
@@ -2723,7 +2752,7 @@ const urlEncoded = (data) => {
     });
     return formData;
 };
-const submit = async (context, success, error, submitAs = 'application/json', input_data = null, action = '', metadata = null) => {
+const submit = async (context, success, error, submitAs = 'multipart/form-data', input_data = null, action = '', metadata = null) => {
     const endpoint = action || context.form.action;
     let data = input_data;
     const attachments = await readAttachments(context.form, true);
@@ -2738,9 +2767,7 @@ const submit = async (context, success, error, submitAs = 'application/json', in
         submitContentType = 'multipart/form-data';
     }
     await request(context, endpoint, 'POST', formData, success, error, {
-        'Content-Type': submitContentType,
-        'X-Dev': 'ci13862519902',
-        'x-adobe-form-hostname': 'main--aem-boilerplate-forms-wip--adobe-rnd.aem.live'
+        'Content-Type': submitContentType
     });
 };
 const multipartFormData = (data, attachments) => {
@@ -2801,6 +2828,8 @@ const createAction = (name, payload = {}, dispatch = false) => {
             return new Valid(payload);
         case 'initialize':
             return new Initialize(payload);
+        case 'focus':
+            return new Focus(payload);
         default:
             console.error('invalid action');
     }
@@ -3066,17 +3095,29 @@ class FunctionRuntimeImpl {
                 _func: (args, data, interpreter) => {
                     const uri = toString(args[0]);
                     const httpVerb = toString(args[1]);
-                    const payload = valueOf(args[2]);
-                    let success, error, headers = {};
-                    if (typeof (args[3]) === 'string') {
-                        interpreter.globals.form.logger.warn('This usage of request is deprecated. Please see the documentation and update');
+                    let payload;
+                    let success;
+                    let error;
+                    let headers = {};
+                    if (args[2] && typeof args[2] === 'object' && !args[2].then && ('data' in args[2] || 'headers' in args[2])) {
+                        const payloadObj = valueOf(args[2]);
+                        payload = payloadObj.data;
+                        headers = payloadObj.headers || {};
                         success = valueOf(args[3]);
                         error = valueOf(args[4]);
                     }
                     else {
-                        headers = valueOf(args[3]);
-                        success = valueOf(args[4]);
-                        error = valueOf(args[5]);
+                        payload = valueOf(args[2]);
+                        if (typeof (args[3]) === 'string') {
+                            interpreter.globals.form.logger.warn('This usage of request is deprecated. Please see the documentation and update');
+                            success = valueOf(args[3]);
+                            error = valueOf(args[4]);
+                        }
+                        else {
+                            headers = valueOf(args[3]);
+                            success = valueOf(args[4]);
+                            error = valueOf(args[5]);
+                        }
                     }
                     return request(interpreter.globals, uri, httpVerb, payload, success, error, headers);
                 },
@@ -3171,6 +3212,20 @@ class FunctionRuntimeImpl {
                         }
                     }
                     return {};
+                },
+                _signature: []
+            },
+            encrypt: {
+                _func: async (args, data, interpreter) => {
+                    const payload = valueOf(args[0]);
+                    return payload;
+                },
+                _signature: []
+            },
+            decrypt: {
+                _func: async (args, data, interpreter) => {
+                    const encData = valueOf(args[0]);
+                    return encData;
                 },
                 _signature: []
             }
@@ -3401,28 +3456,35 @@ class Form extends Container {
         }
     }
     setFocus(field, focusOption) {
-        if (!focusOption) {
-            this.#clearCurrentFocus(field);
-            this.#setActiveFirstDeepChild(field);
-            return;
+        const dependencyTracking = this._ruleEngine.getDependencyTracking();
+        this._ruleEngine.setDependencyTracking(false);
+        try {
+            if (!focusOption) {
+                this.#clearCurrentFocus(field);
+                this.#setActiveFirstDeepChild(field);
+                return;
+            }
+            const parent = (field?.isContainer ? field : field.parent);
+            const navigableChidren = this.#getNavigableChildren(parent.items);
+            let activeChild = parent.activeChild;
+            let currActiveChildIndex = activeChild !== null ? navigableChidren.indexOf(activeChild) : -1;
+            if (parent.activeChild === null) {
+                this.#setActiveFirstDeepChild(navigableChidren[0]);
+                currActiveChildIndex = 0;
+                return;
+            }
+            if (focusOption === FocusOption.NEXT_ITEM) {
+                activeChild = this.#getNextItem(currActiveChildIndex, navigableChidren);
+            }
+            else if (focusOption === FocusOption.PREVIOUS_ITEM) {
+                activeChild = this.#getPreviousItem(currActiveChildIndex, navigableChidren);
+            }
+            if (activeChild !== null) {
+                this.#setActiveFirstDeepChild(activeChild);
+            }
         }
-        const parent = (field?.isContainer ? field : field.parent);
-        const navigableChidren = this.#getNavigableChildren(parent.items);
-        let activeChild = parent.activeChild;
-        let currActiveChildIndex = activeChild !== null ? navigableChidren.indexOf(activeChild) : -1;
-        if (parent.activeChild === null) {
-            this.#setActiveFirstDeepChild(navigableChidren[0]);
-            currActiveChildIndex = 0;
-            return;
-        }
-        if (focusOption === FocusOption.NEXT_ITEM) {
-            activeChild = this.#getNextItem(currActiveChildIndex, navigableChidren);
-        }
-        else if (focusOption === FocusOption.PREVIOUS_ITEM) {
-            activeChild = this.#getPreviousItem(currActiveChildIndex, navigableChidren);
-        }
-        if (activeChild !== null) {
-            this.#setActiveFirstDeepChild(activeChild);
+        finally {
+            this._ruleEngine.setDependencyTracking(dependencyTracking);
         }
     }
     getState(forRestore = false) {
@@ -3630,6 +3692,7 @@ class RuleEngine {
     ];
     customFunctions;
     debugInfo = [];
+    dependencyTracking = true;
     constructor() {
         this.customFunctions = FunctionRuntime.getFunctions();
     }
@@ -3664,9 +3727,15 @@ class RuleEngine {
         return finalRes;
     }
     trackDependency(subscriber) {
-        if (this._context && this._context.field !== undefined && this._context.field !== subscriber) {
+        if (this.dependencyTracking && this._context && this._context.field !== undefined && this._context.field !== subscriber) {
             subscriber._addDependent(this._context.field);
         }
+    }
+    setDependencyTracking(track) {
+        this.dependencyTracking = track;
+    }
+    getDependencyTracking() {
+        return this.dependencyTracking;
     }
 }
 class Fieldset extends Container {
@@ -3818,6 +3887,9 @@ class Field extends Scriptable {
         }
         if (['plain-text', 'image'].indexOf(this.fieldType) === -1) {
             this._jsonModel.value = undefined;
+        }
+        else if (this.fieldType === 'image') {
+            this._jsonModel.value = this._jsonModel?.properties?.['fd:repoPath'] ?? this._jsonModel.value;
         }
         else {
             this._jsonModel.default = this._jsonModel.default || this._jsonModel.value;
@@ -4024,7 +4096,7 @@ class Field extends Scriptable {
             return this.executeExpression(this.displayValueExpression);
         }
         const df = this.displayFormat;
-        if (df && this.isNotEmpty(this.value) && this.valid !== false) {
+        if (df && this.isNotEmpty(this.value) && this?.validity?.typeMismatch !== true) {
             try {
                 return format(this.value, this.lang, df);
             }
@@ -4706,14 +4778,21 @@ class DateField extends Field {
             this._jsonModel.placeholder = parseDateSkeleton(this._jsonModel.editFormat, this.locale);
         }
     }
+    #convertNumberToDate(value) {
+        const coercedValue = numberToDatetime(value);
+        if (!isNaN(coercedValue)) {
+            return formatDate(coercedValue, this.locale, this._dataFormat);
+        }
+        return null;
+    }
     get value() {
         return super.value;
     }
     set value(value) {
         if (typeof value === 'number') {
-            const coercedValue = numberToDatetime(value);
-            if (!isNaN(coercedValue)) {
-                super.value = formatDate(coercedValue, this.locale, this._dataFormat);
+            const coercedValue = this.#convertNumberToDate(value);
+            if (coercedValue) {
+                super.value = coercedValue;
             }
         }
         else {
@@ -4729,6 +4808,34 @@ class DateField extends Field {
             else {
                 super.value = value;
             }
+        }
+    }
+    get minimum() {
+        return super.minimum;
+    }
+    set minimum(value) {
+        if (typeof value === 'number') {
+            const coercedValue = this.#convertNumberToDate(value);
+            if (coercedValue) {
+                super.minimum = coercedValue;
+            }
+        }
+        else if (typeof value === 'string') {
+            super.minimum = value;
+        }
+    }
+    get maximum() {
+        return super.maximum;
+    }
+    set maximum(value) {
+        if (typeof value === 'number') {
+            const coercedValue = this.#convertNumberToDate(value);
+            if (coercedValue) {
+                super.maximum = coercedValue;
+            }
+        }
+        else if (typeof value === 'string') {
+            super.maximum = value;
         }
     }
 }

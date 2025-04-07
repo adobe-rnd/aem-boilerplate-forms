@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.116
+ *  Version: 0.22.121
  */
 var EventSource;
 (function (EventSource) {
@@ -135,8 +135,8 @@ class ValidationComplete extends ActionImpl {
     }
 }
 class Focus extends ActionImpl {
-    constructor() {
-        super({}, 'focus', { dispatch: false });
+    constructor(payload, dispatch = false) {
+        super(payload, 'focus', { dispatch });
     }
 }
 class Submit extends ActionImpl {
