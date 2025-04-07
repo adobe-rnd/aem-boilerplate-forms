@@ -63,8 +63,8 @@
     --form-card-border-radius: 4px;
     --form-card-padding: 0.6rem 0.8rem;
     --form-card-background: var(--background-color-primary);
-    --form-card-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    --form-card-hover-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --form-card-shadow: 0 1px 2px rgb(0 0 0 / 3%);
+    --form-card-hover-shadow: 0 2px 4px rgb(0 0 0 / 6%);
     --form-card-selected-border-color: var(--button-primary-color);
     --form-card-selected-background: #F5F9FF;
     --form-card-selected-shadow: 0 0 0 1px var(--button-primary-color);
@@ -150,14 +150,10 @@ main .form form .field-invalid .field-description {
   main .form form .checkbox-wrapper.field-invalid {
       flex-wrap: wrap;
   }
-  
-  main .form form .checkbox-wrapper.field-invalid > .field-description {
-      order: 1;
-  }
-  
-  main .form form .radio-wrapper.field-invalid > input,
-  main .form form .checkbox-wrapper.field-invalid > input {
-      outline: 1px solid var(--form-error-color);
+
+main .form select {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
 main .form input,
@@ -176,9 +172,17 @@ main .form select {
     border-radius: 0.25rem;
 }
 
-main .form select {
-  padding-top: 0;
-  padding-bottom: 0;
+main .form input:hover, main .form select:hover {
+    border-color: rgb(90 92 96);
+}
+
+main .form input:disabled{
+    background-color: var(--form-input-disable-color);
+}
+
+main .form form .radio-wrapper.field-invalid > input,
+main .form form .checkbox-wrapper.field-invalid > input {
+    outline: 1px solid var(--form-error-color);
 }
 
 main .form input[type='file'] {
@@ -200,10 +204,6 @@ main .form input[type='radio'] {
 
 main .form textarea {
     min-height: 100px;
-}
-
-main .form input:hover, main .form select:hover {
-    border-color: rgb(90 92 96);
 }
 
 main .form fieldset:not(.checkbox-group-wrapper, .radio-group-wrapper) legend {
@@ -268,10 +268,6 @@ main .form form .checkbox-wrapper, main .form form .radio-wrapper {
     gap: 8px;
 }
 
-main .form form fieldset.cards.horizontal {
-    column-gap: 0;
-}
-
 main .form form fieldset > .radio-wrapper,
 main .form form fieldset > .checkbox-wrapper {
     margin-left: var(--form-field-gap);
@@ -332,6 +328,7 @@ main .form form fieldset.cards > .checkbox-wrapper > label:hover {
 main .form form fieldset.cards.horizontal {
     flex-direction: row;
     column-gap: 0.75rem;
+    column-gap: 0;
 }
 
 main .form form fieldset.cards.horizontal > .radio-wrapper,
@@ -379,6 +376,11 @@ main .form form fieldset.cards > .checkbox-wrapper > input:focus ~ label {
     box-shadow: 0 0 0 1px var(--button-primary-color);
 }
 
+main .form .form-image-wrapper img {
+    max-width: 100%;
+    height: auto;
+  }
+
 /* For cards with icons or images */
 main .form form fieldset.cards > .radio-wrapper > label > img,
 main .form form fieldset.cards > .checkbox-wrapper > label > img {
@@ -388,7 +390,7 @@ main .form form fieldset.cards > .checkbox-wrapper > label > img {
 }
 
 /* Responsive adjustments for cards */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     main .form form fieldset.cards > .radio-wrapper,
     main .form form fieldset.cards > .checkbox-wrapper {
         min-width: 100%;
@@ -433,16 +435,10 @@ main .submit-wrapper{
     width: var(--form-submit-width);
 }
 
-main .form input:disabled,
 main .form textarea:disabled,
 main .form select:disabled,
 main .form button:disabled {
     background-color: var(--form-input-disable-color);
-}
-
-main .form form fieldset.cards > .radio-wrapper > input,
-main .form form fieldset.cards > .checkbox-wrapper > input{
-    width: 0;
 }
 
 main .file-wrapper.decorated input[type="file"] {
@@ -545,10 +541,6 @@ main .form form .wizard  {
   background-color: var( --form-wizard-background-color);
   gap: unset;
   padding: 20px var(--form-wizard-padding);
-}
-
-main .form form .wizard > .field-description{
-  width: 100%;
 }
 
 main .form form .wizard > fieldset > legend{
@@ -743,9 +735,12 @@ main .form form .field-wrapper.col-1 {
     grid-column: span 1;
 }
 
-main .form .form-image-wrapper  img {
-  max-width: 100%;
-  height: auto;
+main .form form .wizard > .field-description {
+    width: 100%;
+}
+  
+main .form form .checkbox-wrapper.field-invalid > .field-description {
+      order: 1;
 }
 
 main form .wizard > .current-wizard-step.panel-wrapper:first-of-type ~ .wizard-button-wrapper > .wizard-button-prev,
@@ -775,7 +770,7 @@ main div.form-wrapper {
     background: white;
     padding: 40px;
     border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 24px rgb(0 0 0 / 8%);
 }
 
 /* Responsive adjustments for mobile */
