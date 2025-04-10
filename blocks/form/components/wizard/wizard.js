@@ -167,15 +167,6 @@ export class WizardLayout {
       });
     }
 
-    const resetBtn = panel.querySelector('.reset-wrapper');
-    if (resetBtn) {
-      wrapper.append(resetBtn);
-    }
-
-    const submitBtn = panel.querySelector('.submit-wrapper');
-    if (submitBtn) {
-      wrapper.append(submitBtn);
-    }
     this.assignIndexToSteps(panel);
     panel.append(wrapper);
     panel.querySelector('fieldset')?.classList.add('current-wizard-step');
