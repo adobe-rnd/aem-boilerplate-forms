@@ -177,23 +177,22 @@ export function annotateFormForEditing(formEl, formDefinition) {
 
 function handleNavigation(container, resource, navigationHandler) {
   const el = container.querySelector(`[data-aue-resource='${resource}']`);
-  if (el.hasAttribute('data-index')) {
-    // if selected element is the direct child of wizard
+  if (!el) return;
+  if (el.parentElement === container) {
     navigationHandler(container, el);
   } else {
-    Array.from(container.children).forEach((child) => {
-      const isElPresentUnderChild = child.querySelector(`[data-aue-resource='${resource}']`);
-      if (isElPresentUnderChild) {
-        navigationHandler(container, child);
-      }
-    });
+    const directChild = Array.from(container.children)
+      .find((child) => child.contains(el) || child === el);
+    if (directChild) {
+      navigationHandler(container, directChild);
+    }
   }
 }
 
 /**
  * Event listener for aue:ui-select, selection of a component
  */
-function handleEditorSelect(event) {
+export function handleEditorSelect(event) {
   const { target, detail } = event;
   const { selected, resource } = detail;
 
