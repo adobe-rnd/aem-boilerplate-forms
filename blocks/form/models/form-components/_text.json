@@ -9,7 +9,6 @@
             "resourceType": "core/fd/components/form/text/v1/text",
             "template": {
               "jcr:title": "Text",
-              "fieldType": "plain-text",
               "textIsRich": true,
               "value": "Adaptive Form Text Component"
             }
