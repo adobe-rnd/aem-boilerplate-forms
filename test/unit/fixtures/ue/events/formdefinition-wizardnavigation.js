@@ -45,6 +45,25 @@ export const ueFormDefForWizardNavigationTest = {
           properties: {
             'fd:path': '/content/ng-test1/index/jcr:content/root/section_0/form/panelcontainer_1310348320/panelcontainer',
           },
+          ':itemsOrder': [
+            'nested_panel',
+          ],
+          ':items': {
+            nested_panel: {
+              id: 'panelcontainer-nested',
+              fieldType: 'panel',
+              name: 'nested_panel',
+              visible: true,
+              enabled: true,
+              label: {
+                value: 'Nested Panel',
+              },
+              properties: {
+                'fd:path': '/content/ng-test1/index/jcr:content/root/section_0/form/panelcontainer_1310348320/panelcontainer/nested_panel',
+              },
+              ':type': 'core/fd/components/form/panelcontainer/v1/panelcontainer',
+            },
+          },
           ':type': 'core/fd/components/form/panelcontainer/v1/panelcontainer',
         },
         panelcontainer_1137531211: {
