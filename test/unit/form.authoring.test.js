@@ -21,6 +21,7 @@ import { ueFormDefForWizardNavigationTest } from './fixtures/ue/events/formdefin
 import { renderForm } from './testUtils.js';
 import { ueFormDefForAccordionNavigationTest } from './fixtures/ue/events/formdefinition-accordion-navigation.js';
 import { handleAccordionNavigation } from '../../blocks/form/components/accordion/accordion.js';
+import { handleEditorSelect } from '../../scripts/form-editor-support.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
   
@@ -229,6 +230,36 @@ describe('Universal Editor Authoring Test Cases', () => {
     handleAccordionNavigation(formElPrev.querySelector('.accordion'), formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]'));
     const currentActiveTab = formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]');
     assert.equal(currentActiveTab.classList.contains('accordion-collapse'), false);
+    document.body.replaceChildren();
+  });
+
+  it('test UE wizard navigation with nested panels', async () => {
+    window.hlx.codeBasePath = '../../';
+    await renderForm(ueFormDefForWizardNavigationTest);
+    const formEl = document.querySelector('form');
+    const wizardEl = formEl.querySelector('.wizard');
+    
+    // Find the nested panel element in the rendered HTML
+    const nestedPanel = formEl.querySelector('[data-id="panelcontainer-nested"]');
+    assert.ok(nestedPanel, 'Nested panel should exist');
+    
+    // Set up the event with the actual nested panel element
+    const ueSelectNestedPanelEvent = {
+      target: nestedPanel,
+      detail: {
+        selected: true,
+        resource: 'urn:aemconnection:/content/ng-test1/index/jcr:content/root/section_0/form/panelcontainer_1310348320/panelcontainer/nested_panel',
+      },
+    };
+    
+    // Test that selecting the nested panel navigates to its parent panel
+    handleEditorSelect(ueSelectNestedPanelEvent);
+    
+    // Verify that the parent panel is the current step, not the nested panel
+    const currentStep = wizardEl.querySelector('.current-wizard-step');
+    assert.equal(currentStep.dataset.id, 'panelcontainer-4a4625c3cf', 'Should navigate to parent panel, not nested panel');
+    assert.equal(currentStep.querySelector('legend').textContent, 'Panel', 'Should show parent panel title');
+    
     document.body.replaceChildren();
   });
 });
