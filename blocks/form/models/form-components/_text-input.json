@@ -37,6 +37,12 @@
                             "name": "multiLine",
                             "label": "Allow multiple lines",
                             "valueType": "boolean"
+                        },
+                        {
+                            "component": "product_picker",
+                            "name": "product_picker",
+                            "label": "Product Picker",
+                            "valueType": "string"
                         }
                     ]
                 },
