@@ -227,9 +227,14 @@ describe('Universal Editor Authoring Test Cases', () => {
   it('test UE accordion navigation', async () => {
     await renderForm(ueFormDefForAccordionNavigationTest);
     const formElPrev = document.querySelector('form');
-    handleAccordionNavigation(formElPrev.querySelector('.accordion'), formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]'));
-    const currentActiveTab = formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]');
-    assert.equal(currentActiveTab.classList.contains('accordion-collapse'), false);
+    let secondTab = formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]');
+    let firstTab = formElPrev.querySelector('fieldset[data-id="panelcontainer-c49bd83fb9"]');
+    assert.equal(firstTab.classList.contains('accordion-collapse'), false); // first tab open by default
+    handleAccordionNavigation(formElPrev.querySelector('.accordion'), secondTab, true); // trigger second tab open
+    assert.equal(secondTab.classList.contains('accordion-collapse'), false); // should be open
+    assert.equal(firstTab.classList.contains('accordion-collapse'), false); 
+    handleAccordionNavigation(formElPrev.querySelector('.accordion'), firstTab, true);
+    assert.equal(firstTab.classList.contains('accordion-collapse'), false); // should also be open (not toggle case)
     document.body.replaceChildren();
   });
 
