@@ -71,18 +71,8 @@ function handleAccordionNavigationInEditor(accordionEl, navigateTo) {
 }
 
 function generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition) {
-  const titleEl = document.createElement('div');
-  titleEl.classList.add('fragment-title');
-  titleEl.textContent = fragmentDefinition.label?.value || fragmentDefinition.name;
-  fragmentFieldWrapper.appendChild(titleEl);
-  fragmentFieldWrapper.appendChild(document.createElement('hr'));
-  const fragItems = getItems(fragmentDefinition);
-  fragItems.forEach((fragItem) => {
-    const itemLabel = fragItem.label?.value || fragItem.name;
-    const itemLabelEl = document.createTextNode(itemLabel);
-    fragmentFieldWrapper.appendChild(itemLabelEl);
-    fragmentFieldWrapper.appendChild(document.createElement('br'));
-  });
+  // Add fragment styling class
+  fragmentFieldWrapper.classList.add('fragment-overlay');
 }
 
 function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
@@ -94,11 +84,11 @@ function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
     newFieldWrapper.setAttribute('data-aue-model', 'form-fragment');
     newFieldWrapper.setAttribute('data-aue-label', fragmentDefinition.label?.value || fragmentDefinition.name);
     newFieldWrapper.classList.add('edit-mode');
-    newFieldWrapper.replaceChildren();
+    // newFieldWrapper.replaceChildren();
     fragmentFieldWrapper.insertAdjacentElement('afterend', newFieldWrapper);
     generateFragmentRendition(newFieldWrapper, fragmentDefinition);
   } else {
-    fragmentFieldWrapper.replaceChildren();
+    // fragmentFieldWrapper.replaceChildren();
     generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition);
   }
 }
@@ -206,6 +196,11 @@ function handleNavigation(container, resource, navigationHandler) {
 export function handleEditorSelect(event) {
   const { target, detail } = event;
   const { selected, resource } = detail;
+
+  // Handle fragment expansion when selected
+  if (target.classList.contains('fragment-wrapper') && target.classList.contains('edit-mode')) {
+    target.classList.toggle('expanded', selected);
+  }
 
   if (selected && target.closest('.wizard') && !target.classList.contains('wizard')) {
     handleNavigation(target.closest('.wizard'), resource, handleWizardNavigation);
