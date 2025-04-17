@@ -2823,11 +2823,11 @@
                 "value": "noButtons"
               },
               {
-                "name": "Add & Remove Buttons",
-                "value": "addRemoveButtons"
+                "name": "Add & Delete Buttons",
+                "value": "addDeleteButtons"
               }
             ],
-            "value": "addRemoveButtons",
+            "value": "addDeleteButtons",
             "condition": {
               "===": [
                 {
@@ -2850,7 +2850,7 @@
                     {
                       "var": "variant"
                     },
-                    "addRemoveButtons"
+                    "addDeleteButtons"
                   ]
                 },
                 {
@@ -2877,7 +2877,7 @@
                     {
                       "var": "variant"
                     },
-                    "addRemoveButtons"
+                    "addDeleteButtons"
                   ]
                 },
                 {

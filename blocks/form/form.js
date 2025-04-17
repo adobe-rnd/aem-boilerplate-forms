@@ -348,6 +348,38 @@ function inputDecorator(field, element) {
   }
 }
 
+function decoratePanelContainer(panelDefinition, panelContainer) {
+  if (!panelContainer) return;
+
+  const isPanelWrapper = (container) => container.classList?.contains('panel-wrapper');
+
+  const shouldAddLabel = (container, panel) => panel.label && !container.querySelector(`legend[for=${container.dataset.id}]`);
+
+  const isContainerRepeatable = (container) => container.dataset?.repeatable === 'true' && container.dataset?.variant !== 'noButtons';
+
+  const needsAddButton = (container) => !container.querySelector(':scope > .repeat-actions');
+
+  const needsRemoveButton = (container) => !container.querySelector(':scope > .item-remove');
+
+  if (isPanelWrapper(panelContainer)) {
+    if (shouldAddLabel(panelContainer, panelDefinition)) {
+      const legend = createLegend(panelDefinition);
+      if (legend) {
+        panelContainer.insertAdjacentElement('afterbegin', legend);
+      }
+    }
+
+    if (isContainerRepeatable(panelContainer)) {
+      if (needsAddButton(panelContainer)) {
+        insertAddButton(panelContainer, panelContainer);
+      }
+      if (needsRemoveButton(panelContainer)) {
+        insertRemoveButton(panelContainer, panelContainer);
+      }
+    }
+  }
+}
+
 function renderField(fd) {
   const fieldType = fd?.fieldType?.replace('-input', '') ?? 'text';
   const renderer = fieldRenderers[fieldType];
@@ -394,6 +426,7 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
 
   const children = await Promise.all(promises);
   container.append(...children.filter((_) => _ != null));
+  decoratePanelContainer(panel, container);
   await componentDecorator(container, panel);
 }
 
