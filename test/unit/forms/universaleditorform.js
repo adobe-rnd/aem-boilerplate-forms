@@ -97,6 +97,21 @@ export const ueFormDef = {
       ],
       ':type': 'core/fd/components/form/panelcontainer/v1/panelcontainer',
     },
+    empty_fragment: {
+      id: 'fragment-empty',
+      fieldType: 'panel',
+      name: 'empty_fragment',
+      properties: {
+        'fd:path': '/content/test2/index/jcr:content/root/section_0/form/empty_fragment',
+        'fd:fragment': true,
+      },
+      label: {
+        value: 'Empty Fragment',
+      },
+      ':items': {},
+      ':itemsOrder': [],
+      ':type': 'core/fd/components/form/panelcontainer/v1/panelcontainer',
+    },
     panelcontainer_1558601327: {
       id: 'panelcontainer-4ea210a289',
       fieldType: 'panel',
@@ -170,5 +185,5 @@ export const ueFormDef = {
       ':type': 'modal',
     },
   },
-  ':itemsOrder': ['textinput', 'text', 'panelcontainer', 'fragment_1198843043', 'modal'],
+  ':itemsOrder': ['textinput', 'text', 'panelcontainer', 'fragment_1198843043', 'empty_fragment', 'modal'],
 };
