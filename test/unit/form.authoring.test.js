@@ -21,10 +21,12 @@ import { ueFormDefForWizardNavigationTest } from './fixtures/ue/events/formdefin
 import { renderForm } from './testUtils.js';
 import { ueFormDefForAccordionNavigationTest } from './fixtures/ue/events/formdefinition-accordion-navigation.js';
 import { handleAccordionNavigation } from '../../blocks/form/components/accordion/accordion.js';
+import { ueFormDefForRepeatablePanelTest } from './fixtures/ue/events/formdefinition-repeatable-panel.js';
+import { uePatchEventForRepeatablePanel } from './fixtures/ue/events/event-patch-repeatable-panel.js';
 import { handleEditorSelect } from '../../scripts/form-editor-support.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
-  
+
   beforeEach(async () => {
     document.body.innerHTML = '';
   });
@@ -235,6 +237,48 @@ describe('Universal Editor Authoring Test Cases', () => {
     assert.equal(firstTab.classList.contains('accordion-collapse'), false); 
     handleAccordionNavigation(formElPrev.querySelector('.accordion'), firstTab, true);
     assert.equal(firstTab.classList.contains('accordion-collapse'), false); // should also be open (not toggle case)
+    document.body.replaceChildren();
+  });
+
+  it('test UE repeatable panel buttons', async () => {
+    window.hlx.codeBasePath = '../../';
+    await renderForm(ueFormDefForRepeatablePanelTest);
+    const formEl = document.querySelector('form');
+    const panel = formEl.querySelector('.panel-wrapper');
+
+    // Verify panel is marked as repeatable
+    assert.equal(panel.dataset.repeatable, 'true');
+
+    // Verify add button exists with correct label
+    const addButton = panel.querySelector('.repeat-actions .item-add');
+    assert.ok(addButton, 'Add button should exist');
+    assert.equal(addButton.querySelector('span').textContent, 'Add');
+
+    // Verify remove button exists with correct label
+    const removeButton = panel.querySelector('.item-remove');
+    assert.ok(removeButton, 'Remove button should exist');
+    assert.equal(removeButton.querySelector('span').textContent, 'Delete');
+
+    // Verify panel index is set
+    assert.equal(panel.dataset.index, '0');
+
+    document.body.replaceChildren();
+  });
+
+  it('test UE patch event for repeatable panel buttons', async () => {
+    window.hlx.codeBasePath = '../../';
+    await renderForm(ueFormDefForRepeatablePanelTest);
+    const applied = await applyChanges({ detail: uePatchEventForRepeatablePanel });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    const panel = formEl.querySelector('.panel-wrapper');
+    // Verify panel is still marked as repeatable
+    assert.equal(panel.dataset.repeatable, 'true');
+    assert.equal(panel.dataset.variant, 'addDeleteButtons');
+    // Verify add button exists with updated label
+    const addButton = panel.querySelector('.repeat-actions .item-add');
+    assert.ok(addButton, 'Add button should exist');
+    assert.equal(addButton.querySelector('span').textContent, 'Add New');
     document.body.replaceChildren();
   });
 
