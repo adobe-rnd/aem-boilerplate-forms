@@ -71,6 +71,14 @@ function handleAccordionNavigationInEditor(accordionEl, navigateTo) {
 }
 
 function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
+  if (!fragmentFieldWrapper || !fragmentDefinition || !fragmentDefinition.properties) {
+    console.warn('Invalid arguments passed to annotateFormFragment');
+    return;
+  }
+  if (!fragmentDefinition.properties['fd:path']) {
+    console.warn('Missing fd:path in fragmentDefinition properties');
+    return;
+  }
   fragmentFieldWrapper.classList.add('fragment-wrapper', 'edit-mode');
   fragmentFieldWrapper.setAttribute('data-aue-type', 'component');
   fragmentFieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fragmentDefinition.properties['fd:path']}`);
