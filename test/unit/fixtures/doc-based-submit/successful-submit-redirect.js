@@ -1,10 +1,12 @@
+import { fireEvent } from '@testing-library/dom';
 import assert from 'assert';
 import nock from 'nock';
 import sinon from 'sinon';
-import { fireEvent } from '@testing-library/dom';
 
-const scope = nock('http://localhost:3000')
-  .post('/submit-success-redirect', function test(body) {
+const scope = nock('https://forms.adobe.com')
+  .matchHeader('Content-Type', 'application/json')
+  .matchHeader('x-adobe-form-hostname', undefined)
+  .post('/adobe/forms/af/submit//submit-success-redirect.json', function test(body) {
     // using a function syntax here instead of array because the this parameter is
     // set during the call
     const contentType = this.headers['content-type'];
