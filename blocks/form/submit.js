@@ -77,14 +77,16 @@ async function prepareRequest(form) {
   const { payload } = constructPayload(form);
   const headers = {
     'Content-Type': 'application/json',
+    // eslint-disable-next-line comma-dangle
     'x-adobe-form-hostname': window?.location?.hostname
   };
   const body = { data: payload };
   let url;
   let baseUrl = getSubmitBaseUrl();
   if (!baseUrl) {
+    // eslint-disable-next-line prefer-template
     baseUrl = 'https://forms.adobe.com/adobe/forms/af/submit/';
-    url = baseUrl + btoa(form.dataset.action + '.json');
+    url = baseUrl + btoa(`${form.dataset.action}.json`);
   } else {
     url = form.dataset.action;
   }
