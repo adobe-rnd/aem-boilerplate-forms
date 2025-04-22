@@ -1,13 +1,14 @@
 /* eslint-env mocha */
 import assert from 'assert';
-import fs from 'fs';
-import path from 'path';
 import * as dom from 'dom-compare';
+import fs from 'fs';
 import jsdom from 'jsdom';
+import path from 'path';
+import Sinon from 'sinon';
 import decorate, { DELAY_MS, generateFormRendition } from '../../blocks/form/form.js';
-import { annotateFormForEditing, getItems } from '../../scripts/form-editor-support.js';
-import { resetIds } from '../../blocks/form/util.js';
 import { getCustomComponents, setCustomComponents } from '../../blocks/form/mappings.js';
+import { resetIds } from '../../blocks/form/util.js';
+import { annotateFormForEditing, getItems } from '../../scripts/form-editor-support.js';
 
 function escapeHTML(str) {
   return (str.replace(/[&<>'"]/g, (tag) => ({
@@ -160,6 +161,14 @@ async function test(
 
 export async function testDynamism(filePath, bUrlMode = false) {
   const testName = `checking dynamic behaviour for ${filePath?.substr(filePath.lastIndexOf('/') + 1).split('.')[0]}`;
+  let btoaStub;
+  beforeEach(async () => {
+    btoaStub = Sinon.stub(global, 'btoa').callsFake((str) => str);
+  });
+  afterEach(() => {
+    btoaStub.restore();
+  });
+
   it(testName, async () => {
     const {
       sample, before, op, expect, opDelay, after, formPath, ignore = false, refresh = false,
