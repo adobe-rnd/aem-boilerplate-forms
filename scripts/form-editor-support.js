@@ -309,12 +309,7 @@ export async function applyChanges(event) {
           }
           const parent = element.closest('.panel-wrapper') || element.closest('form') || element.querySelector('form');
           const parentDef = getFieldById(formDef, parent.dataset.id, {});
-          if (parent.classList?.contains('panel-wrapper') && parent.querySelector(`legend[for=${parent.dataset.id}]`)) {
-            const panelLabel = parent.querySelector(`legend[for=${parent.dataset.id}]`);
-            parent.replaceChildren(panelLabel);
-          } else {
-            parent.replaceChildren();
-          }
+          parent.replaceChildren();
           if (parent.hasAttribute('data-component-status')) {
             parent.removeAttribute('data-component-status');
           }
