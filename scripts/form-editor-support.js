@@ -70,37 +70,20 @@ function handleAccordionNavigationInEditor(accordionEl, navigateTo) {
   activeAccordionPanel = navigateTo.dataset.id;
 }
 
-function generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition) {
-  const titleEl = document.createElement('div');
-  titleEl.classList.add('fragment-title');
-  titleEl.textContent = fragmentDefinition.label?.value || fragmentDefinition.name;
-  fragmentFieldWrapper.appendChild(titleEl);
-  fragmentFieldWrapper.appendChild(document.createElement('hr'));
-  const fragItems = getItems(fragmentDefinition);
-  fragItems.forEach((fragItem) => {
-    const itemLabel = fragItem.label?.value || fragItem.name;
-    const itemLabelEl = document.createTextNode(itemLabel);
-    fragmentFieldWrapper.appendChild(itemLabelEl);
-    fragmentFieldWrapper.appendChild(document.createElement('br'));
-  });
-}
-
 function annotateFormFragment(fragmentFieldWrapper, fragmentDefinition) {
-  fragmentFieldWrapper.classList.toggle('fragment-wrapper', true);
-  if (!fragmentFieldWrapper.classList.contains('edit-mode')) {
-    const newFieldWrapper = fragmentFieldWrapper.cloneNode(true);
-    newFieldWrapper.setAttribute('data-aue-type', 'component');
-    newFieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fragmentDefinition.properties['fd:path']}`);
-    newFieldWrapper.setAttribute('data-aue-model', 'form-fragment');
-    newFieldWrapper.setAttribute('data-aue-label', fragmentDefinition.label?.value || fragmentDefinition.name);
-    newFieldWrapper.classList.add('edit-mode');
-    newFieldWrapper.replaceChildren();
-    fragmentFieldWrapper.insertAdjacentElement('afterend', newFieldWrapper);
-    generateFragmentRendition(newFieldWrapper, fragmentDefinition);
-  } else {
-    fragmentFieldWrapper.replaceChildren();
-    generateFragmentRendition(fragmentFieldWrapper, fragmentDefinition);
+  if (!fragmentFieldWrapper || !fragmentDefinition || !fragmentDefinition.properties) {
+    console.warn('Invalid arguments passed to annotateFormFragment');
+    return;
   }
+  if (!fragmentDefinition.properties['fd:path']) {
+    console.warn('Missing fd:path in fragmentDefinition properties');
+    return;
+  }
+  fragmentFieldWrapper.classList.add('fragment-wrapper', 'edit-mode');
+  fragmentFieldWrapper.setAttribute('data-aue-type', 'component');
+  fragmentFieldWrapper.setAttribute('data-aue-resource', `urn:aemconnection:${fragmentDefinition.properties['fd:path']}`);
+  fragmentFieldWrapper.setAttribute('data-aue-model', 'form-fragment');
+  fragmentFieldWrapper.setAttribute('data-aue-label', fragmentDefinition.label?.value || fragmentDefinition.name);
 }
 
 function getPropertyModel(fd) {
@@ -207,6 +190,11 @@ export function handleEditorSelect(event) {
   const { target, detail } = event;
   const { selected, resource } = detail;
 
+  // Handle fragment expansion when selected
+  if (target.classList.contains('fragment-wrapper') && target.classList.contains('edit-mode')) {
+    target.classList.toggle('fragment-expanded', selected);
+  }
+
   if (selected && target.closest('.wizard') && !target.classList.contains('wizard')) {
     handleNavigation(target.closest('.wizard'), resource, handleWizardNavigation);
   } else if (selected && target.closest('.accordion')) {
@@ -282,8 +270,8 @@ export async function applyChanges(event) {
   const { detail } = event;
 
   const resource = detail?.request?.target?.resource // update, patch components
-      || detail?.request?.target?.container?.resource // update, patch, add to sections
-      || detail?.request?.to?.container?.resource; // move in sections
+    || detail?.request?.target?.container?.resource // update, patch, add to sections
+    || detail?.request?.to?.container?.resource; // move in sections
   if (!resource) return false;
   const updates = detail?.response?.updates;
   if (!updates.length) return false;
