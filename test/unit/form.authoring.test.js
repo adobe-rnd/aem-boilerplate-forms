@@ -92,9 +92,28 @@ describe('Universal Editor Authoring Test Cases', () => {
             testChildren(getContainerChildNodes(node, fd), formDef, fieldMap);
           } else if (fd.properties['fd:fragment'] && node.classList.contains('edit-mode')) {
             testAnnotation(node, fd, 'component', 'form-fragment');
-            const textNodeCount = Array.from(node.childNodes)
-              .filter((child) => child.nodeType === 3).length;
-            assert.equal(textNodeCount, Object.keys(fd[':items']).length, `fragment items not set ${textNodeCount} ${fd.id}`);
+            
+            // Test fragment wrapper classes and structure
+            assert.equal(node.classList.contains('fragment-wrapper'), true, 'Fragment should have fragment-wrapper class');
+            assert.equal(node.classList.contains('edit-mode'), true, 'Fragment should have edit-mode class');
+            
+            if (Object.keys(fd[':items']).length === 0) {
+              // Empty fragment - should match selector for "Adaptive Form Fragment" text
+              assert.equal(node.matches('.fragment-wrapper.edit-mode:not(:has(> :not(legend)))'), true, 'Empty fragment should match selector for "Adaptive Form Fragment" text');
+            } else {
+              // Non-empty fragment - should match selector for "CLICK TO EXPAND" text
+              assert.equal(node.matches('.fragment-wrapper.edit-mode:has(> :not(legend))'), true, 'Non-empty fragment should match selector for expand text');
+              
+              // Test expansion behavior
+              handleEditorSelect({
+                target: node,
+                detail: {
+                  selected: true,
+                  resource: `urn:aemconnection:${fd.properties['fd:path']}`
+                }
+              });
+              assert.equal(node.classList.contains('fragment-expanded'), true, 'Fragment should get expanded class on selection');
+            }
           } else if (fd.fieldType === 'plain-text') {
             testPlainTextAnnotation(node, fd, 'richtext', fd.fieldType);
           } else if (fd[':type'] === 'rating') {
