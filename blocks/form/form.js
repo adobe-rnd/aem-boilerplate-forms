@@ -1,19 +1,20 @@
-import {
-  createButton, createFieldWrapper, createLabel, getHTMLRenderType,
-  createHelpText,
-  getId,
-  stripTags,
-  checkValidation,
-  toClassName,
-  getSitePageName,
-} from './util.js';
+import { createOptimizedPicture } from '../../scripts/aem.js';
+import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
+import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
-import DocBasedFormToAF from './transform.js';
-import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { handleSubmit } from './submit.js';
-import { getSubmitBaseUrl, emailPattern, SUBMISSION_SERVICE } from './constant.js';
-import { createOptimizedPicture } from '../../scripts/aem.js';
+import DocBasedFormToAF from './transform.js';
+import {
+  checkValidation,
+  createButton, createFieldWrapper,
+  createHelpText,
+  createLabel, getHTMLRenderType,
+  getId,
+  getSitePageName,
+  stripTags,
+  toClassName,
+} from './util.js';
 
 export const DELAY_MS = 0;
 let captchaField;
@@ -567,6 +568,7 @@ export async function fetchForm(pathname) {
         }
         return doc;
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Unable to fetch form definition for path', pathname, path);
         return null;
       }
