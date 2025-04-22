@@ -16,7 +16,6 @@ export const defaultErrorMessages = {
   required: 'Please fill in this field.',
 };
 
-
 // eslint-disable-next-line no-useless-escape
 export const emailPattern = '([A-Za-z0-9][._]?)+[A-Za-z0-9]@[A-Za-z0-9]+(\.?[A-Za-z0-9]){2}\.([A-Za-z0-9]{2,4})?';
 
