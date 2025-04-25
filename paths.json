@@ -1,0 +1,9 @@
+{
+  "mappings": [
+    "/:/"
+  ],
+  "includes": [
+    "/content/",
+    "/content/dam/"
+  ]
+}
