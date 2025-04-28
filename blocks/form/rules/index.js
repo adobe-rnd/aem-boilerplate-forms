@@ -26,7 +26,7 @@ import { externalize } from './functions.js';
 import initializeRuleEngineWorker from './worker.js';
 import { createOptimizedPicture } from '../../../scripts/aem.js';
 
-const formModel = {};
+const formSubscriptions = {};
 
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
@@ -204,9 +204,6 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
     }
   });
-  if (fieldWrapper?.dataset?.subscribe) {
-    fieldWrapper.dataset.fieldModelChanged = JSON.stringify(Math.random());
-  }
 }
 
 function formChanged(payload, form) {
@@ -284,7 +281,10 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data);
   window.myForm = form;
-  formModel[htmlForm.dataset?.id] = form;
+  formSubscriptions[htmlForm.dataset?.id]?.entries()?.forEach(([id, { callback, fieldDiv }]) => {
+    const model = form.getElement(id);
+    callback(fieldDiv, model, 'register');
+  });
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'fieldChanged');
@@ -337,16 +337,15 @@ export async function initAdaptiveForm(formDef, createForm) {
  * @param {HTMLElement} fieldDiv - The field element to observe for changes.
  * @param {Function} callback - The callback function to execute when changes are detected.
  */
-export function subscribe(fieldDiv, callback) {
+export function subscribe(fieldDiv, formId, callback) {
   if (callback) {
-    fieldDiv.dataset.subscribe = true;
-    const observer = new MutationObserver((mutationsList) => {
-      mutationsList?.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'data-field-model-changed') {
-          callback(fieldDiv, formModel[fieldDiv.closest('form')?.dataset?.id]);
-        }
-      });
-    });
-    observer.observe(fieldDiv, { attributes: true });
+    // Check if a subscription map already exists for this form
+    let subscriptions = formSubscriptions[formId];
+    if (!subscriptions) {
+      subscriptions = new Map();
+      formSubscriptions[formId] = subscriptions;
+    }
+    // Add the new subscription to the existing map
+    subscriptions.set(fieldDiv?.dataset?.id, { callback, fieldDiv });
   }
 }
