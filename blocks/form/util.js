@@ -255,3 +255,8 @@ export function getSitePageName(path) {
   const pathArray = mpath.split('/');
   return pathArray[pathArray.length - 1].replaceAll('-', '_');
 }
+
+export function extractIdFromUrl(url) {
+  const segments = url?.split('/');
+  return segments?.[segments.length - 1];
+}
