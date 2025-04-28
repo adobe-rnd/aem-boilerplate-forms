@@ -1,5 +1,5 @@
-import { test, expect } from '../../fixtures.js';
-import { openPage } from '../../utils.js';
+import { test, expect } from '../fixtures.js';
+import { openPage } from '../utils.js';
 
 test.describe('Reset Doc Based', () => {
     const testURL = '/reset';
