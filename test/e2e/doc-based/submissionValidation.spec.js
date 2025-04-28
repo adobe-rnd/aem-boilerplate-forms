@@ -1,5 +1,5 @@
-import { test, expect } from '../../fixtures.js';
-import {fillField, openPage} from '../../utils.js';
+import { test, expect } from '../fixtures.js';
+import {fillField, openPage} from '../utils.js';
 
 const inputValues = {
   textInput: 'adobe',
