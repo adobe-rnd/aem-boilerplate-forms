@@ -333,9 +333,9 @@ export async function initAdaptiveForm(formDef, createForm) {
 
 /**
  * Subscribes to changes in the specified field element and triggers a callback
- * with access to formModel when changes occur.
+ * with access to formModel when the component is initialised
  * @param {HTMLElement} fieldDiv - The field element to observe for changes.
- * @param {Function} callback - The callback function to execute when changes are detected.
+ * @param {Function} callback - The callback function to which returns fieldModel
  */
 export function subscribe(fieldDiv, formId, callback) {
   if (callback) {
