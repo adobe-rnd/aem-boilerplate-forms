@@ -9,7 +9,7 @@ import {
   checkValidation,
   createButton, createFieldWrapper,
   createHelpText,
-  createLabel, getHTMLRenderType,
+  createLabel, extractIdFromUrl, getHTMLRenderType,
   getId,
   getSitePageName,
   stripTags,
@@ -401,7 +401,7 @@ function renderField(fd) {
   return field;
 }
 
-export async function generateFormRendition(panel, container, getItems = (p) => p?.items) {
+export async function generateFormRendition(panel, container, formId, getItems = (p) => p?.items) {
   const items = getItems(panel) || [];
   const promises = items.map(async (field) => {
     field.value = field.value ?? '';
@@ -418,17 +418,17 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
     }
     colSpanDecorator(field, element);
     if (field?.fieldType === 'panel') {
-      await generateFormRendition(field, element, getItems);
+      await generateFormRendition(field, element, formId, getItems);
       return element;
     }
-    await componentDecorator(element, field, container);
+    await componentDecorator(element, field, container, formId);
     return element;
   });
 
   const children = await Promise.all(promises);
   container.append(...children.filter((_) => _ != null));
   decoratePanelContainer(panel, container);
-  await componentDecorator(container, panel);
+  await componentDecorator(container, panel, null, formId);
 }
 
 function enableValidation(form) {
@@ -445,7 +445,7 @@ function enableValidation(form) {
 
 async function createFormForAuthoring(formDef) {
   const form = document.createElement('form');
-  await generateFormRendition(formDef, form, (container) => {
+  await generateFormRendition(formDef, form, formDef.id, (container) => {
     if (container[':itemsOrder'] && container[':items']) {
       return container[':itemsOrder'].map((itemKey) => container[':items'][itemKey]);
     }
@@ -462,7 +462,8 @@ export async function createForm(formDef, data) {
   if (formDef.appliedCssClassNames) {
     form.className = formDef.appliedCssClassNames;
   }
-  await generateFormRendition(formDef, form);
+  const formId = extractIdFromUrl(formPath); // formDef.id returns $form after getState()
+  await generateFormRendition(formDef, form, formId);
 
   let captcha;
   if (captchaField) {

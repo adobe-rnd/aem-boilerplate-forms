@@ -4,7 +4,7 @@ import { decorateIcons } from '../../../../scripts/aem.js';
 export class Modal {
   constructor() {
     this.dialog = null;
-    this.formModel = null;
+    this.fieldModel = null;
     this.panel = null;
     this.modalWrapper = null;
     this.originalContent = null; // Store original content
@@ -35,7 +35,7 @@ export class Modal {
     dialog.addEventListener('click', (event) => {
       const dialogDimensions = dialog.getBoundingClientRect();
       if (event.clientX < dialogDimensions.left || event.clientX > dialogDimensions.right
-          || event.clientY < dialogDimensions.top || event.clientY > dialogDimensions.bottom) {
+        || event.clientY < dialogDimensions.top || event.clientY > dialogDimensions.bottom) {
         dialog.close();
       }
     });
@@ -51,8 +51,8 @@ export class Modal {
       }
 
       dialog.remove();
-      if (this.formModel) {
-        this.formModel.getElement(panel?.id).visible = false;
+      if (this.fieldModel) {
+        this.fieldModel.visible = false;
       }
     });
     return dialog;
@@ -76,8 +76,8 @@ export class Modal {
     }
   }
 
-  setFormModel(model) {
-    this.formModel = model;
+  setFieldModel(model) {
+    this.fieldModel = model;
   }
 
   wrapDialog(panel) {
@@ -95,14 +95,19 @@ export class Modal {
   }
 }
 
-export default async function decorate(panel) {
+export default async function decorate(panel, panelJson, container, formId) {
   const modal = new Modal();
   modal.decorate(panel);
-  subscribe(panel, async (fieldDiv, formModel) => {
-    modal.setFormModel(formModel);
-    if (formModel.getElement(fieldDiv.id).visible === true) {
-      modal.showModal();
-    }
+  subscribe(panel, formId, async (fieldDiv, fieldModel) => {
+    modal.setFieldModel(fieldModel);
+    fieldModel.subscribe((e) => {
+      const { payload } = e;
+      payload?.changes?.forEach((change) => {
+        if (change?.propertyName === 'visible' && change?.currentValue === true) {
+          modal.showModal();
+        }
+      });
+    }, 'change');
   });
   return panel;
 }
