@@ -301,7 +301,7 @@ export async function applyChanges(event) {
           if (parent.hasAttribute('data-component-status')) {
             parent.removeAttribute('data-component-status');
           }
-          await generateFormRendition(parentDef, parent, getItems);
+          await generateFormRendition(parentDef, parent, formDef?.id, getItems);
           annotateItems(getContainerChildNodes(parent, parentDef), formDef, {});
           return true;
         }

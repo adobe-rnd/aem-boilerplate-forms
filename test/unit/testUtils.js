@@ -243,7 +243,7 @@ export async function renderForm(formDef) {
   formEl.dataset.id = formDef.id;
   div2.appendChild(formEl);
   mainEl.appendChild(divInsideMain);
-  await generateFormRendition(formDef, formEl, getItems);
+  await generateFormRendition(formDef, formEl, formDef?.id, getItems);
   annotateFormForEditing(formEl, formDef);
   document.body.appendChild(mainEl);
 }
