@@ -11,8 +11,8 @@ const selectors = {
   signInWithAdobe: 'text=Sign in with Adobe',
   emailInput: 'input[type="email"]',
   passwordInput: 'input[type="password"]',
-  userDisplayName: 'div#userDisplayName',
   firstExtButtonItem: 'div[class*="ext-button-item"]:first-child',
+  signInButton: 'button[type="submit"]'
 };
 
 async function globalSetup() {
@@ -32,12 +32,12 @@ async function globalSetup() {
   await emailLocator.fill(emailId);
   await emailLocator.blur();
   await page.getByRole('button', { name: 'Next' }).click();
-  expect(await page.locator(selectors.userDisplayName).innerText()).toBe(emailId);
+  await expect(page.getByText(emailId)).toBeVisible();
   await passwordLocator.fill(password);
   await passwordLocator.blur();
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.locator(selectors.signInButton).click();
   await expect(page.getByText('Stay signed in?')).toBeVisible();
-  await page.locator(selectors.firstExtButtonItem).first().click();
+  await page.getByRole('button', { name: 'No' }).click();
   await page.waitForURL('https://author-p133911-e1313554.adobeaemcloud.com/ui#/aem/aem/start.html', { timeout: 30000 });
   await page.waitForLoadState('load');
   await page.waitForURL('https://author-p133911-e1313554.adobeaemcloud.com/ui#/aem/aem/start.html?appId=aemshell');
