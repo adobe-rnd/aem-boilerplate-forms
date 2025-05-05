@@ -281,10 +281,14 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data);
   window.myForm = form;
-  formSubscriptions[htmlForm.dataset?.id]?.entries()?.forEach(([id, { callback, fieldDiv }]) => {
-    const model = form.getElement(id);
-    callback(fieldDiv, model, 'register');
-  });
+  const subscriptions = formSubscriptions[htmlForm.dataset?.id];
+  if (subscriptions) {
+    subscriptions.forEach((subscription, id) => {
+      const { callback, fieldDiv } = subscription;
+      const model = form.getElement(id);
+      callback(fieldDiv, model, 'register');
+    });
+  }
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'fieldChanged');
