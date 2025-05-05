@@ -260,3 +260,170 @@ export function extractIdFromUrl(url) {
   const segments = url?.split('/');
   return segments?.[segments.length - 1];
 }
+const constraintsDef = Object.entries({
+  'password|tel|email|text': [['maxLength', 'maxlength'], ['minLength', 'minlength'], 'pattern'],
+  'number|range|date': [['maximum', 'Max'], ['minimum', 'Min'], 'step'],
+  file: ['accept', 'Multiple'],
+  panel: [['maxOccur', 'data-max'], ['minOccur', 'data-min']],
+}).flatMap(([types, constraintDef]) => types.split('|')
+  .map((type) => [type, constraintDef.map((cd) => (Array.isArray(cd) ? cd : [cd, cd]))]));
+
+const constraintsObject = Object.fromEntries(constraintsDef);
+
+export function setConstraints(element, fd) {
+  const renderType = getHTMLRenderType(fd);
+  const constraints = constraintsObject[renderType];
+  if (constraints) {
+    constraints
+      .filter(([nm]) => fd[nm])
+      .forEach(([nm, htmlNm]) => {
+        element.setAttribute(htmlNm, fd[nm]);
+      });
+  }
+}
+
+export function setPlaceholder(element, fd) {
+  if (fd.placeholder) {
+    element.setAttribute('placeholder', fd.placeholder);
+  }
+}
+
+export function createInput(fd) {
+  const input = document.createElement('input');
+  input.type = getHTMLRenderType(fd);
+  setPlaceholder(input, fd);
+  setConstraints(input, fd);
+  return input;
+}
+
+export function createRadioOrCheckbox(fd) {
+  const wrapper = createFieldWrapper(fd);
+  const input = createInput(fd);
+  const [value, uncheckedValue] = fd.enum || [];
+  input.value = value;
+  if (typeof uncheckedValue !== 'undefined') {
+    input.dataset.uncheckedValue = uncheckedValue;
+  }
+  if (fd?.properties) {
+    const { variant, alignment } = fd.properties;
+    if (fd?.fieldType === 'checkbox' && variant === 'switch') {
+      wrapper.classList.add(variant);
+      if (alignment) {
+        wrapper.classList.add(alignment);
+      }
+    }
+  }
+  wrapper.insertAdjacentElement('afterbegin', input);
+  return wrapper;
+}
+
+export function createRadioOrCheckboxUsingEnum(fd, wrapper) {
+  const legend = wrapper.querySelector('legend');
+  wrapper.innerHTML = '';
+  if (legend) {
+    wrapper.append(legend);
+  }
+  const type = fd.fieldType.split('-')[0];
+  const isSameLength = fd.enum?.length === fd.enumNames?.length;
+  fd.enum.forEach((value, index) => {
+    let labelValues = fd?.enumNames;
+    if (!isSameLength) {
+      labelValues = fd?.enum;
+    }
+    const label = (typeof labelValues?.[index] === 'object' && labelValues?.[index] !== null) ? labelValues[index].value : labelValues?.[index] || value;
+    const id = getId(fd.name);
+    const field = createRadioOrCheckbox({
+      name: fd.name,
+      id,
+      label: { value: label },
+      fieldType: type,
+      enum: [value],
+      required: fd.required,
+    });
+    const { variant, 'afs:layout': layout } = fd.properties;
+    if (variant === 'cards') {
+      wrapper.classList.add(variant);
+    } else {
+      wrapper.classList.remove('cards');
+    }
+    if (layout?.orientation === 'horizontal') {
+      wrapper.classList.add('horizontal');
+    }
+    if (layout?.orientation === 'vertical') {
+      wrapper.classList.remove('horizontal');
+    }
+    field.classList.remove('field-wrapper', `field-${toClassName(fd.name)}`);
+    const input = field.querySelector('input');
+    input.id = id;
+    input.dataset.fieldType = fd.fieldType;
+    input.name = fd.name;
+    input.checked = Array.isArray(fd.value) ? fd.value.includes(value) : value === fd.value;
+    if ((index === 0 && type === 'radio') || type === 'checkbox') {
+      input.required = fd.required;
+    }
+    if (fd.enabled === false || fd.readOnly === true) {
+      input.setAttribute('disabled', 'disabled');
+    }
+    wrapper.appendChild(field);
+  });
+}
+
+export function createDropdownUsingEnum(fd, wrapper) {
+  wrapper.innerHTML = '';
+  wrapper.required = fd.required;
+  wrapper.title = fd.tooltip ? stripTags(fd.tooltip, '') : '';
+  wrapper.readOnly = fd.readOnly;
+  wrapper.multiple = fd.type === 'string[]' || fd.type === 'boolean[]' || fd.type === 'number[]';
+  let ph;
+  if (fd.placeholder) {
+    ph = document.createElement('option');
+    ph.textContent = fd.placeholder;
+    ph.setAttribute('disabled', '');
+    ph.setAttribute('value', '');
+    wrapper.append(ph);
+  }
+  let optionSelected = false;
+
+  const addOption = (label, value) => {
+    const option = document.createElement('option');
+    option.textContent = label instanceof Object ? label?.value?.trim() : label?.trim();
+    option.value = value?.trim() || label?.trim();
+    if (fd.value === option.value || (Array.isArray(fd.value) && fd.value.includes(option.value))) {
+      option.setAttribute('selected', '');
+      optionSelected = true;
+    }
+    wrapper.append(option);
+    return option;
+  };
+
+  const options = fd?.enum || [];
+  const optionNames = fd?.enumNames ?? options;
+
+  if (options.length === 1
+    && options?.[0]?.startsWith('https://')) {
+    const optionsUrl = new URL(options?.[0]);
+    // using async to avoid rendering
+    if (optionsUrl.hostname.endsWith('hlx.page')
+      || optionsUrl.hostname.endsWith('hlx.live')
+      || optionsUrl.hostname.endsWith('aem.live')
+      || optionsUrl.hostname.endsWith('aem.page')) {
+      fetch(`${optionsUrl.pathname}${optionsUrl.search}`)
+        .then(async (response) => {
+          const json = await response.json();
+          const values = [];
+          json.data.forEach((opt) => {
+            addOption(opt.Option, opt.Value);
+            values.push(opt.Value || opt.Option);
+          });
+        });
+    }
+  } else if (options?.length !== optionNames.length) {
+    options.forEach((value) => addOption(value, value));
+  } else {
+    options.forEach((value, index) => addOption(optionNames?.[index] ?? value, value));
+  }
+
+  if (ph && optionSelected === false) {
+    ph.setAttribute('selected', '');
+  }
+}

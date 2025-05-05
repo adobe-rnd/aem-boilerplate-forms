@@ -19,7 +19,12 @@
  ************************************************************************ */
 import { submitSuccess, submitFailure } from '../submit.js';
 import {
-  createHelpText, createLabel, updateOrCreateInvalidMsg, getCheckboxGroupValue,
+  createHelpText,
+  createLabel,
+  updateOrCreateInvalidMsg,
+  getCheckboxGroupValue,
+  createDropdownUsingEnum,
+  createRadioOrCheckboxUsingEnum,
 } from '../util.js';
 import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
@@ -198,6 +203,14 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'valid':
         if (currentValue === true) {
           updateOrCreateInvalidMsg(field, '');
+        }
+        break;
+      case 'enum':
+      case 'enumNames':
+        if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
+          createRadioOrCheckboxUsingEnum(fieldModel, field);
+        } else if (fieldType === 'drop-down') {
+          createDropdownUsingEnum(fieldModel, field);
         }
         break;
       default:
