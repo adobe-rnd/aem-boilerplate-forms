@@ -611,6 +611,42 @@ export default async function decorate(block) {
       rules = false;
     } else {
       afModule = await import('./rules/index.js');
+      // add all properties in formDef.properties with all request parameters and browser user agent
+      if (formDef && typeof formDef === 'object') {
+        formDef.properties = formDef.properties || {};
+
+        // Add URL parameters
+        try {
+          const urlParams = new URLSearchParams(window?.location?.search || '');
+          urlParams.forEach((value, key) => {
+            formDef.properties[`${key}`] = value;
+          });
+        } catch (e) {
+          console.warn('Error reading URL parameters:', e);
+        }
+
+        // Add browser agent
+        try {
+          formDef.properties.browserAgent = navigator?.userAgent || '';
+        } catch (e) {
+          console.warn('Error setting browser agent:', e);
+        }
+
+        // Add cookies
+        try {
+          const cookies = document.cookie.split(';');
+          formDef.properties.cookies = {};
+          cookies.forEach((cookie) => {
+            if (cookie.trim()) {
+              const [key, value] = cookie.trim().split('=');
+              formDef.properties.cookies[key.trim()] = value || '';
+            }
+          });
+        } catch (e) {
+          console.warn('Error reading cookies:', e);
+        }
+      }
+      // end of add all properties
       if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
         form = await afModule.initAdaptiveForm(formDef, createForm);
       } else {
