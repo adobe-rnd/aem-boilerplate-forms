@@ -19,7 +19,12 @@
  ************************************************************************ */
 import { submitSuccess, submitFailure } from '../submit.js';
 import {
-  createHelpText, createLabel, updateOrCreateInvalidMsg, getCheckboxGroupValue,
+  createHelpText,
+  createLabel,
+  updateOrCreateInvalidMsg,
+  getCheckboxGroupValue,
+  createDropdownUsingEnum,
+  createRadioOrCheckboxUsingEnum,
 } from '../util.js';
 import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
@@ -200,6 +205,14 @@ async function fieldChanged(payload, form, generateFormRendition) {
           updateOrCreateInvalidMsg(field, '');
         }
         break;
+      case 'enum':
+      case 'enumNames':
+        if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
+          createRadioOrCheckboxUsingEnum(fieldModel, field);
+        } else if (fieldType === 'drop-down') {
+          createDropdownUsingEnum(fieldModel, field);
+        }
+        break;
       default:
         break;
     }
@@ -237,6 +250,9 @@ function applyRuleEngine(htmlForm, form, captcha) {
     const field = e.target;
     const { value, name, checked } = field;
     const { id } = field.closest('.field-wrapper').dataset;
+    if (id.startsWith('fd:ignore')) {
+      return;
+    }
     if ((field.type === 'checkbox' && field.dataset.fieldType === 'checkbox-group')) {
       const val = getCheckboxGroupValue(name, htmlForm);
       const el = form.getElement(id);

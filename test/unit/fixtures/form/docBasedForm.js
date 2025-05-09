@@ -77,7 +77,7 @@ export const fieldDef = {
     }, {
       Name: 'emailAddress', Type: 'text', Description: '', Placeholder: '', Label: 'Email Address*', 'Read Only': '', Mandatory: 'true', Pattern: '', Step: '', Min: '', Max: '', Value: '', Options: '', OptionNames: '', Fieldset: '',
     }, {
-      Name: 'selectA', Type: 'select', Description: '', Placeholder: '', Label: 'Select a Job Title*', 'Read Only': '', Mandatory: 'true', Pattern: '', Step: '', Min: '', Max: '', Value: '', Options: 'Physician,Nurse,Nurse Practitioner / Physician Assistant,Pharmacist,Other', OptionNames: 'Select an option,Physician,Nurse,Nurse Practitioner / Physician Assistant,Pharmacist,Other', Fieldset: '',
+      Name: 'selectA', Type: 'select', Description: '', Placeholder: '', Label: 'Select a Job Title*', 'Read Only': '', Mandatory: 'true', Pattern: '', Step: '', Min: '', Max: '', Value: '', Options: 'Select an option,Physician,Nurse,Nurse Practitioner / Physician Assistant,Pharmacist,Other', OptionNames: 'Select an option,Physician,Nurse,Nurse Practitioner / Physician Assistant,Pharmacist,Other', Fieldset: '',
     }, {
       Name: 'program-info',
       Type: 'checkbox',
