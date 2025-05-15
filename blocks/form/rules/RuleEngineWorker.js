@@ -32,6 +32,10 @@ export default class RuleEngine {
   getState() {
     return this.form.getState(true);
   }
+
+  getCustomFunctionsPath() {
+    return this.form?.properties?.customFunctionsPath || '../functions.js';
+  }
 }
 
 let ruleEngine;
@@ -56,7 +60,7 @@ onmessage = (e) => {
   }
 
   if (!customFunctionRegistered) {
-    registerCustomFunctions().then(() => {
+    registerCustomFunctions(getCustomFunctionsPath()).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
     });
