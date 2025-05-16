@@ -246,7 +246,7 @@ function dateToDaysSinceEpoch(date) {
 
 /**
 * Set variable value on a field or form
-* @param {string} variableName Name of the variable
+* @param {string} variableName Name of the variable (supports dot notation e.g. 'address.city')
 * @param {string|object|Array} variableValue Value to set for the variable
 * @param {object} [normalFieldOrPanel] - Field or panel component to set the variable on (defaults to Form)
 * @param {scope} globals Global scope object
@@ -254,8 +254,40 @@ function dateToDaysSinceEpoch(date) {
 function setVariable(variableName, variableValue, normalFieldOrPanel, globals) {
   const target = normalFieldOrPanel || globals.form;
   const existingProperties = target.$properties || {};
-  const updatedProperties = { ...existingProperties, [variableName]: variableValue };
-  globals.functions.setProperty(target, { properties: updatedProperties });
+  
+  // Check if the variable name contains dots for nested properties
+  if (variableName.includes('.')) {
+      const parts = variableName.split('.');
+      const topLevelProp = parts[0];
+      
+      // Create a deep clone of existing properties to avoid mutation
+      const updatedProperties = JSON.parse(JSON.stringify(existingProperties));
+      
+      // Start with existing top-level object or create new one
+      let currentObj = updatedProperties[topLevelProp] || {};
+      updatedProperties[topLevelProp] = currentObj;
+      
+      // Traverse the object hierarchy, creating objects as needed
+      let parentObj = currentObj;
+      for (let i = 1; i < parts.length - 1; i++) {
+          if (!parentObj[parts[i]]) {
+              parentObj[parts[i]] = {};
+          } else if (typeof parentObj[parts[i]] !== 'object') {
+              // Convert to object if it's not already one
+              parentObj[parts[i]] = {};
+          }
+          parentObj = parentObj[parts[i]];
+      }
+      
+      // Set the value at the final nested property
+      parentObj[parts[parts.length - 1]] = variableValue;
+      
+      globals.functions.setProperty(target, { properties: updatedProperties });
+  } else {
+      // Handle the simple non-nested case
+      const updatedProperties = { ...existingProperties, [variableName]: variableValue };
+      globals.functions.setProperty(target, { properties: updatedProperties });
+  }
 }
 
 /**
