@@ -245,142 +245,53 @@ function dateToDaysSinceEpoch(date) {
 }
 
 /**
- * Private utility function to set a property value on an object
- * @param {object} target - The target object to set properties on
- * @param {string} variableName - Name of the variable to set
- * @param {*} variableValue - Value to set
- * @param {scope} globals - Global scope object
- * @private
- */
-function _setPropertyValue(target, variableName, variableValue, globals) {
+* Set variable value on a field or form
+* @param {string} variableName Name of the variable
+* @param {string|object|Array} variableValue Value to set for the variable
+* @param {object} [normalFieldOrPanel] - Field or panel component to set the variable on (defaults to Form)
+* @param {scope} globals Global scope object
+*/
+function setVariable(variableName, variableValue, normalFieldOrPanel, globals) {
+  const target = normalFieldOrPanel || globals.form;
   const existingProperties = target.$properties || {};
   const updatedProperties = { ...existingProperties, [variableName]: variableValue };
   globals.functions.setProperty(target, { properties: updatedProperties });
 }
 
 /**
-* Set global variable
-* @param {string} variableName Name of the variable to set
-* @param {string|object|Array} variableValue Value to set for the variable
-* @param {scope} globals Global scope object
+* Get field or form variable value
+* @param {string} variableName - Name of the variable (supports dot notation e.g. 'address.city')
+* @param {object} [normalFieldOrPanel] - Field or panel component to get the value from (defaults to Form)
+* @param {scope} globals - Global scope object containing the current field context
+* @returns {string|object|Array} The value of the requested variable or undefined if not found
 */
-function setGlobalVariable(variableName, variableValue, globals) {
-  _setPropertyValue(globals.form, variableName, variableValue, globals);
-}
- 
-/**
-* Set a local variable value on current rule field
-* @param {string} variableName Name of the variable to set
-* @param {string|object|Array} variableValue Value to set for the variable
-* @param {scope} globals Global scope object
-*/
-function setLocalVariable(variableName, variableValue, globals) {
-  _setPropertyValue(globals.field, variableName, variableValue, globals);
-}
-
-/**
-* Private utility function to get a nested value from an object using dot notation
-* @param {string} path - Path to the nested value using dot notation (e.g. 'address.city')
-* @param {object} obj - Object to traverse
-* @returns {*} - The value at the specified path or undefined if not found
-* @private
-*/
-function _getNestedValue(path, obj) {
-  if (!path || !obj) {
-      return undefined;
+function getVariable(variableName, normalFieldOrPanel, globals) {
+  const target = normalFieldOrPanel || globals.form;
+  if (!variableName || !target.$properties) {
+    return undefined;
   }
-  
-  const properties = path.split('.');
-  let value = obj;
-  
+
+  const properties = variableName.split('.');
+  let value = target.$properties;
+
   for (const prop of properties) {
       if (value === undefined || value === null) {
           return undefined;
       }
       value = value[prop];
   }
-  
+
   return value;
 }
 
 /**
-* Get a local variable value from given field or panel
-* @param {string} variableName - Name of the variable to get (supports dot notation e.g. 'address.city')
-* @param {object} [normalFieldOrPanel] - Field or panel component to get the property from (defaults to current field)
-* @param {scope} globals - Global scope object containing the current field context
-* @returns {string|object|Array} The value of the requested variable or undefined if not found
-*/
-function getLocalVariable(variableName, normalFieldOrPanel, globals) {
-  // Use the provided field/panel or default to the current field from globals
-  const field = normalFieldOrPanel || globals.field;
-   
-  // Return undefined if no property name or if the field has no properties
-  if (!variableName || !field.$properties) {
-    return undefined;
-  }
- 
-  return _getNestedValue(variableName, field.$properties);
-}
-
-/**
-* Get a global variable value
-* @param {string} variableName - Name of the variable to get (supports dot notation e.g. 'address.city')
-* @param {scope} globals - Global scope object containing the current field context
-* @returns {string|object|Array} The value of the requested variable or undefined if not found
-*/
-function getGlobalVariable(variableName, globals) {
-  if (!variableName || !globals.form.$properties) {
-    return undefined;
-  }
- 
-  return _getNestedValue(variableName, globals.form.$properties);
-}
-
-/**
-* Gets the form data by exporting all field values, optionally converts to JSON string
+* Export form data as a JSON string
 * @param {boolean} [stringify] - Convert the form data to a JSON string, defaults to true
+* @param {string} [key] - The key to get the value for (supports dot notation e.g. 'address.city'), defaults to all form data
 * @param {scope} globals - Global scope object containing form context
 * @returns {string|object} The complete form data as a JSON string
 */
-function getFormData(stringify, globals) {
-  if (stringify === undefined || stringify === null) {
-      stringify = true;
-  }
-  const data = globals.functions.exportData();
-  // Check if data exists and is an object
-  if (data && typeof data === 'object' && stringify) {
-    return JSON.stringify(data);
-  }
-  return data;
-}
-
-/**
-* Sets the form data in form fields
-* @param {object} data - The form data to set
-* @param {object} [containerField] - Container field component to set the data on (e.g. panel, fragment), defaults to form
-* @param {scope} globals - Global scope object containing form context
-* @returns {void}
-*/
-function setFormData(data, containerField, globals) {
-  if (containerField) {
-      const containerFieldQualifiedName = containerField.$qualifiedName;
-      globals.functions.importData(data, containerFieldQualifiedName);
-  } else {
-      globals.functions.importData(data);
-  }
-}
-
-/**
-* Gets value for a given key from the form data, optionally converts to JSON string
-* @param {string} key - The key to get the value for (supports dot notation e.g. 'address.city')
-* @param {boolean} [stringify] - Convert the value to a JSON string, defaults to true
-* @param {scope} globals - Global scope object containing form context
-* @returns {string|object|Array} The value for the given key
-*/
-function getValueFromFormData(key, stringify, globals) {
-  if (key === undefined || key === null) {
-      return undefined;
-  }
+function exportFormData(stringify, key, globals) {
   if (stringify === undefined || stringify === null) {
       stringify = true;
   }
@@ -389,9 +300,22 @@ function getValueFromFormData(key, stringify, globals) {
   if (!data) {
       return undefined;
   }
-  
-  const value = _getNestedValue(key, data);
-  
+
+  // Return all data if no key is provided
+  if (key === undefined || key === null) {
+    return stringify && typeof data === 'object' ? JSON.stringify(data) : data;
+  }
+
+  const properties = key.split('.');
+  let value = data;
+
+  for (const prop of properties) {
+      if (value === undefined || value === null) {
+          return undefined;
+      }
+      value = value[prop];
+  }
+
   if (value && typeof value === 'object' && stringify) {
       return JSON.stringify(value);
   }
@@ -408,11 +332,7 @@ export {
   defaultSubmitErrorHandler,
   fetchCaptchaToken,
   dateToDaysSinceEpoch,
-  setGlobalVariable,
-  setLocalVariable,
-  getLocalVariable,
-  getGlobalVariable,
-  getFormData,
-  getValueFromFormData,
-  setFormData
+  setVariable,
+  getVariable,
+  exportFormData
 };
