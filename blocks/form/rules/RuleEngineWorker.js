@@ -43,7 +43,6 @@ onmessage = (e) => {
   function handleMessageEvent(event) {
     switch (event.data.name) {
       case 'init':
-        ruleEngine = new RuleEngine(event.data.payload);
         // eslint-disable-next-line no-case-declarations
         const state = ruleEngine.getState();
         postMessage({
@@ -59,8 +58,9 @@ onmessage = (e) => {
     }
   }
 
-  if (!customFunctionRegistered) {
-    registerCustomFunctions(getCustomFunctionsPath()).then(() => {
+  if (!customFunctionRegistered && e?.data?.name === 'init') {
+    ruleEngine = new RuleEngine(e.data.payload);
+    registerCustomFunctions(ruleEngine.getCustomFunctionsPath()).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
     });
