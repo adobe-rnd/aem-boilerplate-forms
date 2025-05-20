@@ -244,6 +244,82 @@ function dateToDaysSinceEpoch(date) {
   return Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24));
 }
 
+
+/**
+ * @name getQueryParameter
+ * @description Retrieves the value of a specific query parameter from the URL or form properties.
+ * @param {string} param The name of the query parameter to retrieve.
+ * @param {object} globals - An object containing read-only form instance, read-only target field instance and methods for form modifications.
+ * @returns The value of the query parameter if found, or an empty string if not found.
+ */
+function getQueryParameter(param, globals) {
+  if (!param) {
+    return '';
+  }
+
+  if (globals.form?.properties?.queryParams?.[param]) {
+    return globals.form.properties.queryParams[param];
+  }
+
+  try {
+    const urlParams = new URLSearchParams(window?.location?.search || '');
+    return urlParams.get(param);
+  } catch (e) {
+    return '';
+  }
+}
+
+/**
+ * @name getBrowserDetail
+ * @description Retrieves specific browser details based on the provided parameter or form properties.
+ * @param {string} param The name of the browser detail to retrieve. Supported values:
+ * - 'userAgent': Returns the user agent string of the browser.
+ * - 'language': Returns the language of the browser.
+ * - 'platform': Returns the platform of the browser.
+ * @param {object} globals - An object containing read-only form instance, read-only target field instance and methods for form modifications.
+ * @returns The value of the requested browser detail or an empty string if not found.
+ */
+function getBrowserDetail(param, globals) {
+  if (!param) {
+    return '';
+  }
+
+  if (globals.form?.properties?.browserDetails?.[param]) {
+    return globals.form.properties.browserDetails[param];
+  }
+
+  if (typeof navigator !== 'undefined' && param in navigator) {
+    return navigator[param] || '';
+  } else {
+    return '';
+  }
+}
+
+/**
+ * @name getURLDetail
+ * @description Retrieves specific details from the browser's `window.location` object based on the provided parameter or form properties.
+ * @param {string} param The name of the `window.location` property to retrieve. Supported values:
+ * - 'hostname': Returns the domain name of the web host.
+ * - 'pathname': Returns the path of the current page.
+ * @param {object} globals - An object containing read-only form instance, read-only target field instance and methods for form modifications.
+ * @returns The value of the requested `window.location` property or an empty string if not found.
+ */
+function getURLDetail(param, globals) {
+  if (!param) {
+    return '';
+  }
+
+  if (globals.form?.properties?.urlDetails?.[param]) {
+    return globals.form.properties.urlDetails[param];
+  }
+
+  if (typeof window !== 'undefined' && typeof window.location !== 'undefined' && param in window.location) {
+    return window.location[param] || '';
+  } else {
+    return '';
+  }
+}
+
 export {
   externalize,
   validateURL,
@@ -254,4 +330,7 @@ export {
   defaultSubmitErrorHandler,
   fetchCaptchaToken,
   dateToDaysSinceEpoch,
+  getQueryParameter,
+  getBrowserDetail,
+  getURLDetail
 };
