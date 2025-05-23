@@ -12,7 +12,8 @@ const selectors = {
   emailInput: 'input[type="email"]',
   passwordInput: 'input[type="password"]',
   firstExtButtonItem: 'div[class*="ext-button-item"]:first-child',
-  signInButton: 'button[type="submit"]'
+  signInButton: 'button[type="submit"]',
+  signInWithMicrosoft: '[data-id="EmailPage-MicrosoftSignInButton"]'
 };
 
 async function globalSetup() {
@@ -25,14 +26,19 @@ async function globalSetup() {
   await page.locator(selectors.signInWithAdobe).click();
   await expect(page.locator(selectors.createAnAccount)).toBeVisible();
   await page.getByRole('link', { name: 'View more' }).click();
-  await expect(page.getByRole('button', { name: 'Continue with Microsoft' })).toBeVisible();
-  await page.getByRole('button', { name: 'Continue with Microsoft' }).click();
+  const microsoftSignInButton = page.locator(selectors.signInWithMicrosoft);
+  await expect(microsoftSignInButton).toBeVisible();
+  await microsoftSignInButton.click();
   await page.waitForLoadState('networkidle');
   await expect(emailLocator).toBeVisible();
   await emailLocator.fill(emailId);
   await emailLocator.blur();
   await page.getByRole('button', { name: 'Next' }).click();
   await expect(page.getByText(emailId)).toBeVisible();
+  const usePasswordLink = page.getByText('Use your password');
+  if (await usePasswordLink.isVisible()) {
+    await usePasswordLink.click();
+  }
   await passwordLocator.fill(password);
   await passwordLocator.blur();
   await page.locator(selectors.signInButton).click();
