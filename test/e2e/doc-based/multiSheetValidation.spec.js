@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {openPage} from "../../utils.js";
+import {openPage} from "../utils.js";
 
 let requestPayload = null;
 const expectedPayload = {
