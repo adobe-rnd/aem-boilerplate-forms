@@ -6,6 +6,11 @@ function executeGitCommand(command) {
     .replace(/[\n\r\s]+$/, '');
 }
 
+export async function getFieldModel(page, id) {
+  return await page.evaluate(id => {
+    return window.myForm._fields[id]._jsonModel;
+  }, id);
+}
 // eslint-disable-next-line max-len
 export async function fillField(page, componentTitle, inputValues) {
   switch (componentTitle) {
