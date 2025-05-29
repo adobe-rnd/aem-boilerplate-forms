@@ -281,7 +281,7 @@ function setVariable(variableName, variableValue, normalFieldOrPanel, globals) {
       
       // Set the value at the final nested property
       parentObj[parts[parts.length - 1]] = variableValue;
-      
+
       globals.functions.setProperty(target, { properties: updatedProperties });
   } else {
       // Handle the simple non-nested case
@@ -300,7 +300,7 @@ function setVariable(variableName, variableValue, normalFieldOrPanel, globals) {
 function getVariable(variableName, normalFieldOrPanel, globals) {
   const target = normalFieldOrPanel || globals.form;
   if (!variableName || !target.$properties) {
-    return undefined;
+      return undefined;
   }
 
   const properties = variableName.split('.');
@@ -317,9 +317,25 @@ function getVariable(variableName, normalFieldOrPanel, globals) {
 }
 
 /**
+ * Private function to parse a key string that may contain dot notation and array brackets
+ * Converts something like "p1[0].t1" to ["p1", "0", "t1"]
+ * @private
+ * @param {string} keyStr - The key string to parse
+ * @returns {string[]} Array of property names and indices
+ */
+function parsePropertyPath(keyStr) {
+  // Replace '[' with '.' and remove ']', then split on '.' and filter out empty strings
+  return keyStr
+      .replace(/\[/g, '.')
+      .replace(/\]/g, '')
+      .split('.')
+      .filter(Boolean);
+}
+
+/**
 * Export form data as a JSON string
 * @param {boolean} [stringify] - Convert the form data to a JSON string, defaults to true
-* @param {string} [key] - The key to get the value for (supports dot notation e.g. 'address.city'), defaults to all form data
+* @param {string} [key] - The key to get the value for (supports dot notation and array brackets e.g. 'address.city' or 'items[0].name'), defaults to all form data
 * @param {scope} globals - Global scope object containing form context
 * @returns {string|object} The complete form data as a JSON string
 */
@@ -335,10 +351,10 @@ function exportFormData(stringify, key, globals) {
 
   // Return all data if no key is provided
   if (key === undefined || key === null) {
-    return stringify && typeof data === 'object' ? JSON.stringify(data) : data;
+      return stringify && typeof data === 'object' ? JSON.stringify(data) : data;
   }
 
-  const properties = key.split('.');
+  const properties = parsePropertyPath(key);
   let value = data;
 
   for (const prop of properties) {
