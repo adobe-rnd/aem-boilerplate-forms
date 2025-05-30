@@ -9,8 +9,7 @@
             "resourceType": "core/fd/components/form/actions/reset/v1/reset",
             "template": {
               "jcr:title": "Reset",
-              "buttonType": "reset",
-              "fieldType": "button"
+              "buttonType": "reset"
             }
           }
         }

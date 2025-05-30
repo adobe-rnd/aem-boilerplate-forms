@@ -8,8 +8,7 @@
           "page": {
             "resourceType": "core/fd/components/form/button/v1/button",
             "template": {
-              "jcr:title": "Button",
-              "fieldType": "button"
+              "jcr:title": "Button"
             }
           }
         }
