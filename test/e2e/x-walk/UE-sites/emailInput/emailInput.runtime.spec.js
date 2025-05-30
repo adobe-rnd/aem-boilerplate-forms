@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openPage } from '../../../utils.js';
+import { getFieldModel, openPage } from '../../../utils.js';
 
 test.describe('Form Runtime with Email Input', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/email-validation/basic';
@@ -23,15 +23,12 @@ test.describe('Form Runtime with Email Input', () => {
     await page.pause();
     await page.locator(`#${id}`).fill(input);
     await page.locator(`#${id}`).blur();
-    const model = await page.evaluate(id => {
-      return window.myForm._fields[id]._jsonModel;
-    }, id);
+    const model = await getFieldModel(page, id);
     expect(model.value).toBe(input);
   });
 
   test("Email should not have aria-disabled attribute if enable is false", async ({ page }) => {
     const [id, fieldView] = Object.entries(formContainer._fields)[1];
-    await page.pause();
     const emailInput1 = page.locator(`#${id}`);
     await expect(emailInput1).toHaveAttribute('disabled');
   });
