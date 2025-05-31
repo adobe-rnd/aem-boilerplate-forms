@@ -303,7 +303,7 @@ function getVariable(variableName, normalFieldOrPanel, globals) {
       return undefined;
   }
 
-  const properties = variableName.split('.');
+  const properties = parsePropertyPath(variableName);
   let value = target.$properties;
 
   for (const prop of properties) {
