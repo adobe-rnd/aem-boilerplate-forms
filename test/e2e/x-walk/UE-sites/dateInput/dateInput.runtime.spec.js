@@ -9,9 +9,7 @@ test.describe('Form Runtime with Date Picker', () => {
   let formContainer = null;
 
   test.beforeEach(async ({ page }) => {
-    //await openPage(page, testURL);
-    await page.goto("https://main--aem-boilerplate-forms--adobe-rnd.aem.live/content/aem-boilerplate-forms-xwalk-collaterals/date-picker/basic");
-    await page.waitForTimeout(2000);
+    await openPage(page, testURL);
     formContainer = await page.evaluate(() => myForm);
   });
 
@@ -85,6 +83,21 @@ test.describe('Form Runtime with Date Picker', () => {
     const [id] = Object.entries(formContainer._fields)[1];
     const checkBoxGroup1 = page.locator(`#${id}`);
     await expect(checkBoxGroup1).toHaveAttribute('disabled');
+  });
+
+  test('should set and clear value based on rules', async ({ page }) => {
+    const [datePicker1] = Object.entries(formContainer._fields)[0];
+    const [datePicker4] = Object.entries(formContainer._fields)[3];
+    const [datePicker6] = Object.entries(formContainer._fields)[5];
+    const input = "2023-01-12";
+    await page.locator(`#${datePicker1}`).focus();
+    await page.locator(`#${datePicker1}`).fill('2022-05-18');
+    await page.locator(`#${datePicker6}`).focus();
+    await page.locator(`#${datePicker6}`).fill(input);
+    await page.locator(`#${datePicker6}`).blur();
+
+    await expect(page.locator(`#${datePicker1}`)).toHaveValue("");
+    await expect(page.locator(`#${datePicker4}`)).toHaveValue("1/1/23");
   });
 
   test('Should not show calendar widget if marked readonly', async ({ page }) => {
