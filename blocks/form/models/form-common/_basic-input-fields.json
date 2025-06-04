@@ -25,7 +25,7 @@
             "valueType": "boolean"
         },
         {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
