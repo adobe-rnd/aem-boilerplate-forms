@@ -20,7 +20,6 @@ test.describe('Form Runtime with Email Input', () => {
   test("html changes are reflected in model", async ({ page }) => {
     const [id, fieldView] = Object.entries(formContainer._fields)[0];
     const input = "value@dns.com";
-    await page.pause();
     await page.locator(`#${id}`).fill(input);
     await page.locator(`#${id}`).blur();
     const model = await getFieldModel(page, id);
