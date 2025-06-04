@@ -43,7 +43,8 @@ test.describe('Form with Dropdown', () => {
     await expect(page.locator(`#${idDropdown} select option:checked`)).toHaveCount(0);
   });
 
-  test('Multi Select: Test clear dropdown using rule editor', async ({ page }) => {
+  // Multi Select scenario is not in the product
+  test.skip('Multi Select: Test clear dropdown using rule editor', async ({ page }) => {
     const [idDropdown1] = Object.entries(formContainer._fields)[1];
     const [idButton] = Object.entries(formContainer._fields)[6];
     await page.locator(`#${idButton}`).click();
