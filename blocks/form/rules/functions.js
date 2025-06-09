@@ -247,7 +247,7 @@ function dateToDaysSinceEpoch(date) {
 /**
 * Set variable value on a field or form
 * @param {string} variableName Name of the variable (supports dot notation e.g. 'address.city')
-* @param {string|object|Array} variableValue Value to set for the variable
+* @param {string|number|boolean|object|array} variableValue Value to set for the variable
 * @param {object} [normalFieldOrPanel] - Field or panel component to set the variable on (defaults to Form)
 * @param {scope} globals Global scope object
 */
@@ -295,7 +295,7 @@ function setVariable(variableName, variableValue, normalFieldOrPanel, globals) {
 * @param {string} variableName - Name of the variable (supports dot notation e.g. 'address.city')
 * @param {object} [normalFieldOrPanel] - Field or panel component to get the value from (defaults to Form)
 * @param {scope} globals - Global scope object containing the current field context
-* @returns {string|object|Array} The value of the requested variable or undefined if not found
+* @returns {string|number|boolean|object|array} The value of the requested variable or undefined if not found
 */
 function getVariable(variableName, normalFieldOrPanel, globals) {
   const target = normalFieldOrPanel || globals.form;
