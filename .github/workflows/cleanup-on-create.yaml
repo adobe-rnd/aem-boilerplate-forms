@@ -34,17 +34,17 @@ jobs:
           sed -i.bak "s/{repo}/$(basename ${{ github.repository }})/g" README.md
           sed -i.bak "s/{owner}/$(dirname ${{ github.repository }})/g" README.md
 
-      - name: Create fstab.yml for hlx4 projects
+      - name: Create fstab.yaml for hlx4 projects
         run: |
-          cat > fstab.yml << 'EOL'
+          cat > fstab.yaml << 'EOL'
           mountpoints:
             /:
               url: https://author-p133911-e1313554.adobeaemcloud.com/bin/franklin.delivery/{owner}/{repo}/main
               type: "markup"
               suffix: ".html"
           EOL
-          sed -i.bak "s/{repo}/$(basename ${{ github.repository }})/g" fstab.yml
-          sed -i.bak "s/{owner}/$(dirname ${{ github.repository }})/g" fstab.yml
+          sed -i.bak "s/{repo}/$(basename ${{ github.repository }})/g" fstab.yaml
+          sed -i.bak "s/{owner}/$(dirname ${{ github.repository }})/g" fstab.yaml
 
       - name: Initialize Pull Request Template
         run: |
