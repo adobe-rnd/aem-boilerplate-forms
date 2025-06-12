@@ -1,8 +1,8 @@
 // create a string containing head tags from h1 to h5
 import { defaultErrorMessages } from './constant.js';
 
-const headings = Array.from({ length: 5 }, (_, i) => `<h${i + 1}>`).join('');
-const allowedTags = `${headings}<a><b><p><i><em><strong><ul><li><ol>`;
+const headings = Array.from({ length: 6 }, (_, i) => `<h${i + 1}>`).join('');
+const allowedTags = `${headings}<a><b><p><i><em><strong><ul><li><ol><br><hr><u><sup><sub><s>`;
 
 export function stripTags(input, allowd = allowedTags) {
   if (typeof input !== 'string') {
