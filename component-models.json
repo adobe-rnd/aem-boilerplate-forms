@@ -317,6 +317,12 @@
             "valueType": "boolean"
           },
           {
+            "component": "boolean",
+            "name": "useHtmlTemplate",
+            "label": "Use html template",
+            "valueType": "boolean"
+          },
+          {
             "component": "aem-content",
             "name": "templatePath",
             "label": "External template path",
@@ -510,7 +516,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -759,7 +765,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -985,7 +991,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -1241,7 +1247,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -1463,7 +1469,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -1691,7 +1697,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -1902,7 +1908,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -2182,7 +2188,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -2416,7 +2422,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -2682,7 +2688,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -2963,7 +2969,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -3467,7 +3473,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -3681,7 +3687,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -3997,7 +4003,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -4171,7 +4177,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -4317,7 +4323,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -4533,7 +4539,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -4735,7 +4741,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
@@ -4887,7 +4893,7 @@
             "valueType": "boolean"
           },
           {
-            "component": "text",
+            "component": "datasource-bindref",
             "name": "dataRef",
             "label": "Bind reference",
             "valueType": "string"
