@@ -47,6 +47,7 @@ module.exports = {
       rating: 18,
       password: 20,
       tnc: 12,
+      'checkbox-with-others': 23,
     }],
     'xwalk/no-orphan-collapsible-fields': 'off', // Disable until enhancement is done for Forms properties
   },

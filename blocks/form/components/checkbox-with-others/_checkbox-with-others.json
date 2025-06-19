@@ -1,0 +1,74 @@
+{
+    "definitions": [
+        {
+            "title": "Checkbox With Others",
+            "id": "checkbox-with-others",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                        "template": {
+                            "fieldType": "panel",
+                            "fd:viewType": "checkbox-with-others",
+                            "jcr:title": "Checkbox with Others",
+                            "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                            "name": "panelcontainer1745918418255",
+                            "checkboxgroup": {
+                                "jcr:title": "Checkbox Group",
+                                "enum": [
+                                    "0",
+                                    "1",
+                                    "2"
+                                ],
+                                "enumNames": [
+                                    "Item 1",
+                                    "Item 2",
+                                    "Other"
+                                ],
+                                "fieldType": "checkbox-group",
+                                "sling:resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                                "name": "othercheckboxgroup1745918996273",
+                                "orientation": "horizontal",
+                                "type": "string[]"
+                            },
+                            "textinput": {
+                                "fieldType": "text-input",
+                                "jcr:title": "Please specify",
+                                "sling:resourceType": "core/fd/components/form/textinput/v1/textinput",
+                                "name": "othertextinput1745918554430",
+                                "fd:rules": {
+                                    "visible": "contains(othercheckboxgroup1745918996273, '2')",
+                                    "validationStatus": "valid",
+                                    "fd:visible": [
+                                        "{\"nodeName\":\"ROOT\",\"items\":[{\"nodeName\":\"STATEMENT\",\"choice\":{\"nodeName\":\"SHOW_EXPRESSION\",\"items\":[{\"nodeName\":\"AFCOMPONENT\",\"value\":{\"id\":\"$form.panelcontainer1745918418255.othertextinput1745918554430\",\"type\":\"AFCOMPONENT\",\"name\":\"othertextinput1745918554430\"}},{\"nodeName\":\"When\",\"value\":null},{\"nodeName\":\"CONDITIONORALWAYS\",\"choice\":{\"nodeName\":\"COMPARISON_EXPRESSION\",\"items\":[{\"nodeName\":\"EXPRESSION\",\"choice\":{\"nodeName\":\"COMPONENT\",\"value\":{\"id\":\"$form.panelcontainer1745918418255.othercheckboxgroup1745918996273\",\"displayName\":\"Checkbox Group\",\"type\":\"STRING[]\",\"isDuplicate\":true,\"displayPath\":\"FORM/Checkbox with Other/Checkbox Group/\",\"name\":\"othercheckboxgroup1745918996273\",\"parent\":\"$form.panelcontainer1745918418255\",\"metadata\":{\"isAncestorRepeatable\":false}}}},{\"nodeName\":\"OPERATOR\",\"choice\":{\"nodeName\":\"HAS_SELECTED\",\"value\":null}},{\"nodeName\":\"EXPRESSION\",\"choice\":{\"nodeName\":\"STRING_LITERAL\",\"value\":\"2\"}}]}},{\"nodeName\":\"Else\",\"value\":null},{\"nodeName\":\"DONOTHING_OR_HIDE\",\"choice\":{\"nodeName\":\"Hide\",\"value\":null}}]}}],\"isValid\":true,\"enabled\":true,\"version\":1,\"script\":\"contains(othercheckboxgroup1745918996273, '2')\",\"eventName\":\"Visibility\",\"ruleType\":\"\",\"description\":\"\"}"
+                                    ],
+                                    "jcr:primaryType": "nt:unstructured"
+                                },
+                                "fd:events": {
+                                    "jcr:primaryType": "nt:unstructured"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "checkbox-with-others",
+            "fields": [
+                {
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Basic",
+                    "collapsible": false,
+                    "...": "../../models/form-common/_basic-input-fields.json"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json"
+                }
+            ]
+        }
+    ]
+}
