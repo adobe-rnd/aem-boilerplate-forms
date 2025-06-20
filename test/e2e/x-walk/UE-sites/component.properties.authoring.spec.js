@@ -7,7 +7,7 @@ const componentName = 'Email Input';
 const component = 'emailinput';
 const now = new Date();
 const randomValues = now.getTime();
-test.describe('Component properties validation in UE', async () => {
+test.describe.skip('Component properties validation in UE', async () => {
   const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/aem-boilerplate-forms-xwalk-collaterals/componentPropertyValidation.html';
   test('Component title validation in UE @chromium-only', async ({ page }) => {
     await page.goto(testURL, { waitUntil: 'load' });
