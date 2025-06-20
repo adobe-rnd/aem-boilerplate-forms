@@ -109,6 +109,7 @@ export function expect(block) {
   const f1Message = f1.querySelector('.field-invalid .field-description');
   assert.equal(f1Message.textContent, 'Please fill in this field.', 'Required error message for text input');
   setValue(block, '#f1', 'abc');
+  assert.equal(f1.classList.contains('.field-invalid'), false, 'field-invalid class not getting removed once field is valid');
   assert.equal(f1.querySelector('.field-invalid .field-description'), undefined, 'Not Required error message for text input');
 
   // number input error message
