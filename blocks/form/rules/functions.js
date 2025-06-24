@@ -253,7 +253,7 @@ function dateToDaysSinceEpoch(date) {
 */
 function setVariable(variableName, variableValue, normalFieldOrPanel, globals) {
   // Check if variableValue is a proxy object, extract its $value if available
-  if (variableValue && typeof variableValue === 'object' && variableValue.$qualifiedName) {
+  if (variableValue?.$qualifiedName) {
     variableValue = variableValue.$value;
   }
   
