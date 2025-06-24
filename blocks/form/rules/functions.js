@@ -252,6 +252,11 @@ function dateToDaysSinceEpoch(date) {
 * @param {scope} globals Global scope object
 */
 function setVariable(variableName, variableValue, normalFieldOrPanel, globals) {
+  // Check if variableValue is a proxy object, extract its $value if available
+  if (variableValue && typeof variableValue === 'object' && variableValue.$qualifiedName) {
+    variableValue = variableValue.$value;
+  }
+  
   const target = normalFieldOrPanel || globals.form;
   const existingProperties = target.$properties || {};
   
