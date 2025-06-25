@@ -40,7 +40,7 @@ export default async function registerCustomFunctions(customFunctionsPath, codeB
     registerFunctionsInRuntime(ootbFunctionModule);
     
     // Only try to load custom functions if customFunctionsPath is provided
-    if (customFunctionsPath && customFunctionsPath !== 'undefined') {
+    if (codeBasePath && codeBasePath !== 'undefined' && customFunctionsPath && customFunctionsPath !== 'undefined') {
       const customFunctionModule = await import(`${codeBasePath}${customFunctionsPath}`);
       registerFunctionsInRuntime(customFunctionModule);
     }
