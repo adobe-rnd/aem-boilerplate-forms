@@ -36,7 +36,10 @@ export default async function registerCustomFunctions(customFunctionsPath) {
       }
     }
 
-    const customFunctionModule = await import(`${window.hlx.codeBasePath}${customFunctionsPath}`);
+     if (customFunctionsPath && customFunctionsPath !== 'undefined') {
+      const customFunctionModule = await import(`${window.hlx.codeBasePath}${customFunctionsPath}`);
+      registerFunctionsInRuntime(customFunctionModule);
+    }
     const ootbFunctionModule = await import('./functions.js');
     registerFunctionsInRuntime(ootbFunctionModule);
     registerFunctionsInRuntime(customFunctionModule);
