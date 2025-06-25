@@ -27,6 +27,7 @@ export default class RuleEngine {
 
   constructor(formDef) {
     this.form = createFormInstance(formDef);
+    this.codeBasePath = formDef.codeBasePath;
   }
 
   getState() {
@@ -35,6 +36,10 @@ export default class RuleEngine {
 
   getCustomFunctionsPath() {
     return this.form?.properties?.customFunctionsPath || '../functions.js';
+  }
+
+  getCodeBasePath() {
+    return this.codeBasePath;
   }
 }
 
@@ -60,7 +65,7 @@ onmessage = (e) => {
 
   if (!customFunctionRegistered && e?.data?.name === 'init') {
     ruleEngine = new RuleEngine(e.data.payload);
-    registerCustomFunctions(ruleEngine.getCustomFunctionsPath()).then(() => {
+    registerCustomFunctions(ruleEngine.getCustomFunctionsPath(), ruleEngine.getCodeBasePath()).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
     });
