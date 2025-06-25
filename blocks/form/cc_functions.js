@@ -1,3 +1,5 @@
+import { getFullName1 } from './cc/functions';
+
 /**
  * Get Full Name 2
  * @name getFullName2 Concats first name and last name 1
@@ -10,4 +12,4 @@ function getFullName2(firstname, lastname) {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export { getFullName2 };
+export { getFullName1, getFullName2 };
