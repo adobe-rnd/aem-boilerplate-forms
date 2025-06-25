@@ -340,7 +340,7 @@ async function fetchData({ id }) {
 
 export async function initAdaptiveForm(formDef, createForm) {
   const data = await fetchData(formDef);
-  await registerCustomFunctions();
+  await registerCustomFunctions(formDef?.properties?.customFunctionsPath, window.hlx?.codeBasePath);
   const form = await initializeRuleEngineWorker({
     ...formDef,
     data,
