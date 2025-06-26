@@ -8,7 +8,7 @@ import { getFullName1 } from './cc/functions.js';
  * @return {string}
  */
 function getFullName2(firstname, lastname) {
-    return `${firstname} ${lastname}`.trim();
+    return `${firstname} ${lastname}`?.trim();
 }
 
 // eslint-disable-next-line import/prefer-default-export
