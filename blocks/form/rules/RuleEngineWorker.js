@@ -27,10 +27,19 @@ export default class RuleEngine {
 
   constructor(formDef) {
     this.form = createFormInstance(formDef);
+    this.codeBasePath = formDef.codeBasePath;
   }
 
   getState() {
     return this.form.getState(true);
+  }
+
+  getCustomFunctionsPath() {
+    return this.form?.properties?.customFunctionsPath || '../functions.js';
+  }
+
+  getCodeBasePath() {
+    return this.codeBasePath;
   }
 }
 
@@ -39,7 +48,6 @@ onmessage = (e) => {
   function handleMessageEvent(event) {
     switch (event.data.name) {
       case 'init':
-        ruleEngine = new RuleEngine(event.data.payload);
         // eslint-disable-next-line no-case-declarations
         const state = ruleEngine.getState();
         postMessage({
@@ -55,8 +63,9 @@ onmessage = (e) => {
     }
   }
 
-  if (!customFunctionRegistered) {
-    registerCustomFunctions().then(() => {
+  if (!customFunctionRegistered && e?.data?.name === 'init') {
+    ruleEngine = new RuleEngine(e.data.payload);
+    registerCustomFunctions(ruleEngine.getCustomFunctionsPath(), ruleEngine.getCodeBasePath()).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
     });
