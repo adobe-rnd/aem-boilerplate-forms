@@ -2,7 +2,7 @@ import { getFullName1 } from './cc/functions.js';
 
 /**
  * Get Full Name from CC
- * @name Concatenates check given first name and last name with a space in between.
+ * @name getFullName2 check given first name and last name with a space in between.
  * @param {string} firstname in Stringformat
  * @param {string} lastname in Stringformat
  * @return {string}
