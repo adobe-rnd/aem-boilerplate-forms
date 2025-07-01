@@ -7,7 +7,6 @@ const password = process.env.AEM_password;
 
 const selectors = {
   iFrame: 'iframe[id*="exc-app-sandbox"]',
-  createAnAccount: 'a[class="spectrum-Link EmailPage__create-account-link"]',
   signInWithAdobe: 'text=Sign in with Adobe',
   emailInput: 'input[type="email"]',
   passwordInput: 'input[type="password"]',
@@ -24,7 +23,7 @@ async function globalSetup() {
   const emailLocator = page.locator(selectors.emailInput);
   const passwordLocator = page.locator(selectors.passwordInput);
   await page.locator(selectors.signInWithAdobe).click();
-  await expect(page.locator(selectors.createAnAccount)).toBeVisible();
+  await expect(page.getByText('Create an account').last()).toBeVisible();
   await page.getByRole('link', { name: 'View more' }).click();
   const microsoftSignInButton = page.locator(selectors.signInWithMicrosoft);
   await expect(microsoftSignInButton).toBeVisible();
