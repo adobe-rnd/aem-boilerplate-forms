@@ -43,7 +43,6 @@ test.describe.skip('Forms Authoring in Universal Editor tests', () => {
   test.afterEach(async ({ page }) => {
     await page.goto(testURL, { waitUntil: 'load' });
     await frame.locator(universalEditorBase.selectors.contentTreeLabel).click();
-    // eslint-disable-next-line max-len
     await expect(frame.locator(universalEditorBase.selectors.adaptiveFormPathInUE).first()).toBeVisible({ timeout: 10000 });
     await universalEditorBase.verifyComponentDelete(page, frame, component);
   });
