@@ -44,6 +44,7 @@ test.describe('Preview Validation in UE', async () => {
     await textInput.blur();
     await expect(button).toBeVisible();
     await button.locator('button').click();
+
     expect(await emailInput.locator('input').inputValue()).toBe(emailId);
   });
 });
