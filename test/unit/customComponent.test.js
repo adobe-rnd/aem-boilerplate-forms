@@ -1,5 +1,9 @@
-import path from 'path';
-import { testBasicMarkup } from './testUtils.js';
+/* eslint-env mocha */
+import { executeTestInFolder, testBasicMarkup } from './testUtils.js';
 
-window.hlx = { codeBasePath: '' };
-testBasicMarkup(path.resolve('./test/unit/fixtures/custom-component/range.js'), false, ['range'], '../../test/unit/fixtures');
+// Custom component test with custom components array
+function testCustomComponent(filePath, bUrlMode = false) {
+  testBasicMarkup(filePath, bUrlMode, ['range'], '../..');
+}
+
+// executeTestInFolder('./test/unit/fixtures/custom-components/', testCustomComponent);

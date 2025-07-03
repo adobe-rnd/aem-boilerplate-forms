@@ -18,16 +18,16 @@ function updateBubble(input, element) {
   bubble.style.left = `calc(${left})`;
   element.setAttribute('style', style);
 }
-
-// eslint-disable-next-line no-unused-vars
-export default function decorateRange(fieldDiv, field) {
+export default async function decorate(fieldDiv, fieldJson) {
   const input = fieldDiv.querySelector('input');
   // modify the type in case it is not range.
   input.type = 'range';
   input.min = input.min || 1;
+  input.max = input.max || 100;
+  input.step = fieldJson?.properties?.stepValue || 1;
   // create a wrapper div to provide the min/max and current value
   const div = document.createElement('div');
-  div.className = 'range-widget-wrapper';
+  div.className = 'range-widget-wrapper decorated';
   input.after(div);
   const hover = document.createElement('span');
   hover.className = 'range-bubble';
@@ -46,4 +46,5 @@ export default function decorateRange(fieldDiv, field) {
     updateBubble(e.target, div);
   });
   updateBubble(input, div);
+  return fieldDiv;
 }
