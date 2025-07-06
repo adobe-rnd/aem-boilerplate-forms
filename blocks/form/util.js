@@ -1,7 +1,7 @@
 // create a string containing head tags from h1 to h5
 import { defaultErrorMessages } from './constant.js';
 
-const headings = Array.from({ length: 5 }, (_, i) => `<h${i + 1}>`).join('');
+const headings = Array.from({ length: 6 }, (_, i) => `<h${i + 1}>`).join('');
 const allowedTags = `${headings}<a><b><p><i><em><strong><ul><li><ol>`;
 
 export function stripTags(input, allowd = allowedTags) {
@@ -177,6 +177,7 @@ export function updateOrCreateInvalidMsg(fieldElement, msg) {
     element.innerHTML = container.dataset.description;
   } else if (element) {
     element.remove();
+    container?.classList?.remove('field-invalid');
   }
   return element;
 }
