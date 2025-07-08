@@ -1,7 +1,6 @@
 import { expect, test } from '../../fixtures.js';
-import { UniversalEditorBase } from '../../main/page/universalEditorBasePage.js';
 
-// eslint-disable-next-line new-cap
+import { UniversalEditorBase } from '../../main/page/universalEditorBasePage.js';
 const universalEditorBase = new UniversalEditorBase();
 const textInputValue = 'Adobe';
 const emailId = 'adobe@test.com';
@@ -14,7 +13,6 @@ test.describe('Preview Validation in UE', async () => {
     const frame = page.frameLocator(universalEditorBase.selectors.iFrame);
     const iframeEditor = frame.frameLocator(universalEditorBase.selectors.iFrameEditor);
     const componentPathInUE = await iframeEditor.locator(`${universalEditorBase.selectors.componentPath + componentNames[2]}"]`);
-    // eslint-disable-next-line max-len
     await expect(frame.locator(universalEditorBase.selectors.propertyPagePath)).toBeVisible();
     await expect(componentPathInUE).toBeVisible({ timeout: 16000 });
     const previewButton = frame.locator(universalEditorBase.selectors.preview);
@@ -22,23 +20,16 @@ test.describe('Preview Validation in UE', async () => {
     await previewButton.click();
     await expect(frame.locator(universalEditorBase.selectors.iFrameInPreview)).toBeVisible();
     const iframe = frame.frameLocator(universalEditorBase.selectors.iFrameInPreview);
-    // eslint-disable-next-line no-restricted-syntax
     for (const componentName of componentNames) {
-      // eslint-disable-next-line no-use-before-define
       const componentLocator = universalEditorBase.componentLocatorForPreview(componentName);
       if (componentName === 'button') {
-        // eslint-disable-next-line no-await-in-loop
         await expect(iframe.locator(componentLocator)).toBeHidden();
       } else {
-        // eslint-disable-next-line no-await-in-loop
         await expect(iframe.locator(componentLocator)).toBeVisible();
       }
     }
-    // eslint-disable-next-line no-use-before-define,max-len
     const textInput = iframe.locator(universalEditorBase.componentLocatorForPreview(componentNames[0])).locator('input');
-    // eslint-disable-next-line max-len
     const button = iframe.locator(universalEditorBase.componentLocatorForPreview(componentNames[2]));
-    // eslint-disable-next-line no-use-before-define,max-len
     const emailInput = iframe.locator(universalEditorBase.componentLocatorForPreview(componentNames[1]));
     await textInput.fill(textInputValue);
     await textInput.blur();
