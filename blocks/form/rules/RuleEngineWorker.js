@@ -32,6 +32,11 @@ export default class RuleEngine {
   getState() {
     return this.form.getState(true);
   }
+
+  getCustomFunctionsPath() {
+    return this.form?.properties?.customFunctionsPath || '../functions.js';
+  }
+
 }
 
 let ruleEngine;
@@ -39,7 +44,6 @@ onmessage = (e) => {
   function handleMessageEvent(event) {
     switch (event.data.name) {
       case 'init':
-        ruleEngine = new RuleEngine(event.data.payload);
         // eslint-disable-next-line no-case-declarations
         const state = ruleEngine.getState();
         postMessage({
@@ -55,8 +59,9 @@ onmessage = (e) => {
     }
   }
 
-  if (!customFunctionRegistered) {
-    registerCustomFunctions().then(() => {
+  if (!customFunctionRegistered && e?.data?.name === 'init') {
+    ruleEngine = new RuleEngine(e.data.payload);
+    registerCustomFunctions(ruleEngine.getCustomFunctionsPath(), window.hlx?.codeBasePath).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
     });
