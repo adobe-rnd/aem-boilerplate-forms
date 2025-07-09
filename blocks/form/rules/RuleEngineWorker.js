@@ -27,7 +27,6 @@ export default class RuleEngine {
 
   constructor(formDef) {
     this.form = createFormInstance(formDef);
-    this.codeBasePath = formDef.codeBasePath;
   }
 
   getState() {
@@ -38,9 +37,6 @@ export default class RuleEngine {
     return this.form?.properties?.customFunctionsPath || '../functions.js';
   }
 
-  getCodeBasePath() {
-    return this.codeBasePath;
-  }
 }
 
 let ruleEngine;
@@ -65,7 +61,7 @@ onmessage = (e) => {
 
   if (!customFunctionRegistered && e?.data?.name === 'init') {
     ruleEngine = new RuleEngine(e.data.payload);
-    registerCustomFunctions(ruleEngine.getCustomFunctionsPath(), ruleEngine.getCodeBasePath()).then(() => {
+    registerCustomFunctions(ruleEngine.getCustomFunctionsPath(), window.hlx?.codeBasePath).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
     });
