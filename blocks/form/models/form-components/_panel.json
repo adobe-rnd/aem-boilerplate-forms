@@ -157,7 +157,7 @@
                     ]
                 },
                 {
-                    "...": "../../models/form-common/_help-container.json"
+                    "...": "../form-common/_help-container.json"
                 }
             ]
         }
