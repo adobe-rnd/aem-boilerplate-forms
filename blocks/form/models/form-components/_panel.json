@@ -155,6 +155,9 @@
                             }
                         }
                     ]
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json"
                 }
             ]
         }
