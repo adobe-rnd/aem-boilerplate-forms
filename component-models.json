@@ -893,7 +893,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "enableUncheckedValue"
+                  "var": "basic|enableUncheckedValue"
                 },
                 true
               ]
@@ -2799,7 +2799,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "repeatable"
+                  "var": "repeat|repeatable"
                 },
                 true
               ]
@@ -2817,7 +2817,7 @@
                 {
                   "===": [
                     {
-                      "var": "repeatable"
+                      "var": "repeat|repeatable"
                     },
                     true
                   ]
@@ -2825,7 +2825,7 @@
                 {
                   "!==": [
                     {
-                      "var": "variant"
+                      "var": "repeat|variant"
                     },
                     "noButtons"
                   ]
@@ -2851,7 +2851,7 @@
             "condition": {
               "===": [
                 {
-                  "var": "repeatable"
+                  "var": "repeat|repeatable"
                 },
                 true
               ]
@@ -2868,7 +2868,7 @@
                 {
                   "===": [
                     {
-                      "var": "variant"
+                      "var": "repeat|variant"
                     },
                     "addDeleteButtons"
                   ]
@@ -2876,7 +2876,7 @@
                 {
                   "===": [
                     {
-                      "var": "repeatable"
+                      "var": "repeat|repeatable"
                     },
                     true
                   ]
@@ -2895,7 +2895,7 @@
                 {
                   "===": [
                     {
-                      "var": "variant"
+                      "var": "repeat|variant"
                     },
                     "addDeleteButtons"
                   ]
@@ -2903,7 +2903,7 @@
                 {
                   "===": [
                     {
-                      "var": "repeatable"
+                      "var": "repeat|repeatable"
                     },
                     true
                   ]
@@ -4090,34 +4090,6 @@
                 "value": "12"
               }
             ]
-          }
-        ]
-      },
-      {
-        "component": "container",
-        "name": "repeat",
-        "label": "Repeat Accordion",
-        "collapsible": true,
-        "fields": [
-          {
-            "component": "boolean",
-            "name": "repeatable",
-            "label": "Make accordion repeatable",
-            "valueType": "boolean"
-          },
-          {
-            "component": "number",
-            "name": "minOccur",
-            "label": "Minimum repetitions",
-            "valueType": "number",
-            "description": "Minimum number of times the accordion appears on the form"
-          },
-          {
-            "component": "number",
-            "name": "maxOccur",
-            "label": "Maximum repetitions",
-            "valueType": "number",
-            "description": "Maximum number of times the accordion can appear on the form"
           }
         ]
       },
