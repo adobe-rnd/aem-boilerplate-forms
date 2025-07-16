@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getFieldModel, openPage } from '../../../utils.js';
+import { getFieldModel, openPage } from '../../utils.js';
 
 test.describe('Form with Adaptive form text', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/text-validation/basic';
