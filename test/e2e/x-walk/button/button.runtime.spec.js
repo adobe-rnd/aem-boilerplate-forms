@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openPage } from '../../../utils.js';
+import { openPage } from '../../utils.js';
 
 test.describe("Form Runtime with Button Input", () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/button-validation';
