@@ -1,5 +1,5 @@
-import { test, expect } from '../fixtures.js';
-import { fillField, openPage } from '../utils.js';
+import { test, expect } from '../../../fixtures.js';
+import { fillField, openPage } from '../../../utils.js';
 
 const wizardCount = ".repeat-wrapper fieldset[class='panel-wrapper field-wrapper wizard']";
 const wizardPanelCount = 'ul.wizard-menu-items li.wizard-menu-item';
