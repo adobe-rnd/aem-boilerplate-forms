@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getFieldModel, openPage } from '../../../utils.js';
+import { getFieldModel, openPage } from '../../utils.js';
 
 test.describe("Form with Checkbox Group", () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/checkbox-group-validation/basic';
