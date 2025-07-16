@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getFieldModel, openPage } from '../../../utils.js';
+import { getFieldModel, openPage } from '../../utils.js';
 
 
 test.describe("Form with Radio Button Input", () => {
