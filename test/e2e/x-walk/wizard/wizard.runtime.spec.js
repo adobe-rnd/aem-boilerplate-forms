@@ -1,5 +1,5 @@
-import { test, expect } from '../fixtures.js';
-import { openPage } from '../utils.js';
+import { test, expect } from '../../fixtures.js';
+import { openPage } from '../../utils.js';
 
 test.describe('Wizard test', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/wizard';
