@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openPage, getFieldModel } from '../../../utils.js';
+import { openPage, getFieldModel } from '../../utils.js';
 
 test.describe("Form Runtime with Telephone Input", () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/telephone-input/basic';

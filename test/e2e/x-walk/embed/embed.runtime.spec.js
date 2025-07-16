@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openPage } from '../../../utils.js';
+import { openPage } from '../../utils.js';
 
 const titles = ['Text Input', 'Email Input', 'Number Input', 'Checkbox Group', 'Radio Group', 'Reset', 'Submit'];
 
