@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openPage } from '../../../utils.js';
+import { openPage } from '../../utils.js';
 
 test.describe('Form with Dropdown', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/dropdown-validation/basic';
