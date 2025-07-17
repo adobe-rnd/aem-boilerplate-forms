@@ -24,7 +24,7 @@ async function globalSetup() {
   const passwordLocator = page.locator(selectors.passwordInput);
   await page.locator(selectors.signInWithAdobe).click();
   await expect(page.getByText('Create an account').last()).toBeVisible();
-  await page.getByRole('link', { name: 'View more' }).click();
+  await page.getByRole('link', { name: 'More sign-in options' }).click();
   const microsoftSignInButton = page.locator(selectors.signInWithMicrosoft);
   await expect(microsoftSignInButton).toBeVisible();
   await microsoftSignInButton.click();
