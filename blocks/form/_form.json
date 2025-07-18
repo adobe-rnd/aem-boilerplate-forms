@@ -85,7 +85,7 @@
               "component": "text",
               "name": "spreadsheetUrl",
               "label": "Spreadsheet Url",
-              "valueType": "string" 
+              "valueType": "string"
           },
           {
               "component": "container",
@@ -169,6 +169,9 @@
     },
     {
       "...": "./components/*/_*.json#/models"
+    },
+    {
+      "...": "./custom-components/*/_*.json#/models"
     }
   ],
   "filters": [
@@ -198,7 +201,8 @@
         "telephone-input",
         "text-input",
         "tnc",
-        "wizard"
+        "wizard",
+        "range"
       ]
     }
   ]
