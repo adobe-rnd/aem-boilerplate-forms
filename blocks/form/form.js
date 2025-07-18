@@ -1,5 +1,5 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
-import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
+import transferRepeatableDOM, { insertAddButton, insertRemoveButton, createButton as createRepeatButton } from './components/repeat/repeat.js';
 import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
@@ -227,12 +227,6 @@ function decoratePanelContainer(panelDefinition, panelContainer) {
 
   const shouldAddLabel = (container, panel) => panel.label && !container.querySelector(`legend[for=${container.dataset.id}]`);
 
-  const isContainerRepeatable = (container) => container.dataset?.repeatable === 'true' && container.dataset?.variant !== 'noButtons';
-
-  const needsAddButton = (container) => !container.querySelector(':scope > .repeat-actions');
-
-  const needsRemoveButton = (container) => !container.querySelector(':scope > .item-remove');
-
   if (isPanelWrapper(panelContainer)) {
     if (shouldAddLabel(panelContainer, panelDefinition)) {
       const legend = createLegend(panelDefinition);
@@ -241,12 +235,33 @@ function decoratePanelContainer(panelDefinition, panelContainer) {
       }
     }
 
-    if (isContainerRepeatable(panelContainer)) {
-      if (needsAddButton(panelContainer)) {
-        insertAddButton(panelContainer, panelContainer);
+    const form = panelContainer.closest('form');
+    const isEditMode = form && form.classList.contains('edit-mode');
+    const isRepeatable = panelDefinition.repeatable === true || panelContainer.dataset.repeatable === 'true';
+
+    if (isEditMode && isRepeatable) {
+      const hasAddButton = panelContainer.querySelector('.repeat-actions .item-add');
+      const hasRemoveButton = panelContainer.querySelector('.item-remove');
+
+      if (!hasAddButton) {
+        let repeatActions = panelContainer.querySelector('.repeat-actions');
+        if (!repeatActions) {
+          repeatActions = document.createElement('div');
+          repeatActions.className = 'repeat-actions';
+          const legend = panelContainer.querySelector('legend');
+          if (legend) {
+            legend.insertAdjacentElement('afterend', repeatActions);
+          } else {
+            panelContainer.insertAdjacentElement('afterbegin', repeatActions);
+          }
+        }
+        const addButton = createRepeatButton('Add', 'add');
+        repeatActions.appendChild(addButton);
       }
-      if (needsRemoveButton(panelContainer)) {
-        insertRemoveButton(panelContainer, panelContainer);
+
+      if (!hasRemoveButton) {
+        const removeButton = createRepeatButton('Delete', 'remove');
+        panelContainer.appendChild(removeButton);
       }
     }
   }
@@ -314,6 +329,10 @@ function enableValidation(form) {
   });
 }
 
+function isDocumentBasedForm(formDef) {
+  return formDef?.[':type'] === 'sheet' && formDef?.data;
+}
+
 async function createFormForAuthoring(formDef) {
   const form = document.createElement('form');
   await generateFormRendition(formDef, form, formDef.id, (container) => {
@@ -325,10 +344,11 @@ async function createFormForAuthoring(formDef) {
   return form;
 }
 
-export async function createForm(formDef, data) {
+export async function createForm(formDef, data, source = 'aem') {
   const { action: formPath } = formDef;
   const form = document.createElement('form');
   form.dataset.action = formPath;
+  form.dataset.source = source;
   form.noValidate = true;
   if (formDef.appliedCssClassNames) {
     form.className = formDef.appliedCssClassNames;
@@ -352,7 +372,7 @@ export async function createForm(formDef, data) {
   }
 
   enableValidation(form);
-  transferRepeatableDOM(form);
+  transferRepeatableDOM(form, formDef, form, formId);
 
   if (afModule) {
     window.setTimeout(async () => {
@@ -370,10 +390,6 @@ export async function createForm(formDef, data) {
   });
 
   return form;
-}
-
-function isDocumentBasedForm(formDef) {
-  return formDef?.[':type'] === 'sheet' && formDef?.data;
 }
 
 function cleanUp(content) {
@@ -480,7 +496,7 @@ export default async function decorate(block) {
       const transform = new DocBasedFormToAF();
       formDef = transform.transform(formDef);
       source = 'sheet';
-      form = await createForm(formDef);
+      form = await createForm(formDef, null, source);
       const docRuleEngine = await import('./rules-doc/index.js');
       docRuleEngine.default(formDef, form);
       rules = false;
