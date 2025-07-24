@@ -197,7 +197,8 @@ export function handleEditorSelect(event) {
 
   if (selected && target.closest('.wizard') && !target.classList.contains('wizard')) {
     handleNavigation(target.closest('.wizard'), resource, handleWizardNavigation);
-  } else if (selected && target.closest('.accordion')) {
+  }
+  if (selected && target.closest('.accordion')) {
     handleNavigation(target.closest('.accordion'), resource, handleAccordionNavigationInEditor);
   }
 }
