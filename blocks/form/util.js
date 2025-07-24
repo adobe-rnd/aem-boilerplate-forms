@@ -236,11 +236,6 @@ export function checkValidation(fieldElement) {
     removeInvalidMsg(fieldElement);
     return;
   }
-  // for decimal inputs don't display stepMismatch error message
-  if (wrapper?.dataset?.type === 'number' && fieldElement.validity?.stepMismatch) {
-    removeInvalidMsg(fieldElement);
-    return;
-  }
 
   const message = getValidationMessage(fieldElement, wrapper);
   updateOrCreateInvalidMsg(fieldElement, message);
@@ -292,6 +287,9 @@ export function setPlaceholder(element, fd) {
 export function createInput(fd) {
   const input = document.createElement('input');
   input.type = getHTMLRenderType(fd);
+  if (fd.fieldType === 'number-input' && fd.type === 'number') {
+    input.setAttribute('step', 'any');
+  }
   setPlaceholder(input, fd);
   setConstraints(input, fd);
   return input;
