@@ -20,9 +20,9 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.121
+ *  Version: 0.22.134
  */
-import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, SubmitError, SubmitFailure, Submit, Save, Reset, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
+import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, RequestSuccess, SubmitError, SubmitFailure, RequestFailure, Submit, Save, Reset, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
@@ -175,6 +175,10 @@ const isCheckboxGroup = function (item) {
 const isEmailInput = function (item) {
     const fieldType = item?.fieldType || defaultFieldTypes(item);
     return (fieldType === 'text-input' && item?.format === 'email') || fieldType === 'email';
+};
+const isDateTimeField = function (item) {
+    const fieldType = item?.fieldType || defaultFieldTypes(item);
+    return (fieldType === 'text-input' && item?.format === 'date-time') || fieldType === 'datetime-input';
 };
 const isDateField = function (item) {
     const fieldType = item?.fieldType || defaultFieldTypes(item);
@@ -1014,14 +1018,14 @@ const checkFile = (inputVal) => {
     };
 };
 const matchMediaType = (mediaType, accepts) => {
-    return !mediaType || accepts.some((accept) => {
+    return mediaType !== '' && (!mediaType || accepts.some((accept) => {
         const trimmedAccept = accept.trim();
         const prefixAccept = trimmedAccept.split('/')[0];
         const suffixAccept = trimmedAccept.split('.')[1];
         return ((trimmedAccept.includes('*') && mediaType.startsWith(prefixAccept)) ||
             (trimmedAccept.includes('.') && mediaType.endsWith(suffixAccept)) ||
             (trimmedAccept === mediaType));
-    });
+    }));
 };
 const partitionArray = (inputVal, validatorFn) => {
     const value = toArray(inputVal);
@@ -1043,7 +1047,8 @@ const ValidConstraints = {
     number: ['minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum'],
     array: ['minItems', 'maxItems', 'uniqueItems'],
     file: ['accept', 'maxFileSize'],
-    email: ['minLength', 'maxLength', 'format', 'pattern']
+    email: ['minLength', 'maxLength', 'format', 'pattern'],
+    datetime: ['minimum', 'maximum']
 };
 const validationConstraintsList = ['type', 'format', 'minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'minItems',
     'maxItems', 'uniqueItems', 'minLength', 'maxLength', 'pattern', 'required', 'enum', 'accept', 'maxFileSize'];
@@ -1321,15 +1326,20 @@ class BaseNode {
     _tokens = [];
     _eventSource = EventSource.CODE;
     _fragment = '$form';
+    _idSet;
+    createIdSet() {
+        return new Set();
+    }
     get isContainer() {
         return false;
     }
     constructor(params, _options) {
         this._options = _options;
+        this._idSet = this.createIdSet();
         this[qualifiedName] = null;
         this._jsonModel = {
             ...params,
-            id: 'id' in params ? params.id : this.form.getUniqueId()
+            id: this.form.getUniqueId(params?.id)
         };
         if (this.parent?.isFragment) {
             this._fragment = this.parent.qualifiedName;
@@ -1591,26 +1601,31 @@ class BaseNode {
             _data = NullDataValue;
         }
         else if (dataRef !== undefined && !this.repeatable) {
-            if (this._tokens.length === 0) {
-                this._tokens = tokenize(dataRef);
-            }
-            let searchData = contextualDataModel;
-            if (this._tokens[0].type === TOK_GLOBAL) {
-                searchData = this.form.getDataNode();
-            }
-            else if (this._tokens[0].type === TOK_REPEATABLE) {
-                let repeatRoot = this.parent;
-                while (!repeatRoot.repeatable && repeatRoot !== this.form) {
-                    repeatRoot = repeatRoot.parent;
+            try {
+                if (this._tokens.length === 0) {
+                    this._tokens = tokenize(dataRef);
                 }
-                searchData = repeatRoot.getDataNode();
+                let searchData = contextualDataModel;
+                if (this._tokens[0].type === TOK_GLOBAL) {
+                    searchData = this.form.getDataNode();
+                }
+                else if (this._tokens[0].type === TOK_REPEATABLE) {
+                    let repeatRoot = this.parent;
+                    while (!repeatRoot.repeatable && repeatRoot !== this.form) {
+                        repeatRoot = repeatRoot.parent;
+                    }
+                    searchData = repeatRoot.getDataNode();
+                }
+                if (typeof searchData !== 'undefined') {
+                    const name = this._tokens[this._tokens.length - 1].value;
+                    const create = this.defaultDataModel(name);
+                    _data = resolveData(searchData, this._tokens, create);
+                    _parent = resolveData(searchData, this._tokens.slice(0, -1));
+                    _key = name;
+                }
             }
-            if (typeof searchData !== 'undefined') {
-                const name = this._tokens[this._tokens.length - 1].value;
-                const create = this.defaultDataModel(name);
-                _data = resolveData(searchData, this._tokens, create);
-                _parent = resolveData(searchData, this._tokens.slice(0, -1));
-                _key = name;
+            catch (error) {
+                console.error(`Error parsing dataRef "${dataRef}" for field "${this.id}". The data of this field will not be exported.`);
             }
         }
         else {
@@ -1675,6 +1690,13 @@ class BaseNode {
         }
         return nonTransparentParent;
     }
+    _isAncestorRepeatable() {
+        let parent = this.parent;
+        while (parent && !parent.repeatable) {
+            parent = parent.parent;
+        }
+        return Boolean(parent);
+    }
     _initialize(mode) {
         if (typeof this._data === 'undefined') {
             let dataNode, parent = this.parent;
@@ -1703,13 +1725,17 @@ class BaseNode {
             return this[qualifiedName];
         }
         const parent = this.getNonTransparentParent();
+        let qn;
         if (parent && parent.type === 'array') {
-            this[qualifiedName] = `${parent.qualifiedName}[${this.index}]`;
+            qn = `${parent.qualifiedName}[${this.index}]`;
         }
         else {
-            this[qualifiedName] = `${parent.qualifiedName}.${this.name}`;
+            qn = `${parent.qualifiedName}.${this.name}`;
         }
-        return this[qualifiedName];
+        if (!this._isAncestorRepeatable()) {
+            this[qualifiedName] = qn;
+        }
+        return qn;
     }
     focus() {
         if (this.parent) {
@@ -1925,6 +1951,7 @@ class Scriptable extends BaseNode {
                 target: this.getRuleNode()
             }
         };
+        this.ruleEngine.setDependencyTracking(['change', 'executeRule'].includes(action.type));
         const eventName = action.isCustomEvent ? `custom:${action.type}` : action.type;
         const funcName = action.isCustomEvent ? `custom_${action.type}` : action.type;
         const node = this.getCompiledEvent(eventName);
@@ -2417,7 +2444,7 @@ class Container extends Scriptable {
             for (const change of action.payload.changes) {
                 if (change.propertyName !== undefined && notifyChildrenAttributes.includes(change.propertyName)) {
                     this.items.forEach((child) => {
-                        if (change.currentValue !== child.getState()[change.propertyName]) {
+                        if (change.currentValue !== child._jsonModel[change.propertyName]) {
                             child._jsonModel[change.propertyName] = change.currentValue;
                             this.notifyDependents.call(child, propertyChange(change.propertyName, child.getState()[change.propertyName], null));
                         }
@@ -2719,14 +2746,29 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
         method: httpVerb,
         ...encryptOutput
     };
+    const targetField = context.$field || null;
+    const targetEvent = context.$event || null;
+    response.submitter = targetField;
+    const enhancedPayload = {
+        request: response.originalRequest,
+        response,
+        targetField,
+        targetEvent
+    };
     if (response?.status >= 200 && response?.status <= 299) {
         const eName = getCustomEventName(success);
         if (success === 'submitSuccess') {
             context.form.dispatch(new SubmitSuccess(response, true));
         }
         else {
-            context.form.dispatch(new CustomEvent(eName, response, true));
+            if (context.field) {
+                context.field.dispatch(new CustomEvent(eName, response, true));
+            }
+            else {
+                context.form.dispatch(new CustomEvent(eName, response, true));
+            }
         }
+        context.form.dispatch(new RequestSuccess(enhancedPayload, false));
     }
     else {
         context.form.logger.error('Error invoking a rest API');
@@ -2736,9 +2778,16 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
             context.form.dispatch(new SubmitFailure(response, true));
         }
         else {
-            context.form.dispatch(new CustomEvent(eName, response, true));
+            if (context.field) {
+                context.field.dispatch(new CustomEvent(eName, response, true));
+            }
+            else {
+                context.form.dispatch(new CustomEvent(eName, response, true));
+            }
         }
+        context.form.dispatch(new RequestFailure(enhancedPayload, false));
     }
+    return response;
 };
 const urlEncoded = (data) => {
     const formData = new URLSearchParams();
@@ -3123,6 +3172,77 @@ class FunctionRuntimeImpl {
                 },
                 _signature: []
             },
+            requestWithRetry: {
+                _func: (args, data, interpreter) => {
+                    const uri = toString(args[0]);
+                    const httpVerb = toString(args[1]);
+                    let success;
+                    let errorFn;
+                    let payload = valueOf(args[2]);
+                    if (typeof (args[3]) === 'string' && args.length === 5) {
+                        success = valueOf(args[3]);
+                        errorFn = valueOf(args[4]);
+                    }
+                    else if (typeof (args[4]) === 'string' && args.length === 6) {
+                        success = valueOf(args[4]);
+                        errorFn = valueOf(args[5]);
+                    }
+                    return async (retryOptions) => {
+                        try {
+                            if (payload instanceof Promise) {
+                                payload = await payload;
+                            }
+                        }
+                        catch (error) {
+                            console.error('Error resolving payload Promise:', error);
+                            throw error;
+                        }
+                        let finalHeaders = {};
+                        let finalBody = {};
+                        if (args.length === 5) {
+                            finalBody = payload.body || {};
+                            finalHeaders = payload.headers || {};
+                        }
+                        else {
+                            finalBody = payload || {};
+                            finalHeaders = args[3] || {};
+                        }
+                        if (retryOptions) {
+                            if (retryOptions.body) {
+                                finalBody = {
+                                    ...finalBody,
+                                    ...retryOptions.body
+                                };
+                            }
+                            if (retryOptions.headers) {
+                                finalHeaders = {
+                                    ...finalHeaders,
+                                    ...retryOptions.headers
+                                };
+                            }
+                        }
+                        const finalPayload = { 'body': finalBody, 'headers': finalHeaders };
+                        try {
+                            const response = await request(interpreter.globals, uri, httpVerb, finalPayload, success, errorFn, finalHeaders);
+                            return response;
+                        }
+                        catch (error) {
+                            if (error && typeof error === 'object' && 'status' in error && error.status >= 400) {
+                                throw error;
+                            }
+                            throw new Error('Request failed');
+                        }
+                    };
+                },
+                _signature: []
+            },
+            retryHandler: {
+                _func: (args, data, interpreter) => {
+                    const requestFn = valueOf(args[0]);
+                    return requestFn();
+                },
+                _signature: []
+            },
             awaitFn: {
                 _func: async (args, data, interpreter) => {
                     const success = args[1];
@@ -3144,7 +3264,7 @@ class FunctionRuntimeImpl {
             addInstance: {
                 _func: (args, data, interpreter) => {
                     const element = args[0];
-                    const payload = args.length > 2 ? valueOf(args[2]) : undefined;
+                    const payload = args.length > 1 ? valueOf(args[1]) : undefined;
                     try {
                         const formElement = interpreter.globals.form.getElement(element.$id);
                         const action = createAction('addInstance', payload);
@@ -3159,7 +3279,7 @@ class FunctionRuntimeImpl {
             removeInstance: {
                 _func: (args, data, interpreter) => {
                     const element = args[0];
-                    const payload = args.length > 2 ? valueOf(args[2]) : undefined;
+                    const payload = args.length > 1 ? valueOf(args[1]) : undefined;
                     try {
                         const formElement = interpreter.globals.form.getElement(element.$id);
                         const action = createAction('removeInstance', payload);
@@ -3226,6 +3346,90 @@ class FunctionRuntimeImpl {
                 _func: async (args, data, interpreter) => {
                     const encData = valueOf(args[0]);
                     return encData;
+                },
+                _signature: []
+            },
+            getQueryParameter: {
+                _func: (args, data, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getQueryParameter. A parameter is expected');
+                        return '';
+                    }
+                    if (interpreter.globals.form?.properties?.queryParams?.[param]) {
+                        return interpreter.globals.form.properties.queryParams[param];
+                    }
+                    try {
+                        const urlParams = new URLSearchParams(window?.location?.search || '');
+                        return urlParams.get(param);
+                    }
+                    catch (e) {
+                        interpreter.globals.form.logger.warn('Error reading URL parameters:', e);
+                    }
+                    return '';
+                },
+                _signature: []
+            },
+            getBrowserDetail: {
+                _func: (args, data, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getBrowserDetail. A parameter is expected');
+                        return '';
+                    }
+                    if (interpreter.globals.form?.properties?.browserDetails?.[param]) {
+                        return interpreter.globals.form.properties.browserDetails[param];
+                    }
+                    if (typeof navigator !== 'undefined' && param in navigator) {
+                        return navigator[param] || '';
+                    }
+                    else {
+                        interpreter.globals.form.logger.warn(`Invalid or unsupported browser detail requested: "${param}"`);
+                        return '';
+                    }
+                },
+                _signature: []
+            },
+            getURLDetail: {
+                _func: (args, data, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getURLDetail. A parameter is expected');
+                        return '';
+                    }
+                    if (interpreter.globals.form?.properties?.urlDetails?.[param]) {
+                        return interpreter.globals.form.properties.urlDetails[param];
+                    }
+                    if (typeof window !== 'undefined' && typeof window.location !== 'undefined' && param in window.location) {
+                        return window.location[param] || '';
+                    }
+                    else {
+                        interpreter.globals.form.logger.warn(`Invalid or unsupported url parameter requested: "${param}"`);
+                        return '';
+                    }
+                },
+                _signature: []
+            },
+            getRelativeInstanceIndex: {
+                _func: (args, data, interpreter) => {
+                    if (!Array.isArray(args[0]) || args[0].length === 0) {
+                        return -1;
+                    }
+                    const instanceManager = valueOf(args[0])[0].$parent;
+                    const field = interpreter.globals.$field;
+                    const baseName = instanceManager.$qualifiedName;
+                    const qn = field.$qualifiedName;
+                    if (qn.startsWith(baseName + '[')) {
+                        const startBracket = baseName.length + 1;
+                        const endBracket = qn.indexOf(']', startBracket);
+                        if (endBracket !== -1) {
+                            const idx = Number(qn.slice(startBracket, endBracket));
+                            if (!Number.isNaN(idx)) {
+                                return idx;
+                            }
+                        }
+                    }
+                    return instanceManager.length - 1;
                 },
                 _signature: []
             }
@@ -3388,6 +3592,9 @@ class Form extends Container {
         }
     }
     resolveQualifiedName(qualifiedName) {
+        if (this.qualifiedName === qualifiedName) {
+            return this;
+        }
         let foundFormElement = null;
         this.visit(formElement => {
             if (formElement.qualifiedName === qualifiedName) {
@@ -3403,11 +3610,23 @@ class Form extends Container {
                 captchaInfoObj[field.qualifiedName] = field.value;
             }
         });
+        const additionalMeta = {};
         const draftId = this.properties['fd:draftId'] || '';
         if (draftId) {
-            this.setAdditionalSubmitMetadata({
-                'fd:draftId': draftId
-            });
+            additionalMeta['fd:draftId'] = draftId;
+        }
+        const dorProps = this.properties['fd:dor'];
+        if (dorProps && dorProps.dorType !== 'none') {
+            const excludeFromDoRIfHidden = dorProps['fd:excludeFromDoRIfHidden'];
+            const excludeFromDoR = Object.values(this._fields)
+                .filter(field => field.enabled === false || (excludeFromDoRIfHidden && field.visible === false))
+                .map(field => field.qualifiedName);
+            if (excludeFromDoR && excludeFromDoR.length > 0) {
+                additionalMeta.excludeFromDoR = excludeFromDoR;
+            }
+        }
+        if (Object.keys(additionalMeta).length > 0) {
+            this.setAdditionalSubmitMetadata(additionalMeta);
         }
         const options = {
             lang: this.lang,
@@ -3515,11 +3734,20 @@ class Form extends Container {
     get ruleEngine() {
         return this._ruleEngine;
     }
-    getUniqueId() {
+    getUniqueId(id) {
+        if (id && !this._idSet?.has(id)) {
+            this._idSet?.add(id);
+            return id;
+        }
         if (this._ids == null) {
             return '';
         }
-        return this._ids.next().value;
+        const newId = this._ids.next().value;
+        this._idSet?.add(newId);
+        return newId;
+    }
+    clearIdRegistry() {
+        this._idSet?.clear();
     }
     fieldAdded(field) {
         if (field.fieldType === 'captcha' && !this._captcha) {
@@ -3866,6 +4094,7 @@ class Field extends Scriptable {
                     'multiline-input': 'string',
                     'number-input': 'number',
                     'date-input': 'string',
+                    'date-time': 'string',
                     'email': 'string',
                     'plain-text': 'string',
                     'image': 'string',
@@ -3940,7 +4169,7 @@ class Field extends Scriptable {
         }
         this.coerceParam('minLength', 'number');
         this.coerceParam('maxLength', 'number');
-        if (this._jsonModel.type !== 'number' && this._jsonModel.format !== 'date' && this._jsonModel.type !== 'integer') {
+        if (this._jsonModel.type !== 'number' && this._jsonModel.format !== 'date' && this._jsonModel.format !== 'date-time' && this._jsonModel.type !== 'integer') {
             this.unset('step', ...props);
         }
         props.forEach(c => {
@@ -4043,22 +4272,22 @@ class Field extends Scriptable {
         this._setProperty('required', r);
     }
     get maximum() {
-        if (this.type === 'number' || this.format === 'date' || this.type === 'integer') {
+        if (this.type === 'number' || this.format === 'date' || this.format === 'date-time' || this.type === 'integer') {
             return this._jsonModel.maximum;
         }
     }
     set maximum(m) {
-        if (this.type === 'number' || this.format === 'date' || this.type === 'integer') {
+        if (this.type === 'number' || this.format === 'date' || this.format === 'date-time' || this.type === 'integer') {
             this._setProperty('maximum', m);
         }
     }
     get minimum() {
-        if (this.type === 'number' || this.format === 'date' || this.type === 'integer') {
+        if (this.type === 'number' || this.format === 'date' || this.format === 'date-time' || this.type === 'integer') {
             return this._jsonModel.minimum;
         }
     }
     set minimum(m) {
-        if (this.type === 'number' || this.format === 'date' || this.type === 'integer') {
+        if (this.type === 'number' || this.format === 'date' || this.format === 'date-time' || this.type === 'integer') {
             this._setProperty('minimum', m);
         }
     }
@@ -4096,7 +4325,9 @@ class Field extends Scriptable {
             return this.executeExpression(this.displayValueExpression);
         }
         const df = this.displayFormat;
-        if (df && this.isNotEmpty(this.value) && this?.validity?.typeMismatch !== true) {
+        if (df && this.isNotEmpty(this.value) &&
+            this?.validity?.typeMismatch !== true &&
+            ((this.format === 'date' || this.format === 'date-time') ? this?.validity?.formatMismatch !== true : true)) {
             try {
                 return format(this.value, this.lang, df);
             }
@@ -4303,6 +4534,8 @@ class Field extends Scriptable {
                 switch (this.format) {
                     case 'date':
                         return ValidConstraints.date;
+                    case 'date-time':
+                        return ValidConstraints.datetime;
                     case 'email':
                         return ValidConstraints.email;
                     case 'binary':
@@ -4332,6 +4565,9 @@ class Field extends Scriptable {
                         break;
                     case 'file-input':
                         this._jsonModel.format = 'data-url';
+                        break;
+                    case 'date-time':
+                        this._jsonModel.format = 'date-time';
                         break;
                 }
             }
@@ -4553,7 +4789,7 @@ __decorate([
     dependencyTracked()
 ], Field.prototype, "errorMessage", null);
 __decorate([
-    include('text-input', 'date-input', 'file-input', 'email')
+    include('text-input', 'date-input', 'file-input', 'email', 'datetime-input')
 ], Field.prototype, "format", null);
 __decorate([
     include('text-input')
@@ -4839,6 +5075,18 @@ class DateField extends Field {
         }
     }
 }
+class DateTimeField extends DateField {
+    _dataFormat = 'yyyy-MM-ddTHH:mm';
+    _applyDefaults() {
+        super._applyDefaults();
+    }
+    get value() {
+        return super.value;
+    }
+    set value(value) {
+        super.value = value;
+    }
+}
 class EmailInput extends Field {
     _getDefaults() {
         return {
@@ -4949,6 +5197,9 @@ class FormFieldFactoryImpl {
             }
             else if (isDateField(child)) {
                 retVal = new DateField(child, options);
+            }
+            else if (isDateTimeField(child)) {
+                retVal = new DateTimeField(child, options);
             }
             else if (isCaptcha(child)) {
                 retVal = new Captcha(child, options);
