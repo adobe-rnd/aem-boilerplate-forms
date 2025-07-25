@@ -9,7 +9,6 @@
                         "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
                         "template": {
                             "jcr:title": "Checkbox",
-                            "fieldType": "checkbox",
                             "checkedValue": "on"
                         }
                     }
