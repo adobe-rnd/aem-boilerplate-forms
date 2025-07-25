@@ -40,3 +40,16 @@ npm run lint
 1. Install the [AEM CLI](https://github.com/adobe/helix-cli): `npm install -g @adobe/aem-cli`
 1. Start AEM Proxy: `aem up` (opens your browser at `http://localhost:3000`)
 1. Open the `{repo}` directory in your favorite IDE and start coding :)
+
+## Custom Form Components
+
+Create custom form components using the interactive scaffolder:
+
+```sh
+npm run create:custom-component
+```
+
+This will guide you through creating a new custom component with:
+- Interactive prompts for component name and base type
+- Automatic file generation (JS, CSS, JSON)
+- Automatic integration in form block with mappings

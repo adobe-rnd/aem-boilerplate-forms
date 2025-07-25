@@ -18,8 +18,23 @@
     {
       "...": "./models/form-components/_*.json#/definitions"
     },
-    {
-      "...": "./components/*/_*.json#/definitions"
+    { 
+      "...": "./components/accordion/_accordion.json#/definitions" 
+    },
+    { 
+      "...": "./components/modal/_modal.json#/definitions" 
+    },
+    { 
+      "...": "./components/password/_password.json#/definitions" 
+    },
+    { 
+      "...": "./components/rating/_rating.json#/definitions" 
+    },
+    { 
+      "...": "./components/tnc/_tnc.json#/definitions" 
+    },
+    { 
+      "...": "./components/wizard/_wizard.json#/definitions" 
     }
   ],
   "models": [
@@ -85,7 +100,7 @@
               "component": "text",
               "name": "spreadsheetUrl",
               "label": "Spreadsheet Url",
-              "valueType": "string" 
+              "valueType": "string"
           },
           {
               "component": "container",
@@ -198,7 +213,8 @@
         "telephone-input",
         "text-input",
         "tnc",
-        "wizard"
+        "wizard",
+        "range"
       ]
     }
   ]
