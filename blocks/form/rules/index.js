@@ -250,6 +250,9 @@ function applyRuleEngine(htmlForm, form, captcha) {
     const field = e.target;
     const { value, name, checked } = field;
     const { id } = field.closest('.field-wrapper').dataset;
+    if (id.startsWith('fd:ignore')) {
+      return;
+    }
     if ((field.type === 'checkbox' && field.dataset.fieldType === 'checkbox-group')) {
       const val = getCheckboxGroupValue(name, htmlForm);
       const el = form.getElement(id);
