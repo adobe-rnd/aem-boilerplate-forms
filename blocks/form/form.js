@@ -486,8 +486,12 @@ export default async function decorate(block) {
       rules = false;
     } else {
       afModule = await import('./rules/index.js');
+      const useWorker = new URL(import.meta.url).searchParams.get('useWorker') !== 'false';
       if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
-        form = await afModule.initAdaptiveForm(formDef, createForm);
+        form = await afModule.initAdaptiveForm(formDef, async (model, data) => {
+          formDef = useWorker ? model : model.getState();
+          return createForm(formDef, data);
+        }, useWorker);
       } else {
         form = await createFormForAuthoring(formDef);
       }
@@ -502,5 +506,91 @@ export default async function decorate(block) {
       form.dataset.formpath = formDef.properties['fd:path'];
     }
     container.replaceWith(form);
+  }
+}
+
+export async function embedForm(formUrl, element) {
+  if (!formUrl || !element) {
+    throw new Error('formUrl and element are required parameters');
+  }
+
+  try {
+    element.innerHTML = '';
+
+    const loadingPlaceholder = document.createElement('div');
+    loadingPlaceholder.textContent = 'Loading Form...';
+    element.appendChild(loadingPlaceholder);
+
+    const url = new URL(formUrl);
+    const formPath = formUrl.includes('/jcr:content')
+      ? formUrl.split('/jcr:content')[0]
+      : formUrl;
+
+    const formStyles = document.createElement('link');
+    formStyles.rel = 'stylesheet';
+    formStyles.href = `${url.origin}/blocks/form/form.css`;
+
+    const loadStylesheets = async (basePath) => {
+      try {
+        const cssFiles = ['styles.css', 'fonts.css'];
+        const fontFiles = [
+          'roboto-condensed-bold.woff2',
+          'roboto-bold.woff2',
+          'roboto-medium.woff2',
+          'roboto-regular.woff2'
+        ];
+        
+        const fontPromises = fontFiles.map(fontFile => {
+          return new Promise((resolve) => {
+            const font = new FontFace('Inter', `url(${basePath}/fonts/${fontFile})`);
+            font.load().then(() => {
+              document.fonts.add(font);
+              resolve();
+            }).catch(() => {
+              console.error(`Failed to load ${fontFile}`);
+              resolve();
+            });
+          });
+        });
+
+        const stylePromises = cssFiles.map(cssFile => {
+          return new Promise((resolve) => {
+            const style = document.createElement('link');
+            style.rel = 'stylesheet';
+            style.href = `${basePath}/styles/${cssFile}`;
+            style.onload = resolve;
+            style.onerror = () => {
+              console.error(`Failed to load ${cssFile}`);
+              resolve();
+            };
+            document.head.appendChild(style);
+          });
+        });
+
+        await Promise.all(fontPromises);
+        await Promise.all(stylePromises);
+      } catch (error) {
+        console.error('Error in loadStylesheets:', error);
+      }
+    };
+
+    // await loadStylesheets(url.origin);
+    await new Promise((resolve, reject) => {
+      formStyles.onload = resolve;
+      formStyles.onerror = () => reject(new Error('Failed to load form CSS'));
+      document.head.appendChild(formStyles);
+    });
+
+    const formLink = document.createElement('a');
+    formLink.href = formPath;
+    formLink.style.all = 'unset';
+    element.appendChild(formLink);
+
+    await decorate(element);
+    loadingPlaceholder.remove();
+  } catch (error) {
+    console.error('Error embedding form:', error);
+    element.innerHTML = `<div class="form-error">Failed to load form: ${error.message}</div>`;
+    throw error;
   }
 }
