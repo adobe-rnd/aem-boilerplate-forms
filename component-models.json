@@ -1357,6 +1357,12 @@
             "valueType": "string"
           },
           {
+            "component": "boolean",
+            "label": "Allow multiple selection",
+            "name": "multiSelect",
+            "valueType": "boolean"
+          },
+          {
             "component": "select",
             "label": "Data type of submitted value",
             "name": "type",
@@ -1374,6 +1380,18 @@
               {
                 "name": "Number",
                 "value": "number"
+              },
+              {
+                "name": "String[]",
+                "value": "string[]"
+              },
+              {
+                "name": "Boolean[]",
+                "value": "boolean[]"
+              },
+              {
+                "name": "Number[]",
+                "value": "number[]"
               }
             ]
           },
