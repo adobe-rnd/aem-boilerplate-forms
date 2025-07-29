@@ -146,9 +146,11 @@ function createComponentFiles(componentName, baseComponent, targetDir) {
  * Decorates a custom form field component
  * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper. Refer to the documentation for its structure for each component.
  * @param {Object} fieldJson - The form json object for the component.
+ * @param {HTMLElement} parentElement - The parent element of the field.
+ * @param {string} formId - The unique identifier of the form.
  */
-export default async function decorate(fieldDiv, fieldJson) {
-  console.log('${emojis.gear} Decorating ${componentName} component:', fieldDiv, fieldJson);
+export default async function decorate(fieldDiv, fieldJson, parentElement, formId) {
+  console.log('${emojis.gear} Decorating ${componentName} component:', fieldDiv, fieldJson, parentElement, formId);
   
   // TODO: Implement your custom component logic here
   // You can access the field properties via fieldJson.properties
@@ -271,15 +273,15 @@ export default async function decorate(fieldDiv, fieldJson) {
 // Update _form.json to include the new component in filters
 function updateFormJson(componentName) {
   const formJsonPath = path.join(__dirname, '../blocks/form/_form.json');
-
+  
   try {
     // Read current _form.json as text
     let formJsonContent = readFileSync(formJsonPath, 'utf-8');
-
+    
     // Find the filters section with regex
     const filtersRegex = /"filters":\s*\[\s*\{\s*"id":\s*"form",\s*"components":\s*\[([^\]]*)\]/;
     const match = formJsonContent.match(filtersRegex);
-
+    
     if (match) {
       // Parse the current components array
       const componentsString = match[1];
@@ -287,32 +289,32 @@ function updateFormJson(componentName) {
         .split(',')
         .map(comp => comp.trim().replace(/['"]/g, ''))
         .filter(comp => comp.length > 0);
-
+      
       // Check if component already exists
       if (!currentComponents.includes(componentName)) {
         // Add component to the array
         currentComponents.push(componentName);
-
+        
         // Create new components string (keep original formatting)
         const newComponentsString = currentComponents
           .map(comp => `\n        "${comp}"`)
           .join(',');
-
+        
         // Replace only the components array
         const newFiltersSection = `"filters": [
     {
       "id": "form",
       "components": [${newComponentsString}
       ]`;
-
+        
         formJsonContent = formJsonContent.replace(
           /"filters":\s*\[\s*\{\s*"id":\s*"form",\s*"components":\s*\[([^\]]*)\]/,
           newFiltersSection
         );
-
+        
         // Write back to file
         writeFileSync(formJsonPath, formJsonContent);
-
+        
         logSuccess(`Updated _form.json to include '${componentName}' in form filters`);
         return true;
       } else {
@@ -329,35 +331,35 @@ function updateFormJson(componentName) {
   }
 }
 
-// Update _component-definition.json to include the new custom component in a separate section from the OOTB components
+// Update _component-definition.json to include the new custom component
 function updateComponentDefinition(componentName) {
   const componentDefPath = path.join(__dirname, '../models/_component-definition.json');
-
+  
   try {
     // Read current component definition
     const componentDef = JSON.parse(readFileSync(componentDefPath, 'utf-8'));
-
+    
     // Find the custom components group
     const customGroup = componentDef.groups.find(group => group.id === 'custom-components');
-
+    
     if (customGroup) {
       // Create the new component entry
       const newComponentEntry = {
         "...": `../blocks/form/components/${componentName}/_${componentName}.json#/definitions`
       };
-
+      
       // Check if this component path already exists to avoid duplicates
-      const existingEntry = customGroup.components.find(comp =>
+      const existingEntry = customGroup.components.find(comp => 
         comp["..."] === newComponentEntry["..."]
       );
-
+      
       if (!existingEntry) {
         // Append the new component to the existing array
         customGroup.components.push(newComponentEntry);
-
+        
         // Write back to file with proper formatting
         writeFileSync(componentDefPath, JSON.stringify(componentDef, null, 2));
-
+        
         logSuccess(`Added '${componentName}' to _component-definition.json`);
         return true;
       } else {
