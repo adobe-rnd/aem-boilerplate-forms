@@ -13,8 +13,8 @@ jobs:
     permissions:
       contents: write
       actions: write
-    # only run if commit message is "Initial commit" on main branch
-    if: ${{ github.event_name == 'workflow_dispatch' || ( github.ref == 'refs/heads/main' && !(contains(github.event, 'head_commit') || github.event.head_commit.message == 'Initial commit' )) }}
+    # only run if cleanup workflow file exists (indicates template usage)
+    if: ${{ github.event_name == 'workflow_dispatch' || ( github.ref == 'refs/heads/main' && hashFiles('.github/workflows/cleanup-on-create.yaml') != '' ) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
