@@ -8,10 +8,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Configure npm for Adobe Artifactory
+          name: Configure npm registry
           command: |
-            npm config set strict-ssl false
-            npm config set @aemforms:registry https://artifactory.corp.adobe.com/artifactory/api/npm/npm-aem-release/
+            npm config set registry https://registry.npmjs.org/
+            npm config set @aemforms:registry https://registry.npmjs.org/
       - node/install-packages:
           pkg-manager: npm
       - run:
@@ -23,10 +23,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Configure npm for Adobe Artifactory
+          name: Configure npm registry
           command: |
-            npm config set strict-ssl false
-            npm config set @aemforms:registry https://artifactory.corp.adobe.com/artifactory/api/npm/npm-aem-release/
+            npm config set registry https://registry.npmjs.org/
+            npm config set @aemforms:registry https://registry.npmjs.org/
       - node/install-packages:
           pkg-manager: npm
       - run:
@@ -52,10 +52,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Configure npm for Adobe Artifactory
+          name: Configure npm registry
           command: |
-            npm config set strict-ssl false
-            npm config set @aemforms:registry https://artifactory.corp.adobe.com/artifactory/api/npm/npm-aem-release/
+            npm config set registry https://registry.npmjs.org/
+            npm config set @aemforms:registry https://registry.npmjs.org/
       - run:
           name: Install Playwright
           command: |
@@ -81,10 +81,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Configure npm for Adobe Artifactory
+          name: Configure npm registry
           command: |
-            npm config set strict-ssl false
-            npm config set @aemforms:registry https://artifactory.corp.adobe.com/artifactory/api/npm/npm-aem-release/
+            npm config set registry https://registry.npmjs.org/
+            npm config set @aemforms:registry https://registry.npmjs.org/
       - node/install-packages:
           pkg-manager: npm
       - run:
