@@ -53,12 +53,21 @@ test.describe('resetButton validation test', () => {
       // eslint-disable-next-line no-await-in-loop,max-len
       await fillField(page, title, inputValues);
     }
-    await page.getByRole('button', { name: 'Reset' }).click();
+    await page.getByRole('button', { name: 'Reset', exact: true }).click();
     // eslint-disable-next-line no-restricted-syntax
     for (const title of titles) {
       // eslint-disable-next-line no-await-in-loop,no-use-before-define
       await checkIfReset(page, title);
     }
+  });
+
+  test('Check reset for panel not populating fields with undefined', async ({ page }) => {
+    const testURL1 = '/content/aem-boilerplate-forms-xwalk-collaterals/reset-validation';
+    await openPage(page, testURL1);
+    const emailInput = await page.getByRole('group', { name: 'Panel' }).getByLabel('Test Field');
+    await emailInput.fill('test@adobe.com');
+    await page.getByRole('button', { name: 'Reset Panel' }).click();
+    await expect(emailInput).toHaveValue('');
   });
   // eslint-disable-next-line no-shadow
   const checkIfReset = async (page, ComponentsTitle) => {
