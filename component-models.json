@@ -2004,9 +2004,7 @@
           },
           {
             "component": "edit-fragment",
-            "name": "editFragment",
-            "label": "Edit Fragment",
-            "valueType": "boolean"
+            "label": "Edit Fragment"
           }
         ]
       },
