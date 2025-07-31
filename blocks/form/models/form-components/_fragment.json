@@ -38,7 +38,8 @@
                         {
                             "component": "edit-fragment",
                             "name": "editFragment",
-                            "label": "Edit Fragment"
+                            "label": "Edit Fragment",
+                            "valueType": "boolean"
                         }
                     ]
                 },
