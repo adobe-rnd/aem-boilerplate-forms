@@ -2003,9 +2003,9 @@
             "valueType": "string"
           },
           {
-            "component": "open-fragment",
-            "name": "openFragment",
-            "label": "Open Fragment",
+            "component": "edit-fragment",
+            "name": "editFragment",
+            "label": "Edit Fragment",
             "valueType": "boolean"
           }
         ]
