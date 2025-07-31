@@ -1997,16 +1997,16 @@
             ]
           },
           {
-            "component": "open-fragment",
-            "name": "openFragment",
-            "label": "Open Fragment",
-            "valueType": "boolean"
-          },
-          {
             "component": "aem-content",
             "name": "fragmentPath",
             "label": "Fragment reference",
             "valueType": "string"
+          },
+          {
+            "component": "open-fragment",
+            "name": "openFragment",
+            "label": "Open Fragment",
+            "valueType": "boolean"
           }
         ]
       },
