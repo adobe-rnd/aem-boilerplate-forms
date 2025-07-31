@@ -32,7 +32,7 @@ module.exports = {
       'drop-down': 19,
       email: 22,
       'file-input': 20,
-      'form-fragment': 15,
+      'form-fragment': 16,
       'form-image': 7,
       'multiline-input': 23,
       'number-input': 22,

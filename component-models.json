@@ -2001,6 +2001,12 @@
             "name": "fragmentPath",
             "label": "Fragment reference",
             "valueType": "string"
+          },
+          {
+            "component": "edit-fragment",
+            "name": "editFragment",
+            "label": "Edit Fragment",
+            "valueType": "boolean"
           }
         ]
       },
