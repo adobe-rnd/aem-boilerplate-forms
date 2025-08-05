@@ -21,9 +21,12 @@ import { ueFormDefForWizardNavigationTest } from './fixtures/ue/events/formdefin
 import { renderForm } from './testUtils.js';
 import { ueFormDefForAccordionNavigationTest } from './fixtures/ue/events/formdefinition-accordion-navigation.js';
 import { handleAccordionNavigation } from '../../blocks/form/components/accordion/accordion.js';
+import { ueFormDefForRepeatablePanelTest } from './fixtures/ue/events/formdefinition-repeatable-panel.js';
+import { uePatchEventForRepeatablePanel } from './fixtures/ue/events/event-patch-repeatable-panel.js';
+import { handleEditorSelect } from '../../scripts/form-editor-support.js';
 
 describe('Universal Editor Authoring Test Cases', () => {
-  
+
   beforeEach(async () => {
     document.body.innerHTML = '';
   });
@@ -89,9 +92,28 @@ describe('Universal Editor Authoring Test Cases', () => {
             testChildren(getContainerChildNodes(node, fd), formDef, fieldMap);
           } else if (fd.properties['fd:fragment'] && node.classList.contains('edit-mode')) {
             testAnnotation(node, fd, 'component', 'form-fragment');
-            const textNodeCount = Array.from(node.childNodes)
-              .filter((child) => child.nodeType === 3).length;
-            assert.equal(textNodeCount, Object.keys(fd[':items']).length, `fragment items not set ${textNodeCount} ${fd.id}`);
+            
+            // Test fragment wrapper classes and structure
+            assert.equal(node.classList.contains('fragment-wrapper'), true, 'Fragment should have fragment-wrapper class');
+            assert.equal(node.classList.contains('edit-mode'), true, 'Fragment should have edit-mode class');
+            
+            if (Object.keys(fd[':items']).length === 0) {
+              // Empty fragment - should match selector for "Adaptive Form Fragment" text
+              assert.equal(node.matches('.fragment-wrapper.edit-mode:not(:has(> :not(legend)))'), true, 'Empty fragment should match selector for "Adaptive Form Fragment" text');
+            } else {
+              // Non-empty fragment - should match selector for "CLICK TO EXPAND" text
+              assert.equal(node.matches('.fragment-wrapper.edit-mode:has(> :not(legend))'), true, 'Non-empty fragment should match selector for expand text');
+              
+              // Test expansion behavior
+              handleEditorSelect({
+                target: node,
+                detail: {
+                  selected: true,
+                  resource: `urn:aemconnection:${fd.properties['fd:path']}`
+                }
+              });
+              assert.equal(node.classList.contains('fragment-expanded'), true, 'Fragment should get expanded class on selection');
+            }
           } else if (fd.fieldType === 'plain-text') {
             testPlainTextAnnotation(node, fd, 'richtext', fd.fieldType);
           } else if (fd[':type'] === 'rating') {
@@ -226,9 +248,86 @@ describe('Universal Editor Authoring Test Cases', () => {
   it('test UE accordion navigation', async () => {
     await renderForm(ueFormDefForAccordionNavigationTest);
     const formElPrev = document.querySelector('form');
-    handleAccordionNavigation(formElPrev.querySelector('.accordion'), formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]'));
-    const currentActiveTab = formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]');
-    assert.equal(currentActiveTab.classList.contains('accordion-collapse'), false);
+    let secondTab = formElPrev.querySelector('fieldset[data-id="panelcontainer-d5a2c8d340"]');
+    let firstTab = formElPrev.querySelector('fieldset[data-id="panelcontainer-c49bd83fb9"]');
+    assert.equal(firstTab.classList.contains('accordion-collapse'), false); // first tab open by default
+    handleAccordionNavigation(formElPrev.querySelector('.accordion'), secondTab, true); // trigger second tab open
+    assert.equal(secondTab.classList.contains('accordion-collapse'), false); // should be open
+    assert.equal(firstTab.classList.contains('accordion-collapse'), false); 
+    handleAccordionNavigation(formElPrev.querySelector('.accordion'), firstTab, true);
+    assert.equal(firstTab.classList.contains('accordion-collapse'), false); // should also be open (not toggle case)
+    document.body.replaceChildren();
+  });
+
+  it('test UE repeatable panel buttons', async () => {
+    window.hlx.codeBasePath = '../../';
+    await renderForm(ueFormDefForRepeatablePanelTest);
+    const formEl = document.querySelector('form');
+    const panel = formEl.querySelector('.panel-wrapper');
+
+    // Verify panel is marked as repeatable
+    assert.equal(panel.dataset.repeatable, 'true');
+
+    // Verify add button exists with correct label
+    const addButton = panel.querySelector('.repeat-actions .item-add');
+    assert.ok(addButton, 'Add button should exist');
+    assert.equal(addButton.querySelector('span').textContent, 'Add');
+
+    // Verify remove button exists with correct label
+    const removeButton = panel.querySelector('.item-remove');
+    assert.ok(removeButton, 'Remove button should exist');
+    assert.equal(removeButton.querySelector('span').textContent, 'Delete');
+
+    // Verify panel index is set
+    assert.equal(panel.dataset.index, '0');
+
+    document.body.replaceChildren();
+  });
+
+  it('test UE patch event for repeatable panel buttons', async () => {
+    window.hlx.codeBasePath = '../../';
+    await renderForm(ueFormDefForRepeatablePanelTest);
+    const applied = await applyChanges({ detail: uePatchEventForRepeatablePanel });
+    assert.equal(applied, true);
+    const formEl = document.querySelector('form');
+    const panel = formEl.querySelector('.panel-wrapper');
+    // Verify panel is still marked as repeatable
+    assert.equal(panel.dataset.repeatable, 'true');
+    assert.equal(panel.dataset.variant, 'addDeleteButtons');
+    // Verify add button exists with updated label
+    const addButton = panel.querySelector('.repeat-actions .item-add');
+    assert.ok(addButton, 'Add button should exist');
+    assert.equal(addButton.querySelector('span').textContent, 'Add New');
+    document.body.replaceChildren();
+  });
+
+  it('test UE wizard navigation with nested panels', async () => {
+    window.hlx.codeBasePath = '../../';
+    await renderForm(ueFormDefForWizardNavigationTest);
+    const formEl = document.querySelector('form');
+    const wizardEl = formEl.querySelector('.wizard');
+    
+    // Find the nested panel element in the rendered HTML
+    const nestedPanel = formEl.querySelector('[data-id="panelcontainer-nested"]');
+    assert.ok(nestedPanel, 'Nested panel should exist');
+    
+    // Set up the event with the actual nested panel element
+    const ueSelectNestedPanelEvent = {
+      target: nestedPanel,
+      detail: {
+        selected: true,
+        resource: 'urn:aemconnection:/content/ng-test1/index/jcr:content/root/section_0/form/panelcontainer_1310348320/panelcontainer/nested_panel',
+      },
+    };
+    
+    // Test that selecting the nested panel navigates to its parent panel
+    handleEditorSelect(ueSelectNestedPanelEvent);
+    
+    // Verify that the parent panel is the current step, not the nested panel
+    const currentStep = wizardEl.querySelector('.current-wizard-step');
+    assert.equal(currentStep.dataset.id, 'panelcontainer-4a4625c3cf', 'Should navigate to parent panel, not nested panel');
+    assert.equal(currentStep.querySelector('legend').textContent, 'Panel', 'Should show parent panel title');
+    
     document.body.replaceChildren();
   });
 });

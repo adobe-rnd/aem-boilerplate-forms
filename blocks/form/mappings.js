@@ -19,7 +19,7 @@ export function getCustomComponents() {
  * Loads JS and CSS for a block.
  * @param {Element} block The block element
  */
-async function loadComponent(componentName, element, fd, container) {
+async function loadComponent(componentName, element, fd, container, formId) {
   const status = element.dataset.componentStatus;
   if (status !== 'loading' && status !== 'loaded') {
     element.dataset.componentStatus = 'loading';
@@ -33,7 +33,7 @@ async function loadComponent(componentName, element, fd, container) {
               `${window.hlx.codeBasePath}/blocks/form/components/${componentName}/${componentName}.js`
             );
             if (mod.default) {
-              await mod.default(element, fd, container);
+              await mod.default(element, fd, container, formId);
             }
           } catch (error) {
             // eslint-disable-next-line no-console
@@ -56,18 +56,18 @@ async function loadComponent(componentName, element, fd, container) {
  * returns a decorator to decorate the field definition
  *
  * */
-export default async function componentDecorator(element, fd, container) {
+export default async function componentDecorator(element, fd, container, formId) {
   const { ':type': type = '', fieldType } = fd;
   if (fieldType === 'file-input') {
-    await loadComponent('file', element, fd, container);
+    await loadComponent('file', element, fd, container, formId);
   }
 
   if (type.endsWith('wizard')) {
-    await loadComponent('wizard', element, fd, container);
+    await loadComponent('wizard', element, fd, container, formId);
   }
 
   if (getCustomComponents().includes(type) || getOOTBComponents().includes(type)) {
-    await loadComponent(type, element, fd, container);
+    await loadComponent(type, element, fd, container, formId);
   }
 
   return null;

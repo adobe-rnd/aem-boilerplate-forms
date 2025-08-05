@@ -19,14 +19,19 @@
  ************************************************************************ */
 import { submitSuccess, submitFailure } from '../submit.js';
 import {
-  createHelpText, createLabel, updateOrCreateInvalidMsg, getCheckboxGroupValue,
+  createHelpText,
+  createLabel,
+  updateOrCreateInvalidMsg,
+  getCheckboxGroupValue,
+  createDropdownUsingEnum,
+  createRadioOrCheckboxUsingEnum,
 } from '../util.js';
 import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
 import initializeRuleEngineWorker from './worker.js';
 import { createOptimizedPicture } from '../../../scripts/aem.js';
 
-const formModel = {};
+const formSubscriptions = {};
 
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
@@ -81,35 +86,39 @@ async function fieldChanged(payload, form, generateFormRendition) {
         {
           const { validity } = payload.field;
           if (field.setCustomValidity
-          && (validity?.expressionMismatch || validity?.customConstraint)) {
+            && (validity?.expressionMismatch || validity?.customConstraint)) {
             field.setCustomValidity(currentValue);
             updateOrCreateInvalidMsg(field, currentValue);
           }
         }
         break;
       case 'value':
+        // Handle undefined currentValue to prevent "undefined" appearing in form fields
+        // eslint-disable-next-line no-case-declarations
+        const valueToSet = currentValue === undefined ? '' : currentValue;
+
         if (['number', 'date', 'text', 'email'].includes(field.type) && (displayFormat || displayValueExpression)) {
-          field.setAttribute('edit-value', currentValue);
+          field.setAttribute('edit-value', valueToSet);
           field.setAttribute('display-value', displayValue);
           if (document.activeElement !== field) {
             field.value = displayValue;
           }
         } else if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
           field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
-            const exists = (Array.isArray(currentValue)
-              && currentValue.some((x) => compare(x, el.value, type.replace('[]', ''))))
-              || compare(currentValue, el.value, type);
+            const exists = (Array.isArray(valueToSet)
+              && valueToSet.some((x) => compare(x, el.value, type.replace('[]', ''))))
+              || compare(valueToSet, el.value, type);
             el.checked = exists;
           });
         } else if (fieldType === 'checkbox') {
-          field.checked = compare(currentValue, field.value, type);
+          field.checked = compare(valueToSet, field.value, type);
         } else if (fieldType === 'plain-text') {
-          field.innerHTML = currentValue;
+          field.innerHTML = valueToSet;
         } else if (fieldType === 'image') {
           const altText = field?.querySelector('img')?.alt || '';
-          field.querySelector('picture')?.replaceWith(createOptimizedPicture(field, currentValue, altText));
+          field.querySelector('picture')?.replaceWith(createOptimizedPicture(valueToSet, altText));
         } else if (field.type !== 'file') {
-          field.value = currentValue;
+          field.value = valueToSet;
         }
         break;
       case 'visible':
@@ -200,13 +209,18 @@ async function fieldChanged(payload, form, generateFormRendition) {
           updateOrCreateInvalidMsg(field, '');
         }
         break;
+      case 'enum':
+      case 'enumNames':
+        if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
+          createRadioOrCheckboxUsingEnum(fieldModel, field);
+        } else if (fieldType === 'drop-down') {
+          createDropdownUsingEnum(fieldModel, field);
+        }
+        break;
       default:
         break;
     }
   });
-  if (fieldWrapper?.dataset?.subscribe) {
-    fieldWrapper.dataset.fieldModelChanged = JSON.stringify(Math.random());
-  }
 }
 
 function formChanged(payload, form) {
@@ -284,7 +298,14 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data);
   window.myForm = form;
-  formModel[htmlForm.dataset?.id] = form;
+  const subscriptions = formSubscriptions[htmlForm.dataset?.id];
+  if (subscriptions) {
+    subscriptions.forEach((subscription, id) => {
+      const { callback, fieldDiv } = subscription;
+      const model = form.getElement(id);
+      callback(fieldDiv, model, 'register');
+    });
+  }
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'fieldChanged');
@@ -333,20 +354,19 @@ export async function initAdaptiveForm(formDef, createForm) {
 
 /**
  * Subscribes to changes in the specified field element and triggers a callback
- * with access to formModel when changes occur.
+ * with access to formModel when the component is initialised
  * @param {HTMLElement} fieldDiv - The field element to observe for changes.
- * @param {Function} callback - The callback function to execute when changes are detected.
+ * @param {Function} callback - The callback function to which returns fieldModel
  */
-export function subscribe(fieldDiv, callback) {
+export function subscribe(fieldDiv, formId, callback) {
   if (callback) {
-    fieldDiv.dataset.subscribe = true;
-    const observer = new MutationObserver((mutationsList) => {
-      mutationsList?.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'data-field-model-changed') {
-          callback(fieldDiv, formModel[fieldDiv.closest('form')?.dataset?.id]);
-        }
-      });
-    });
-    observer.observe(fieldDiv, { attributes: true });
+    // Check if a subscription map already exists for this form
+    let subscriptions = formSubscriptions[formId];
+    if (!subscriptions) {
+      subscriptions = new Map();
+      formSubscriptions[formId] = subscriptions;
+    }
+    // Add the new subscription to the existing map
+    subscriptions.set(fieldDiv?.dataset?.id, { callback, fieldDiv });
   }
 }

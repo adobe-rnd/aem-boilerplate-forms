@@ -63,6 +63,20 @@
                         },
                         {
                             "component": "text",
+                            "name": "uncheckedValue",
+                            "label": "When Unchecked, return value",
+                            "valueType": "string",
+                            "condition": {
+                                "===": [
+                                    {
+                                        "var": "basic|enableUncheckedValue"
+                                    },
+                                    true
+                                ]
+                            }
+                        },
+                        {
+                            "component": "text",
                             "name": "default",
                             "label": "Default Value",
                             "valueType": "string"
