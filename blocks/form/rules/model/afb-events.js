@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.121
+ *  Version: 0.22.145
  */
 var EventSource;
 (function (EventSource) {
@@ -206,5 +206,15 @@ class RemoveInstance extends ActionImpl {
         super(payload, 'removeInstance');
     }
 }
+class RequestSuccess extends ActionImpl {
+    constructor(payload, dispatch = false) {
+        super(payload, 'requestSuccess', { dispatch });
+    }
+}
+class RequestFailure extends ActionImpl {
+    constructor(payload, dispatch = false) {
+        super(payload, 'requestFailure', { dispatch });
+    }
+}
 
-export { AddInstance, AddItem, Blur, Change, Click, CustomEvent, ExecuteRule, FieldChanged, Focus, FormLoad, Initialize, Invalid, RemoveInstance, RemoveItem, Reset, Save, Submit, SubmitError, SubmitFailure, SubmitSuccess, UIChange, Valid, ValidationComplete, propertyChange };
+export { AddInstance, AddItem, Blur, Change, Click, CustomEvent, ExecuteRule, FieldChanged, Focus, FormLoad, Initialize, Invalid, RemoveInstance, RemoveItem, RequestFailure, RequestSuccess, Reset, Save, Submit, SubmitError, SubmitFailure, SubmitSuccess, UIChange, Valid, ValidationComplete, propertyChange };
