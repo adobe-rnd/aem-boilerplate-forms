@@ -86,35 +86,39 @@ async function fieldChanged(payload, form, generateFormRendition) {
         {
           const { validity } = payload.field;
           if (field.setCustomValidity
-          && (validity?.expressionMismatch || validity?.customConstraint)) {
+            && (validity?.expressionMismatch || validity?.customConstraint)) {
             field.setCustomValidity(currentValue);
             updateOrCreateInvalidMsg(field, currentValue);
           }
         }
         break;
       case 'value':
+        // Handle undefined currentValue to prevent "undefined" appearing in form fields
+        // eslint-disable-next-line no-case-declarations
+        const valueToSet = currentValue === undefined ? '' : currentValue;
+
         if (['number', 'date', 'text', 'email'].includes(field.type) && (displayFormat || displayValueExpression)) {
-          field.setAttribute('edit-value', currentValue);
+          field.setAttribute('edit-value', valueToSet);
           field.setAttribute('display-value', displayValue);
           if (document.activeElement !== field) {
             field.value = displayValue;
           }
         } else if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
           field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
-            const exists = (Array.isArray(currentValue)
-              && currentValue.some((x) => compare(x, el.value, type.replace('[]', ''))))
-              || compare(currentValue, el.value, type);
+            const exists = (Array.isArray(valueToSet)
+              && valueToSet.some((x) => compare(x, el.value, type.replace('[]', ''))))
+              || compare(valueToSet, el.value, type);
             el.checked = exists;
           });
         } else if (fieldType === 'checkbox') {
-          field.checked = compare(currentValue, field.value, type);
+          field.checked = compare(valueToSet, field.value, type);
         } else if (fieldType === 'plain-text') {
-          field.innerHTML = currentValue;
+          field.innerHTML = valueToSet;
         } else if (fieldType === 'image') {
           const altText = field?.querySelector('img')?.alt || '';
-          field.querySelector('picture')?.replaceWith(createOptimizedPicture(field, currentValue, altText));
+          field.querySelector('picture')?.replaceWith(createOptimizedPicture(valueToSet, altText));
         } else if (field.type !== 'file') {
-          field.value = currentValue;
+          field.value = valueToSet;
         }
         break;
       case 'visible':
