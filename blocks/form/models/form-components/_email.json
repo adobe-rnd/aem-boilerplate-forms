@@ -8,8 +8,7 @@
                     "page": {
                         "resourceType": "core/fd/components/form/emailinput/v1/emailinput",
                         "template": {
-                            "jcr:title": "Email Input",
-                            "fieldType": "email"
+                            "jcr:title": "Email Input"
                         }
                     }
                 }

@@ -9,7 +9,6 @@
                         "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                         "template": {
                             "jcr:title": "Panel",
-                            "fieldType": "panel",
                             "minOccur": 1
                         }
                     }

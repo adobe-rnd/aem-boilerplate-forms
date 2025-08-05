@@ -9,17 +9,14 @@
                         "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
                         "template": {
                             "jcr:title": "Accordion",
-                            "fieldType": "panel",
                             "fd:viewType": "accordion",
                             "minOccur": 1,
                             "panel1": {
                                 "jcr:title": "Item 1",
-                                "fieldType": "panel",
                                 "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                             },
                             "panel2": {
                                 "jcr:title": "Item 2",
-                                "fieldType": "panel",
                                 "sling:resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer"
                             }
                         }

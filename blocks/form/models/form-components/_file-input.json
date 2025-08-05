@@ -9,7 +9,6 @@
                         "resourceType": "core/fd/components/form/fileinput/v2/fileinput",
                         "template": {
                             "jcr:title": "File Attachment",
-                            "fieldType": "file-input",
                             "accept": [
                                 "audio/*",
                                 "video/*",

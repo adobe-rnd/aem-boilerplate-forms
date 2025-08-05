@@ -8,8 +8,7 @@
                     "page": {
                         "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
                         "template": {
-                            "jcr:title": "Date Input",
-                            "fieldType": "date-input"
+                            "jcr:title": "Date Input"
                         }
                     }
                 }

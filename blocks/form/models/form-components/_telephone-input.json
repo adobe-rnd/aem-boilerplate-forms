@@ -8,8 +8,7 @@
           "page": {
             "resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
             "template": {
-              "jcr:title": "Telephone Input",
-              "fieldType": "text-input"
+              "jcr:title": "Telephone Input"
             }
           }
         }
