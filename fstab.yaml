@@ -1,0 +1,5 @@
+mountpoints:
+  /:
+    url: https://author-p132902-e308812-cmstg.adobeaemcloud.com/bin/franklin.delivery/subodh2711/aem-boilerplate-forms/main
+    type: "markup"
+    suffix: ".html"

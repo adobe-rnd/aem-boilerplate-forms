@@ -235,6 +235,12 @@
         }
       },
       {
+          "component": "text",
+          "name": "customFunctionsPath",
+          "label": "Custom Functions Path",
+          "valueType": "string"
+      },
+      {
         "component": "text",
         "name": "restEndpointPostUrl",
         "label": "URL For POST request",
