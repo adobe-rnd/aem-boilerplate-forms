@@ -1,3 +1,4 @@
+/* eslint-disable one-var */
 /** ***********************************************************************
  * ADOBE CONFIDENTIAL
  * ___________________
@@ -342,7 +343,10 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
   });
 
   return new Promise((resolve) => {
-    let form; let captcha; let data; let generateFormRendition;
+    let form,
+      captcha,
+      data,
+      generateFormRendition;
     myWorker.addEventListener('message', async (e) => {
       // main thread starts html rendering
       if (e.data.name === 'init') {
