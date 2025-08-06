@@ -6,6 +6,7 @@ export class UniversalEditorBase {
   selectors = {
     ruleEditor: 'button[aria-label="Rule Editor"]',
     preview: '[aria-label="Preview"]',
+    contentTree: 'button[aria-label="Content tree"]',
     mainInContentTree: 'li > [class*="content expandable collapsed"]',
     adaptiveFormPathInUE: 'main[class="Canvas"] button[data-resource$="content/root/section/form"]',
     adaptiveFormDropdown: 'li[data-resource*="content/root/section/form"] button[aria-label]',
