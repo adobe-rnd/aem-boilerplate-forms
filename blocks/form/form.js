@@ -449,7 +449,7 @@ export async function fetchForm(pathname) {
   return data;
 }
 
-function addFormProperties(formDef) {
+function addRequestContextToForm(formDef) {
   if (formDef && typeof formDef === 'object') {
     formDef.properties = formDef.properties || {};
 
@@ -464,13 +464,6 @@ function addFormProperties(formDef) {
       });
     } catch (e) {
       console.warn('Error reading URL parameters:', e);
-    }
-
-    // Add browser agent
-    try {
-      formDef.properties.browserAgent = navigator?.userAgent || '';
-    } catch (e) {
-      console.warn('Error setting browser agent:', e);
     }
 
     // Add cookies
@@ -526,7 +519,7 @@ export default async function decorate(block) {
       rules = false;
     } else {
       afModule = await import('./rules/index.js');
-      addFormProperties(formDef);
+      addRequestContextToForm(formDef);
       if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
         form = await afModule.initAdaptiveForm(formDef, createForm);
       } else {
