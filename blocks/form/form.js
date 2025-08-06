@@ -449,6 +449,46 @@ export async function fetchForm(pathname) {
   return data;
 }
 
+function addFormProperties(formDef) {
+  if (formDef && typeof formDef === 'object') {
+    formDef.properties = formDef.properties || {};
+
+    // Add URL parameters
+    try {
+      const urlParams = new URLSearchParams(window?.location?.search || '');
+      if (!formDef.properties.queryParams) {
+        formDef.properties.queryParams = {};
+      }
+      urlParams.forEach((value, key) => {
+        formDef.properties.queryParams[key] = value;
+      });
+    } catch (e) {
+      console.warn('Error reading URL parameters:', e);
+    }
+
+    // Add browser agent
+    try {
+      formDef.properties.browserAgent = navigator?.userAgent || '';
+    } catch (e) {
+      console.warn('Error setting browser agent:', e);
+    }
+
+    // Add cookies
+    try {
+      const cookies = document.cookie.split(';');
+      formDef.properties.cookies = {};
+      cookies.forEach((cookie) => {
+        if (cookie.trim()) {
+          const [key, value] = cookie.trim().split('=');
+          formDef.properties.cookies[key.trim()] = value || '';
+        }
+      });
+    } catch (e) {
+      console.warn('Error reading cookies:', e);
+    }
+  }
+}
+
 export default async function decorate(block) {
   let container = block.querySelector('a[href]');
   let formDef;
@@ -486,6 +526,7 @@ export default async function decorate(block) {
       rules = false;
     } else {
       afModule = await import('./rules/index.js');
+      addFormProperties(formDef);
       if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
         form = await afModule.initAdaptiveForm(formDef, createForm);
       } else {
