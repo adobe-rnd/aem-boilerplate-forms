@@ -459,7 +459,7 @@ function addRequestContextToForm(formDef) {
       if (!formDef.properties.queryParams) {
         formDef.properties.queryParams = {};
       }
-      urlParams.forEach((value, key) => {
+      urlParams?.forEach((value, key) => {
         formDef.properties.queryParams[key] = value;
       });
     } catch (e) {
@@ -468,9 +468,9 @@ function addRequestContextToForm(formDef) {
 
     // Add cookies
     try {
-      const cookies = document.cookie.split(';');
+      const cookies = document?.cookie.split(';');
       formDef.properties.cookies = {};
-      cookies.forEach((cookie) => {
+      cookies?.forEach((cookie) => {
         if (cookie.trim()) {
           const [key, value] = cookie.trim().split('=');
           formDef.properties.cookies[key.trim()] = value || '';
@@ -532,7 +532,7 @@ export default async function decorate(block) {
     form.dataset.source = source;
     form.dataset.rules = rules;
     form.dataset.id = formDef.id;
-    if (source === 'aem' && formDef.properties) {
+    if (source === 'aem' && formDef.properties && formDef.properties['fd:path']) {
       form.dataset.formpath = formDef.properties['fd:path'];
     }
     container.replaceWith(form);
