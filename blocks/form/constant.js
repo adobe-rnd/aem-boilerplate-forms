@@ -11,7 +11,7 @@ const getLogLevelFromURL = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const afdebug = urlParams.get('afdebug');
       if (afdebug === 'true') {
-        return 'info'; // Debug logging
+        return 'debug'; // Debug logging, most verbose
       }
     }
   } catch (error) {
