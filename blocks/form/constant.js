@@ -5,13 +5,24 @@ export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you for your submission.';
 
 // Logging Configuration
 // Enable verbose logging via URL parameter: ?afdebug=true
-const getLogLevelFromURL = () => {
+export const getLogLevelFromURL = (urlString = null) => {
   try {
-    if (typeof window !== 'undefined' && window.location) {
-      const urlParams = new URLSearchParams(window.location.search);
+    let searchParams = '';
+
+    if (urlString) {
+      // For worker context - use passed URL string
+      const url = new URL(urlString);
+      searchParams = url.search;
+    } else if (typeof window !== 'undefined' && window.location) {
+      // For main thread context - use window.location
+      searchParams = window.location.search;
+    }
+
+    if (searchParams) {
+      const urlParams = new URLSearchParams(searchParams);
       const afdebug = urlParams.get('afdebug');
       if (afdebug === 'true') {
-        return 'debug'; // Debug logging, most verbose
+        return 'debug'; // Debug for verbose logging
       }
     }
   } catch (error) {

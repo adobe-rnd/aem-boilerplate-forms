@@ -19,15 +19,17 @@
  ************************************************************************ */
 import { createFormInstance } from './model/afb-runtime.js';
 import registerCustomFunctions from './functionRegistration.js';
-import { LOG_LEVEL } from '../constant.js';
+import { getLogLevelFromURL } from '../constant.js';
 
 let customFunctionRegistered = false;
 
 export default class RuleEngine {
   rulesOrder = {};
 
-  constructor(formDef) {
-    this.form = createFormInstance(formDef, undefined, LOG_LEVEL);
+  constructor(formDef, url) {
+    // Determine log level from URL in worker context
+    const logLevel = getLogLevelFromURL(url);
+    this.form = createFormInstance(formDef, undefined, logLevel);
   }
 
   getState() {
@@ -40,7 +42,7 @@ onmessage = (e) => {
   function handleMessageEvent(event) {
     switch (event.data.name) {
       case 'init':
-        ruleEngine = new RuleEngine(event.data.payload);
+        ruleEngine = new RuleEngine(event.data.payload, event.data.url);
         // eslint-disable-next-line no-case-declarations
         const state = ruleEngine.getState();
         postMessage({
