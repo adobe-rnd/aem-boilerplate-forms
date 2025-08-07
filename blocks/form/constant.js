@@ -4,8 +4,35 @@ export const dragDropText = 'Drag and Drop To Upload';
 export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you for your submission.';
 
 // Logging Configuration
+// Enable verbose logging via URL parameter: ?afdebug=true
+export const getLogLevelFromURL = (urlString = null) => {
+  try {
+    let searchParams = '';
+
+    if (urlString) {
+      // For worker context - use passed URL string
+      const url = new URL(urlString);
+      searchParams = url.search;
+    } else if (typeof window !== 'undefined' && window.location) {
+      // For main thread context - use window.location
+      searchParams = window.location.search;
+    }
+
+    if (searchParams) {
+      const urlParams = new URLSearchParams(searchParams);
+      const afdebug = urlParams.get('afdebug');
+      if (afdebug === 'true') {
+        return 'debug'; // Debug for verbose logging
+      }
+    }
+  } catch (error) {
+    // Fallback to default if URL parsing fails
+  }
+  return 'error'; // Normal logging (default)
+};
+// Logging Configuration
 // To set log level, modify this constant:
-export const LOG_LEVEL = 'error'; // Available options: 'off', 'debug', 'info', 'warn', 'error'
+export const LOG_LEVEL = getLogLevelFromURL(); // Available options: 'off', 'debug', 'info', 'warn', 'error'
 
 export const defaultErrorMessages = {
   accept: 'The specified file type not supported.',

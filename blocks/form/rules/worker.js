@@ -26,10 +26,12 @@ export default async function initializeRuleEngineWorker(formDef, renderHTMLForm
     return renderHTMLForm(form.getState(true), formDef.data);
   }
   const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`, { type: 'module' });
-
+  // Pass the current URL to the worker for log level determination
+  const currentUrl = window.location.href;
   myWorker.postMessage({
     name: 'init',
     payload: formDef,
+    url: currentUrl, // Pass URL for log level determination
   });
 
   return new Promise((resolve) => {
