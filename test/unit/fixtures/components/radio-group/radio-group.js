@@ -30,7 +30,7 @@ export const fieldDef = {
     ':type': 'forms-components-examples/components/form/radiobutton',
   },
   {
-    id: 'radiobutton-0978fab44df',
+    id: 'radiobutton-boolean-without-enum',
     fieldType: 'radio-group',
     name: 'radiobutton-boolean-without-enum',
     visible: true,
