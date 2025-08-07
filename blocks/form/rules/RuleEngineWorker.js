@@ -19,6 +19,7 @@
  ************************************************************************ */
 import { createFormInstance } from './model/afb-runtime.js';
 import registerCustomFunctions from './functionRegistration.js';
+import { LOG_LEVEL } from '../constant.js';
 
 let customFunctionRegistered = false;
 
@@ -26,7 +27,7 @@ export default class RuleEngine {
   rulesOrder = {};
 
   constructor(formDef) {
-    this.form = createFormInstance(formDef);
+    this.form = createFormInstance(formDef, undefined, LOG_LEVEL);
   }
 
   getState() {
