@@ -182,8 +182,27 @@ function inputDecorator(field, element) {
       input.setAttribute('display-value', field.displayValue ?? '');
       input.type = 'text';
       input.value = field.displayValue ?? '';
-      input.addEventListener('touchstart', () => { input.type = field.type; }); // in mobile devices the input type needs to be toggled before focus
-      input.addEventListener('focus', () => handleFocus(input, field));
+      // Handle mobile touch events to enable native date picker
+      let isMobileTouch = false;
+      input.addEventListener('touchstart', () => {
+        isMobileTouch = true;
+        input.type = field.type;
+        // Set the edit value immediately to prevent empty field
+        const editValue = input.getAttribute('edit-value');
+        if (editValue) {
+          input.value = editValue;
+        }
+      });
+
+      input.addEventListener('focus', () => {
+        // Only change type on desktop or if not already changed by touchstart
+        if (!isMobileTouch && input.type !== field.type) {
+          input.type = field.type;
+        }
+        handleFocus(input, field);
+        // Reset mobile touch flag
+        isMobileTouch = false;
+      });
       input.addEventListener('blur', () => handleFocusOut(input));
     } else if (input.type !== 'file') {
       input.value = field.value ?? '';
