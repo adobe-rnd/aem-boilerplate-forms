@@ -1,3 +1,4 @@
+/* eslint-disable one-var */
 /** ***********************************************************************
  * ADOBE CONFIDENTIAL
  * ___________________
@@ -25,10 +26,10 @@ import {
   getCheckboxGroupValue,
   createDropdownUsingEnum,
   createRadioOrCheckboxUsingEnum,
+  fetchData,
 } from '../util.js';
 import registerCustomFunctions from './functionRegistration.js';
-import { externalize } from './functions.js';
-import initializeRuleEngineWorker from './worker.js';
+import { LOG_LEVEL } from '../constant.js';
 import { createOptimizedPicture } from '../../../scripts/aem.js';
 
 const formSubscriptions = {};
@@ -328,28 +329,63 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   applyRuleEngine(htmlForm, form, captcha);
 }
 
-async function fetchData({ id }) {
-  try {
-    const { search = '' } = window.location;
-    const url = externalize(`/adobe/forms/af/data/${id}${search}`);
-    const response = await fetch(url);
-    const json = await response.json();
-    const { data: prefillData } = json;
-    const { data: { afData: { afBoundData: { data = {} } = {} } = {} } = {} } = json;
-    return Object.keys(data).length > 0 ? data : (prefillData || json);
-  } catch (ex) {
-    return null;
+async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
+  if (typeof Worker === 'undefined') {
+    const data = await fetchData(formDef?.id, window.location.search || '');
+    const ruleEngine = await import('./model/afb-runtime.js');
+    const form = ruleEngine.createFormInstance({ ...formDef, data }, undefined, LOG_LEVEL);
+    return renderHTMLForm(form.getState(true), data);
   }
+  const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`, { type: 'module' });
+  // Trigger the worker to start form initialization
+  myWorker.postMessage({
+    name: 'init',
+    payload: {
+      ...formDef,
+      search: window.location.search || '',
+    },
+  });
+
+  return new Promise((resolve) => {
+    let form,
+      captcha,
+      data,
+      generateFormRendition;
+    myWorker.addEventListener('message', async (e) => {
+      // main thread starts html rendering
+      if (e.data.name === 'init') {
+        const response = await renderHTMLForm(e.data.payload);
+        form = response.form;
+        captcha = response.captcha;
+        data = response.data;
+        generateFormRendition = response.generateFormRendition;
+        form?.classList.add('loading');
+        // informing the worker that html form rendition is complete
+        myWorker.postMessage({
+          name: 'decorated',
+        });
+        resolve(response);
+      }
+
+      if (e.data.name === 'restore') {
+        loadRuleEngine(e.data.payload, form, captcha, generateFormRendition, data);
+      }
+
+      if (e.data.name === 'fieldChanged') {
+        await fieldChanged(e.data.payload, form, generateFormRendition);
+      }
+
+      if (e.data.name === 'sync-complete') {
+        form?.classList.remove('loading');
+      }
+    });
+  });
 }
 
 export async function initAdaptiveForm(formDef, createForm) {
-  const data = await fetchData(formDef);
   await registerCustomFunctions();
-  const form = await initializeRuleEngineWorker({
-    ...formDef,
-    data,
-  }, createForm);
-  return form;
+  const response = await initializeRuleEngineWorker(formDef, createForm);
+  return response?.form;
 }
 
 /**
