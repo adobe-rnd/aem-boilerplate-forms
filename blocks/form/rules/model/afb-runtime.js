@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.145
+ *  Version: 0.22.146
  */
 import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, RequestSuccess, SubmitError, SubmitFailure, RequestFailure, Submit, Save, Reset, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
@@ -1617,7 +1617,14 @@ class BaseNode {
         };
     }
     _addDependent(dependent, propertyName) {
-        if (this._dependents.find(({ node }) => node === dependent) === undefined) {
+        const existingDependency = this._dependents.find(({ node, propertyName: existingProp }) => {
+            let isExistingDependent = node === dependent;
+            if (isExistingDependent && propertyName && propertyName.startsWith('properties.')) {
+                isExistingDependent = existingProp === propertyName;
+            }
+            return isExistingDependent;
+        });
+        if (existingDependency === undefined) {
             const subscription = this.subscribe((change) => {
                 const changes = change.payload.changes;
                 const propsToLook = [...dynamicProps, 'items'];
@@ -2542,7 +2549,7 @@ class Container extends Scriptable {
                 activeChild.activeChild = null;
                 activeChild = temp;
             }
-            const change = propertyChange('activeChild', c, this._activeChild);
+            const change = propertyChange('activeChild', c?.getState(), this._activeChild?.getState());
             this._activeChild = c;
             if (this.parent && c !== null) {
                 this.parent.activeChild = this;
@@ -3556,7 +3563,7 @@ class FunctionRuntimeImpl {
                         return '';
                     }
                     if (interpreter.globals.form?.properties?.queryParams?.[param]) {
-                        return interpreter.globals.form.properties.queryParams[param];
+                        return interpreter.globals.form.properties.queryParams[param.toLowerCase()];
                     }
                     try {
                         const urlParams = new URLSearchParams(window?.location?.search || '');
