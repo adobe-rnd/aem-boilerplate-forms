@@ -29,7 +29,7 @@ import {
   fetchData,
 } from '../util.js';
 import registerCustomFunctions from './functionRegistration.js';
-
+import { LOG_LEVEL } from '../constant.js';
 import { createOptimizedPicture } from '../../../scripts/aem.js';
 
 const formSubscriptions = {};
@@ -333,7 +333,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
   if (typeof Worker === 'undefined') {
     const data = await fetchData(formDef?.id, window.location.search || '');
     const ruleEngine = await import('./model/afb-runtime.js');
-    const form = ruleEngine.createFormInstance({ ...formDef, data });
+    const form = ruleEngine.createFormInstance(formDef, undefined, LOG_LEVEL);
     return renderHTMLForm(form.getState(true), data);
   }
   const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`, { type: 'module' });

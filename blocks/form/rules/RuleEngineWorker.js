@@ -20,6 +20,7 @@
 import { createFormInstance } from './model/afb-runtime.js';
 import registerCustomFunctions from './functionRegistration.js';
 import { fetchData } from '../util.js';
+import { LOG_LEVEL } from '../constant.js';
 
 let customFunctionRegistered = false;
 
@@ -29,7 +30,7 @@ export default class RuleEngine {
   fieldChanges = [];
 
   constructor(formDef) {
-    this.form = createFormInstance(formDef);
+    this.form = createFormInstance(formDef, undefined, LOG_LEVEL);
     this.form.subscribe((e) => {
       const { payload } = e;
       this.fieldChanges.push(payload);
