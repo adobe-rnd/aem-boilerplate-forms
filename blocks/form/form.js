@@ -354,22 +354,29 @@ export async function createForm(formDef, data) {
   enableValidation(form);
   transferRepeatableDOM(form);
 
-  if (afModule) {
+  if (afModule && typeof Worker === 'undefined') {
     window.setTimeout(async () => {
       afModule.loadRuleEngine(formDef, form, captcha, generateFormRendition, data);
     }, DELAY_MS);
   }
 
   form.addEventListener('reset', async () => {
-    const newForm = await createForm(formDef);
-    document.querySelector(`[data-action="${form?.dataset?.action}"]`)?.replaceWith(newForm);
+    const response = await createForm(formDef);
+    if (response?.form) {
+      document.querySelector(`[data-action="${form?.dataset?.action}"]`)?.replaceWith(response?.form);
+    }
   });
 
   form.addEventListener('submit', (e) => {
     handleSubmit(e, form, captcha);
   });
 
-  return form;
+  return {
+    form,
+    captcha,
+    generateFormRendition,
+    data,
+  };
 }
 
 function isDocumentBasedForm(formDef) {
@@ -513,7 +520,8 @@ export default async function decorate(block) {
       const transform = new DocBasedFormToAF();
       formDef = transform.transform(formDef);
       source = 'sheet';
-      form = await createForm(formDef);
+      const response = await createForm(formDef);
+      form = response?.form;
       const docRuleEngine = await import('./rules-doc/index.js');
       docRuleEngine.default(formDef, form);
       rules = false;
