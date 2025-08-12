@@ -33,7 +33,16 @@
                             "component": "aem-content",
                             "name": "fragmentPath",
                             "label": "Fragment reference",
-                            "valueType": "string"
+                            "valueType": "string",
+                            "validation": {
+                                "rootPath": "/content/forms/af"
+                            }
+                        },
+                        {
+                            "component": "edit-fragment",
+                            "name": "editFragment",
+                            "label": "Edit Fragment",
+                            "valueType": "boolean"
                         }
                     ]
                 },

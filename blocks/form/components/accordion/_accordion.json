@@ -40,34 +40,6 @@
                     "...": "../../models/form-common/_basic-input-fields.json"
                 },
                 {
-                    "component": "container",
-                    "name": "repeat",
-                    "label": "Repeat Accordion",
-                    "collapsible": true,
-                    "fields": [
-                        {
-                            "component": "boolean",
-                            "name": "repeatable",
-                            "label": "Make accordion repeatable",
-                            "valueType": "boolean"
-                        },
-                        {
-                            "component": "number",
-                            "name": "minOccur",
-                            "label": "Minimum repetitions",
-                            "valueType": "number",
-                            "description": "Minimum number of times the accordion appears on the form"
-                        },
-                        {
-                            "component": "number",
-                            "name": "maxOccur",
-                            "label": "Maximum repetitions",
-                            "valueType": "number",
-                            "description": "Maximum number of times the accordion can appear on the form"
-                        }
-                    ]
-                },
-                {
                     "...": "../../models/form-common/_help-container.json"
                 }
             ]
