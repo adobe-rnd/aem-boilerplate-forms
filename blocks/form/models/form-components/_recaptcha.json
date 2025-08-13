@@ -21,6 +21,12 @@
             "id": "captcha",
             "fields": [
                 {
+                    "component": "container",
+                    "name": "component-name",
+                    "label": "Captcha (Invisible)"
+                },
+                {
+                    "component": "container",
                     "component": "text",
                     "name": "name",
                     "label": "Name",

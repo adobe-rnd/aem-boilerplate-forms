@@ -61,6 +61,11 @@
       "fields": [
         {
           "component": "container",
+          "name": "component-name",
+          "label": "Terms and conditions"
+        },
+        {
+          "component": "container",
           "name": "basic",
           "label": "Basic",
           "collapsible": false,

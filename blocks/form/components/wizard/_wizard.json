@@ -34,6 +34,11 @@
       "fields": [
         {
           "component": "container",
+          "name": "component-name",
+          "label": "Wizard"
+        },
+        {
+          "component": "container",
           "name": "basic",
           "label": "Basic",
           "collapsible": false,
