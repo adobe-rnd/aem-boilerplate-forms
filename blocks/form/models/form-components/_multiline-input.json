@@ -6,6 +6,11 @@
       "fields": [
         {
           "component": "container",
+          "name": "component-name",
+          "label": "Multiline Input"
+        },
+        {
+          "component": "container",
           "name": "basic",
           "label": "Basic",
           "collapsible": false,

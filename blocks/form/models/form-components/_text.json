@@ -23,6 +23,12 @@
       "id": "plain-text",
       "fields": [
         {
+          "component": "container",
+          "name": "component-name",
+          "label": "Text"
+        },
+        {
+          "component": "container",
           "component": "text",
           "name": "name",
           "label": "Name",

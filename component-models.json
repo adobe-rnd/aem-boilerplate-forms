@@ -365,6 +365,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Form Button"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -485,6 +490,11 @@
   {
     "id": "checkbox-group",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Checkbox Group"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -736,6 +746,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Checkbox"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -960,6 +975,11 @@
   {
     "id": "date-input",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Date Input"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -1218,6 +1238,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Dropdown"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -1438,6 +1463,11 @@
   {
     "id": "email",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Email Input"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -1668,6 +1698,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "File Attachment"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -1879,6 +1914,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Fragment"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -2067,6 +2107,11 @@
     "id": "form-image",
     "fields": [
       {
+        "component": "container",
+        "name": "component-name",
+        "label": "Image"
+      },
+      {
         "component": "text",
         "name": "name",
         "label": "Name",
@@ -2166,6 +2211,11 @@
   {
     "id": "multiline-input",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Multiline Input"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -2400,6 +2450,11 @@
   {
     "id": "number-input",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Number Input"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -2666,6 +2721,11 @@
   {
     "id": "panel",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Panel"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -2949,6 +3009,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Radio Group"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -3196,6 +3261,11 @@
     "id": "captcha",
     "fields": [
       {
+        "component": "container",
+        "name": "component-name",
+        "label": "Captcha (Invisible)"
+      },
+      {
         "component": "text",
         "name": "name",
         "label": "Name",
@@ -3207,6 +3277,11 @@
   {
     "id": "form-reset-button",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Reset Button"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -3331,6 +3406,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Submit Button"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -3451,6 +3531,11 @@
   {
     "id": "telephone-input",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Telephone Input"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -3665,6 +3750,11 @@
   {
     "id": "text-input",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Text Input"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -3900,6 +3990,11 @@
     "id": "plain-text",
     "fields": [
       {
+        "component": "container",
+        "name": "component-name",
+        "label": "Text"
+      },
+      {
         "component": "text",
         "name": "name",
         "label": "Name",
@@ -3981,6 +4076,11 @@
   {
     "id": "accordion",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Accordion"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -4129,6 +4229,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Modal"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -4273,6 +4378,11 @@
   {
     "id": "password",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Password"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -4489,6 +4599,10 @@
   {
     "id": "range",
     "fields": [
+      {
+        "name": "component-name",
+        "label": "Range"
+      },
       {
         "component": "container",
         "name": "basic",
@@ -4708,6 +4822,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Rating"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -4910,6 +5029,11 @@
     "fields": [
       {
         "component": "container",
+        "name": "component-name",
+        "label": "Terms and conditions"
+      },
+      {
+        "component": "container",
         "name": "basic",
         "label": "Basic",
         "collapsible": false,
@@ -5060,6 +5184,11 @@
   {
     "id": "wizard",
     "fields": [
+      {
+        "component": "container",
+        "name": "component-name",
+        "label": "Wizard"
+      },
       {
         "component": "container",
         "name": "basic",

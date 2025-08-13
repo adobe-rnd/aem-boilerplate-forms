@@ -32,6 +32,11 @@
             "fields": [
                 {
                     "component": "container",
+                    "name": "component-name",
+                    "label": "File Attachment"
+                },
+                {
+                    "component": "container",
                     "name": "basic",
                     "label": "Basic",
                     "collapsible": false,

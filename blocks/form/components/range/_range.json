@@ -24,6 +24,10 @@
         "id": "range",
         "fields": [
           {
+            "name": "component-name",
+            "label": "Range"
+          },
+          {
             "component": "container",
             "name": "basic",
             "label": "Basic",
