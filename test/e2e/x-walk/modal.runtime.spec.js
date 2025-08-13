@@ -52,7 +52,7 @@ test.describe('Modal Form Test', () => {
   });
 
 
-  test.only('check modal works in newly added repeatable panel', async ({ page }) => {
+  test('check modal works in newly added repeatable panel', async ({ page }) => {
     const url = '/content/aem-boilerplate-forms-xwalk-collaterals/subscribe';
     await openPage(page, url);
     const button = await page.getByText('Open PopUp').first();
