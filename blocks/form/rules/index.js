@@ -68,13 +68,13 @@ async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
     id, name, fieldType, ':type': componentType, readOnly, type, displayValue, displayFormat, displayValueExpression,
-    activeChild, qualifiedName
+    activeChild, qualifiedName,
   } = fieldModel;
   const field = form.querySelector(`#${id}`);
   if (!field) {
     // Check if there's a pending render promise where qualifiedName is a substring
     if (qualifiedName) {
-      const matchingKey = Object.keys(renderPromises).find(key => qualifiedName.includes(key));
+      const matchingKey = Object.keys(renderPromises).find((key) => qualifiedName.includes(key));
       if (matchingKey) {
         await renderPromises[matchingKey];
         // Clear the promise after it's resolved
