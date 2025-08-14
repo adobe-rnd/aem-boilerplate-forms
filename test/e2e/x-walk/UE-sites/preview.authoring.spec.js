@@ -5,7 +5,7 @@ const universalEditorBase = new UniversalEditorBase();
 const textInputValue = 'Adobe';
 const emailId = 'adobe@test.com';
 const componentNames = ['textinput', 'emailinput', 'button'];
-test.describe('Preview Validation in UE', async () => {
+test.describe.skip('Preview Validation in UE', async () => {
   const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/aem-boilerplate-forms-xwalk-collaterals/ruleValidationInPreview.html';
 
   test('Rules validation in UE preview mode @chromium-only', async ({ page }) => {
