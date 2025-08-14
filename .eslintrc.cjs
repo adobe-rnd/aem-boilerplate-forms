@@ -29,7 +29,7 @@ module.exports = {
       'checkbox-group': 20,
       checkbox: 19,
       'date-input': 21,
-      'drop-down': 19,
+      'drop-down': 20,
       email: 22,
       'file-input': 20,
       'form-fragment': 16,
