@@ -25,7 +25,7 @@
         {
           "component": "text",
           "name": "name",
-          "label": "Name",
+          "label": "Text",
           "valueType": "string",
           "required": true
         },

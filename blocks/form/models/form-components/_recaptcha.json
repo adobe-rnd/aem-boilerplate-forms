@@ -21,11 +21,19 @@
             "id": "captcha",
             "fields": [
                 {
-                    "component": "text",
-                    "name": "name",
-                    "label": "Name",
-                    "valueType": "string",
-                    "required": true
+                    "component": "container",
+                    "name": "basic",
+                    "label": "Captcha (Invisible)",
+                    "collapsible": false,
+                    "fields": [
+                        {
+                            "component": "text",
+                            "name": "name",
+                            "label": "Name",
+                            "valueType": "string",
+                            "required": true
+                        }
+                    ]
                 }
             ]
         }

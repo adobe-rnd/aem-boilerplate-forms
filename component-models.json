@@ -366,7 +366,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Form Button",
         "collapsible": false,
         "fields": [
           {
@@ -488,7 +488,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Checkbox Group",
         "collapsible": false,
         "fields": [
           {
@@ -737,7 +737,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Checkbox",
         "collapsible": false,
         "fields": [
           {
@@ -963,7 +963,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Date Input",
         "collapsible": false,
         "fields": [
           {
@@ -1219,7 +1219,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Drop Down List",
         "collapsible": false,
         "fields": [
           {
@@ -1459,7 +1459,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Email Input",
         "collapsible": false,
         "fields": [
           {
@@ -1687,7 +1687,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "File Attachment",
         "collapsible": false,
         "fields": [
           {
@@ -1898,7 +1898,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Fragment",
         "collapsible": false,
         "fields": [
           {
@@ -2085,97 +2085,105 @@
     "id": "form-image",
     "fields": [
       {
-        "component": "text",
-        "name": "name",
-        "label": "Name",
-        "valueType": "string",
-        "required": true
-      },
-      {
-        "component": "text",
-        "name": "jcr:title",
-        "label": "Title",
-        "valueType": "string"
-      },
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "fileReference",
+        "component": "container",
+        "name": "basic",
         "label": "Image",
-        "multi": false
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "altText",
-        "label": "Alternate text"
-      },
-      {
-        "component": "text",
-        "name": "dataRef",
-        "label": "Bind reference",
-        "valueType": "string"
-      },
-      {
-        "component": "boolean",
-        "name": "visible",
-        "label": "Show Component",
-        "valueType": "boolean",
-        "value": true
-      },
-      {
-        "component": "select",
-        "name": "colspan",
-        "label": "Column Span",
-        "valueType": "string",
-        "options": [
+        "collapsible": false,
+        "fields": [
           {
-            "name": "1 column",
-            "value": "1"
+            "component": "text",
+            "name": "name",
+            "label": "Name",
+            "valueType": "string",
+            "required": true
           },
           {
-            "name": "2 column",
-            "value": "2"
+            "component": "text",
+            "name": "jcr:title",
+            "label": "Title",
+            "valueType": "string"
           },
           {
-            "name": "3 column",
-            "value": "3"
+            "component": "reference",
+            "valueType": "string",
+            "name": "fileReference",
+            "label": "Image",
+            "multi": false
           },
           {
-            "name": "4 column",
-            "value": "4"
+            "component": "text",
+            "valueType": "string",
+            "name": "altText",
+            "label": "Alternate text"
           },
           {
-            "name": "5 column",
-            "value": "5"
+            "component": "text",
+            "name": "dataRef",
+            "label": "Bind reference",
+            "valueType": "string"
           },
           {
-            "name": "6 column",
-            "value": "6"
+            "component": "boolean",
+            "name": "visible",
+            "label": "Show Component",
+            "valueType": "boolean",
+            "value": true
           },
           {
-            "name": "7 column",
-            "value": "7"
-          },
-          {
-            "name": "8 column",
-            "value": "8"
-          },
-          {
-            "name": "9 column",
-            "value": "9"
-          },
-          {
-            "name": "10 column",
-            "value": "10"
-          },
-          {
-            "name": "11 column",
-            "value": "11"
-          },
-          {
-            "name": "12 column",
-            "value": "12"
+            "component": "select",
+            "name": "colspan",
+            "label": "Column Span",
+            "valueType": "string",
+            "options": [
+              {
+                "name": "1 column",
+                "value": "1"
+              },
+              {
+                "name": "2 column",
+                "value": "2"
+              },
+              {
+                "name": "3 column",
+                "value": "3"
+              },
+              {
+                "name": "4 column",
+                "value": "4"
+              },
+              {
+                "name": "5 column",
+                "value": "5"
+              },
+              {
+                "name": "6 column",
+                "value": "6"
+              },
+              {
+                "name": "7 column",
+                "value": "7"
+              },
+              {
+                "name": "8 column",
+                "value": "8"
+              },
+              {
+                "name": "9 column",
+                "value": "9"
+              },
+              {
+                "name": "10 column",
+                "value": "10"
+              },
+              {
+                "name": "11 column",
+                "value": "11"
+              },
+              {
+                "name": "12 column",
+                "value": "12"
+              }
+            ]
           }
         ]
       }
@@ -2187,7 +2195,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Multiline Input",
         "collapsible": false,
         "fields": [
           {
@@ -2421,7 +2429,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Number Input",
         "collapsible": false,
         "fields": [
           {
@@ -2687,7 +2695,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Panel",
         "collapsible": false,
         "fields": [
           {
@@ -2968,7 +2976,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Radio Group",
         "collapsible": false,
         "fields": [
           {
@@ -3214,11 +3222,19 @@
     "id": "captcha",
     "fields": [
       {
-        "component": "text",
-        "name": "name",
-        "label": "Name",
-        "valueType": "string",
-        "required": true
+        "component": "container",
+        "name": "basic",
+        "label": "Captcha (Invisible)",
+        "collapsible": false,
+        "fields": [
+          {
+            "component": "text",
+            "name": "name",
+            "label": "Name",
+            "valueType": "string",
+            "required": true
+          }
+        ]
       }
     ]
   },
@@ -3228,7 +3244,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Reset Button",
         "collapsible": false,
         "fields": [
           {
@@ -3350,7 +3366,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Submit Button",
         "collapsible": false,
         "fields": [
           {
@@ -3472,7 +3488,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Telephone Input",
         "collapsible": false,
         "fields": [
           {
@@ -3686,7 +3702,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Basic",
+        "label": "Text Input",
         "collapsible": false,
         "fields": [
           {
@@ -3920,7 +3936,7 @@
       {
         "component": "text",
         "name": "name",
-        "label": "Name",
+        "label": "Text",
         "valueType": "string",
         "required": true
       },

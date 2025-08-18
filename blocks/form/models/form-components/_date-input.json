@@ -23,7 +23,7 @@
                 {
                     "component": "container",
                     "name": "basic",
-                    "label": "Basic",
+                    "label": "Date Input",
                     "collapsible": false,
                     "fields": [
                         {
