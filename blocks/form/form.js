@@ -486,7 +486,7 @@ function addRequestContextToForm(formDef) {
         formDef.properties.queryParams = {};
       }
       urlParams?.forEach((value, key) => {
-        formDef.properties.queryParams[key] = value;
+        formDef.properties.queryParams[key?.toLowerCase()] = value;
       });
     } catch (e) {
       console.warn('Error reading URL parameters:', e);

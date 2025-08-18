@@ -33,6 +33,8 @@ import { LOG_LEVEL } from '../constant.js';
 import { createOptimizedPicture } from '../../../scripts/aem.js';
 
 const formSubscriptions = {};
+const formModels = {};
+const renderPromises = {};
 
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
@@ -66,10 +68,21 @@ async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
     id, name, fieldType, ':type': componentType, readOnly, type, displayValue, displayFormat, displayValueExpression,
-    activeChild,
+    activeChild, qualifiedName,
   } = fieldModel;
   const field = form.querySelector(`#${id}`);
   if (!field) {
+    // Check if there's a pending render promise where qualifiedName is a substring
+    if (qualifiedName) {
+      const matchingKey = Object.keys(renderPromises).find((key) => qualifiedName.includes(key));
+      if (matchingKey) {
+        await renderPromises[matchingKey];
+        // Clear the promise after it's resolved
+        delete renderPromises[matchingKey];
+        // Retry field changed after the render is complete
+        await fieldChanged(payload, form, generateFormRendition);
+      }
+    }
     return;
   }
   const fieldWrapper = field?.closest('.field-wrapper');
@@ -200,7 +213,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
           const removeId = prevValue.id;
           field?.querySelector(`#${removeId}`)?.remove();
         } else {
-          generateFormRendition({ items: [currentValue] }, field?.querySelector('.repeat-wrapper'));
+          const promise = generateFormRendition({ items: [currentValue] }, field?.querySelector('.repeat-wrapper'), form.dataset?.id);
+          renderPromises[currentValue?.qualifiedName] = promise;
         }
         break;
       case 'activeChild': handleActiveChild(activeChild, form);
@@ -299,14 +313,14 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data);
   window.myForm = form;
+  formModels[htmlForm.dataset?.id] = form;
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];
-  if (subscriptions) {
-    subscriptions.forEach((subscription, id) => {
-      const { callback, fieldDiv } = subscription;
-      const model = form.getElement(id);
-      callback(fieldDiv, model, 'register');
-    });
-  }
+  subscriptions?.forEach((subscription, id) => {
+    const { callback, fieldDiv } = subscription;
+    const model = form.getElement(id);
+    callback(fieldDiv, model, 'register');
+  });
+
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'fieldChanged');
@@ -401,6 +415,12 @@ export function subscribe(fieldDiv, formId, callback) {
     if (!subscriptions) {
       subscriptions = new Map();
       formSubscriptions[formId] = subscriptions;
+    }
+    // In case of custom components inside repeatable panels,
+    //  the subscribe callback is triggered after form is initialised
+    if (formModels[formId]) {
+      const form = formModels[formId];
+      callback(fieldDiv, form.getElement(fieldDiv?.dataset?.id), 'register');
     }
     // Add the new subscription to the existing map
     subscriptions.set(fieldDiv?.dataset?.id, { callback, fieldDiv });
