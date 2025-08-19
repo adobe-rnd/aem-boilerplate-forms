@@ -377,7 +377,7 @@
             "required": true,
             "valueFormat": "regexp",
             "validation": {
-              "regExp": "^(?!\\$)[A-Za-z0-9_-]+$",
+              "regExp": "^(?!\\$)[A-Za-z0-9_]+$",
               "customErrorMsg": "Name must only contain letters, numbers, underscores, or hyphens and cannot start with $"
             }
           },
@@ -3239,7 +3239,7 @@
             "required": true,
             "valueFormat": "regexp",
             "validation": {
-              "regExp": "^(?!\\$)[A-Za-z0-9_-]+$",
+              "regExp": "^(?!\\$)[A-Za-z0-9_]+$",
               "customErrorMsg": "Name must only contain letters, numbers, underscores, or hyphens and cannot start with $"
             }
           },
@@ -3361,7 +3361,7 @@
             "required": true,
             "valueFormat": "regexp",
             "validation": {
-              "regExp": "^(?!\\$)[A-Za-z0-9_-]+$",
+              "regExp": "^(?!\\$)[A-Za-z0-9_]+$",
               "customErrorMsg": "Name must only contain letters, numbers, underscores, or hyphens and cannot start with $"
             }
           },
