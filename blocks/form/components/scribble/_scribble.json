@@ -2,7 +2,7 @@
   "definitions": [
     {
       "title": "Scribble Signature",
-      "id": "sign",
+      "id": "scribble",
       "plugins": {
         "xwalk": {
           "page": {
