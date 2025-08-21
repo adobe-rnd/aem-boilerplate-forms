@@ -1,6 +1,6 @@
 import { loadCSS } from '../../scripts/aem.js';
 
-let customComponents = ['range', 'sign', 'test'];
+let customComponents = ['range', 'scribble'];
 const OOTBComponentDecorators = ['accordion', 'file', 'modal', 'password', 'rating', 'repeat', 'tnc', 'toggleable-link', 'wizard'];
 
 export function setCustomComponents(components) {
@@ -63,16 +63,16 @@ async function loadComponent(componentName, element, fd, container, formId) {
  * */
 export default async function componentDecorator(element, fd, container, formId) {
   const { ':type': type = '', fieldType } = fd;
+  if (getCustomComponents().includes(type) || getOOTBComponents().includes(type)) {
+    await loadComponent(type, element, fd, container, formId);
+  }
+
   if (fieldType === 'file-input') {
     await loadComponent('file', element, fd, container, formId);
   }
 
   if (type.endsWith('wizard')) {
     await loadComponent('wizard', element, fd, container, formId);
-  }
-
-  if (getCustomComponents().includes(type) || getOOTBComponents().includes(type)) {
-    await loadComponent(type, element, fd, container, formId);
   }
 
   return null;

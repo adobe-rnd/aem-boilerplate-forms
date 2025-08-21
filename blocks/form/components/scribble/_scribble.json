@@ -1,14 +1,14 @@
 {
   "definitions": [
     {
-      "title": "Sign",
+      "title": "Scribble Signature",
       "id": "sign",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/fd/components/form/fileinput/v2/fileinput",
             "template": {
-              "jcr:title": "Sign",
+              "jcr:title": "Scribble Signature",
               "fieldType": "file-input",
               "accept": [
                 "audio/*",
@@ -20,7 +20,7 @@
               "buttonText": "Attach",
               "dragDropText": "Drag and Drop To Upload",
               "type": "file",
-              "fd:viewType": "sign"
+              "fd:viewType": "scribble"
             }
           }
         }
@@ -29,7 +29,7 @@
   ],
   "models": [
     {
-      "id": "sign",
+      "id": "scribble",
       "fields": [
         {
           "component": "container",

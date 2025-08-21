@@ -35,6 +35,9 @@
     },
     { 
       "...": "./components/wizard/_wizard.json#/definitions" 
+    },
+    {
+      "...": "./components/scribble/_scribble.json#/definitions"
     }
   ],
   "models": [
@@ -215,7 +218,7 @@
         "tnc",
         "wizard",
         "range",
-        "sign"
+        "scribble"
       ]
     }
   ]

@@ -631,6 +631,32 @@
           }
         },
         {
+          "title": "Scribble Signature",
+          "id": "sign",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/fileinput/v2/fileinput",
+                "template": {
+                  "jcr:title": "Scribble Signature",
+                  "fieldType": "file-input",
+                  "accept": [
+                    "audio/*",
+                    "video/*",
+                    "image/*",
+                    "text/*",
+                    "application/pdf"
+                  ],
+                  "buttonText": "Attach",
+                  "dragDropText": "Drag and Drop To Upload",
+                  "type": "file",
+                  "fd:viewType": "scribble"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Fragment",
           "id": "fragment",
           "plugins": {
@@ -679,32 +705,6 @@
                   "fd:viewType": "range",
                   "enabled": true,
                   "visible": true
-                }
-              }
-            }
-          }
-        },
-        {
-          "title": "Sign",
-          "id": "sign",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/fileinput/v2/fileinput",
-                "template": {
-                  "jcr:title": "Sign",
-                  "fieldType": "file-input",
-                  "accept": [
-                    "audio/*",
-                    "video/*",
-                    "image/*",
-                    "text/*",
-                    "application/pdf"
-                  ],
-                  "buttonText": "Attach",
-                  "dragDropText": "Drag and Drop To Upload",
-                  "type": "file",
-                  "fd:viewType": "sign"
                 }
               }
             }

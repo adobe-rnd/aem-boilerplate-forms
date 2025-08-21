@@ -1,0 +1,154 @@
+/* Signature Canvas Container */
+.signature-canvas-container {
+  margin-bottom: 16px;
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Signature Canvas */
+.signature-canvas {
+  display: block;
+  margin: 0 auto;
+  cursor: crosshair;
+  border: 2px solid #e3f2fd;
+  border-radius: 4px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease;
+  width: 100%;
+  max-width: 400px;
+  height: 200px;
+}
+
+.signature-canvas:hover {
+  border-color: #2196f3;
+}
+
+.signature-canvas:active {
+  cursor: crosshair;
+  border-color: #1976d2;
+}
+
+/* Signature Controls */
+.signature-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Signature Clear Button - Styled as a blue button */
+.signature-clear-btn {
+  background-color: #2196f3;
+  border: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  min-width: 80px;
+}
+
+.signature-clear-btn:hover {
+  background-color: #1976d2;
+}
+
+.signature-clear-btn:active {
+  background-color: #0d47a1;
+}
+
+/* Signature Save Button - Hidden since we're using the file input */
+.signature-save-btn {
+  display: none;
+}
+
+/* Success Message */
+.signature-success-msg {
+  color: #28a745;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Drawing feedback */
+.signature-canvas.drawing {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .signature-canvas {
+    width: 100%;
+    max-width: 350px;
+    height: 150px;
+  }
+  
+  .signature-controls {
+    justify-content: center;
+    margin-top: 12px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .signature-canvas {
+    cursor: default;
+  }
+  
+  .signature-canvas:active {
+    border-color: #2196f3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+  }
+}
+
+/* High DPI display support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .signature-canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .signature-canvas {
+    background-color: #1a202c;
+    border-color: #4a5568;
+  }
+  
+  .signature-clear-btn {
+    background-color: #3182ce;
+  }
+  
+  .signature-clear-btn:hover {
+    background-color: #2c5aa0;
+  }
+  
+  .signature-clear-btn:active {
+    background-color: #1e3a8a;
+  }
+}
+

@@ -4,11 +4,10 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   // Access custom properties defined in the JSON
   const {
     buttonText = 'Draw Signature',
-    dragDropText = 'Draw your signature below',
     canvasWidth = 400,
     canvasHeight = 200,
     penColor = '#000000',
-    penWidth = 2
+    penWidth = 2,
   } = fieldJson?.properties || {};
 
   // Find the existing file input
@@ -22,55 +21,51 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   const canvas = document.createElement('canvas');
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
-  canvas.style.border = '1px solid #ccc';
-  canvas.style.borderRadius = '4px';
-  canvas.style.cursor = 'crosshair';
-  canvas.style.backgroundColor = '#ffffff';
   canvas.classList.add('signature-canvas');
+  // Ensure white background is applied
+  canvas.style.backgroundColor = '#ffffff';
 
   // Create canvas container
   const canvasContainer = document.createElement('div');
   canvasContainer.classList.add('signature-canvas-container');
-  canvasContainer.style.marginBottom = '16px';
   canvasContainer.appendChild(canvas);
 
   // Create control buttons
   const buttonContainer = document.createElement('div');
   buttonContainer.classList.add('signature-controls');
-  buttonContainer.style.marginBottom = '16px';
-  buttonContainer.style.display = 'flex';
-  buttonContainer.style.gap = '8px';
 
   const clearButton = document.createElement('button');
   clearButton.type = 'button';
-  clearButton.textContent = 'Clear';
+  clearButton.textContent = 'Reset';
   clearButton.classList.add('signature-clear-btn');
-  clearButton.style.padding = '8px 16px';
-  clearButton.style.border = '1px solid #ccc';
-  clearButton.style.borderRadius = '4px';
-  clearButton.style.backgroundColor = '#f8f9fa';
-  clearButton.style.cursor = 'pointer';
 
   const saveButton = document.createElement('button');
   saveButton.type = 'button';
   saveButton.textContent = buttonText;
   saveButton.classList.add('signature-save-btn');
-  saveButton.style.padding = '8px 16px';
-  saveButton.style.border = '1px solid #007cba';
-  saveButton.style.borderRadius = '4px';
-  saveButton.style.backgroundColor = '#007cba';
-  saveButton.style.color = '#ffffff';
-  saveButton.style.cursor = 'pointer';
 
   buttonContainer.appendChild(clearButton);
   buttonContainer.appendChild(saveButton);
 
-  // Insert canvas and controls before the file input
-  const fieldWrapper = fieldDiv.querySelector('.field-wrapper');
-  if (fieldWrapper) {
-    fieldWrapper.insertBefore(canvasContainer, fieldWrapper.firstChild);
-    fieldWrapper.insertBefore(buttonContainer, canvasContainer.nextSibling);
+  // Insert canvas and controls after the label
+  // First try to find the label in the fieldDiv
+  let label = fieldDiv.querySelector('label');
+
+  if (!label) {
+    // If no label found in fieldDiv, try to find it in field-wrapper
+    const fieldWrapper = fieldDiv.querySelector('.field-wrapper');
+    if (fieldWrapper) {
+      label = fieldWrapper.querySelector('label');
+    }
+  }
+
+  if (label) {
+    // Insert canvas container after the label
+    label.parentNode.insertBefore(canvasContainer, label.nextSibling);
+    // Insert button container after the canvas container
+    canvasContainer.parentNode.insertBefore(buttonContainer, canvasContainer.nextSibling);
   } else {
+    // Fallback: insert at beginning of fieldDiv if no label found
     fieldDiv.insertBefore(canvasContainer, fieldDiv.firstChild);
     fieldDiv.insertBefore(buttonContainer, canvasContainer.nextSibling);
   }
@@ -80,28 +75,64 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   let isDrawing = false;
   let lastX = 0;
   let lastY = 0;
+  let points = [];
 
   // Set canvas styles
   ctx.strokeStyle = penColor;
   ctx.lineWidth = penWidth;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  // Set canvas context background to white for drawing area
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Get canvas coordinates from client coordinates
+  function getCanvasCoordinates(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  }
+
+  // Draw smooth line between points
+  function drawSmoothLine() {
+    if (points.length < 2) return;
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+
+    for (let i = 1; i < points.length; i += 1) {
+      const point = points[i];
+      ctx.lineTo(point.x, point.y);
+    }
+
+    ctx.stroke();
+  }
 
   // Mouse events for drawing
   function startDrawing(e) {
     isDrawing = true;
-    const rect = canvas.getBoundingClientRect();
-    lastX = e.clientX - rect.left;
-    lastY = e.clientY - rect.top;
+    points = [];
+    const coords = getCanvasCoordinates(e.clientX, e.clientY);
+    lastX = coords.x;
+    lastY = coords.y;
+    points.push({ x: lastX, y: lastY });
   }
 
   function draw(e) {
     if (!isDrawing) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
 
+    const coords = getCanvasCoordinates(e.clientX, e.clientY);
+    const currentX = coords.x;
+    const currentY = coords.y;
+
+    // Add point to array
+    points.push({ x: currentX, y: currentY });
+
+    // Draw line from last point to current point
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(currentX, currentY);
@@ -112,28 +143,39 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   }
 
   function stopDrawing() {
-    isDrawing = false;
+    if (isDrawing) {
+      isDrawing = false;
+      // Draw final smooth line
+      drawSmoothLine();
+      points = [];
+    }
   }
 
   // Touch events for mobile devices
   function startDrawingTouch(e) {
     e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    lastX = touch.clientX - rect.left;
-    lastY = touch.clientY - rect.top;
     isDrawing = true;
+    points = [];
+    const touch = e.touches[0];
+    const coords = getCanvasCoordinates(touch.clientX, touch.clientY);
+    lastX = coords.x;
+    lastY = coords.y;
+    points.push({ x: lastX, y: lastY });
   }
 
   function drawTouch(e) {
     e.preventDefault();
     if (!isDrawing) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    const currentX = touch.clientX - rect.left;
-    const currentY = touch.clientY - rect.top;
 
+    const touch = e.touches[0];
+    const coords = getCanvasCoordinates(touch.clientX, touch.clientY);
+    const currentX = coords.x;
+    const currentY = coords.y;
+
+    // Add point to array
+    points.push({ x: currentX, y: currentY });
+
+    // Draw line from last point to current point
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(currentX, currentY);
@@ -144,7 +186,12 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   }
 
   function stopDrawingTouch() {
-    isDrawing = false;
+    if (isDrawing) {
+      isDrawing = false;
+      // Draw final smooth line
+      drawSmoothLine();
+      points = [];
+    }
   }
 
   // Add event listeners
@@ -167,8 +214,8 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   saveButton.addEventListener('click', () => {
     // Check if canvas has content
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const hasContent = imageData.data.some(channel => channel !== 0);
-    
+    const hasContent = imageData.data.some((channel) => channel !== 0);
+
     if (!hasContent) {
       alert('Please draw a signature before saving.');
       return;
@@ -180,36 +227,33 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
         // Create a File object from the blob
         const signatureFile = new File([blob], 'signature.png', {
           type: 'image/png',
-          lastModified: Date.now()
+          lastModified: Date.now(),
         });
 
         // Create a DataTransfer object to set the file input
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(signatureFile);
-        
+
         // Set the file input value
         fileInput.files = dataTransfer.files;
-        
+
         // Trigger change event
         const changeEvent = new Event('change', { bubbles: true });
         fileInput.dispatchEvent(changeEvent);
-        
+
         // Show success message
         const successMsg = document.createElement('div');
         successMsg.textContent = 'Signature saved successfully!';
-        successMsg.style.color = '#28a745';
-        successMsg.style.fontSize = '14px';
-        successMsg.style.marginTop = '8px';
         successMsg.classList.add('signature-success-msg');
-        
+
         // Remove existing success message if any
         const existingMsg = buttonContainer.querySelector('.signature-success-msg');
         if (existingMsg) {
           existingMsg.remove();
         }
-        
+
         buttonContainer.appendChild(successMsg);
-        
+
         // Auto-remove success message after 3 seconds
         setTimeout(() => {
           if (successMsg.parentNode) {
@@ -230,7 +274,8 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
 
   // Hide the original file input since we're using the canvas
   fileInput.style.display = 'none';
-  
+  fileInput.style.pointerEvents = 'none'; // Ensure it's unclickable
+
   // Also hide the drag and drop area if it exists
   const dragArea = fieldDiv.querySelector('.file-drag-area');
   if (dragArea) {

@@ -42,9 +42,6 @@
       "components": [
         {
           "...": "../blocks/form/components/range/_range.json#/definitions"
-        },
-        {
-          "...": "../blocks/form/components/sign/_sign.json#/definitions"
         }
       ]
     }
