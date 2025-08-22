@@ -25,14 +25,15 @@ function replaceInputs(element, model) {
       item.items?.forEach(processItem);
       return;
     }
+    const { fieldType, id } = item;
+
+    if (fieldType === 'button') {
+      element.querySelector(`[data-id="${id}"]`)?.remove();
+      return;
+    }
 
     if (!item.value || !item.id) return;
-
-    // Remove empty fields
-    element.querySelector(`[data-id="${item.id}"]`)?.remove();
-
     const divElement = createReviewFieldElement(item);
-    const { fieldType, id } = item;
 
     if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
       const group = element.querySelector(`fieldset[data-id="${id}"]`);
@@ -58,12 +59,13 @@ function replaceInputs(element, model) {
 }
 
 function render(element, fd, model) {
-  if (element.hasAttribute('data-rendered')) return;
+  element.innerHTML = ''; 
+  if (!model) return;
 
   const { form } = model;
   const { properties } = fd;
 
-  if (!properties?.panelNames || !form) return;
+  if (!properties?.panelNames) return;
 
   const panelModels = [];
   form.visit((field) => {
@@ -73,7 +75,7 @@ function render(element, fd, model) {
   });
 
   panelModels.forEach(async (field) => {
-    if (!field.isContainer && !field.value) return;
+    if (!field.isContainer) return;
 
     const panelWrapper = document.createElement('div');
     panelWrapper.className = `review-panel-wrapper ${field.name}`;
@@ -83,7 +85,7 @@ function render(element, fd, model) {
 
     if (!decoratedPanel) return;
 
-    element.setAttribute('data-rendered', 'true');
+    element.appendChild(panelWrapper);
   });
 }
 
