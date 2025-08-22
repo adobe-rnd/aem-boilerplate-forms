@@ -11,7 +11,7 @@ main .form .review-container label {
   position: relative;
 }
 
-main .form .review-container .field-wrapper:not(.panel-wrapper, .plain-text-wrapper, .file-wrapper) {
+main .form form:not(.edit-mode) .review-container .field-wrapper:not(.panel-wrapper, .plain-text-wrapper, .file-wrapper) {
   border-left: 3px solid var(--color-action-border-primary-disabled);
   padding-left: 1rem;
   padding-right: 1rem;
