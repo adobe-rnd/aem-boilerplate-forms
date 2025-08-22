@@ -4957,12 +4957,6 @@
             "valueType": "boolean"
           },
           {
-            "component": "datasource-bindref",
-            "name": "dataRef",
-            "label": "Bind reference",
-            "valueType": "string"
-          },
-          {
             "component": "boolean",
             "name": "unboundFormElement",
             "label": "Mark as Unbound Form Element",
@@ -4974,19 +4968,6 @@
             "label": "Show Component",
             "valueType": "boolean",
             "value": true
-          },
-          {
-            "component": "boolean",
-            "name": "enabled",
-            "label": "Enable Component",
-            "valueType": "boolean",
-            "value": true
-          },
-          {
-            "component": "boolean",
-            "name": "readOnly",
-            "label": "Read-only",
-            "valueType": "boolean"
           },
           {
             "component": "select",
