@@ -328,7 +328,7 @@ class ScribbleSignature {
   }
 }
 
-export default function decorate(fieldDiv, fieldJson, container, formId) {
+export default function decorate(fieldDiv, fieldJson) {
   try {
     /* eslint-disable no-new */
     new ScribbleSignature(fieldDiv, fieldJson);
