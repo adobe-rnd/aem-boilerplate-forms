@@ -1,5 +1,5 @@
 class ScribbleSignature {
-  constructor(fieldDiv, fieldJson, container, formId) {
+  constructor(fieldDiv, fieldJson) {
     this.fieldDiv = fieldDiv;
     this.fieldJson = fieldJson;
 
@@ -81,7 +81,16 @@ class ScribbleSignature {
 
   setupCanvas() {
     this.ctx = this.canvas.getContext('2d');
-    this.makeCanvasResponsive();
+
+    requestAnimationFrame(() => {
+      this.makeCanvasResponsive();
+    });
+
+    // Watch for container resize (mobile responsive fix)
+    const resizeObserver = new ResizeObserver(() => {
+      this.makeCanvasResponsive();
+    });
+    resizeObserver.observe(this.canvasContainer);
 
     // Set initial canvas styles
     this.ctx.strokeStyle = this.penColor;
@@ -93,28 +102,34 @@ class ScribbleSignature {
   }
 
   makeCanvasResponsive() {
-    const containerWidth = this.canvasContainer.offsetWidth;
-    if (containerWidth > 0) {
-      this.canvas.width = containerWidth;
-      this.canvas.height = this.canvasHeight;
+    const rect = this.canvasContainer.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
 
-      // Redraw with new dimensions
-      this.ctx.strokeStyle = this.penColor;
-      this.ctx.lineWidth = this.penWidth;
-      this.ctx.lineCap = 'round';
-      this.ctx.lineJoin = 'round';
-      this.ctx.fillStyle = '#ffffff';
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    }
+    // Match canvas resolution to its display size * devicePixelRatio
+    this.canvas.width = rect.width * ratio;
+    this.canvas.height = this.canvasHeight * ratio;
+
+    // CSS size stays the same
+    this.canvas.style.width = `${rect.width}px`;
+    this.canvas.style.height = `${this.canvasHeight}px`;
+
+    // Scale context so 1 unit = 1 CSS pixel
+    this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    // Reset styles + background
+    this.ctx.strokeStyle = this.penColor;
+    this.ctx.lineWidth = this.penWidth;
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   getCanvasCoordinates(clientX, clientY) {
     const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
     return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY,
+      x: clientX - rect.left,
+      y: clientY - rect.top,
     };
   }
 
@@ -140,7 +155,7 @@ class ScribbleSignature {
     this.lastX = coords.x;
     this.lastY = coords.y;
     this.points.push({ x: this.lastX, y: this.lastY });
-  }
+  };
 
   draw = (e) => {
     if (!this.isDrawing) return;
@@ -158,7 +173,7 @@ class ScribbleSignature {
 
     this.lastX = currentX;
     this.lastY = currentY;
-  }
+  };
 
   stopDrawing = () => {
     if (this.isDrawing) {
@@ -166,7 +181,7 @@ class ScribbleSignature {
       this.drawSmoothLine();
       this.points = [];
     }
-  }
+  };
 
   // Touch event handlers
   startDrawingTouch = (e) => {
@@ -178,7 +193,7 @@ class ScribbleSignature {
     this.lastX = coords.x;
     this.lastY = coords.y;
     this.points.push({ x: this.lastX, y: this.lastY });
-  }
+  };
 
   drawTouch = (e) => {
     e.preventDefault();
@@ -198,7 +213,7 @@ class ScribbleSignature {
 
     this.lastX = currentX;
     this.lastY = currentY;
-  }
+  };
 
   stopDrawingTouch = () => {
     if (this.isDrawing) {
@@ -206,12 +221,23 @@ class ScribbleSignature {
       this.drawSmoothLine();
       this.points = [];
     }
-  }
+  };
 
   // Button event handlers
   handleClear = () => {
+    // Clear the canvas
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  }
+
+    // Clear the file input value
+    this.fileInput.value = '';
+
+    // Clear the files property
+    this.fileInput.files = new DataTransfer().files;
+
+    // Trigger change event to notify the form
+    const changeEvent = new Event('change', { bubbles: true });
+    this.fileInput.dispatchEvent(changeEvent);
+  };
 
   handleSave = () => {
     // Check if canvas has content
@@ -230,7 +256,7 @@ class ScribbleSignature {
         this.showSuccessMessage();
       }
     }, 'image/png');
-  }
+  };
 
   saveSignatureAsFile(blob) {
     // Create a File object from the blob
@@ -305,7 +331,7 @@ class ScribbleSignature {
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   try {
     /* eslint-disable no-new */
-    new ScribbleSignature(fieldDiv, fieldJson, container, formId);
+    new ScribbleSignature(fieldDiv, fieldJson);
   } catch (error) {
     console.error('Failed to initialize scribble signature component:', error);
   }

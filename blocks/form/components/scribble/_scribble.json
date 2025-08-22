@@ -45,12 +45,6 @@
           "valueType": "string"
         },
         {
-          "component": "richtext",
-          "name": "dragDropText",
-          "label": "Drag Drop Text",
-          "valueType": "string"
-        },
-        {
           "...": "../../models/form-common/_help-container.json"
         },
         {
@@ -61,31 +55,6 @@
           "fields": [
             {
               "...": "../../models/form-common/_basic-validation-fields.json#/fields"
-            },
-            {
-              "component": "number",
-              "name": "maxFileSize",
-              "label": "Maximum file size (MB)",
-              "valueType": "string"
-            },
-            {
-              "component": "text",
-              "name": "maxFileSizeMessage",
-              "label": "Maximum file size error message",
-              "valueType": "string"
-            },
-            {
-              "component": "text",
-              "name": "accept",
-              "label": "Allowed file types",
-              "valueType": "string",
-              "multi": true
-            },
-            {
-              "component": "text",
-              "name": "acceptMessage",
-              "label": "File type error message",
-              "valueType": "string"
             }
           ]
         }

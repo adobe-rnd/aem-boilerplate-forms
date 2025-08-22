@@ -90,9 +90,14 @@
 .signature-success-msg {
   color: #28a745;
   font-size: 14px;
-  margin-top: 8px;
+  margin-top: 16px;
   text-align: center;
   animation: fadeIn 0.3s ease-in;
+  width: 100%;
+  padding: 8px;
+  background-color: #f8fff9;
+  border: 1px solid #d4edda;
+  border-radius: 4px;
 }
 
 @keyframes fadeIn {
