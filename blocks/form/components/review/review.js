@@ -59,7 +59,7 @@ function replaceInputs(element, model) {
 }
 
 function render(element, fd, model) {
-  element.innerHTML = ''; 
+  element.innerHTML = '';
   if (!model) return;
 
   const { form } = model;
