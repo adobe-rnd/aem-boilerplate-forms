@@ -26,9 +26,16 @@ main .form .review-panel-wrapper .checkbox-wrapper {
   margin: 5px;
 }
 
+main .form form.edit-mode .review-container .field-wrapper {
+  display: none;
+}
+
 main .form form.edit-mode .review-container::after {
   content: 'Review of selected panels appear here';
   font-size: 20px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
 }
