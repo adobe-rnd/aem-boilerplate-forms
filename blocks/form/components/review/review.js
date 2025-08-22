@@ -59,13 +59,14 @@ function replaceInputs(element, model) {
 }
 
 function render(element, fd, model) {
-  element.innerHTML = '';
   if (!model) return;
 
   const { form } = model;
   const { properties } = fd;
 
   if (!properties?.panelNames) return;
+
+  element.innerHTML = '';
 
   const panelModels = [];
   form.visit((field) => {
