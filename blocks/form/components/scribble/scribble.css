@@ -3,7 +3,7 @@
   margin-bottom: 16px;
   text-align: center;
   position: relative;
-  display: inline-block;
+  display: block;
   width: 100%;
 }
 
@@ -18,7 +18,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: border-color 0.2s ease;
   width: 100%;
-  max-width: 400px;
   height: 200px;
 }
 
@@ -34,15 +33,13 @@
 /* Signature Controls */
 .signature-controls {
   display: flex;
-  gap: 8px;
-  justify-content: flex-end;
+  gap: 12px;
+  justify-content: center;
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: 12px;
   position: relative;
   width: 100%;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  align-items: center;
 }
 
 /* Signature Clear Button - Styled as a blue button */
@@ -67,9 +64,26 @@
   background-color: #0d47a1;
 }
 
-/* Signature Save Button - Hidden since we're using the file input */
+/* Signature Save Button */
 .signature-save-btn {
-  display: none;
+  background-color: #4caf50;
+  border: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  min-width: 80px;
+}
+
+.signature-save-btn:hover {
+  background-color: #45a049;
+}
+
+.signature-save-btn:active {
+  background-color: #3d8b40;
 }
 
 /* Success Message */
@@ -102,13 +116,20 @@
 @media (max-width: 768px) {
   .signature-canvas {
     width: 100%;
-    max-width: 350px;
     height: 150px;
   }
   
   .signature-controls {
     justify-content: center;
     margin-top: 12px;
+    gap: 8px;
+  }
+  
+  .signature-clear-btn,
+  .signature-save-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+    min-width: 70px;
   }
 }
 
@@ -129,26 +150,6 @@
   .signature-canvas {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .signature-canvas {
-    background-color: #1a202c;
-    border-color: #4a5568;
-  }
-  
-  .signature-clear-btn {
-    background-color: #3182ce;
-  }
-  
-  .signature-clear-btn:hover {
-    background-color: #2c5aa0;
-  }
-  
-  .signature-clear-btn:active {
-    background-color: #1e3a8a;
   }
 }
 
