@@ -1,0 +1,45 @@
+{
+  "definitions": [
+     {
+        "title": "Review",
+        "id": "review",
+        "plugins": {
+           "xwalk": {
+              "page": {
+                 "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                 "template": {
+                    "jcr:title": "Review",
+                    "fieldType": "panel",
+                    "fd:viewType": "review"
+                 }
+              }
+           }
+        }
+     }
+  ],
+  "models": [
+     {
+        "id": "review",
+        "fields": [
+           {
+              "component": "container",
+              "name": "basic",
+              "label": "Basic",
+              "collapsible": false,
+              "...": "../../models/form-common/_basic-input-fields.json"
+           },
+           {
+              "component": "text",
+              "name": "panelNames",
+              "label": "Panel Names",
+              "valueType": "string",
+              "multi": true,
+              "required": true
+           },
+           {
+              "...": "../../models/form-common/_help-container.json"
+           }
+        ]
+     }
+  ]
+}
