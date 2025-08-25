@@ -516,14 +516,14 @@
           }
         },
         {
-          "title": "Password",
+          "title": "Password Field",
           "id": "password",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/fd/components/form/textinput/v1/textinput",
                 "template": {
-                  "jcr:title": "Password",
+                  "jcr:title": "Password Field",
                   "fieldType": "text-input",
                   "fd:viewType": "password"
                 }

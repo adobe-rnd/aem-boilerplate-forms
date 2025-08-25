@@ -21,11 +21,15 @@
   "models": [
     {
       "id": "plain-text",
+      "component": "container",
+      "name": "basic",
+      "label": "Static Text / Display Text",
+      "collapsible": false,
       "fields": [
         {
           "component": "text",
           "name": "name",
-          "label": "Static Text / Display Text",
+          "label": "Text",
           "valueType": "string",
           "required": true
         },
