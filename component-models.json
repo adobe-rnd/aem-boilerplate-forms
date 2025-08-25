@@ -377,8 +377,8 @@
             "required": true,
             "valueFormat": "regexp",
             "validation": {
-              "regExp": "^[^$].*",
-              "customErrorMsg": "Name cannot start with $"
+              "regExp": "^(?!\\$)[A-Za-z0-9_]+$",
+              "customErrorMsg": "Name must only contain letters, numbers, or underscores and cannot start with $"
             }
           },
           {
@@ -3255,8 +3255,8 @@
             "required": true,
             "valueFormat": "regexp",
             "validation": {
-              "regExp": "^[^$].*",
-              "customErrorMsg": "Name cannot start with $"
+              "regExp": "^(?!\\$)[A-Za-z0-9_]+$",
+              "customErrorMsg": "Name must only contain letters, numbers, or underscores and cannot start with $"
             }
           },
           {
@@ -3377,8 +3377,8 @@
             "required": true,
             "valueFormat": "regexp",
             "validation": {
-              "regExp": "^[^$].*",
-              "customErrorMsg": "Name cannot start with $"
+              "regExp": "^(?!\\$)[A-Za-z0-9_]+$",
+              "customErrorMsg": "Name must only contain letters, numbers, or underscores and cannot start with $"
             }
           },
           {
