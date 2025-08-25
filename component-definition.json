@@ -165,7 +165,7 @@
               "page": {
                 "resourceType": "core/fd/components/form/button/v1/button",
                 "template": {
-                  "jcr:title": "Button",
+                  "jcr:title": "Form Button",
                   "fieldType": "button"
                 }
               }
