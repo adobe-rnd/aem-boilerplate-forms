@@ -21,38 +21,40 @@
   "models": [
     {
       "id": "plain-text",
-      "component": "container",
-      "name": "basic",
-      "label": "Static Text / Display Text",
-      "collapsible": false,
       "fields": [
         {
-          "component": "text",
-          "name": "name",
-          "label": "Text",
-          "valueType": "string",
-          "required": true
-        },
-        {
-          "component": "text",
-          "name": "dataRef",
-          "label": "Bind reference",
-          "valueType": "string"
-        },
-        {
-          "component": "boolean",
-          "name": "visible",
-          "label": "Show Component",
-          "valueType": "boolean",
-          "value": true
-        },
-        {
-            "component": "select",
-            "name": "colspan",
-            "label": "Column Span",
-            "valueType": "string",
-            "value": "12",
-            "options": [
+          "component": "container",
+          "name": "basic",
+          "label": "Static Text / Display Text",
+          "collapsible": false,
+          "fields": [
+            {
+              "component": "text",
+              "name": "name",
+              "label": "Name",
+              "valueType": "string",
+              "required": true
+            },
+            {
+              "component": "text",
+              "name": "dataRef",
+              "label": "Bind reference",
+              "valueType": "string"
+            },
+            {
+              "component": "boolean",
+              "name": "visible",
+              "label": "Show Component",
+              "valueType": "boolean",
+              "value": true
+            },
+            {
+              "component": "select",
+              "name": "colspan",
+              "label": "Column Span",
+              "valueType": "string",
+              "value": "12",
+              "options": [
                 {
                     "name": "1 column",
                     "value": "1"
@@ -101,7 +103,9 @@
                     "name": "12 column",
                     "value": "12"
                 }
-            ]
+              ]
+            }
+          ]
         }
       ]
     }
