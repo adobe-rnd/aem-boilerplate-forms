@@ -1,14 +1,14 @@
 {
   "definitions": [
     {
-      "title": "Dropdown List",
+      "title": "Dropdown",
       "id": "drop-down",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
             "template": {
-              "jcr:title": "Drop Down List",
+              "jcr:title": "Dropdown",
               "fieldType": "drop-down",
               "enum": [
                 "0",
@@ -32,7 +32,7 @@
         {
           "component": "container",
           "name": "basic",
-          "label": "Drop Down List",
+          "label": "Dropdown",
           "collapsible": false,
           "fields": [
             {

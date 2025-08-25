@@ -1,14 +1,14 @@
 {
     "definitions": [
         {
-            "title": "Checkbox",
+            "title": "Single Checkbox",
             "id": "checkbox",
             "plugins": {
                 "xwalk": {
                     "page": {
                         "resourceType": "core/fd/components/form/checkbox/v1/checkbox",
                         "template": {
-                            "jcr:title": "Checkbox",
+                            "jcr:title": "Single Checkbox",
                             "fieldType": "checkbox",
                             "checkedValue": "on"
                         }
@@ -24,7 +24,7 @@
                 {
                     "component": "container",
                     "name": "basic",
-                    "label": "Checkbox",
+                    "label": "Single Checkbox",
                     "collapsible": false,
                     "fields": [
                         {

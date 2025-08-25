@@ -7,7 +7,7 @@
         {
           "component": "container",
           "name": "basic",
-          "label": "Multiline Input",
+          "label": "Text area",
           "collapsible": false,
           "fields": [
             {

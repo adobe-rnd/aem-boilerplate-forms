@@ -1,14 +1,14 @@
 {
     "definitions": [
         {
-            "title": "Email",
+            "title": "Email Field",
             "id": "email",
             "plugins": {
                 "xwalk": {
                     "page": {
                         "resourceType": "core/fd/components/form/emailinput/v1/emailinput",
                         "template": {
-                            "jcr:title": "Email Input",
+                            "jcr:title": "Email Field",
                             "fieldType": "email"
                         }
                     }
@@ -23,7 +23,7 @@
                 {
                     "component": "container",
                     "name": "basic",
-                    "label": "Email Input",
+                    "label": "Email Field",
                     "collapsible": false,
                     "fields": [
                         {

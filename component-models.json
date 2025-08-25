@@ -737,7 +737,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Checkbox",
+        "label": "Single Checkbox",
         "collapsible": false,
         "fields": [
           {
@@ -963,7 +963,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Date Input",
+        "label": "Date Picker",
         "collapsible": false,
         "fields": [
           {
@@ -1219,7 +1219,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Drop Down List",
+        "label": "Dropdown",
         "collapsible": false,
         "fields": [
           {
@@ -1459,7 +1459,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Email Input",
+        "label": "Email Field",
         "collapsible": false,
         "fields": [
           {
@@ -1687,7 +1687,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "File Attachment",
+        "label": "File Upload",
         "collapsible": false,
         "fields": [
           {
@@ -1898,7 +1898,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Fragment",
+        "label": "Form Fragment",
         "collapsible": false,
         "fields": [
           {
@@ -2195,7 +2195,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Multiline Input",
+        "label": "Text area",
         "collapsible": false,
         "fields": [
           {
@@ -2429,7 +2429,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Number Input",
+        "label": "Number Field",
         "collapsible": false,
         "fields": [
           {
@@ -2695,7 +2695,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Panel",
+        "label": "Panel / Section",
         "collapsible": false,
         "fields": [
           {
@@ -3224,7 +3224,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Captcha (Invisible)",
+        "label": "Captcha (Invisible reCAPTCHA)",
         "collapsible": false,
         "fields": [
           {
@@ -3244,7 +3244,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Reset Button",
+        "label": "Reset Form Button",
         "collapsible": false,
         "fields": [
           {
@@ -3366,7 +3366,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Submit Button",
+        "label": "Submit Form Button",
         "collapsible": false,
         "fields": [
           {
@@ -3488,7 +3488,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Telephone Input",
+        "label": "Phone Number Field",
         "collapsible": false,
         "fields": [
           {
@@ -3702,7 +3702,7 @@
       {
         "component": "container",
         "name": "basic",
-        "label": "Text Input",
+        "label": "Text Field",
         "collapsible": false,
         "fields": [
           {
@@ -3936,7 +3936,7 @@
       {
         "component": "text",
         "name": "name",
-        "label": "Text",
+        "label": "Static Text / Display Text",
         "valueType": "string",
         "required": true
       },

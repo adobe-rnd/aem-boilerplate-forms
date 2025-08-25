@@ -1,14 +1,14 @@
 {
     "definitions": [
         {
-            "title": "Number Input",
+            "title": "Number Field",
             "id": "number-input",
             "plugins": {
                 "xwalk": {
                     "page": {
                         "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                         "template": {
-                            "jcr:title": "Number Input",
+                            "jcr:title": "Number Field",
                             "fieldType": "number-input"
                         }
                     }
@@ -23,7 +23,7 @@
                 {
                     "component": "container",
                     "name": "basic",
-                    "label": "Number Input",
+                    "label": "Number Field",
                     "collapsible": false,
                     "fields": [
                         {
