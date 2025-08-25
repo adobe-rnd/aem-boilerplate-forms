@@ -44,7 +44,7 @@
         {
           "component": "container",
           "name": "basic",
-          "label": "To configure properties for the Adaptive Form such as submit action, prefill or thank you options,use the Edit Form Properties extension",
+          "label": "Use the Edit Form Properties extension to configure Adaptive Form properties, including Submit Action, Prefill, and Thank-You options.",
           "collapsible": false,
           "fields": []
         }
