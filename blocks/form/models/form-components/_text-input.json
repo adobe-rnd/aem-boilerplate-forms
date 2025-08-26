@@ -21,6 +21,12 @@
             "id": "text-input",
             "fields": [
                 {
+                    "component": "container",
+                    "name": "text-input",
+                    "label": "Text Input",
+                    "collapsible": "false"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"
