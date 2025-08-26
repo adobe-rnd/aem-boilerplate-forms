@@ -44,7 +44,9 @@
                 {
                     "component": "tab",
                     "label": "Validation",
-                    "name": "validation",
+                    "name": "validation"
+                },
+                {
                     "...": "../form-common/_string-validation-fields.json"
                 }
             ]

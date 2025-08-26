@@ -3858,7 +3858,9 @@
       {
         "component": "tab",
         "label": "Validation",
-        "name": "validation",
+        "name": "validation"
+      },
+      {
         "fields": [
           {
             "component": "boolean",
