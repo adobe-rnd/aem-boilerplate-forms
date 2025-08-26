@@ -22,33 +22,43 @@
             "fields": [
                 {
                     "component": "container",
-                    "name": "basic",
-                    "label": "Basic",
+                    "name": "text-input",
+                    "label": "Text Input",
                     "collapsible": false,
-                    "fields": [
-                        {
-                            "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
-                        },
-                        {
-                            "...": "../form-common/_basic-input-default-value-fields.json#/fields"
-                        },
-                        {
-                            "component": "boolean",
-                            "name": "multiLine",
-                            "label": "Allow multiple lines",
-                            "valueType": "boolean"
-                        }
-                    ]
+                    "fields": []
                 },
                 {
-                    "...": "../form-common/_help-container.json"
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
                 },
                 {
-                    "component": "container",
-                    "name": "validation",
+                    "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                },
+                {
+                    "...": "../form-common/_basic-input-default-value-fields.json#/fields"
+                },
+                {
+                    "component": "boolean",
+                    "name": "multiLine",
+                    "label": "Allow multiple lines",
+                    "valueType": "boolean"
+                },
+                {
+                    "component": "tab",
+                    "label": "Help Content",
+                    "name": "help"
+                },
+                {
+                    "...": "../form-common/_help-container.json#/fields"
+                },
+                {
+                    "component": "tab",
                     "label": "Validation",
-                    "collapsible": true,
-                    "...": "../form-common/_string-validation-fields.json"
+                    "name": "validation"
+                },
+                {
+                    "...": "../form-common/_string-validation-fields.json#/fields"
                 }
             ]
         }
