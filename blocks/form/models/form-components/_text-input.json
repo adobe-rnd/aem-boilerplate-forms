@@ -24,7 +24,7 @@
                     "component": "container",
                     "name": "text-input",
                     "label": "Text Input",
-                    "collapsible": "false"
+                    "collapsible": false
                 },
                 {
                     "component": "tab",
