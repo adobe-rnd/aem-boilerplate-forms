@@ -21,33 +21,30 @@
             "id": "text-input",
             "fields": [
                 {
-                    "component": "container",
-                    "name": "basic",
+                    "component": "tab",
                     "label": "Basic",
-                    "collapsible": false,
-                    "fields": [
-                        {
-                            "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
-                        },
-                        {
-                            "...": "../form-common/_basic-input-default-value-fields.json#/fields"
-                        },
-                        {
-                            "component": "boolean",
-                            "name": "multiLine",
-                            "label": "Allow multiple lines",
-                            "valueType": "boolean"
-                        }
-                    ]
+                    "name": "basic"
                 },
+                {
+                    "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                },
+                {
+                    "...": "../form-common/_basic-input-default-value-fields.json#/fields"
+                },
+                {
+                    "component": "boolean",
+                    "name": "multiLine",
+                    "label": "Allow multiple lines",
+                    "valueType": "boolean"
+                },
+
                 {
                     "...": "../form-common/_help-container.json"
                 },
                 {
-                    "component": "container",
-                    "name": "validation",
+                    "component": "tab",
                     "label": "Validation",
-                    "collapsible": true,
+                    "name": "validation",
                     "...": "../form-common/_string-validation-fields.json"
                 }
             ]
