@@ -39,7 +39,7 @@
                 },
 
                 {
-                    "...": "../form-common/_help-container.json"
+                    "...": "../form-common/_help-container.json#/fields"
                 },
                 {
                     "component": "tab",
