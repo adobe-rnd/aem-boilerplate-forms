@@ -47,7 +47,7 @@
                     "name": "validation"
                 },
                 {
-                    "...": "../form-common/_string-validation-fields.json"
+                    "...": "../form-common/_string-validation-fields.json#/fields"
                 }
             ]
         }
