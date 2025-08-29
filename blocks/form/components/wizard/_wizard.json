@@ -38,7 +38,7 @@
           "name": "basic"
         },
         {
-          "...": "../../models/form-common/_basic-input-fields.json"
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
         },
         {
           "...": "../../models/form-common/_help-container.json#/fields"
