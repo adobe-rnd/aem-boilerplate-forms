@@ -3859,10 +3859,11 @@
     "id": "accordion",
     "fields": [
       {
-        "component": "container",
-        "name": "basic",
+        "component": "tab",
         "label": "Basic",
-        "collapsible": false,
+        "name": "basic"
+      },
+      {
         "fields": [
           {
             "component": "text",
@@ -3980,25 +3981,21 @@
         ]
       },
       {
-        "fields": [
-          {
-            "component": "tab",
-            "label": "Help Content",
-            "name": "help"
-          },
-          {
-            "component": "richtext",
-            "name": "description",
-            "label": "Help text",
-            "valueType": "string"
-          },
-          {
-            "component": "richtext",
-            "name": "tooltip",
-            "label": "Short description",
-            "valueType": "string"
-          }
-        ]
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -4006,10 +4003,11 @@
     "id": "modal",
     "fields": [
       {
-        "component": "container",
-        "name": "basic",
+        "component": "tab",
         "label": "Basic",
-        "collapsible": false,
+        "name": "basic"
+      },
+      {
         "fields": [
           {
             "component": "text",
@@ -4127,25 +4125,21 @@
         ]
       },
       {
-        "fields": [
-          {
-            "component": "tab",
-            "label": "Help Content",
-            "name": "help"
-          },
-          {
-            "component": "richtext",
-            "name": "description",
-            "label": "Help text",
-            "valueType": "string"
-          },
-          {
-            "component": "richtext",
-            "name": "tooltip",
-            "label": "Short description",
-            "valueType": "string"
-          }
-        ]
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -4153,10 +4147,11 @@
     "id": "password",
     "fields": [
       {
-        "component": "container",
-        "name": "basic",
+        "component": "tab",
         "label": "Basic",
-        "collapsible": false,
+        "name": "basic"
+      },
+      {
         "fields": [
           {
             "component": "text",
@@ -4274,31 +4269,28 @@
         ]
       },
       {
-        "fields": [
-          {
-            "component": "tab",
-            "label": "Help Content",
-            "name": "help"
-          },
-          {
-            "component": "richtext",
-            "name": "description",
-            "label": "Help text",
-            "valueType": "string"
-          },
-          {
-            "component": "richtext",
-            "name": "tooltip",
-            "label": "Short description",
-            "valueType": "string"
-          }
-        ]
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
       },
       {
-        "component": "container",
-        "name": "validation",
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
+      },
+      {
+        "component": "tab",
         "label": "Validation",
-        "collapsible": true,
+        "name": "validation"
+      },
+      {
         "fields": [
           {
             "component": "boolean",
@@ -4370,10 +4362,11 @@
     "id": "range",
     "fields": [
       {
-        "component": "container",
-        "name": "basic",
+        "component": "tab",
         "label": "Basic",
-        "collapsible": false,
+        "name": "basic"
+      },
+      {
         "fields": [
           {
             "component": "text",
@@ -4491,31 +4484,28 @@
         ]
       },
       {
-        "fields": [
-          {
-            "component": "tab",
-            "label": "Help Content",
-            "name": "help"
-          },
-          {
-            "component": "richtext",
-            "name": "description",
-            "label": "Help text",
-            "valueType": "string"
-          },
-          {
-            "component": "richtext",
-            "name": "tooltip",
-            "label": "Short description",
-            "valueType": "string"
-          }
-        ]
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
       },
       {
-        "component": "container",
-        "name": "validation",
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
+      },
+      {
+        "component": "tab",
         "label": "Validation",
-        "collapsible": true,
+        "name": "validation"
+      },
+      {
         "fields": [
           {
             "component": "boolean",
@@ -4568,19 +4558,16 @@
         ]
       },
       {
-        "component": "container",
-        "name": "custom",
+        "component": "tab",
         "label": "Custom Properties",
-        "collapsible": true,
-        "fields": [
-          {
-            "component": "number",
-            "name": "stepValue",
-            "label": "Step Value",
-            "valueType": "number",
-            "description": "Step value for the range"
-          }
-        ]
+        "name": "custom"
+      },
+      {
+        "component": "number",
+        "name": "stepValue",
+        "label": "Step Value",
+        "valueType": "number",
+        "description": "Step value for the range"
       }
     ]
   },
@@ -4588,10 +4575,11 @@
     "id": "rating",
     "fields": [
       {
-        "component": "container",
-        "name": "basic",
+        "component": "tab",
         "label": "Basic",
-        "collapsible": false,
+        "name": "basic"
+      },
+      {
         "fields": [
           {
             "component": "text",
@@ -4709,31 +4697,28 @@
         ]
       },
       {
-        "fields": [
-          {
-            "component": "tab",
-            "label": "Help Content",
-            "name": "help"
-          },
-          {
-            "component": "richtext",
-            "name": "description",
-            "label": "Help text",
-            "valueType": "string"
-          },
-          {
-            "component": "richtext",
-            "name": "tooltip",
-            "label": "Short description",
-            "valueType": "string"
-          }
-        ]
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
       },
       {
-        "component": "container",
-        "name": "validation",
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
+      },
+      {
+        "component": "tab",
         "label": "Validation",
-        "collapsible": true,
+        "name": "validation"
+      },
+      {
         "fields": [
           {
             "component": "boolean",
@@ -4791,152 +4776,145 @@
     "id": "tnc",
     "fields": [
       {
-        "component": "container",
-        "name": "basic",
+        "component": "tab",
         "label": "Basic",
-        "collapsible": false,
-        "fields": [
+        "name": "basic"
+      },
+      {
+        "component": "text",
+        "name": "name",
+        "label": "Name",
+        "valueType": "string",
+        "required": true,
+        "valueFormat": "regexp",
+        "validation": {
+          "regExp": "^[^$].*",
+          "customErrorMsg": "Name cannot start with $"
+        }
+      },
+      {
+        "component": "text",
+        "name": "jcr:title",
+        "label": "Title",
+        "valueType": "string"
+      },
+      {
+        "component": "boolean",
+        "name": "hideTitle",
+        "label": "Hide title",
+        "valueType": "boolean"
+      },
+      {
+        "component": "datasource-bindref",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
+      },
+      {
+        "component": "boolean",
+        "name": "unboundFormElement",
+        "label": "Mark as Unbound Form Element",
+        "valueType": "boolean"
+      },
+      {
+        "component": "boolean",
+        "name": "visible",
+        "label": "Show Component",
+        "valueType": "boolean",
+        "value": true
+      },
+      {
+        "component": "boolean",
+        "name": "enabled",
+        "label": "Enable Component",
+        "valueType": "boolean",
+        "value": true
+      },
+      {
+        "component": "boolean",
+        "name": "readOnly",
+        "label": "Read-only",
+        "valueType": "boolean"
+      },
+      {
+        "component": "select",
+        "name": "colspan",
+        "label": "Column Span",
+        "valueType": "string",
+        "value": "12",
+        "options": [
           {
-            "component": "text",
-            "name": "name",
-            "label": "Name",
-            "valueType": "string",
-            "required": true,
-            "valueFormat": "regexp",
-            "validation": {
-              "regExp": "^[^$].*",
-              "customErrorMsg": "Name cannot start with $"
-            }
+            "name": "1 column",
+            "value": "1"
           },
           {
-            "component": "text",
-            "name": "jcr:title",
-            "label": "Title",
-            "valueType": "string"
+            "name": "2 column",
+            "value": "2"
           },
           {
-            "component": "boolean",
-            "name": "hideTitle",
-            "label": "Hide title",
-            "valueType": "boolean"
+            "name": "3 column",
+            "value": "3"
           },
           {
-            "component": "datasource-bindref",
-            "name": "dataRef",
-            "label": "Bind reference",
-            "valueType": "string"
+            "name": "4 column",
+            "value": "4"
           },
           {
-            "component": "boolean",
-            "name": "unboundFormElement",
-            "label": "Mark as Unbound Form Element",
-            "valueType": "boolean"
+            "name": "5 column",
+            "value": "5"
           },
           {
-            "component": "boolean",
-            "name": "visible",
-            "label": "Show Component",
-            "valueType": "boolean",
-            "value": true
+            "name": "6 column",
+            "value": "6"
           },
           {
-            "component": "boolean",
-            "name": "enabled",
-            "label": "Enable Component",
-            "valueType": "boolean",
-            "value": true
+            "name": "7 column",
+            "value": "7"
           },
           {
-            "component": "boolean",
-            "name": "readOnly",
-            "label": "Read-only",
-            "valueType": "boolean"
+            "name": "8 column",
+            "value": "8"
           },
           {
-            "component": "select",
-            "name": "colspan",
-            "label": "Column Span",
-            "valueType": "string",
-            "value": "12",
-            "options": [
-              {
-                "name": "1 column",
-                "value": "1"
-              },
-              {
-                "name": "2 column",
-                "value": "2"
-              },
-              {
-                "name": "3 column",
-                "value": "3"
-              },
-              {
-                "name": "4 column",
-                "value": "4"
-              },
-              {
-                "name": "5 column",
-                "value": "5"
-              },
-              {
-                "name": "6 column",
-                "value": "6"
-              },
-              {
-                "name": "7 column",
-                "value": "7"
-              },
-              {
-                "name": "8 column",
-                "value": "8"
-              },
-              {
-                "name": "9 column",
-                "value": "9"
-              },
-              {
-                "name": "10 column",
-                "value": "10"
-              },
-              {
-                "name": "11 column",
-                "value": "11"
-              },
-              {
-                "name": "12 column",
-                "value": "12"
-              }
-            ]
+            "name": "9 column",
+            "value": "9"
           },
           {
-            "component": "boolean",
-            "name": "showLink",
-            "label": "Replace consent text with weblink(s)",
-            "valueType": "boolean"
+            "name": "10 column",
+            "value": "10"
+          },
+          {
+            "name": "11 column",
+            "value": "11"
+          },
+          {
+            "name": "12 column",
+            "value": "12"
           }
         ]
       },
       {
-        "fields": [
-          {
-            "component": "tab",
-            "label": "Help Content",
-            "name": "help"
-          },
-          {
-            "component": "richtext",
-            "name": "description",
-            "label": "Help text",
-            "valueType": "string"
-          },
-          {
-            "component": "richtext",
-            "name": "tooltip",
-            "label": "Short description",
-            "valueType": "string"
-          }
-        ]
+        "component": "boolean",
+        "name": "showLink",
+        "label": "Replace consent text with weblink(s)",
+        "valueType": "boolean"
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -4944,10 +4922,11 @@
     "id": "wizard",
     "fields": [
       {
-        "component": "container",
-        "name": "basic",
+        "component": "tab",
         "label": "Basic",
-        "collapsible": false,
+        "name": "basic"
+      },
+      {
         "fields": [
           {
             "component": "text",
@@ -5065,25 +5044,21 @@
         ]
       },
       {
-        "fields": [
-          {
-            "component": "tab",
-            "label": "Help Content",
-            "name": "help"
-          },
-          {
-            "component": "richtext",
-            "name": "description",
-            "label": "Help text",
-            "valueType": "string"
-          },
-          {
-            "component": "richtext",
-            "name": "tooltip",
-            "label": "Short description",
-            "valueType": "string"
-          }
-        ]
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },

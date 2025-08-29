@@ -33,14 +33,15 @@
             "id": "accordion",
             "fields": [
                 {
-                    "component": "container",
-                    "name": "basic",
+                    "component": "tab",
                     "label": "Basic",
-                    "collapsible": false,
+                    "name": "basic"
+                },
+                {
                     "...": "../../models/form-common/_basic-input-fields.json"
                 },
                 {
-                    "...": "../../models/form-common/_help-container.json"
+                    "...": "../../models/form-common/_help-container.json#/fields"
                 }
             ]
         }

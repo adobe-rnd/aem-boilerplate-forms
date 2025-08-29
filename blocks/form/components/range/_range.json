@@ -24,36 +24,35 @@
         "id": "range",
         "fields": [
           {
-            "component": "container",
-            "name": "basic",
+            "component": "tab",
             "label": "Basic",
-            "collapsible": false,
+            "name": "basic"
+          },
+          {
             "...": "../../models/form-common/_basic-input-fields.json"
           },
           {
-            "...": "../../models/form-common/_help-container.json"
+            "...": "../../models/form-common/_help-container.json#/fields"
           },
           {
-            "component": "container",
-            "name": "validation",
+            "component": "tab",
             "label": "Validation",
-            "collapsible": true,
+            "name": "validation"
+          },
+          {
             "...": "../../models/form-common/_number-validation-fields.json"
           },
           {
-            "component": "container",
-            "name": "custom",
+            "component": "tab",
             "label": "Custom Properties",
-            "collapsible": true,
-            "fields": [
-              {
-                "component": "number",
-                "name": "stepValue",
-                "label": "Step Value",
-                "valueType": "number",
-                "description": "Step value for the range"
-              }
-            ]
+            "name": "custom"
+          },
+          {
+            "component": "number",
+            "name": "stepValue",
+            "label": "Step Value",
+            "valueType": "number",
+            "description": "Step value for the range"
           }
         ]
       }
