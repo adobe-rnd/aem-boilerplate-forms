@@ -29,7 +29,7 @@
             "name": "basic"
           },
           {
-            "...": "../../models/form-common/_basic-input-fields.json"
+            "...": "../../models/form-common/_basic-input-fields.json#/fields"
           },
           {
             "...": "../../models/form-common/_help-container.json#/fields"
@@ -40,7 +40,7 @@
             "name": "validation"
           },
           {
-            "...": "../../models/form-common/_number-validation-fields.json"
+            "...": "../../models/form-common/_number-validation-fields.json#/fields"
           },
           {
             "component": "tab",
