@@ -877,7 +877,7 @@
         "condition": {
           "===": [
             {
-              "var": "basic|enableUncheckedValue"
+              "var": "enableUncheckedValue"
             },
             true
           ]
@@ -2729,7 +2729,7 @@
         "condition": {
           "===": [
             {
-              "var": "repeat|repeatable"
+              "var": "repeatable"
             },
             true
           ]
@@ -2747,7 +2747,7 @@
             {
               "===": [
                 {
-                  "var": "repeat|repeatable"
+                  "var": "repeatable"
                 },
                 true
               ]
@@ -2755,7 +2755,7 @@
             {
               "!==": [
                 {
-                  "var": "repeat|variant"
+                  "var": "variant"
                 },
                 "noButtons"
               ]
@@ -2781,7 +2781,7 @@
         "condition": {
           "===": [
             {
-              "var": "repeat|repeatable"
+              "var": "repeatable"
             },
             true
           ]
@@ -2798,7 +2798,7 @@
             {
               "===": [
                 {
-                  "var": "repeat|variant"
+                  "var": "variant"
                 },
                 "addDeleteButtons"
               ]
@@ -2806,7 +2806,7 @@
             {
               "===": [
                 {
-                  "var": "repeat|repeatable"
+                  "var": "repeatable"
                 },
                 true
               ]
@@ -2825,7 +2825,7 @@
             {
               "===": [
                 {
-                  "var": "repeat|variant"
+                  "var": "variant"
                 },
                 "addDeleteButtons"
               ]
@@ -2833,7 +2833,7 @@
             {
               "===": [
                 {
-                  "var": "repeat|repeatable"
+                  "var": "repeatable"
                 },
                 true
               ]

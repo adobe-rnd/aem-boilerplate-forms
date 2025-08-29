@@ -69,7 +69,7 @@
                     "condition": {
                         "===": [
                             {
-                                "var": "basic|enableUncheckedValue"
+                                "var": "enableUncheckedValue"
                             },
                             true
                         ]
