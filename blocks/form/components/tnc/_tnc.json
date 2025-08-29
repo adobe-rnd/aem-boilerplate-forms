@@ -60,24 +60,21 @@
       "id": "tnc",
       "fields": [
         {
-          "component": "container",
-          "name": "basic",
+          "component": "tab",
           "label": "Basic",
-          "collapsible": false,
-          "fields": [
-            {
-              "...": "../../models/form-common/_basic-input-fields.json#/fields"
-            },
-            {
-              "component": "boolean",
-              "name": "showLink",
-              "label": "Replace consent text with weblink(s)",
-              "valueType": "boolean"
-            }
-          ]
+          "name": "basic"
         },
         {
-        "...": "../../models/form-common/_help-container.json"
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "component": "boolean",
+          "name": "showLink",
+          "label": "Replace consent text with weblink(s)",
+          "valueType": "boolean"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
         }
       ]
     }
