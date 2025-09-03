@@ -22,16 +22,17 @@
         {
             "id": "modal",
             "fields": [
-                {
-                    "component": "container",
-                    "name": "basic",
-                    "label": "Basic",
-                    "collapsible": false,
-                    "...": "../../models/form-common/_basic-input-fields.json"
-                },
-                {
-                    "...": "../../models/form-common/_help-container.json"
-                }
+              {
+                "component": "tab",
+                "label": "Basic",
+                "name": "basic"
+              },
+              {
+                "...": "../../models/form-common/_basic-input-fields.json#/fields"
+              },
+              {
+                "...": "../../models/form-common/_help-container.json#/fields"
+              }
             ]
         }
     ]
