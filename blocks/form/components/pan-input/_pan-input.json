@@ -1,0 +1,99 @@
+{
+  "definitions": [
+    {
+      "title": "PAN Input",
+      "id": "pan-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/textinput/v1/textinput",
+            "template": {
+              "jcr:title": "PAN Input",
+              "fieldType": "text-input",
+              "fd:viewType": "pan-input",
+              "maxLength": 10,
+              "placeholder": "ABCDE1234F"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "pan-input",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-default-value-fields.json#/fields"
+        },
+        {
+          "component": "text",
+          "name": "fourthCharacter",
+          "label": "Fourth Character",
+          "valueType": "string",
+          "value": "P",
+          "description": "The character that should appear in the 4th position (default: P)"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        },
+        {
+          "component": "text",
+          "name": "invalidFormatMessage",
+          "label": "Invalid Format Error Message",
+          "valueType": "string",
+          "value": "PAN must be in format: 5 letters, 4 numbers, 1 letter",
+          "description": "Error message shown when PAN format is invalid"
+        },
+        {
+          "component": "text",
+          "name": "invalidFirstFiveMessage",
+          "label": "Invalid First 5 Characters Error Message",
+          "valueType": "string",
+          "value": "First 5 characters must be letters",
+          "description": "Error message shown when first 5 characters are not letters"
+        },
+        {
+          "component": "text",
+          "name": "invalidMiddleFourMessage",
+          "label": "Invalid Middle 4 Characters Error Message",
+          "valueType": "string",
+          "value": "Characters 6-9 must be numbers",
+          "description": "Error message shown when middle 4 characters are not numbers"
+        },
+        {
+          "component": "text",
+          "name": "invalidLastCharacterMessage",
+          "label": "Invalid Last Character Error Message",
+          "valueType": "string",
+          "value": "Last character must be a letter",
+          "description": "Error message shown when last character is not a letter"
+        },
+        {
+          "component": "text",
+          "name": "invalidFourthCharacterMessage",
+          "label": "Invalid Fourth Character Error Message",
+          "valueType": "string",
+          "value": "Fourth character must be the specified character",
+          "description": "Error message shown when fourth character doesn't match the configured value"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+/* PAN Input Component Styles */
+
+.pan-input-wrapper {
+  position: relative;
+}
+
+.pan-input-wrapper .pan-input {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Visual formatting to show PAN structure */
+.pan-input-wrapper .pan-input {
+  background-image: 
+    linear-gradient(90deg, transparent 0%, transparent 49%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1) 51%, transparent 52%),
+    linear-gradient(90deg, transparent 0%, transparent 49%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1) 51%, transparent 52%);
+  background-size: 20% 100%, 20% 100%;
+  background-position: 0% 0%, 50% 0%;
+  background-repeat: no-repeat;
+}
+
+/* Focus state */
+.pan-input-wrapper .pan-input:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* Invalid state */
+.pan-input-wrapper.field-invalid .pan-input {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 1px #d32f2f;
+}
+
+.pan-input-wrapper.field-invalid .field-description {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+/* Valid state */
+.pan-input-wrapper:not(.field-invalid) .pan-input:valid {
+  border-color: #2e7d32;
+}
+
+/* Placeholder styling */
+.pan-input-wrapper .pan-input::placeholder {
+  color: #666;
+  opacity: 0.7;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pan-input-wrapper .pan-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Accessibility improvements */
+.pan-input-wrapper .pan-input:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .pan-input-wrapper .pan-input {
+    border-width: 2px;
+  }
+  
+  .pan-input-wrapper.field-invalid .pan-input {
+    border-color: #ff0000;
+  }
+}
