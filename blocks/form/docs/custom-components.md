@@ -147,7 +147,7 @@ Example: For creating or updating error messages for components we can re-use th
 - **Callback Signature:**
   - The callback receives two arguments:
     1. `element`: The HTML element for the field.
-    2. `fieldModel`: An object representing the field's state and events.
+    2. `fieldModel`: An object representing the field's state and events (created by `afb-runtime.js`).
 - To listen to value changes or custom events, use `fieldModel.subscribe((event) => { ... }, 'eventName')` inside your callback. The `event` object contains details about what changed.
 - **Example: Countdown Timer**
   ```js
@@ -168,6 +168,102 @@ Example: For creating or updating error messages for components we can re-use th
   }
   ```
 - This allows your component to update its UI or perform logic whenever the field value or properties change programmatically, or when a custom event is triggered.
+
+---
+
+## FieldModel API Reference
+
+The `fieldModel` object passed to your `subscribe` callback is an instance of the `Field` class from `afb-runtime.js`. It provides access to the field's state and methods for programmatic control.
+
+### Core Properties (Getters/Setters)
+
+#### Field State Properties
+- **`value`** - Get/set the field's current value
+- **`visible`** - Get/set field visibility (boolean)
+- **`enabled`** - Get/set field enabled state (boolean)
+- **`readOnly`** - Get/set field read-only state (boolean)
+- **`required`** - Get/set field required state (boolean)
+- **`valid`** - Get/set field validation state (boolean)
+
+#### Field Configuration Properties
+- **`enum`** - Get/set available options for dropdown/radio/checkbox groups
+- **`enumNames`** - Get/set display names for enum options
+- **`maximum`** - Get/set maximum value (for number/date fields)
+- **`minimum`** - Get/set minimum value (for number/date fields)
+- **`placeholder`** - Get placeholder text
+- **`tooltip`** - Get tooltip text
+- **`description`** - Get/set field description/help text
+- **`label`** - Get/set field label object
+- **`errorMessage`** - Get/set custom error message
+- **`constraintMessage`** - Set constraint-specific error messages
+
+#### Field Metadata Properties
+- **`id`** - Field's unique identifier
+- **`name`** - Field's name attribute
+- **`fieldType`** - Type of field (e.g., 'text-input', 'drop-down')
+- **`type`** - Data type (e.g., 'string', 'number', 'boolean')
+- **`properties`** - Custom properties object (access via `fieldModel.properties.customProperty`)
+
+### Core Methods
+
+#### Event Handling
+- **`subscribe(callback, eventName)`** - Subscribe to field changes or custom events
+- **`dispatch(action)`** - Dispatch custom events or actions
+- **`queueEvent(action)`** - Queue an event for processing
+
+#### Field Control
+- **`focus()`** - Set focus to the field
+- **`reset()`** - Reset field to default state
+- **`validate()`** - Trigger field validation
+- **`markAsInvalid(message, constraint)`** - Mark field as invalid with custom message
+
+#### Data Management
+- **`getDataNode()`** - Get the underlying data node
+- **`updateDataNodeAndTypedValue(value)`** - Update field value and data model
+
+### Important Notes
+
+1. **Property Access**: All properties are reactive - changing them will trigger appropriate events and update the form model.
+
+2. **Custom Properties**: Access custom properties defined in your JSON schema via `fieldModel.properties.propertyName`.
+
+3. **Event Subscription**: The `subscribe` method returns an object with an `unsubscribe()` method for cleanup.
+
+4. **Validation**: Use `markAsInvalid()` to set custom error messages, or modify `errorMessage` property.
+
+5. **Data Binding**: The fieldModel automatically handles data binding to the form's data model.
+
+### Example Usage in Custom Components
+
+```js
+import { subscribe } from '../../rules/index.js';
+
+export default function decorate(element, fd, container, formId) {
+  subscribe(element, formId, (_fieldDiv, fieldModel) => {
+    // Listen to value changes
+    fieldModel.subscribe((event) => {
+      const changes = event.payload.changes;
+      changes.forEach(change => {
+        if (change.propertyName === 'value') {
+          console.log('Value changed:', change.currentValue);
+          // Update your custom UI based on new value
+        }
+      });
+    }, 'change');
+
+    // Programmatically update field properties
+    fieldModel.visible = true;
+    fieldModel.enabled = false;
+    fieldModel.value = 'new value';
+    
+    // Set custom error message
+    fieldModel.markAsInvalid('Custom validation failed', 'custom');
+    
+    // Access custom properties
+    const customProp = fieldModel.properties.myCustomProperty;
+  });
+}
+```
 
 
 

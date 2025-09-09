@@ -57,7 +57,7 @@ The view can subscribe to value change or enum change in case of a radio, checkb
         e?.payload?.changes.forEach((change) => {
             const {propertyName, currentValue} = change;
             // for radio, checkbox group and dropdown look for enum updates for other check for value updates
-            if(propertyName === 'enum|value') {
+            if(propertyName === 'enum' || propertyName === 'value') {
                 // logic to update the view 
                 updateView(element, currentValue);
             }
@@ -67,8 +67,10 @@ The view can subscribe to value change or enum change in case of a radio, checkb
   }
   ```
 
+**Note**: The `fieldModel` object is an instance of the `Field` class from `afb-runtime.js`. You can access field properties like `fieldModel.value`, `fieldModel.enum`, `fieldModel.visible`, etc., and call methods like `fieldModel.markAsInvalid()`, `fieldModel.focus()`, etc. See the [FieldModel API Reference](../custom-components.md#fieldmodel-api-reference) for complete details.
 
-  ### 3. Custom Event
+
+  ### 4. Custom Event
 
 User can dispatch a custom event on the fieldModel and expect the view to be updated.
 In such cases listen to the custom event using subscribe as shown below:
@@ -85,6 +87,8 @@ In such cases listen to the custom event using subscribe as shown below:
   }
   ```
 
+**Note**: You can also dispatch custom events using `fieldModel.dispatch(action)` or programmatically control the field using methods like `fieldModel.markAsInvalid()`, `fieldModel.focus()`, etc. See the [FieldModel API Reference](../custom-components.md#fieldmodel-api-reference) for complete details.
+
 
 ## API Reference
 
@@ -98,6 +102,15 @@ In such cases listen to the custom event using subscribe as shown below:
 - `fd.properties.*`: Custom component properties
 - `fd.fieldType`: Base component type
 - `fd[':type']`: Custom component identifier
+
+### FieldModel Object
+The `fieldModel` parameter in subscribe callbacks is an instance of the `Field` class from `afb-runtime.js`. It provides:
+
+**Properties**: `value`, `visible`, `enabled`, `readOnly`, `required`, `valid`, `enum`, `enumNames`, `maximum`, `minimum`, `placeholder`, `tooltip`, `description`, `label`, `errorMessage`, `id`, `name`, `fieldType`, `type`, `properties`
+
+**Methods**: `subscribe()`, `dispatch()`, `queueEvent()`, `focus()`, `reset()`, `validate()`, `markAsInvalid()`, `getDataNode()`, `updateDataNodeAndTypedValue()`
+
+For complete API details, see the [FieldModel API Reference](../custom-components.md#fieldmodel-api-reference).
 
 ## 🎲 Decision Tree
 
