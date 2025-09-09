@@ -132,6 +132,13 @@ npm run create:custom-component
 
 ---
 
+## Reusing Existing Utility Functions
+
+When creating custom components, it's important to leverage existing utility functions from `util.js` and `form.js` if required to avoid code duplication.
+
+
+---
+
 ## Listening to Field Changes: How `subscribe` Works
 - The `subscribe` function allows your component to react to changes in the field's value or other custom events.
 - When you call `subscribe(element, formId, callback)`, the system registers your callback to be notified when the field changes.
@@ -220,6 +227,59 @@ When defining fields in your custom component's JSON (for any field group—basi
 ---
 
 ## Step-by-Step: Creating a Custom Component
+
+### 📋 Recommended Workflow
+
+```
+1. Start: Need Custom Component
+   ↓
+2. Run Scaffolder Tool (npm run create:custom-component)
+   ↓
+3. Choose Name & Base Component
+   ↓
+4. Scaffolder Creates Files & Handles Wiring ✅
+   ↓
+5. Edit JSON: Add Custom Properties
+   ↓
+6. Edit JS: Add Component Logic
+   ↓
+7. Edit CSS: Add Custom Styles
+   ↓
+8. Run build:json (if JSON changes made)
+   ↓
+9. Component Ready! ✅
+```
+
+
+---
+
+### Method 1: Using Scaffolder Tool (Recommended) 
+
+1. **Run the scaffolder tool**:
+   ```sh
+   npm run create:custom-component
+   ```
+
+2. **Follow the prompts**:
+   - Enter component name (e.g., `countdown-timer`)
+   - Select base component to extend (e.g., `Button`)
+
+3. **Edit the generated files**:
+   - **JSON**: Add custom properties to `_countdown-timer.json`
+   - **JS**: Implement your component logic in `countdown-timer.js`
+   - **CSS**: Add custom styles to `countdown-timer.css`
+
+4. **Run build:json** (if you modified JSON):
+   ```sh
+   npm run build:json
+   ```
+
+**That's it!** The scaffolder handles all the complex wiring automatically.
+
+### Method 2: Manual Setup 
+
+**Only use this if you understand the full system architecture and need custom setup.**
+
 1. **Choose an OOTB component to extend** (e.g., button, drop-down, text-input, etc.).
 2. **Create a folder** in `blocks/form/components` with your component's name (e.g., `countdown-timer`).
 3. **Add a JS file** with the same name:
@@ -261,11 +321,12 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
 ---
 
 ## Best Practices
+
 - **Keep your component logic focused**: Only add/override what is necessary for your custom behavior.
 - **Leverage the base structure**: Use the OOTB HTML as your starting point.
 - **Use authorable properties**: Expose configurable options via the JSON schema.
 - **Namespace your CSS**: Avoid style collisions by using unique class names.
-- **Test with different field values and events**.
+- **Reuse existing utility functions**: Always check `util.js` and `form.js` for existing functions before implementing custom logic.
 
 ---
 
