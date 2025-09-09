@@ -677,6 +677,30 @@
           }
         },
         {
+          "title": "Dynamic Text",
+          "id": "dynamic-text",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/text/v1/text",
+                "template": {
+                  "jcr:title": "Dynamic Text",
+                  "fieldType": "plain-text",
+                  "fd:viewType": "dynamic-text",
+                  "enabled": true,
+                  "visible": true,
+                  "text": {
+                    "value": "Hello {{name}}, welcome to {{company}}!",
+                    "sling:resourceType": "core/fd/components/form/text/v1/text",
+                    "fieldType": "plain-text",
+                    "textIsRich": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Fragment",
           "id": "fragment",
           "plugins": {

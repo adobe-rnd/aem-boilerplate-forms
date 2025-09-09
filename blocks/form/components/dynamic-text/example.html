@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Text Component Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .example {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .dynamic-text-wrapper {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dynamic Text Component Example</h1>
+    
+    <div class="example">
+        <h2>Example 1: Welcome Message</h2>
+        <div class="dynamic-text-wrapper">
+            <p>Hello {{name}}, welcome to {{company}}! You have {{unreadCount}} unread messages.</p>
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="nameInput" placeholder="Enter name" value="John Doe">
+            <input type="text" id="companyInput" placeholder="Enter company" value="Acme Corp">
+            <input type="number" id="countInput" placeholder="Unread count" value="5">
+            <button onclick="updateWelcomeMessage()">Update Message</button>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Example 2: Order Confirmation</h2>
+        <div class="dynamic-text-wrapper">
+            <p>Thank you {{customerName}}! Your order #{{orderNumber}} totaling ${{totalAmount}} has been confirmed. Estimated delivery: {{deliveryDate}}.</p>
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="customerInput" placeholder="Customer name" value="Jane Smith">
+            <input type="text" id="orderInput" placeholder="Order number" value="ORD-12345">
+            <input type="text" id="amountInput" placeholder="Total amount" value="99.99">
+            <input type="text" id="dateInput" placeholder="Delivery date" value="2024-01-15">
+            <button onclick="updateOrderMessage()">Update Order Message</button>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Example 3: Rich Text with HTML</h2>
+        <div class="dynamic-text-wrapper">
+            <p>Hello <strong>{{name}}</strong>,<br>Your order <em>{{orderId}}</em> is ready for pickup at <strong>{{location}}</strong>!</p>
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="richNameInput" placeholder="Name" value="Alice Johnson">
+            <input type="text" id="richOrderInput" placeholder="Order ID" value="ORD-67890">
+            <input type="text" id="richLocationInput" placeholder="Location" value="Store Location B">
+            <button onclick="updateRichMessage()">Update Rich Message</button>
+        </div>
+    </div>
+
+    <script>
+        // Simulate the dynamic text component functionality
+        function substituteProperties(textContent, properties) {
+            if (!textContent || !properties) return textContent;
+            
+            let result = textContent;
+            
+            Object.keys(properties).forEach((propName) => {
+                const placeholderPattern = `{{${propName}}}`;
+                const value = properties[propName];
+                
+                let stringValue = '';
+                if (value !== null && value !== undefined) {
+                    if (typeof value === 'object') {
+                        stringValue = JSON.stringify(value);
+                    } else {
+                        stringValue = String(value);
+                    }
+                }
+                
+                const escapedPlaceholder = placeholderPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                result = result.replace(new RegExp(escapedPlaceholder, 'g'), stringValue);
+            });
+            
+            return result;
+        }
+
+        function updateWelcomeMessage() {
+            const name = document.getElementById('nameInput').value;
+            const company = document.getElementById('companyInput').value;
+            const count = document.getElementById('countInput').value;
+            
+            const template = "Hello {{name}}, welcome to {{company}}! You have {{unreadCount}} unread messages.";
+            const properties = { name, company, unreadCount: count };
+            
+            const result = substituteProperties(template, properties);
+            document.querySelector('.example:nth-child(2) .dynamic-text-wrapper p').textContent = result;
+        }
+
+        function updateOrderMessage() {
+            const customer = document.getElementById('customerInput').value;
+            const order = document.getElementById('orderInput').value;
+            const amount = document.getElementById('amountInput').value;
+            const date = document.getElementById('dateInput').value;
+            
+            const template = "Thank you {{customerName}}! Your order #{{orderNumber}} totaling ${{totalAmount}} has been confirmed. Estimated delivery: {{deliveryDate}}.";
+            const properties = { customerName: customer, orderNumber: order, totalAmount: amount, deliveryDate: date };
+            
+            const result = substituteProperties(template, properties);
+            document.querySelector('.example:nth-child(3) .dynamic-text-wrapper p').textContent = result;
+        }
+
+        function updateRichMessage() {
+            const name = document.getElementById('richNameInput').value;
+            const order = document.getElementById('richOrderInput').value;
+            const location = document.getElementById('richLocationInput').value;
+            
+            const template = "Hello <strong>{{name}}</strong>,<br>Your order <em>{{orderId}}</em> is ready for pickup at <strong>{{location}}</strong>!";
+            const properties = { name, orderId: order, location };
+            
+            const result = substituteProperties(template, properties);
+            document.querySelector('.example:nth-child(4) .dynamic-text-wrapper p').innerHTML = result;
+        }
+
+        // Initialize with default values
+        updateWelcomeMessage();
+        updateOrderMessage();
+        updateRichMessage();
+    </script>
+</body>
+</html>

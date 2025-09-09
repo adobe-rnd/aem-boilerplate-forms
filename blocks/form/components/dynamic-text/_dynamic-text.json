@@ -1,0 +1,92 @@
+{
+  "definitions": [
+    {
+      "title": "Dynamic Text",
+      "id": "dynamic-text",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/text/v1/text",
+            "template": {
+              "jcr:title": "Dynamic Text",
+              "fieldType": "plain-text",
+              "fd:viewType": "dynamic-text",
+              "enabled": true,
+              "visible": true,
+              "text": {
+                "value": "Hello {{name}}, welcome to {{company}}!",
+                "sling:resourceType": "core/fd/components/form/text/v1/text",
+                "fieldType": "plain-text",
+                "textIsRich": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "dynamic-text",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Dynamic Text Properties",
+          "name": "dynamic"
+        },
+        {
+          "component": "richtext",
+          "name": "text",
+          "label": "Text Template",
+          "valueType": "string",
+          "description": "Text template with placeholders in the format {{propertyName}}. These will be replaced with actual property values when set programmatically.",
+          "default": "Hello {{name}}, welcome to {{company}}!",
+          "required": true
+        },
+        {
+          "component": "text",
+          "name": "placeholder",
+          "label": "Placeholder Format",
+          "valueType": "string",
+          "description": "The format for placeholders in the text (default: {{propertyName}})",
+          "default": "{{propertyName}}"
+        },
+        {
+          "component": "boolean",
+          "name": "enableRichText",
+          "label": "Enable Rich Text",
+          "valueType": "boolean",
+          "description": "Allow HTML formatting in the text template",
+          "default": false
+        },
+        {
+          "component": "text",
+          "name": "emptyTextMessage",
+          "label": "Empty Text Message",
+          "valueType": "string",
+          "description": "Message to display when no text template is provided",
+          "default": "No text template provided"
+        },
+        {
+          "component": "text",
+          "name": "updateEvent",
+          "label": "Custom Update Event",
+          "valueType": "string",
+          "description": "Custom event name to listen for text updates (optional)",
+          "default": "updateText"
+        }
+      ]
+    }
+  ]
+}

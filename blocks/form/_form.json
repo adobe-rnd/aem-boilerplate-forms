@@ -41,6 +41,9 @@
     },
     { 
       "...": "./components/others-checkbox/_others-checkbox.json#/definitions" 
+    },
+    { 
+      "...": "./components/dynamic-text/_dynamic-text.json#/definitions" 
     }
   ],
   "models": [
@@ -222,7 +225,8 @@
         "wizard",
         "range",
         "pan-input",
-        "others-checkbox"
+        "others-checkbox",
+        "dynamic-text"
       ]
     }
   ]

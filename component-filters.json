@@ -70,7 +70,8 @@
       "wizard",
       "range",
       "pan-input",
-      "others-checkbox"
+      "others-checkbox",
+      "dynamic-text"
     ]
   }
 ]

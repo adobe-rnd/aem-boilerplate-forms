@@ -1,0 +1,39 @@
+/* Dynamic Text Component Styles */
+.dynamic-text-wrapper {
+  margin: 1rem 0;
+}
+
+.dynamic-text-wrapper p,
+.dynamic-text-wrapper div,
+.dynamic-text-wrapper span {
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.dynamic-text-wrapper.field-invalid p,
+.dynamic-text-wrapper.field-invalid div,
+.dynamic-text-wrapper.field-invalid span {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+/* Placeholder styling for empty text */
+.dynamic-text-wrapper.empty-text p,
+.dynamic-text-wrapper.empty-text div,
+.dynamic-text-wrapper.empty-text span {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Animation for text updates */
+.dynamic-text-wrapper p,
+.dynamic-text-wrapper div,
+.dynamic-text-wrapper span {
+  transition: all 0.3s ease-in-out;
+}
