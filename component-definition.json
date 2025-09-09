@@ -689,12 +689,9 @@
                   "fd:viewType": "dynamic-text",
                   "enabled": true,
                   "visible": true,
-                  "text": {
-                    "value": "Hello {{name}}, welcome to {{company}}!",
-                    "sling:resourceType": "core/fd/components/form/text/v1/text",
-                    "fieldType": "plain-text",
-                    "textIsRich": false
-                  }
+                  "value": "Hello {{name}}, welcome to {{company}}!",
+                  "sling:resourceType": "core/fd/components/form/text/v1/text",
+                  "textIsRich": true
                 }
               }
             }
