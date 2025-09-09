@@ -723,7 +723,8 @@
                     "Elderberry"
                   ],
                   "type": "string",
-                  "placeholder": "Type to search..."
+                  "placeholder": "Type to search...",
+                  "sling:resourceType": "core/fd/components/form/dropdown/v1/dropdown"
                 }
               }
             }
