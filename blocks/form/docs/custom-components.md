@@ -169,6 +169,43 @@ Example: For creating or updating error messages for components we can re-use th
   ```
 - This allows your component to update its UI or perform logic whenever the field value or properties change programmatically, or when a custom event is triggered.
 
+### Important: Subscribe Callback Invocation Timing
+
+**Critical**: The callback passed to the `subscribe` method is **only invoked during form initialization**, not on every field change. The `fieldModel` object passed as an argument to this callback is the live model instance for the field.
+
+**Key Points:**
+- The callback runs **once** when the form initializes and the field is ready
+- The `fieldModel` parameter is the actual field model instance that persists throughout the form's lifecycle
+- If you need to update any model property, it should be done directly on this `fieldModel` object
+- Use `fieldModel.subscribe()` inside the callback to listen for ongoing changes to the field
+
+**Example:**
+```js
+import { subscribe } from '../../rules/index.js';
+
+export default function decorate(element, fd, container, formId) {
+  subscribe(element, formId, (_fieldDiv, fieldModel) => {
+    // This callback runs ONCE during form initialization
+    // fieldModel is the live model instance for this field
+    
+    // Update model properties directly on fieldModel
+    fieldModel.visible = true;
+    fieldModel.enabled = false;
+    
+    // Listen for ongoing changes using fieldModel.subscribe()
+    fieldModel.subscribe((event) => {
+      // This callback runs whenever the field changes
+      const changes = event.payload.changes;
+      changes.forEach(change => {
+        if (change.propertyName === 'value') {
+          console.log('Value changed:', change.currentValue);
+        }
+      });
+    }, 'change');
+  });
+}
+```
+
 ---
 
 ## FieldModel API Reference

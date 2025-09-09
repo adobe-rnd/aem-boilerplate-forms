@@ -69,6 +69,8 @@ The view can subscribe to value change or enum change in case of a radio, checkb
 
 **Note**: The `fieldModel` object is an instance of the `Field` class from `afb-runtime.js`. You can access field properties like `fieldModel.value`, `fieldModel.enum`, `fieldModel.visible`, etc., and call methods like `fieldModel.markAsInvalid()`, `fieldModel.focus()`, etc. See the [FieldModel API Reference](../custom-components.md#fieldmodel-api-reference) for complete details.
 
+**Important**: The callback passed to `subscribe()` is **only invoked during form initialization**. The `fieldModel` parameter is the live model instance that persists throughout the form's lifecycle. If you need to update any model property, it should be done directly on this `fieldModel` object.
+
 
   ### 4. Custom Event
 
@@ -88,6 +90,8 @@ In such cases listen to the custom event using subscribe as shown below:
   ```
 
 **Note**: You can also dispatch custom events using `fieldModel.dispatch(action)` or programmatically control the field using methods like `fieldModel.markAsInvalid()`, `fieldModel.focus()`, etc. See the [FieldModel API Reference](../custom-components.md#fieldmodel-api-reference) for complete details.
+
+**Important**: The callback passed to `subscribe()` is **only invoked during form initialization**. The `fieldModel` parameter is the live model instance that persists throughout the form's lifecycle. If you need to update any model property, it should be done directly on this `fieldModel` object.
 
 
 ## API Reference
