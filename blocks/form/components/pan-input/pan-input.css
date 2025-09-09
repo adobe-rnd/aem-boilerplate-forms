@@ -1,0 +1,92 @@
+/* PAN Input Component Styles */
+.pan-input-wrapper {
+  position: relative;
+}
+
+.pan-input-wrapper input {
+  font-family: 'Courier New', monospace;
+  font-size: 1.1em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.75rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 4px;
+  transition: border-color 0.2s ease-in-out;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pan-input-wrapper input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.pan-input-wrapper.field-invalid input {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.pan-input-wrapper input::placeholder {
+  color: #6c757d;
+  opacity: 1;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+}
+
+/* Visual format hint */
+.pan-input-wrapper::after {
+  content: "Format: ABCDE1234F";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.pan-input-wrapper:focus-within::after {
+  opacity: 1;
+}
+
+/* Error message styling */
+.pan-input-wrapper .field-description {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+.pan-input-wrapper.field-invalid .field-description {
+  display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pan-input-wrapper input {
+    font-size: 1rem;
+    padding: 0.625rem;
+  }
+  
+  .pan-input-wrapper::after {
+    font-size: 0.7rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .pan-input-wrapper input {
+    border-width: 3px;
+  }
+  
+  .pan-input-wrapper input:focus {
+    border-color: #000;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+  }
+  
+  .pan-input-wrapper.field-invalid input {
+    border-color: #d00;
+  }
+}

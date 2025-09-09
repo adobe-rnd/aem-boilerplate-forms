@@ -35,6 +35,9 @@
     },
     { 
       "...": "./components/wizard/_wizard.json#/definitions" 
+    },
+    { 
+      "...": "./components/pan-input/_pan-input.json#/definitions" 
     }
   ],
   "models": [
@@ -214,7 +217,8 @@
         "text-input",
         "tnc",
         "wizard",
-        "range"
+        "range",
+        "pan-input"
       ]
     }
   ]

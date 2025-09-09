@@ -1,0 +1,122 @@
+{
+  "definitions": [
+    {
+      "title": "PAN Input",
+      "id": "pan-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/textinput/v1/textinput",
+            "template": {
+              "jcr:title": "PAN Input",
+              "fieldType": "text-input",
+              "fd:viewType": "pan-input",
+              "name": "pan",
+              "required": true,
+              "maxLength": 10,
+              "minLength": 10,
+              "placeholder": "ABCDE1234F",
+              "fourthCharacter": "P",
+              "invalidFormatMessage": "PAN must be in format ABCDE1234F (5 letters, 4 numbers, 1 letter)",
+              "invalidFourthCharacterMessage": "Fourth character must be '{fourthCharacter}'",
+              "invalidFirstFiveMessage": "First 5 characters must be letters",
+              "invalidMiddleFourMessage": "Characters 6-9 must be numbers",
+              "invalidLastCharacterMessage": "Last character must be a letter",
+              "lengthErrorMessage": "PAN must be exactly 10 characters long"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "pan-input",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "component": "text",
+          "name": "fourthCharacter",
+          "label": "Fourth Character",
+          "valueType": "string",
+          "description": "The character that must appear in the 4th position (default: P)",
+          "default": "P"
+        },
+        {
+          "component": "text",
+          "name": "placeholder",
+          "label": "Placeholder",
+          "valueType": "string",
+          "description": "Placeholder text shown in the input field",
+          "default": "ABCDE1234F"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        },
+        {
+          "component": "text",
+          "name": "invalidFormatMessage",
+          "label": "Invalid Format Error Message",
+          "valueType": "string",
+          "description": "Error message shown when PAN format is invalid",
+          "default": "PAN must be in format ABCDE1234F (5 letters, 4 numbers, 1 letter)"
+        },
+        {
+          "component": "text",
+          "name": "invalidFourthCharacterMessage",
+          "label": "Invalid Fourth Character Error Message",
+          "valueType": "string",
+          "description": "Error message shown when 4th character is invalid",
+          "default": "Fourth character must be '{fourthCharacter}'"
+        },
+        {
+          "component": "text",
+          "name": "invalidFirstFiveMessage",
+          "label": "Invalid First Five Characters Error Message",
+          "valueType": "string",
+          "description": "Error message shown when first 5 characters are not letters",
+          "default": "First 5 characters must be letters"
+        },
+        {
+          "component": "text",
+          "name": "invalidMiddleFourMessage",
+          "label": "Invalid Middle Four Characters Error Message",
+          "valueType": "string",
+          "description": "Error message shown when characters 6-9 are not numbers",
+          "default": "Characters 6-9 must be numbers"
+        },
+        {
+          "component": "text",
+          "name": "invalidLastCharacterMessage",
+          "label": "Invalid Last Character Error Message",
+          "valueType": "string",
+          "description": "Error message shown when last character is not a letter",
+          "default": "Last character must be a letter"
+        },
+        {
+          "component": "text",
+          "name": "lengthErrorMessage",
+          "label": "Length Error Message",
+          "valueType": "string",
+          "description": "Error message shown when PAN length is not 10 characters",
+          "default": "PAN must be exactly 10 characters long"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        }
+      ]
+    }
+  ]
+}

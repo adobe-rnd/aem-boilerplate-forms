@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAN Input Component Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .test-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .field-wrapper {
+            margin: 10px 0;
+        }
+        .field-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .field-description {
+            font-size: 0.8em;
+            margin-top: 5px;
+            min-height: 20px;
+        }
+        .field-invalid {
+            border-color: #dc3545 !important;
+        }
+        .field-invalid .field-description {
+            color: #dc3545;
+        }
+    </style>
+    <link rel="stylesheet" href="blocks/form/components/pan-input/pan-input.css">
+</head>
+<body>
+    <h1>PAN Input Component Test</h1>
+    
+    <div class="form-container">
+        <h2>Test Cases</h2>
+        
+        <div class="test-section">
+            <div class="test-title">Test 1: Valid PAN (Default 4th character 'P')</div>
+            <div class="test-description">Enter: ABCPE1234F</div>
+            <div class="field-wrapper pan-input-wrapper">
+                <label for="pan1" class="field-label">PAN Number</label>
+                <input type="text" id="pan1" name="pan1" maxlength="10" pattern="[A-Z]{5}[0-9]{4}[A-Z]" placeholder="ABCDE1234F" title="PAN format: 5 letters (4th must be P), 4 numbers, 1 letter">
+                <div class="field-description" id="pan1-description"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 2: Invalid 4th Character</div>
+            <div class="test-description">Enter: ABCDE1234F (4th character should be 'P')</div>
+            <div class="field-wrapper pan-input-wrapper">
+                <label for="pan2" class="field-label">PAN Number</label>
+                <input type="text" id="pan2" name="pan2" maxlength="10" pattern="[A-Z]{5}[0-9]{4}[A-Z]" placeholder="ABCDE1234F" title="PAN format: 5 letters (4th must be P), 4 numbers, 1 letter">
+                <div class="field-description" id="pan2-description"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 3: Invalid Length</div>
+            <div class="test-description">Enter: ABCP123F (too short)</div>
+            <div class="field-wrapper pan-input-wrapper">
+                <label for="pan3" class="field-label">PAN Number</label>
+                <input type="text" id="pan3" name="pan3" maxlength="10" pattern="[A-Z]{5}[0-9]{4}[A-Z]" placeholder="ABCDE1234F" title="PAN format: 5 letters (4th must be P), 4 numbers, 1 letter">
+                <div class="field-description" id="pan3-description"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 4: Invalid Middle Numbers</div>
+            <div class="test-description">Enter: ABCPEABCD (middle should be numbers)</div>
+            <div class="field-wrapper pan-input-wrapper">
+                <label for="pan4" class="field-label">PAN Number</label>
+                <input type="text" id="pan4" name="pan4" maxlength="10" pattern="[A-Z]{5}[0-9]{4}[A-Z]" placeholder="ABCDE1234F" title="PAN format: 5 letters (4th must be P), 4 numbers, 1 letter">
+                <div class="field-description" id="pan4-description"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 5: Invalid Last Character</div>
+            <div class="test-description">Enter: ABCPE12345 (last should be letter)</div>
+            <div class="field-wrapper pan-input-wrapper">
+                <label for="pan5" class="field-label">PAN Number</label>
+                <input type="text" id="pan5" name="pan5" maxlength="10" pattern="[A-Z]{5}[0-9]{4}[A-Z]" placeholder="ABCDE1234F" title="PAN format: 5 letters (4th must be P), 4 numbers, 1 letter">
+                <div class="field-description" id="pan5-description"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the PAN input component
+        import panInputDecorator from './blocks/form/components/pan-input/pan-input.js';
+        
+        // Mock field definition for testing
+        const mockFieldDefinition = {
+            properties: {
+                fourthCharacter: 'P',
+                invalidFormatMessage: 'PAN must be in format ABCDE1234F (5 letters, 4 numbers, 1 letter)',
+                invalidFourthCharacterMessage: 'Fourth character must be \'{fourthCharacter}\'',
+                invalidFirstFiveMessage: 'First 5 characters must be letters',
+                invalidMiddleFourMessage: 'Characters 6-9 must be numbers',
+                invalidLastCharacterMessage: 'Last character must be a letter',
+                lengthErrorMessage: 'PAN must be exactly 10 characters long'
+            }
+        };
+
+        // Apply the component to all test inputs
+        document.querySelectorAll('.pan-input-wrapper').forEach((wrapper, index) => {
+            const input = wrapper.querySelector('input');
+            const description = wrapper.querySelector('.field-description');
+            
+            // Store original help text
+            description.dataset.originalText = description.textContent || '';
+            
+            // Apply the PAN input decorator
+            panInputDecorator(wrapper, mockFieldDefinition, null, 'test-form');
+        });
+    </script>
+</body>
+</html>

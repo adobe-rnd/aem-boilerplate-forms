@@ -631,6 +631,34 @@
           }
         },
         {
+          "title": "PAN Input",
+          "id": "pan-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "PAN Input",
+                  "fieldType": "text-input",
+                  "fd:viewType": "pan-input",
+                  "name": "pan",
+                  "required": true,
+                  "maxLength": 10,
+                  "minLength": 10,
+                  "placeholder": "ABCDE1234F",
+                  "fourthCharacter": "P",
+                  "invalidFormatMessage": "PAN must be in format ABCDE1234F (5 letters, 4 numbers, 1 letter)",
+                  "invalidFourthCharacterMessage": "Fourth character must be '{fourthCharacter}'",
+                  "invalidFirstFiveMessage": "First 5 characters must be letters",
+                  "invalidMiddleFourMessage": "Characters 6-9 must be numbers",
+                  "invalidLastCharacterMessage": "Last character must be a letter",
+                  "lengthErrorMessage": "PAN must be exactly 10 characters long"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Fragment",
           "id": "fragment",
           "plugins": {
