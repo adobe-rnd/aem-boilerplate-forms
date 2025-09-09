@@ -13,7 +13,8 @@ export default function decorate(element, fd, container, formId) {
   element.classList.add('others-checkbox-wrapper');
 
   // Find the fieldset and all checkboxes
-  const fieldset = element.querySelector('fieldset');
+  // Handle case where element is itself the fieldset or contains a fieldset
+  const fieldset = element.tagName === 'FIELDSET' ? element : element.querySelector('fieldset');
   if (!fieldset) return;
 
   const checkboxes = fieldset.querySelectorAll('input[type="checkbox"]');
@@ -42,7 +43,8 @@ export default function decorate(element, fd, container, formId) {
   othersInputWrapper.appendChild(othersInput);
 
   // Insert the others input after the fieldset
-  fieldset.parentNode.insertBefore(othersInputWrapper, fieldset.nextSibling);
+  // Handle case where fieldset might be the element itself
+  fieldset.appendChild(othersInputWrapper);
 
   // Function to update the field value
   function updateFieldValue() {
