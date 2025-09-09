@@ -399,7 +399,8 @@ export async function createForm(formDef, data) {
 }
 
 function isDocumentBasedForm(formDef) {
-  return formDef?.[':type'] === 'sheet' && formDef?.data;
+  const type = formDef?.[':type'];
+  return ((type === 'sheet' || type === 'multi-sheet') && formDef?.data);
 }
 
 function cleanUp(content) {
