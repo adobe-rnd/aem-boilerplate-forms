@@ -38,6 +38,9 @@
     },
     { 
       "...": "./components/pan-input/_pan-input.json#/definitions" 
+    },
+    { 
+      "...": "./components/others-checkbox/_others-checkbox.json#/definitions" 
     }
   ],
   "models": [
@@ -218,7 +221,8 @@
         "tnc",
         "wizard",
         "range",
-        "pan-input"
+        "pan-input",
+        "others-checkbox"
       ]
     }
   ]

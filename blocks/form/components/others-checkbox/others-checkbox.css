@@ -1,0 +1,59 @@
+/* Others Checkbox Component Styles */
+main .form form .others-checkbox-wrapper {
+  margin-bottom: 1rem;
+}
+
+main .form form .others-checkbox-wrapper .others-input-wrapper {
+  margin-top: 0.5rem;
+  margin-left: 1.5rem; /* Indent to align with checkbox content */
+  transition: all 0.3s ease;
+}
+
+main .form form .others-checkbox-wrapper .others-text-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+main .form form .others-checkbox-wrapper .others-text-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+main .form form .others-checkbox-wrapper .others-text-input:invalid {
+  border-color: #dc3545;
+}
+
+main .form form .others-checkbox-wrapper.field-invalid .others-text-input {
+  border-color: #dc3545;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  main .form form .others-checkbox-wrapper .others-input-wrapper {
+    margin-left: 1rem;
+  }
+  
+  main .form form .others-checkbox-wrapper .others-text-input {
+    max-width: 100%;
+  }
+}
+
+/* Animation for showing/hiding the input */
+main .form form .others-checkbox-wrapper .others-input-wrapper {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease;
+}
+
+main .form form .others-checkbox-wrapper .others-input-wrapper[style*="block"] {
+  opacity: 1;
+  max-height: 100px;
+}
