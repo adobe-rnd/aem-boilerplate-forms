@@ -698,6 +698,38 @@
           }
         },
         {
+          "title": "Autocomplete Dropdown",
+          "id": "autocomplete-dropdown",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
+                "template": {
+                  "jcr:title": "Autocomplete Dropdown",
+                  "fieldType": "drop-down",
+                  "fd:viewType": "autocomplete-dropdown",
+                  "enum": [
+                    "apple",
+                    "banana",
+                    "cherry",
+                    "date",
+                    "elderberry"
+                  ],
+                  "enumNames": [
+                    "Apple",
+                    "Banana",
+                    "Cherry",
+                    "Date",
+                    "Elderberry"
+                  ],
+                  "type": "string",
+                  "placeholder": "Type to search..."
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Fragment",
           "id": "fragment",
           "plugins": {

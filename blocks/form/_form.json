@@ -44,6 +44,9 @@
     },
     { 
       "...": "./components/dynamic-text/_dynamic-text.json#/definitions" 
+    },
+    { 
+      "...": "./components/autocomplete-dropdown/_autocomplete-dropdown.json#/definitions" 
     }
   ],
   "models": [
@@ -226,7 +229,8 @@
         "range",
         "pan-input",
         "others-checkbox",
-        "dynamic-text"
+        "dynamic-text",
+        "autocomplete-dropdown"
       ]
     }
   ]

@@ -1,0 +1,153 @@
+{
+  "definitions": [
+    {
+      "title": "Autocomplete Dropdown",
+      "id": "autocomplete-dropdown",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
+            "template": {
+              "jcr:title": "Autocomplete Dropdown",
+              "fieldType": "drop-down",
+              "fd:viewType": "autocomplete-dropdown",
+              "enum": [
+                "apple",
+                "banana",
+                "cherry",
+                "date",
+                "elderberry"
+              ],
+              "enumNames": [
+                "Apple",
+                "Banana", 
+                "Cherry",
+                "Date",
+                "Elderberry"
+              ],
+              "type": "string",
+              "placeholder": "Type to search..."
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "autocomplete-dropdown",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-select-fields.json#/fields"
+        },
+        {
+          "component": "boolean",
+          "label": "Allow multiple selection",
+          "name": "multiSelect",
+          "valueType": "boolean"
+        },
+        {
+          "component": "select",
+          "label": "Data type of submitted value",
+          "name": "type",
+          "valueType": "string",
+          "value": "string",
+          "options": [
+            {
+              "name": "String",
+              "value": "string"
+            },
+            {
+              "name": "Boolean",
+              "value": "boolean"
+            },
+            {
+              "name": "Number",
+              "value": "number"
+            },
+            {
+              "name": "String[]",
+              "value": "string[]"
+            },
+            {
+              "name": "Boolean[]",
+              "value": "boolean[]"
+            },
+            {
+              "name": "Number[]",
+              "value": "number[]"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "name": "placeholder",
+          "label": "Placeholder text",
+          "valueType": "string",
+          "default": "Type to search..."
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Autocomplete Properties",
+          "name": "autocomplete"
+        },
+        {
+          "component": "number",
+          "name": "minSearchLength",
+          "label": "Minimum search length",
+          "valueType": "number",
+          "description": "Minimum number of characters required before showing suggestions",
+          "default": 1
+        },
+        {
+          "component": "number",
+          "name": "maxSuggestions",
+          "label": "Maximum suggestions",
+          "valueType": "number",
+          "description": "Maximum number of suggestions to display",
+          "default": 10
+        },
+        {
+          "component": "boolean",
+          "name": "caseSensitive",
+          "label": "Case sensitive search",
+          "valueType": "boolean",
+          "description": "Whether the search should be case sensitive",
+          "default": false
+        },
+        {
+          "component": "boolean",
+          "name": "highlightMatches",
+          "label": "Highlight matches",
+          "valueType": "boolean",
+          "description": "Whether to highlight matching text in suggestions",
+          "default": true
+        },
+        {
+          "component": "text",
+          "name": "noResultsMessage",
+          "label": "No results message",
+          "valueType": "string",
+          "description": "Message to show when no suggestions are found",
+          "default": "No results found"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        }
+      ]
+    }
+  ]
+}

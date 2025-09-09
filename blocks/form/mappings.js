@@ -1,6 +1,6 @@
 import { loadCSS } from '../../scripts/aem.js';
 
-let customComponents = ['range', 'pan-input', 'others-checkbox', 'dynamic-text'];
+let customComponents = ['range', 'pan-input', 'others-checkbox', 'dynamic-text', 'autocomplete-dropdown'];
 const OOTBComponentDecorators = ['accordion', 'file', 'modal', 'password', 'rating', 'repeat', 'tnc', 'toggleable-link', 'wizard'];
 
 export function setCustomComponents(components) {

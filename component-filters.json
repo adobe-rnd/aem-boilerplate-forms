@@ -71,7 +71,8 @@
       "range",
       "pan-input",
       "others-checkbox",
-      "dynamic-text"
+      "dynamic-text",
+      "autocomplete-dropdown"
     ]
   }
 ]
