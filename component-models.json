@@ -4136,6 +4136,232 @@
     ]
   },
   {
+    "id": "pan-input",
+    "fields": [
+      {
+        "component": "tab",
+        "label": "Basic",
+        "name": "basic"
+      },
+      {
+        "component": "text",
+        "name": "name",
+        "label": "Name",
+        "valueType": "string",
+        "required": true,
+        "valueFormat": "regexp",
+        "validation": {
+          "regExp": "^[^$].*",
+          "customErrorMsg": "Name cannot start with $"
+        }
+      },
+      {
+        "component": "text",
+        "name": "jcr:title",
+        "label": "Title",
+        "valueType": "string"
+      },
+      {
+        "component": "boolean",
+        "name": "hideTitle",
+        "label": "Hide title",
+        "valueType": "boolean"
+      },
+      {
+        "component": "datasource-bindref",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
+      },
+      {
+        "component": "boolean",
+        "name": "unboundFormElement",
+        "label": "Mark as Unbound Form Element",
+        "valueType": "boolean"
+      },
+      {
+        "component": "boolean",
+        "name": "visible",
+        "label": "Show Component",
+        "valueType": "boolean",
+        "value": true
+      },
+      {
+        "component": "boolean",
+        "name": "enabled",
+        "label": "Enable Component",
+        "valueType": "boolean",
+        "value": true
+      },
+      {
+        "component": "boolean",
+        "name": "readOnly",
+        "label": "Read-only",
+        "valueType": "boolean"
+      },
+      {
+        "component": "select",
+        "name": "colspan",
+        "label": "Column Span",
+        "valueType": "string",
+        "value": "12",
+        "options": [
+          {
+            "name": "1 column",
+            "value": "1"
+          },
+          {
+            "name": "2 column",
+            "value": "2"
+          },
+          {
+            "name": "3 column",
+            "value": "3"
+          },
+          {
+            "name": "4 column",
+            "value": "4"
+          },
+          {
+            "name": "5 column",
+            "value": "5"
+          },
+          {
+            "name": "6 column",
+            "value": "6"
+          },
+          {
+            "name": "7 column",
+            "value": "7"
+          },
+          {
+            "name": "8 column",
+            "value": "8"
+          },
+          {
+            "name": "9 column",
+            "value": "9"
+          },
+          {
+            "name": "10 column",
+            "value": "10"
+          },
+          {
+            "name": "11 column",
+            "value": "11"
+          },
+          {
+            "name": "12 column",
+            "value": "12"
+          }
+        ]
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
+      },
+      {
+        "component": "tab",
+        "label": "Validation",
+        "name": "validation"
+      },
+      {
+        "component": "boolean",
+        "name": "required",
+        "label": "Required",
+        "valueType": "boolean"
+      },
+      {
+        "component": "text",
+        "name": "mandatoryMessage",
+        "label": "Error message",
+        "valueType": "string",
+        "description": "Error message shown when required field is left empty."
+      },
+      {
+        "component": "text",
+        "name": "validateExpMessage",
+        "label": "Script validation message",
+        "valueType": "string",
+        "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
+        "label": "Custom Properties",
+        "name": "custom"
+      },
+      {
+        "component": "text",
+        "name": "fourthCharacter",
+        "label": "Fourth Character",
+        "valueType": "string",
+        "description": "The character to be used as the 4th character in PAN (default: P)",
+        "default": "P"
+      },
+      {
+        "component": "text",
+        "name": "invalidFormatErrorMessage",
+        "label": "Invalid Format Error Message",
+        "valueType": "string",
+        "description": "Error message shown when PAN format is invalid",
+        "default": "PAN must be in format: 5 letters (4th configurable), 4 numbers, 1 letter"
+      },
+      {
+        "component": "text",
+        "name": "invalidFourthCharacterErrorMessage",
+        "label": "Invalid Fourth Character Error Message",
+        "valueType": "string",
+        "description": "Error message shown when 4th character is not as configured",
+        "default": "The 4th character must be '{fourthCharacter}'"
+      },
+      {
+        "component": "text",
+        "name": "invalidLettersErrorMessage",
+        "label": "Invalid Letters Error Message",
+        "valueType": "string",
+        "description": "Error message shown when letters are not valid",
+        "default": "First 5 characters must be letters"
+      },
+      {
+        "component": "text",
+        "name": "invalidNumbersErrorMessage",
+        "label": "Invalid Numbers Error Message",
+        "valueType": "string",
+        "description": "Error message shown when numbers are not valid",
+        "default": "Characters 6-9 must be numbers"
+      },
+      {
+        "component": "text",
+        "name": "invalidLastCharacterErrorMessage",
+        "label": "Invalid Last Character Error Message",
+        "valueType": "string",
+        "description": "Error message shown when last character is not a letter",
+        "default": "Last character must be a letter"
+      },
+      {
+        "component": "text",
+        "name": "lengthErrorMessage",
+        "label": "Length Error Message",
+        "valueType": "string",
+        "description": "Error message shown when PAN length is incorrect",
+        "default": "PAN must be exactly 10 characters long"
+      }
+    ]
+  },
+  {
     "id": "password",
     "fields": [
       {

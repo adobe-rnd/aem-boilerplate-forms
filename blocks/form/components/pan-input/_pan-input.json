@@ -1,0 +1,109 @@
+{
+  "definitions": [
+    {
+      "title": "PAN Input",
+      "id": "pan-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/textinput/v1/textinput",
+            "template": {
+              "jcr:title": "PAN Input",
+              "fieldType": "text-input",
+              "fd:viewType": "pan-input",
+              "enabled": true,
+              "visible": true
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "pan-input",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Custom Properties",
+          "name": "custom"
+        },
+        {
+          "component": "text",
+          "name": "fourthCharacter",
+          "label": "Fourth Character",
+          "valueType": "string",
+          "description": "The character to be used as the 4th character in PAN (default: P)",
+          "default": "P"
+        },
+        {
+          "component": "text",
+          "name": "invalidFormatErrorMessage",
+          "label": "Invalid Format Error Message",
+          "valueType": "string",
+          "description": "Error message shown when PAN format is invalid",
+          "default": "PAN must be in format: 5 letters (4th configurable), 4 numbers, 1 letter"
+        },
+        {
+          "component": "text",
+          "name": "invalidFourthCharacterErrorMessage",
+          "label": "Invalid Fourth Character Error Message",
+          "valueType": "string",
+          "description": "Error message shown when 4th character is not as configured",
+          "default": "The 4th character must be '{fourthCharacter}'"
+        },
+        {
+          "component": "text",
+          "name": "invalidLettersErrorMessage",
+          "label": "Invalid Letters Error Message",
+          "valueType": "string",
+          "description": "Error message shown when letters are not valid",
+          "default": "First 5 characters must be letters"
+        },
+        {
+          "component": "text",
+          "name": "invalidNumbersErrorMessage",
+          "label": "Invalid Numbers Error Message",
+          "valueType": "string",
+          "description": "Error message shown when numbers are not valid",
+          "default": "Characters 6-9 must be numbers"
+        },
+        {
+          "component": "text",
+          "name": "invalidLastCharacterErrorMessage",
+          "label": "Invalid Last Character Error Message",
+          "valueType": "string",
+          "description": "Error message shown when last character is not a letter",
+          "default": "Last character must be a letter"
+        },
+        {
+          "component": "text",
+          "name": "lengthErrorMessage",
+          "label": "Length Error Message",
+          "valueType": "string",
+          "description": "Error message shown when PAN length is incorrect",
+          "default": "PAN must be exactly 10 characters long"
+        }
+      ]
+    }
+  ]
+}

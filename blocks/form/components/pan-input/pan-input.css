@@ -1,0 +1,59 @@
+/* PAN Input Component Styles */
+.pan-input-wrapper .pan-input {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.3s ease;
+}
+
+.pan-input-wrapper .pan-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.pan-input-wrapper.field-invalid .pan-input {
+  border-color: #dc3545;
+}
+
+.pan-input-wrapper.field-invalid .pan-input:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+/* Error message styling */
+.pan-input-wrapper .field-invalid-msg {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Label styling */
+.pan-input-wrapper .field-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Help text styling */
+.pan-input-wrapper .field-description {
+  font-size: 14px;
+  color: #6c757d;
+  margin-top: 5px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pan-input-wrapper .pan-input {
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 10px;
+  }
+}

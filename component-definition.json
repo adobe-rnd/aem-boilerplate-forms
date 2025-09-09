@@ -631,6 +631,24 @@
           }
         },
         {
+          "title": "PAN Input",
+          "id": "pan-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "PAN Input",
+                  "fieldType": "text-input",
+                  "fd:viewType": "pan-input",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Fragment",
           "id": "fragment",
           "plugins": {
