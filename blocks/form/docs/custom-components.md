@@ -136,6 +136,7 @@ npm run create:custom-component
 
 When creating custom components, it's important to leverage existing utility functions from `util.js` and `form.js` if required to avoid code duplication.
 
+Example: For creating or updating error messages for components we can re-use the `updateOrCreateInvalidMsg`
 
 ---
 
