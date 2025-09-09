@@ -141,6 +141,7 @@ When creating custom components, it's important to leverage existing utility fun
 
 ## Listening to Field Changes: How `subscribe` Works
 - The `subscribe` function allows your component to react to changes in the field's value or other custom events.
+- **Important**: Use `subscribe` only when you need to update the view when a field's value is changed programmatically. Do NOT use it for handling user input events.
 - When you call `subscribe(element, formId, callback)`, the system registers your callback to be notified when the field changes.
 - **Callback Signature:**
   - The callback receives two arguments:
@@ -165,7 +166,7 @@ When creating custom components, it's important to leverage existing utility fun
     });
   }
   ```
-- This allows your component to update its UI or perform logic whenever the field value or properties change, or when a custom event is triggered.
+- This allows your component to update its UI or perform logic whenever the field value or properties change programmatically, or when a custom event is triggered.
 
 
 
@@ -192,6 +193,89 @@ When creating custom components, it's important to leverage existing utility fun
 }
 
 ```
+---
+
+## Understanding Model Updates and Event Propagation
+
+### How `index.js` Handles HTML Changes
+
+The `index.js` file in the form system continuously listens to changes in the HTML and automatically updates the form model accordingly. This means:
+
+- **Automatic Model Updates**: When users interact with form fields (typing, selecting, etc.), the system automatically detects these changes and updates the underlying form model.
+- **Event Propagation**: These model updates propagate throughout the form system, triggering various listeners and callbacks.
+
+**Important**: This automatic model update behavior means that when creating custom components, you must either override this change propagation or handle it appropriately to prevent conflicts with your custom logic.
+
+### Handling Model Updates in Custom Components
+
+When creating custom components, you need to be aware of this automatic model update behavior:
+
+#### 1. **Override Event Propagation When Necessary**
+If your custom component needs to prevent the default model update behavior, you must explicitly override or handle the change propagation:
+
+```js
+export default function decorate(element, fd, container, formId) {
+  // Example: Prevent default change propagation for a custom input
+  const input = element.querySelector('change');
+  
+  input.addEventListener('change', (event) => {
+    // Prevent the default model update
+    event.stopPropagation();
+    
+    // Handle the change manually
+    // ... your custom logic here ...
+  });
+}
+```
+
+#### 2. **Use `subscribe` Only for View Updates**
+The `subscribe` function should **only** be used when you need to update the view when a field's value is changed programmatically. It should NOT be used for handling user input events:
+
+```js
+import { subscribe } from '../../rules/index.js';
+
+export default function decorate(element, fd, container, formId) {
+  // Only subscribe if you need to react to programmatic changes
+  subscribe(element, formId, (fieldDiv, fieldModel) => {
+    fieldModel.subscribe((event) => {
+      // This callback fires when the model is updated programmatically
+      // Use this to update your component's view accordingly
+      updateComponentView(event.payload.changes);
+    }, 'change');
+  });
+}
+```
+
+#### 3. **Avoid Infinite Loops**
+**Critical**: Every time the model is updated, if you have subscribed to changes, you will receive a callback. This can lead to infinite loops if not handled carefully:
+
+```js
+// ❌ WRONG - This can cause infinite loops
+subscribe(element, formId, (fieldDiv, fieldModel) => {
+  fieldModel.subscribe((event) => {
+    // Don't update the model from within a model change callback
+    fieldModel.updateValue('someValue'); // This triggers another callback!
+  }, 'change');
+});
+
+// ✅ CORRECT - Only update the view, not the model
+subscribe(element, formId, (fieldDiv, fieldModel) => {
+  fieldModel.subscribe((event) => {
+    // Only update the visual representation
+    updateVisualState(event.payload.changes);
+    // Don't call fieldModel.updateValue() or similar methods here
+  }, 'change');
+});
+```
+
+### Key Principles for Custom Components
+
+1. **Separate Concerns**: Use `subscribe` only for view updates, not for handling user input
+2. **Prevent Propagation**: Use `event.stopPropagation()` when you need custom input handling
+3. **Avoid Model Updates in Callbacks**: Never update the model from within a model change callback
+4. **Test for Loops**: Always test your components to ensure they don't create infinite update loops
+5. **Handle HTML Changes Appropriately**: Either override the automatic model update behavior or work with it, but don't ignore it
+
 ---
 
 ## Reusing and Extending Fields in Custom Components
@@ -228,57 +312,6 @@ When defining fields in your custom component's JSON (for any field group—basi
 
 ## Step-by-Step: Creating a Custom Component
 
-### 📋 Recommended Workflow
-
-```
-1. Start: Need Custom Component
-   ↓
-2. Run Scaffolder Tool (npm run create:custom-component)
-   ↓
-3. Choose Name & Base Component
-   ↓
-4. Scaffolder Creates Files & Handles Wiring ✅
-   ↓
-5. Edit JSON: Add Custom Properties
-   ↓
-6. Edit JS: Add Component Logic
-   ↓
-7. Edit CSS: Add Custom Styles
-   ↓
-8. Run build:json (if JSON changes made)
-   ↓
-9. Component Ready! ✅
-```
-
-
----
-
-### Method 1: Using Scaffolder Tool (Recommended) 
-
-1. **Run the scaffolder tool**:
-   ```sh
-   npm run create:custom-component
-   ```
-
-2. **Follow the prompts**:
-   - Enter component name (e.g., `countdown-timer`)
-   - Select base component to extend (e.g., `Button`)
-
-3. **Edit the generated files**:
-   - **JSON**: Add custom properties to `_countdown-timer.json`
-   - **JS**: Implement your component logic in `countdown-timer.js`
-   - **CSS**: Add custom styles to `countdown-timer.css`
-
-4. **Run build:json** (if you modified JSON):
-   ```sh
-   npm run build:json
-   ```
-
-**That's it!** The scaffolder handles all the complex wiring automatically.
-
-### Method 2: Manual Setup 
-
-**Only use this if you understand the full system architecture and need custom setup.**
 
 1. **Choose an OOTB component to extend** (e.g., button, drop-down, text-input, etc.).
 2. **Create a folder** in `blocks/form/components` with your component's name (e.g., `countdown-timer`).
