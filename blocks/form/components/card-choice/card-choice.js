@@ -1,8 +1,9 @@
 import { subscribe } from '../../rules/index.js';
 
 export default function decorate(element, fd, container, formId) {
-  // Access custom properties
-  const { cardOptions = [] } = fd?.properties || {};
+  // Access enum and enumNames properties
+  const enumValues = fd?.enum || [];
+  const enumNames = fd?.enumNames || [];
   
   // Add custom class for styling
   element.classList.add('card-choice-wrapper');
@@ -24,8 +25,8 @@ export default function decorate(element, fd, container, formId) {
   const cardsContainer = document.createElement('div');
   cardsContainer.className = 'card-choice-cards';
   
-  // Create cards for each option
-  cardOptions.forEach((option, index) => {
+  // Create cards for each enum option
+  enumValues.forEach((enumValue, index) => {
     const cardWrapper = document.createElement('div');
     cardWrapper.className = 'card-choice-card';
     
@@ -34,7 +35,7 @@ export default function decorate(element, fd, container, formId) {
     radioInput.type = 'radio';
     radioInput.id = `${fd?.id || 'card-choice'}-${index}`;
     radioInput.name = fd?.name || 'card-choice';
-    radioInput.value = option.value;
+    radioInput.value = typeof enumValue === 'object' ? enumValue.value : enumValue;
     radioInput.className = 'card-choice-input';
     
     // Create card label
@@ -46,20 +47,30 @@ export default function decorate(element, fd, container, formId) {
     const cardContent = document.createElement('div');
     cardContent.className = 'card-choice-content';
     
+    // Get title and image from enum object or use enumNames
+    let title, imageUrl;
+    if (typeof enumValue === 'object') {
+      title = enumValue.title || enumNames[index] || `Option ${index + 1}`;
+      imageUrl = enumValue.imageUrl || `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+    } else {
+      title = enumNames[index] || enumValue || `Option ${index + 1}`;
+      imageUrl = `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+    }
+    
     // Create image
     const image = document.createElement('img');
-    image.src = option.imageUrl;
-    image.alt = option.title;
+    image.src = imageUrl;
+    image.alt = title;
     image.className = 'card-choice-image';
     
     // Create title
-    const title = document.createElement('h3');
-    title.textContent = option.title;
-    title.className = 'card-choice-title';
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = title;
+    titleElement.className = 'card-choice-title';
     
     // Assemble card
     cardContent.appendChild(image);
-    cardContent.appendChild(title);
+    cardContent.appendChild(titleElement);
     cardLabel.appendChild(cardContent);
     
     cardWrapper.appendChild(radioInput);
@@ -103,12 +114,13 @@ export default function decorate(element, fd, container, formId) {
     fieldModel.subscribe((event) => {
       const changes = event.payload.changes;
       changes.forEach(change => {
-        if (change.propertyName === 'enum' || change.propertyName === 'cardOptions') {
+        if (change.propertyName === 'enum' || change.propertyName === 'enumNames') {
           // Re-render cards if options change
-          const newCardOptions = fieldModel.properties.cardOptions || [];
-          if (newCardOptions.length > 0) {
+          const newEnumValues = fieldModel.enum || [];
+          const newEnumNames = fieldModel.enumNames || [];
+          if (newEnumValues.length > 0) {
             // Update the cards with new options
-            updateCards(cardsContainer, newCardOptions, fd, fieldModel);
+            updateCards(cardsContainer, newEnumValues, newEnumNames, fd, fieldModel);
           }
         }
       });
@@ -116,12 +128,12 @@ export default function decorate(element, fd, container, formId) {
   });
 }
 
-function updateCards(cardsContainer, cardOptions, fd, fieldModel) {
+function updateCards(cardsContainer, enumValues, enumNames, fd, fieldModel) {
   // Clear existing cards
   cardsContainer.innerHTML = '';
   
   // Create new cards
-  cardOptions.forEach((option, index) => {
+  enumValues.forEach((enumValue, index) => {
     const cardWrapper = document.createElement('div');
     cardWrapper.className = 'card-choice-card';
     
@@ -130,7 +142,7 @@ function updateCards(cardsContainer, cardOptions, fd, fieldModel) {
     radioInput.type = 'radio';
     radioInput.id = `${fd?.id || 'card-choice'}-${index}`;
     radioInput.name = fd?.name || 'card-choice';
-    radioInput.value = option.value;
+    radioInput.value = typeof enumValue === 'object' ? enumValue.value : enumValue;
     radioInput.className = 'card-choice-input';
     
     // Create card label
@@ -142,20 +154,30 @@ function updateCards(cardsContainer, cardOptions, fd, fieldModel) {
     const cardContent = document.createElement('div');
     cardContent.className = 'card-choice-content';
     
+    // Get title and image from enum object or use enumNames
+    let title, imageUrl;
+    if (typeof enumValue === 'object') {
+      title = enumValue.title || enumNames[index] || `Option ${index + 1}`;
+      imageUrl = enumValue.imageUrl || `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+    } else {
+      title = enumNames[index] || enumValue || `Option ${index + 1}`;
+      imageUrl = `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+    }
+    
     // Create image
     const image = document.createElement('img');
-    image.src = option.imageUrl;
-    image.alt = option.title;
+    image.src = imageUrl;
+    image.alt = title;
     image.className = 'card-choice-image';
     
     // Create title
-    const title = document.createElement('h3');
-    title.textContent = option.title;
-    title.className = 'card-choice-title';
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = title;
+    titleElement.className = 'card-choice-title';
     
     // Assemble card
     cardContent.appendChild(image);
-    cardContent.appendChild(title);
+    cardContent.appendChild(titleElement);
     cardLabel.appendChild(cardContent);
     
     cardWrapper.appendChild(radioInput);
@@ -176,7 +198,7 @@ function updateCards(cardsContainer, cardOptions, fd, fieldModel) {
       cardWrapper.classList.add('selected');
       
       // Update field model value
-      fieldModel.value = option.value;
+      fieldModel.value = typeof enumValue === 'object' ? enumValue.value : enumValue;
       
       // Trigger change event for form validation
       radioInput.dispatchEvent(new Event('change', { bubbles: true }));

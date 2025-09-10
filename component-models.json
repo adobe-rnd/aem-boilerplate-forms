@@ -4437,6 +4437,10 @@
             "value": "string"
           },
           {
+            "name": "Object",
+            "value": "object"
+          },
+          {
             "name": "Boolean",
             "value": "boolean"
           },
@@ -4444,43 +4448,8 @@
             "name": "Number",
             "value": "number"
           }
-        ]
-      },
-      {
-        "component": "array",
-        "name": "cardOptions",
-        "label": "Card Options",
-        "valueType": "object",
-        "description": "Define the cards that users can choose from",
-        "items": {
-          "component": "object",
-          "fields": [
-            {
-              "component": "text",
-              "name": "value",
-              "label": "Value",
-              "valueType": "string",
-              "description": "The value submitted when this card is selected",
-              "required": true
-            },
-            {
-              "component": "text",
-              "name": "title",
-              "label": "Title",
-              "valueType": "string",
-              "description": "The title displayed on the card",
-              "required": true
-            },
-            {
-              "component": "text",
-              "name": "imageUrl",
-              "label": "Image URL",
-              "valueType": "string",
-              "description": "URL of the image to display on the card",
-              "required": true
-            }
-          ]
-        }
+        ],
+        "value": "object"
       },
       {
         "component": "tab",

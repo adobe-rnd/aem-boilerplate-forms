@@ -742,14 +742,6 @@
                   "fieldType": "radio-group",
                   "fd:viewType": "card-choice",
                   "enum": [
-                    "option1",
-                    "option2"
-                  ],
-                  "enumNames": [
-                    "Option 1",
-                    "Option 2"
-                  ],
-                  "cardOptions": [
                     {
                       "value": "option1",
                       "title": "Card Option 1",
@@ -760,6 +752,10 @@
                       "title": "Card Option 2",
                       "imageUrl": "https://via.placeholder.com/200x150/2196F3/FFFFFF?text=Card+2"
                     }
+                  ],
+                  "enumNames": [
+                    "Card Option 1",
+                    "Card Option 2"
                   ]
                 }
               }
