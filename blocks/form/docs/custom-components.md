@@ -463,7 +463,8 @@ When defining fields in your custom component's JSON (for any field group—basi
 7. **Register your component as a variant** in the form builder and set the `variant` property or `fd:viewType`/`:type` in the JSON to your component's name (e.g., `countdown-timer`).
 8. **Update `mappings.js`:** Add your component's name to the `OOTBComponentDecorators` (for OOTB-style components) or `customComponents` list so it is recognized and loaded by the system.
 9. **Update `_form.json`:** Add your component's name to the `filters.components` array so it can be dropped in the authoring UI.
-10. **Run the build:json script:** Execute `npm run build:json` to compile and merge all component JSON definitions into a single file to be served from the server. This ensures your new component's schema is included in the merged output.
+10. **Update `_component-definition.json`:** Add an entry for the new component in the custom form component section of this json similar to the range component.
+11. **Run the build:json script:** Execute `npm run build:json` to compile and merge all component JSON definitions into a single file to be served from the server. This ensures your new component's schema is included in the merged output.
 
 **JS implementation (`countdown-timer.js`):**
 ```js
