@@ -47,6 +47,9 @@
     },
     { 
       "...": "./components/autocomplete-dropdown/_autocomplete-dropdown.json#/definitions" 
+    },
+    { 
+      "...": "./components/card-choice/_card-choice.json#/definitions" 
     }
   ],
   "models": [
@@ -230,7 +233,8 @@
         "pan-input",
         "others-checkbox",
         "dynamic-text",
-        "autocomplete-dropdown"
+        "autocomplete-dropdown",
+        "card-choice"
       ]
     }
   ]

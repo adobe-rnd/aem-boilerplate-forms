@@ -1,0 +1,130 @@
+/* Card Choice Component Styles */
+.card-choice-wrapper {
+  margin: 1rem 0;
+}
+
+.card-choice-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card-choice-fieldset .field-label {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: block;
+  color: #333;
+}
+
+.card-choice-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-choice-card {
+  position: relative;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  background: white;
+}
+
+.card-choice-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.card-choice-card.selected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2), 0 2px 4px -1px rgba(59, 130, 246, 0.1);
+}
+
+.card-choice-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-choice-label {
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.card-choice-content {
+  padding: 1rem;
+  text-align: center;
+}
+
+.card-choice-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.card-choice-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.card-choice-card.selected .card-choice-title {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-choice-cards {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .card-choice-image {
+    height: 120px;
+  }
+  
+  .card-choice-content {
+    padding: 0.75rem;
+  }
+}
+
+/* Focus styles for accessibility */
+.card-choice-card:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Error state */
+.card-choice-wrapper.field-invalid .card-choice-card {
+  border-color: #ef4444;
+}
+
+.card-choice-wrapper.field-invalid .card-choice-card:hover {
+  border-color: #dc2626;
+}
+
+/* Disabled state */
+.card-choice-wrapper.field-disabled .card-choice-card {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card-choice-wrapper.field-disabled .card-choice-card:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #e5e7eb;
+}

@@ -1,0 +1,134 @@
+{
+  "definitions": [
+    {
+      "title": "Card Choice",
+      "id": "card-choice",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
+            "template": {
+              "jcr:title": "Card Choice",
+              "fieldType": "radio-group",
+              "fd:viewType": "card-choice",
+              "enum": [
+                "option1",
+                "option2"
+              ],
+              "enumNames": [
+                "Option 1",
+                "Option 2"
+              ],
+              "cardOptions": [
+                {
+                  "value": "option1",
+                  "title": "Card Option 1",
+                  "imageUrl": "https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+1"
+                },
+                {
+                  "value": "option2", 
+                  "title": "Card Option 2",
+                  "imageUrl": "https://via.placeholder.com/200x150/2196F3/FFFFFF?text=Card+2"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "card-choice",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-select-fields.json#/fields"
+        },
+        {
+          "component": "select",
+          "name": "variant",
+          "label": "Variant",
+          "options": [
+            {
+              "name": "Default",
+              "value": "default"
+            }
+          ],
+          "value": "default"
+        },
+        {
+          "component": "select",
+          "label": "Data type of submitted value",
+          "name": "type",
+          "valueType": "string",
+          "options": [
+            {
+              "name": "String",
+              "value": "string"
+            },
+            {
+              "name": "Boolean",
+              "value": "boolean"
+            },
+            {
+              "name": "Number",
+              "value": "number"
+            }
+          ]
+        },
+        {
+          "component": "array",
+          "name": "cardOptions",
+          "label": "Card Options",
+          "valueType": "object",
+          "description": "Define the cards that users can choose from",
+          "items": {
+            "component": "object",
+            "fields": [
+              {
+                "component": "text",
+                "name": "value",
+                "label": "Value",
+                "valueType": "string",
+                "description": "The value submitted when this card is selected",
+                "required": true
+              },
+              {
+                "component": "text",
+                "name": "title",
+                "label": "Title",
+                "valueType": "string",
+                "description": "The title displayed on the card",
+                "required": true
+              },
+              {
+                "component": "text",
+                "name": "imageUrl",
+                "label": "Image URL",
+                "valueType": "string",
+                "description": "URL of the image to display on the card",
+                "required": true
+              }
+            ]
+          }
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        }
+      ]
+    }
+  ]
+}

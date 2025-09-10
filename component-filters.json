@@ -72,7 +72,8 @@
       "pan-input",
       "others-checkbox",
       "dynamic-text",
-      "autocomplete-dropdown"
+      "autocomplete-dropdown",
+      "card-choice"
     ]
   }
 ]
