@@ -35,7 +35,7 @@ export default function decorate(element, fd, container, formId) {
     radioInput.type = 'radio';
     radioInput.id = `${fd?.id || 'card-choice'}-${index}`;
     radioInput.name = fd?.name || 'card-choice';
-    radioInput.value = typeof enumValue === 'object' ? enumValue.value : enumValue;
+    radioInput.value = typeof enumValue === 'object' ? enumValue.name : enumValue;
     radioInput.className = 'card-choice-input';
     
     // Create card label
@@ -47,14 +47,18 @@ export default function decorate(element, fd, container, formId) {
     const cardContent = document.createElement('div');
     cardContent.className = 'card-choice-content';
     
-    // Get title and image from enum object or use enumNames
-    let title, imageUrl;
+    // Get card data from enum object or use enumNames
+    let title, description, imageUrl, benefits;
     if (typeof enumValue === 'object') {
-      title = enumValue.title || enumNames[index] || `Option ${index + 1}`;
-      imageUrl = enumValue.imageUrl || `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+      title = enumValue.name || enumNames[index] || `Option ${index + 1}`;
+      description = enumValue.description || '';
+      imageUrl = enumValue.image || `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+      benefits = enumValue.benefits || '';
     } else {
       title = enumNames[index] || enumValue || `Option ${index + 1}`;
+      description = '';
       imageUrl = `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+      benefits = '';
     }
     
     // Create image
@@ -68,9 +72,21 @@ export default function decorate(element, fd, container, formId) {
     titleElement.textContent = title;
     titleElement.className = 'card-choice-title';
     
+    // Create description
+    const descriptionElement = document.createElement('p');
+    descriptionElement.textContent = description;
+    descriptionElement.className = 'card-choice-description';
+    
+    // Create benefits
+    const benefitsElement = document.createElement('div');
+    benefitsElement.textContent = benefits;
+    benefitsElement.className = 'card-choice-benefits';
+    
     // Assemble card
     cardContent.appendChild(image);
     cardContent.appendChild(titleElement);
+    if (description) cardContent.appendChild(descriptionElement);
+    if (benefits) cardContent.appendChild(benefitsElement);
     cardLabel.appendChild(cardContent);
     
     cardWrapper.appendChild(radioInput);
@@ -142,7 +158,7 @@ function updateCards(cardsContainer, enumValues, enumNames, fd, fieldModel) {
     radioInput.type = 'radio';
     radioInput.id = `${fd?.id || 'card-choice'}-${index}`;
     radioInput.name = fd?.name || 'card-choice';
-    radioInput.value = typeof enumValue === 'object' ? enumValue.value : enumValue;
+    radioInput.value = typeof enumValue === 'object' ? enumValue.name : enumValue;
     radioInput.className = 'card-choice-input';
     
     // Create card label
@@ -154,14 +170,18 @@ function updateCards(cardsContainer, enumValues, enumNames, fd, fieldModel) {
     const cardContent = document.createElement('div');
     cardContent.className = 'card-choice-content';
     
-    // Get title and image from enum object or use enumNames
-    let title, imageUrl;
+    // Get card data from enum object or use enumNames
+    let title, description, imageUrl, benefits;
     if (typeof enumValue === 'object') {
-      title = enumValue.title || enumNames[index] || `Option ${index + 1}`;
-      imageUrl = enumValue.imageUrl || `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+      title = enumValue.name || enumNames[index] || `Option ${index + 1}`;
+      description = enumValue.description || '';
+      imageUrl = enumValue.image || `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+      benefits = enumValue.benefits || '';
     } else {
       title = enumNames[index] || enumValue || `Option ${index + 1}`;
+      description = '';
       imageUrl = `https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+${index + 1}`;
+      benefits = '';
     }
     
     // Create image
@@ -175,9 +195,21 @@ function updateCards(cardsContainer, enumValues, enumNames, fd, fieldModel) {
     titleElement.textContent = title;
     titleElement.className = 'card-choice-title';
     
+    // Create description
+    const descriptionElement = document.createElement('p');
+    descriptionElement.textContent = description;
+    descriptionElement.className = 'card-choice-description';
+    
+    // Create benefits
+    const benefitsElement = document.createElement('div');
+    benefitsElement.textContent = benefits;
+    benefitsElement.className = 'card-choice-benefits';
+    
     // Assemble card
     cardContent.appendChild(image);
     cardContent.appendChild(titleElement);
+    if (description) cardContent.appendChild(descriptionElement);
+    if (benefits) cardContent.appendChild(benefitsElement);
     cardLabel.appendChild(cardContent);
     
     cardWrapper.appendChild(radioInput);
@@ -198,7 +230,7 @@ function updateCards(cardsContainer, enumValues, enumNames, fd, fieldModel) {
       cardWrapper.classList.add('selected');
       
       // Update field model value
-      fieldModel.value = typeof enumValue === 'object' ? enumValue.value : enumValue;
+      fieldModel.value = typeof enumValue === 'object' ? enumValue.name : enumValue;
       
       // Trigger change event for form validation
       radioInput.dispatchEvent(new Event('change', { bubbles: true }));

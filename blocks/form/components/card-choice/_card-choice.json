@@ -13,19 +13,21 @@
               "fd:viewType": "card-choice",
               "enum": [
                 {
-                  "value": "option1",
-                  "title": "Card Option 1",
-                  "imageUrl": "https://via.placeholder.com/200x150/4CAF50/FFFFFF?text=Card+1"
+                  "name": "Rewards Card",
+                  "description": "Best Card for Rewards & Offers",
+                  "image": "https://main--afb--jalagari.hlx.live/lab/images/low-fee.png",
+                  "benefits": "Upto 10X CashPoints, ₹150 spent = 1 Reward Point, Joining/ Renewal Fees - ₹500/-"
                 },
                 {
-                  "value": "option2",
-                  "title": "Card Option 2", 
-                  "imageUrl": "https://via.placeholder.com/200x150/2196F3/FFFFFF?text=Card+2"
+                  "name": "Premium Card",
+                  "description": "Premium Card with Exclusive Benefits",
+                  "image": "https://via.placeholder.com/200x150/2196F3/FFFFFF?text=Premium",
+                  "benefits": "Upto 15X CashPoints, ₹100 spent = 1 Reward Point, Joining/ Renewal Fees - ₹1000/-"
                 }
               ],
               "enumNames": [
-                "Card Option 1",
-                "Card Option 2"
+                "Rewards Card",
+                "Premium Card"
               ]
             }
           }
