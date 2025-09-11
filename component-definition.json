@@ -684,6 +684,73 @@
               }
             }
           }
+        },
+        {
+          "title": "Icon radio",
+          "id": "icon-radio",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
+                "template": {
+                  "jcr:title": "Icon radio",
+                  "fieldType": "radio-group",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Item 1",
+                    "Item 2"
+                  ],
+                  "orientation": "horizontal",
+                  "fd:viewType": "icon-radio"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Address",
+          "id": "address",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Address",
+                  "fieldType": "panel",
+                  "minOccur": 1,
+                  "fd:viewType": "address",
+                  "text-input1": {
+                    "jcr:title": "Text Input",
+                    "sling:resourceType": "core/fd/components/form/textinput/v1/textinput",
+                    "fieldType": "text-input"
+                  },
+                  "number-input2": {
+                    "jcr:title": "Number Input",
+                    "sling:resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                    "fieldType": "number-input"
+                  },
+                  "telephone-input3": {
+                    "jcr:title": "Telephone input",
+                    "sling:resourceType": "core/fd/components/form/telephoneinput/v1/telephoneinput",
+                    "fieldType": "text-input"
+                  },
+                  "radio-group4": {
+                    "jcr:title": "Radio Group",
+                    "sling:resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
+                    "fieldType": "radio-group"
+                  },
+                  "form-button5": {
+                    "jcr:title": "Button",
+                    "sling:resourceType": "core/fd/components/form/button/v1/button",
+                    "fieldType": "button"
+                  }
+                }
+              }
+            }
+          }
         }
       ]
     }
