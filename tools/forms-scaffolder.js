@@ -270,6 +270,7 @@ async function getAllFormComponents() {
             // Type info
             fieldType: template?.fieldType || definition.id,
             resourceType: definition.plugins?.xwalk?.page?.resourceType,
+            template: template || {},
             
             // Full data
             ...componentData // includes definitions, models, definition, model
