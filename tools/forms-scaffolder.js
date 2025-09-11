@@ -463,9 +463,10 @@ async function generateCompositeJSON(componentName, selectedComponents) {
   compositeDefinition.id = componentName;
   compositeDefinition.plugins.xwalk.page.template = template;
   
-  // Use full panel model with ALL features (repeatable, minOccur, maxOccur, etc.)
-  const compositeModel = JSON.parse(JSON.stringify(basePanelModel));
-  compositeModel.id = componentName;
+  const compositeModel = transformComponentPaths({
+    ...JSON.parse(JSON.stringify(basePanelModel)),
+    id: componentName
+  });
   
   return {
     "definitions": [compositeDefinition],
