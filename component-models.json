@@ -698,23 +698,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -737,6 +720,23 @@
         "label": "Script validation message",
         "valueType": "string",
         "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -915,23 +915,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -954,6 +937,23 @@
         "label": "Script validation message",
         "valueType": "string",
         "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -1092,23 +1092,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -1198,6 +1181,23 @@
             "value": "d/M/y"
           }
         ]
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -1390,23 +1390,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -1429,6 +1412,23 @@
         "label": "Script validation message",
         "valueType": "string",
         "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -1567,23 +1567,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -1648,6 +1631,23 @@
         "valueType": "string",
         "label": "Pattern Error message",
         "description": "Error message shown when the pattern is not matched."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -1786,23 +1786,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -1849,6 +1832,23 @@
         "component": "text",
         "name": "acceptMessage",
         "label": "File type error message",
+        "valueType": "string"
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
         "valueType": "string"
       }
     ]
@@ -2290,23 +2290,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -2371,6 +2354,23 @@
         "valueType": "string",
         "label": "Pattern Error message",
         "description": "Error message shown when the pattern is not matched."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -2525,23 +2525,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -2625,6 +2608,23 @@
             "value": "#,###,##0%"
           }
         ]
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -3097,23 +3097,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -3136,6 +3119,23 @@
         "label": "Script validation message",
         "valueType": "string",
         "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -3518,23 +3518,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -3585,6 +3568,23 @@
         "valueType": "string",
         "label": "Maximum error message",
         "description": "Error message shown when the entered value is more than maximum."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -3729,23 +3729,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -3810,6 +3793,23 @@
         "valueType": "string",
         "label": "Pattern Error message",
         "description": "Error message shown when the pattern is not matched."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -4298,23 +4298,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -4379,6 +4362,23 @@
         "valueType": "string",
         "label": "Pattern Error message",
         "description": "Error message shown when the pattern is not matched."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -4505,23 +4505,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -4584,6 +4567,23 @@
         "label": "Step Value",
         "valueType": "number",
         "description": "Step value for the range"
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
@@ -4710,23 +4710,6 @@
       },
       {
         "component": "tab",
-        "label": "Help Content",
-        "name": "help"
-      },
-      {
-        "component": "richtext",
-        "name": "description",
-        "label": "Help text",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tooltip",
-        "label": "Short description",
-        "valueType": "string"
-      },
-      {
-        "component": "tab",
         "label": "Validation",
         "name": "validation"
       },
@@ -4777,6 +4760,23 @@
         "valueType": "string",
         "label": "Maximum error message",
         "description": "Error message shown when the entered value is more than maximum."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
       }
     ]
   },
