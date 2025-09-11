@@ -533,7 +533,7 @@ async function createComponentFiles(componentName, componentData, targetDir) {
     }
     
     try {
-      const baseComponentData = await getComponentDefinition(baseComponent.id || baseComponent.filename);
+      const baseComponentData = await getComponentDefinition(baseComponent.filename || baseComponent.id);
       
       if (!baseComponentData || !baseComponentData.definitions || !baseComponentData.models) {
         throw new Error(`Invalid base component data for '${baseComponent.name}' (${baseComponent.id})`);
@@ -845,13 +845,15 @@ async function scaffoldComponent() {
     });
 
     if (!confirm) {
-      logWarning('Operation cancelled.');
+      logWarning(`${emojis.warning} Operation cancelled.`);
       return;
     }
 
     // Create component files with spinner
     const creationSpinner = createSpinner('Creating component structure...');
+    let files;
 
+    try {
     // Create directory structure
     const targetDir = path.join(__dirname, '../blocks/form/components', componentName);
 
@@ -863,8 +865,12 @@ async function scaffoldComponent() {
     mkdirSync(targetDir, { recursive: true });
 
     // Create files
-    const files = await createComponentFiles(componentName, componentData, targetDir);
+      files = await createComponentFiles(componentName, componentData, targetDir);
     creationSpinner.stop('✅ Component files created successfully');
+    } catch (error) {
+      creationSpinner.stop('❌ Component creation failed');
+      throw new Error(`Failed to create component files: ${error.message}`);
+    }
 
     // Update _component-definition.json to include the new custom component
     const componentDefSpinner = createSpinner('Updating component definitions...');
