@@ -732,19 +732,28 @@ async function scaffoldComponent() {
 
     console.log(''); // Add spacing
       
-    const { componentName } = await enquirer.prompt({
+    const { componentName: rawComponentName } = await enquirer.prompt({
       type: 'input',
       name: 'componentName',
       message: `${emojis.gear} What would you like to name the custom component?`,
+      hint: 'lowercase, no spaces (e.g., icon-radio)',
       validate: validateComponentName,
       format: (value) => {
-        // Auto-convert input to proper format
+        // Auto-convert input to proper format (display only)
         return value.trim()
           .toLowerCase()
           .replace(/\s+/g, '-')      // Replace spaces with hyphens
           .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
       },
     });
+
+    // Apply same transformation to actual value (not just display)
+    const componentName = rawComponentName.trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')      // Replace spaces with hyphens
+      .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
+      .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
+      .replace(/^-+|-+$/g, '');  // Remove leading/trailing hyphens
 
     console.log(''); // Add spacing
 
@@ -834,7 +843,7 @@ async function scaffoldComponent() {
     });
 
     if (!confirm) {
-      logWarning('Operation cancelled');
+      logWarning('Operation cancelled.');
       return;
     }
 
@@ -890,7 +899,7 @@ async function scaffoldComponent() {
     log(`\n${emojis.celebration} Enjoy building with your new component!`, colors.green + colors.bright);
   } catch (error) {
     console.log(''); // Add spacing
-    logWarning('Operation cancelled by user');
+    logWarning('Operation cancelled.');
     process.exit(0);
   }
 }
