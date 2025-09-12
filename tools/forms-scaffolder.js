@@ -10,6 +10,66 @@ import { logger, createSpinner } from './utils.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Command line argument parsing
+function parseCommandLineArgs() {
+  const args = process.argv.slice(2);
+  const options = {
+    componentName: null,
+    baseType: null,
+    help: false,
+  };
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    
+    if (arg === '--help' || arg === '-h') {
+      options.help = true;
+    } else if (arg === '--component-name' || arg === '-c') {
+      options.componentName = args[i + 1];
+      i++; // Skip next argument as it's the value
+    } else if (arg === '--base-type' || arg === '-b') {
+      options.baseType = args[i + 1];
+      i++; // Skip next argument as it's the value
+    } else if (arg.startsWith('--component-name=')) {
+      options.componentName = arg.split('=')[1];
+    } else if (arg.startsWith('--base-type=')) {
+      options.baseType = arg.split('=')[1];
+    }
+  }
+
+  return options;
+}
+
+// Display help information
+function displayHelp() {
+  console.log(colorize(`
+${emojis.aem} AEM Forms Custom Component Scaffolding Tool
+
+${colors.bright}Usage:${colors.reset}
+  node tools/forms-scaffolder.js [options]
+  npm run create:custom-component -- [options]
+
+${colors.bright}Options:${colors.reset}
+  -c, --component-name <name>    Name of the custom component (required)
+  -b, --base-type <type>         Base component type to extend (required)
+  -h, --help                     Display this help message
+
+${colors.bright}Examples:${colors.reset}
+  node tools/forms-scaffolder.js --component-name icon-radio --base-type "Radio Group"
+  npm run create:custom-component -- -c my-custom-input -b "Text Input"
+  node tools/forms-scaffolder.js --component-name=rating-stars --base-type="Rating"
+
+${colors.bright}Available Base Types:${colors.reset}
+  Button, Checkbox, Checkbox Group, Date Input, Drop Down, Email,
+  File Input, Image, Number Input, Panel, Radio Group, Reset Button,
+  Submit Button, Telephone Input, Text, Text Input
+
+${colors.bright}Interactive Mode:${colors.reset}
+  If no arguments are provided, the tool will run in interactive mode
+  and prompt for component name and base type selection.
+`, colors.cyan));
+}
+
 // CLI Colors and Emojis
 const colors = {
   reset: '\x1b[0m',
@@ -91,6 +151,26 @@ function getBaseComponents() {
     value: name.toLowerCase().replace(/\s+/g, '-'),
     filename: `_${name.toLowerCase().replace(/\s+/g, '-')}.json`,
   }));
+}
+
+// Find base component by name (case-insensitive)
+function findBaseComponentByName(baseTypeName) {
+  const baseComponents = getBaseComponents();
+  
+  // Try exact match first
+  let baseComponent = baseComponents.find(comp => 
+    comp.name.toLowerCase() === baseTypeName.toLowerCase()
+  );
+  
+  // If no exact match, try partial match
+  if (!baseComponent) {
+    baseComponent = baseComponents.find(comp => 
+      comp.name.toLowerCase().includes(baseTypeName.toLowerCase()) ||
+      baseTypeName.toLowerCase().includes(comp.name.toLowerCase())
+    );
+  }
+  
+  return baseComponent;
 }
 
 // Check if component directory already exists
@@ -377,7 +457,29 @@ function updateComponentDefinition(componentName) {
 }
 
 // Main scaffolding function
-async function scaffoldComponent() {
+async function scaffoldComponent(cliOptions = null) {
+  // Parse command line arguments if not provided
+  const options = cliOptions || parseCommandLineArgs();
+  
+  // Handle help option
+  if (options.help) {
+    displayHelp();
+    return;
+  }
+
+  // Validate CLI arguments if provided
+  if (options.componentName && !options.baseType) {
+    logError('Error: --base-type is required when --component-name is provided');
+    console.log('\nUse --help for usage information.');
+    process.exit(1);
+  }
+  
+  if (options.baseType && !options.componentName) {
+    logError('Error: --component-name is required when --base-type is provided');
+    console.log('\nUse --help for usage information.');
+    process.exit(1);
+  }
+
   console.clear();
 
   // ASCII Art Banner - Ocean theme colors
@@ -396,59 +498,95 @@ async function scaffoldComponent() {
   log(`${emojis.rocket} Let's create a new custom component!`, colors.cyan);
 
   const baseComponents = getBaseComponents();
+  let componentName, baseComponent;
 
   try {
-    // Prompt for component name
-    const { componentName } = await enquirer.prompt({
-      type: 'input',
-      name: 'componentName',
-      message: `${emojis.gear} What's the name of your custom component?`,
-      hint: 'lowercase, no spaces (e.g., icon-radio)',
-      validate: validateComponentName,
-      format: (value) => {
-        // Auto-convert input to proper format
-        return value.trim()
-          .toLowerCase()
-          .replace(/\s+/g, '-')      // Replace spaces with hyphens
-          .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
-      },
-    });
+    // Handle CLI mode vs Interactive mode
+    if (options.componentName && options.baseType) {
+      // CLI mode - validate and use provided arguments
+      componentName = options.componentName.trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-_]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
 
-    console.log(''); // Add spacing
+      // Validate component name
+      const validationResult = validateComponentName(componentName);
+      if (validationResult !== true) {
+        logError(`Invalid component name: ${validationResult}`);
+        process.exit(1);
+      }
 
-    // Prompt for base component
-    const { baseComponent } = await enquirer.prompt({
-      type: 'select',
-      name: 'baseComponent',
-      message: `${emojis.magic} Which base component should this extend?`,
-      hint: 'Use arrow keys to navigate through the list, Enter to select',
-      limit: 8,
-      choices: baseComponents.map((comp) => ({
-        name: `${comp.name}`,
-        value: comp,
-      })),
-      result() {
-        return this.focused.value;
-      },
-    });
+      // Find base component
+      baseComponent = findBaseComponentByName(options.baseType);
+      if (!baseComponent) {
+        logError(`Base component '${options.baseType}' not found.`);
+        log(`Available base components: ${baseComponents.map(c => c.name).join(', ')}`, colors.dim);
+        process.exit(1);
+      }
 
-    console.log(''); // Add spacing
+      log(`${emojis.gear} Using CLI arguments:`, colors.cyan);
+      log(`   Component name: ${colorize(componentName, colors.green)}`, colors.white);
+      log(`   Base component: ${colorize(baseComponent.name, colors.green)}`, colors.white);
+      console.log(''); // Add spacing
 
-    // Show summary and confirm
-    log(`${emojis.sparkles} Summary:`, colors.cyan + colors.bright);
-    log(`   Custom Component name: ${colorize(componentName, colors.green)}`, colors.white);
-    log(`   Base component: ${colorize(baseComponent.name, colors.green)}`, colors.white);
+    } else {
+      // Interactive mode - prompt for inputs
+      // Prompt for component name
+      const componentNameResponse = await enquirer.prompt({
+        type: 'input',
+        name: 'componentName',
+        message: `${emojis.gear} What's the name of your custom component?`,
+        hint: 'lowercase, no spaces (e.g., icon-radio)',
+        validate: validateComponentName,
+        format: (value) => {
+          // Auto-convert input to proper format
+          return value.trim()
+            .toLowerCase()
+            .replace(/\s+/g, '-')      // Replace spaces with hyphens
+            .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
+        },
+      });
 
-    const { confirm } = await enquirer.prompt({
-      type: 'confirm',
-      name: 'confirm',
-      message: `${emojis.check} Create this custom component?`,
-      initial: true,
-    });
+      componentName = componentNameResponse.componentName;
+      console.log(''); // Add spacing
 
-    if (!confirm) {
-      logWarning('Operation cancelled');
-      return;
+      // Prompt for base component
+      const baseComponentResponse = await enquirer.prompt({
+        type: 'select',
+        name: 'baseComponent',
+        message: `${emojis.magic} Which base component should this extend?`,
+        hint: 'Use arrow keys to navigate through the list, Enter to select',
+        limit: 8,
+        choices: baseComponents.map((comp) => ({
+          name: `${comp.name}`,
+          value: comp,
+        })),
+        result() {
+          return this.focused.value;
+        },
+      });
+
+      baseComponent = baseComponentResponse.baseComponent;
+      console.log(''); // Add spacing
+
+      // Show summary and confirm
+      log(`${emojis.sparkles} Summary:`, colors.cyan + colors.bright);
+      log(`   Custom Component name: ${colorize(componentName, colors.green)}`, colors.white);
+      log(`   Base component: ${colorize(baseComponent.name, colors.green)}`, colors.white);
+
+      const { confirm } = await enquirer.prompt({
+        type: 'confirm',
+        name: 'confirm',
+        message: `${emojis.check} Create this custom component?`,
+        initial: true,
+      });
+
+      if (!confirm) {
+        logWarning('Operation cancelled');
+        return;
+      }
     }
 
     // Create component files with spinner
@@ -502,8 +640,13 @@ async function scaffoldComponent() {
     log(`\n${emojis.celebration} Enjoy customizing your component!`, colors.green + colors.bright);
   } catch (error) {
     console.log(''); // Add spacing
-    logWarning('Operation cancelled by user');
-    process.exit(0);
+    if (error.name === 'ExitPrompt') {
+      logWarning('Operation cancelled by user');
+      process.exit(0);
+    } else {
+      logError(`Unexpected error: ${error.message}`);
+      process.exit(1);
+    }
   }
 }
 
