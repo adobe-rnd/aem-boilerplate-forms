@@ -36,15 +36,23 @@ jobs:
           BRANCH="sync-xwalk-$(date +'%Y-%m-%d')"
           git checkout -b "$BRANCH" origin/main
 
+          # Reset any workflow files to their original state before rebase
+          git checkout HEAD -- .github/workflows/
+
           set +e
           git rebase upstream/main
           while [ $? -ne 0 ]; do
             echo "Merge conflicts detected — auto-committing resolution..."
+            # Exclude workflow files from auto-commit
             git add -A
+            git reset HEAD .github/workflows/
             git commit -m "Auto-resolve conflict during monthly sync with xwalk"
             git rebase --continue
           done
           set -e
+
+          # Ensure workflow files remain unchanged
+          git checkout HEAD -- .github/workflows/
 
           git push origin "$BRANCH"
           echo "BRANCH_NAME=$BRANCH" >> $GITHUB_ENV
@@ -57,7 +65,8 @@ jobs:
             --title "chore:monthly sync from xwalk" \
             --body "This PR syncs changes from [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) into this fork.  
             - Branch: $BRANCH_NAME  
-            - All conflicts (if any) were auto-committed during rebase." \
+            - All conflicts (if any) were auto-committed during rebase.
+            - **Note**: Workflow files (.github/workflows/) are excluded from this sync and need to be synced manually if needed." \
             --base main \
             --head "$BRANCH_NAME" \
             || echo "PR may already exist. Skipping..."
