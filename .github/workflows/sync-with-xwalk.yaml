@@ -9,6 +9,7 @@ permissions:
   contents: write
   pull-requests: write
   actions: write
+  id-token: write
 
 jobs:
   sync:
@@ -74,5 +75,6 @@ jobs:
             - Note: Workflow files (.github/workflows/) are reverted to match our main and must be synced manually if required." \
             --base main \
             --head "$BRANCH_NAME" \
+            --web \
             || echo "PR may already exist. Skipping..."
 
