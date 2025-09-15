@@ -38,7 +38,7 @@ jobs:
           git checkout -b "$BRANCH" origin/main
 
           # Reset any workflow files to their original state before rebase
-          # git checkout HEAD -- .github/workflows/
+          # git checkout HEAD -- .github/
 
           set +e
           git rebase upstream/main
@@ -46,17 +46,17 @@ jobs:
             echo "Merge conflicts detected — auto-committing resolution..."
             # Exclude workflow files from auto-commit
             git add -A
-            # git reset HEAD .github/workflows/
+            # git reset HEAD .github/
             git commit -m "Auto-resolve conflict during monthly sync with xwalk"
             git rebase --continue
           done
           set -e
 
           # Revert any workflow file changes from upstream
-          git checkout origin/main -- .github/workflows/
+          git checkout origin/main -- .github/
           
           # If there are any staged changes to workflow files, commit the reversion
-          if ! git diff --cached --quiet .github/workflows/; then
+          if ! git diff --cached --quiet .github/; then
             git commit -m "Revert workflow file changes from upstream sync"
           fi
 
