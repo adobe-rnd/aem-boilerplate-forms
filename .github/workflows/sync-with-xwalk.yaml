@@ -51,8 +51,14 @@ jobs:
           done
           set -e
 
-          # Ensure workflow files remain unchanged
-          git checkout HEAD -- .github/workflows/
+          # Revert any workflow file changes from upstream
+          git checkout origin/main -- .github/workflows/
+          
+          # If there are any changes to workflow files, commit the reversion
+          if ! git diff --quiet .github/workflows/; then
+            git add .github/workflows/
+            git commit -m "Revert workflow file changes from upstream sync"
+          fi
 
           git push origin "$BRANCH"
           echo "BRANCH_NAME=$BRANCH" >> $GITHUB_ENV
