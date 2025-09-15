@@ -5,6 +5,10 @@ on:
     - cron: "0 0 1 * *" # Runs at 00:00 on the 1st of every month
   workflow_dispatch: # allow manual trigger
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -26,21 +30,20 @@ jobs:
           git remote add upstream https://github.com/adobe-rnd/aem-boilerplate-xwalk.git
           git fetch upstream
 
-      - name: Create sync branch
+      - name: Create sync branch and rebase
         run: |
           BRANCH="sync-xwalk-$(date +'%Y-%m-%d')"
           git checkout -b "$BRANCH" origin/main
 
-          # Rebase upstream/main into new branch
           set +e
-          git rebase upstream/main || true
-          set -e
-
-          # If conflicts remain, stage and commit them
-          if ! git diff --check --exit-code; then
+          git rebase upstream/main
+          while [ $? -ne 0 ]; do
+            echo "Merge conflicts detected — auto-committing resolution..."
             git add -A
-            git commit -m "Resolve merge conflicts during monthly sync with xwalk"
-          fi
+            git commit -m "Auto-resolve conflict during monthly sync with xwalk"
+            git rebase --continue
+          done
+          set -e
 
           git push origin "$BRANCH"
           echo "BRANCH_NAME=$BRANCH" >> $GITHUB_ENV
@@ -53,7 +56,7 @@ jobs:
             --title "chore:monthly sync from xwalk" \
             --body "This PR syncs changes from [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) into this fork.  
             - Branch: $BRANCH_NAME  
-            - Conflicts (if any) were auto-committed." \
+            - All conflicts (if any) were auto-committed during rebase." \
             --base main \
             --head "$BRANCH_NAME" \
             || echo "PR may already exist. Skipping..."
