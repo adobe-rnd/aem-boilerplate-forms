@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+
   actions: write
   id-token: write
 
@@ -37,16 +38,11 @@ jobs:
           BRANCH="sync-xwalk-$(date +'%Y-%m-%d')"
           git checkout -b "$BRANCH" origin/main
 
-          # Reset any workflow files to their original state before rebase
-          # git checkout HEAD -- .github/
-
           set +e
           git rebase upstream/main
           while [ $? -ne 0 ]; do
             echo "Merge conflicts detected — auto-committing resolution..."
-            # Exclude workflow files from auto-commit
             git add -A
-            # git reset HEAD .github/
             git commit -m "Auto-resolve conflict during monthly sync with xwalk"
             git rebase --continue
           done
@@ -79,4 +75,3 @@ jobs:
             }' \
             https://api.github.com/repos/adobe-rnd/aem-boilerplate-forms/pulls \
             || echo "PR may already exist. Skipping..."
-
