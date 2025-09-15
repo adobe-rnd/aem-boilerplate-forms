@@ -20,9 +20,9 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.121
+ *  Version: 0.22.145
  */
-import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, SubmitError, SubmitFailure, Submit, Save, Reset, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
+import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, RequestSuccess, SubmitError, SubmitFailure, RequestFailure, Submit, Save, Reset, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
@@ -176,6 +176,10 @@ const isEmailInput = function (item) {
     const fieldType = item?.fieldType || defaultFieldTypes(item);
     return (fieldType === 'text-input' && item?.format === 'email') || fieldType === 'email';
 };
+const isDateTimeField = function (item) {
+    const fieldType = item?.fieldType || defaultFieldTypes(item);
+    return (fieldType === 'text-input' && item?.format === 'date-time') || fieldType === 'datetime-input';
+};
 const isDateField = function (item) {
     const fieldType = item?.fieldType || defaultFieldTypes(item);
     return (fieldType === 'text-input' && item?.format === 'date') || fieldType === 'date-input';
@@ -220,6 +224,102 @@ const isRepeatable$1 = (obj) => {
             (obj.minOccur !== undefined && obj.minOccur >= 0) ||
             (obj.maxOccur !== undefined && obj.maxOccur !== 0))) || false);
 };
+class PropertiesManager {
+    constructor(host) {
+        this.host = host;
+        this._definedProperties = new Set();
+        this._propertiesWrapper = {};
+        this._initialized = false;
+    }
+    get properties() {
+        if (!this._initialized) {
+            this._setupInitialProperties();
+            this._initialized = true;
+        }
+        return this._propertiesWrapper;
+    }
+    set properties(p) {
+        const oldProperties = this.host._jsonModel.properties || {};
+        const newProperties = { ...p };
+        this.host._jsonModel.properties = newProperties;
+        Object.keys(newProperties).forEach(prop => {
+            this._ensurePropertyDescriptor(prop);
+        });
+        Object.keys({ ...oldProperties, ...newProperties }).forEach(prop => {
+            if (oldProperties[prop] !== newProperties[prop]) {
+                const changeAction = propertyChange(`properties.${prop}`, newProperties[prop], oldProperties[prop]);
+                this.host.notifyDependents(changeAction);
+            }
+        });
+    }
+    ensurePropertyDescriptor(propertyName) {
+        this._ensurePropertyDescriptor(propertyName);
+    }
+    _setupInitialProperties() {
+        const properties = this.host._jsonModel.properties || {};
+        Object.keys(properties).forEach(prop => {
+            this._ensurePropertyDescriptor(prop);
+        });
+        if (!this.host._jsonModel.properties) {
+            this.host._jsonModel.properties = {};
+        }
+    }
+    _ensurePropertyDescriptor(prop) {
+        if (this._definedProperties.has(prop)) {
+            return;
+        }
+        Object.defineProperty(this._propertiesWrapper, prop, {
+            get: () => {
+                if (!prop.startsWith('fd:')) {
+                    this.host.ruleEngine.trackDependency(this.host, `properties.${prop}`);
+                }
+                const properties = this.host._jsonModel.properties || {};
+                return properties[prop];
+            },
+            set: (value) => {
+                const properties = this.host._jsonModel.properties || {};
+                const oldValue = properties[prop];
+                if (oldValue !== value) {
+                    const updatedProperties = { ...properties, [prop]: value };
+                    this.host._jsonModel.properties = updatedProperties;
+                    const changeAction = propertyChange(`properties.${prop}`, value, oldValue);
+                    this.host.notifyDependents(changeAction);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        this._definedProperties.add(prop);
+    }
+    updateNestedProperty(propertyPath, value) {
+        const parts = propertyPath.split('.');
+        const topLevelProp = parts[0];
+        this._ensurePropertyDescriptor(topLevelProp);
+        const properties = this.host._jsonModel.properties || {};
+        const updatedProperties = JSON.parse(JSON.stringify(properties));
+        const currentObj = updatedProperties[topLevelProp] || {};
+        updatedProperties[topLevelProp] = currentObj;
+        let parentObj = currentObj;
+        for (let i = 1; i < parts.length - 1; i++) {
+            if (!parentObj[parts[i]]) {
+                parentObj[parts[i]] = {};
+            } else if (typeof parentObj[parts[i]] !== 'object') {
+                parentObj[parts[i]] = {};
+            }
+            parentObj = parentObj[parts[i]];
+        }
+        const finalProp = parts[parts.length - 1];
+        const oldValue = parentObj[finalProp];
+        parentObj[finalProp] = value;
+        this.host._jsonModel.properties = updatedProperties;
+        const changeAction = propertyChange(`properties.${propertyPath}`, value, oldValue);
+        this.host.notifyDependents(changeAction);
+    }
+    updateSimpleProperty(propertyName, value) {
+        this._ensurePropertyDescriptor(propertyName);
+        this._propertiesWrapper[propertyName] = value;
+    }
+}
 class DataValue {
     $_name;
     $_value;
@@ -706,7 +806,7 @@ const processItem = (item, excludeUnbound, isAsync) => {
                 ? item.dataRef
                 : (name.length > 0 ? item.name : undefined);
             if (item.value instanceof Array) {
-                if (item.type === 'string[]') {
+                if (item.type === 'string[]' && item?.format === 'data-url') {
                     if (isAsync) {
                         return item.serialize().then(serializedFiles => {
                             ret[item.id] = serializedFiles.map((x) => {
@@ -728,7 +828,7 @@ const processItem = (item, excludeUnbound, isAsync) => {
                 }
             }
             else if (item.value != null) {
-                if (item.type === 'string') {
+                if (item.type === 'string' && item?.format === 'data-url') {
                     if (isAsync) {
                         return item.serialize().then(serializedFile => {
                             ret[item.id] = { ...serializedFile[0], 'dataRef': dataRef };
@@ -1014,14 +1114,14 @@ const checkFile = (inputVal) => {
     };
 };
 const matchMediaType = (mediaType, accepts) => {
-    return !mediaType || accepts.some((accept) => {
+    return mediaType !== '' && (!mediaType || accepts.some((accept) => {
         const trimmedAccept = accept.trim();
         const prefixAccept = trimmedAccept.split('/')[0];
         const suffixAccept = trimmedAccept.split('.')[1];
         return ((trimmedAccept.includes('*') && mediaType.startsWith(prefixAccept)) ||
             (trimmedAccept.includes('.') && mediaType.endsWith(suffixAccept)) ||
             (trimmedAccept === mediaType));
-    });
+    }));
 };
 const partitionArray = (inputVal, validatorFn) => {
     const value = toArray(inputVal);
@@ -1043,7 +1143,8 @@ const ValidConstraints = {
     number: ['minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum'],
     array: ['minItems', 'maxItems', 'uniqueItems'],
     file: ['accept', 'maxFileSize'],
-    email: ['minLength', 'maxLength', 'format', 'pattern']
+    email: ['minLength', 'maxLength', 'format', 'pattern'],
+    datetime: ['minimum', 'maximum']
 };
 const validationConstraintsList = ['type', 'format', 'minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'minItems',
     'maxItems', 'uniqueItems', 'minLength', 'maxLength', 'pattern', 'required', 'enum', 'accept', 'maxFileSize'];
@@ -1284,7 +1385,7 @@ function dependencyTracked() {
         const get = descriptor.get;
         if (get != undefined) {
             descriptor.get = function () {
-                this.ruleEngine.trackDependency(this);
+                this.ruleEngine.trackDependency(this, propertyKey);
                 return get.call(this);
             };
         }
@@ -1321,15 +1422,21 @@ class BaseNode {
     _tokens = [];
     _eventSource = EventSource.CODE;
     _fragment = '$form';
+    _idSet;
+    _propertiesManager;
+    createIdSet() {
+        return new Set();
+    }
     get isContainer() {
         return false;
     }
     constructor(params, _options) {
         this._options = _options;
+        this._idSet = this.createIdSet();
         this[qualifiedName] = null;
         this._jsonModel = {
             ...params,
-            id: 'id' in params ? params.id : this.form.getUniqueId()
+            id: this.form.getUniqueId(params?.id)
         };
         if (this.parent?.isFragment) {
             this._fragment = this.parent.qualifiedName;
@@ -1337,6 +1444,7 @@ class BaseNode {
         else if (this.parent?.fragment) {
             this._fragment = this.parent.fragment;
         }
+        this._propertiesManager = new PropertiesManager(this);
     }
     get fragment() {
         return this._fragment;
@@ -1452,7 +1560,11 @@ class BaseNode {
         return this._jsonModel.label;
     }
     set label(l) {
-        if (l !== this._jsonModel.label) {
+        const isLabelSame = (l !== null && this._jsonModel.label !== null &&
+            typeof l === 'object' && typeof this._jsonModel.label === 'object') ?
+            JSON.stringify(l) === JSON.stringify(this._jsonModel.label) :
+            l === this._jsonModel.label;
+        if (!isLabelSame) {
             const changeAction = propertyChange('label', l, this._jsonModel.label);
             this._jsonModel = {
                 ...this._jsonModel,
@@ -1469,29 +1581,31 @@ class BaseNode {
         return !this._jsonModel.name && !isNonTransparent;
     }
     getDependents() {
-        return this._dependents.map(x => x.node.id);
+        return this._dependents.map(x => ({ id: x.node.id, propertyName: x.propertyName }));
     }
     getState(forRestore = false) {
-        return {
-            ...this._jsonModel,
-            properties: this.properties,
-            index: this.index,
-            parent: undefined,
-            qualifiedName: this.qualifiedName,
-            ...(this.repeatable === true ? {
-                repeatable: true,
-                minOccur: this.parent.minItems,
-                maxOccur: this.parent.maxItems
-            } : {}),
-            ':type': this[':type'],
-            ...(forRestore ? {
-                _dependents: this._dependents.length ? this.getDependents() : undefined,
-                allowedComponents: undefined,
-                columnClassNames: undefined,
-                columnCount: undefined,
-                gridClassNames: undefined
-            } : {})
-        };
+        return this.withDependencyTrackingControl(true, () => {
+            return {
+                ...this._jsonModel,
+                properties: this.properties,
+                index: this.index,
+                parent: undefined,
+                qualifiedName: this.qualifiedName,
+                ...(this.repeatable === true ? {
+                    repeatable: true,
+                    minOccur: this.parent.minItems,
+                    maxOccur: this.parent.maxItems
+                } : {}),
+                ':type': this[':type'],
+                ...(forRestore ? {
+                    _dependents: this._dependents.length ? this.getDependents() : undefined,
+                    allowedComponents: undefined,
+                    columnClassNames: undefined,
+                    columnCount: undefined,
+                    gridClassNames: undefined
+                } : {})
+            };
+        });
     }
     subscribe(callback, eventName = 'change') {
         this._callbacks[eventName] = this._callbacks[eventName] || [];
@@ -1502,13 +1616,14 @@ class BaseNode {
             }
         };
     }
-    _addDependent(dependent) {
+    _addDependent(dependent, propertyName) {
         if (this._dependents.find(({ node }) => node === dependent) === undefined) {
             const subscription = this.subscribe((change) => {
                 const changes = change.payload.changes;
                 const propsToLook = [...dynamicProps, 'items'];
                 const isPropChanged = changes.findIndex(x => {
-                    return propsToLook.indexOf(x.propertyName) > -1;
+                    const changedPropertyName = x.propertyName;
+                    return propsToLook.includes(changedPropertyName) || (changedPropertyName.startsWith('properties.') && propertyName === changedPropertyName);
                 }) > -1;
                 if (isPropChanged) {
                     if (this.form.changeEventBehaviour === 'deps') {
@@ -1519,7 +1634,7 @@ class BaseNode {
                     }
                 }
             });
-            this._dependents.push({ node: dependent, subscription });
+            this._dependents.push({ node: dependent, propertyName, subscription });
         }
     }
     removeDependent(dependent) {
@@ -1537,20 +1652,36 @@ class BaseNode {
         this.queueEvent(action);
         this.form.getEventQueue().runPendingQueue();
     }
+    withDependencyTrackingControl(disableDependencyTracking, callback) {
+        const currentDependencyTracking = this.form.ruleEngine.getDependencyTracking();
+        if (disableDependencyTracking) {
+            this.form.ruleEngine.setDependencyTracking(false);
+        }
+        try {
+            return callback();
+        }
+        finally {
+            if (disableDependencyTracking) {
+                this.form.ruleEngine.setDependencyTracking(currentDependencyTracking);
+            }
+        }
+    }
     notifyDependents(action) {
         const depsToRestore = this._jsonModel._dependents;
         if (depsToRestore) {
             depsToRestore.forEach((x) => {
-                const node = this.form.getElement(x);
+                const node = this.form.getElement(x.id);
                 if (node) {
-                    this._addDependent(node);
+                    this._addDependent(node, x.propertyName);
                 }
             });
             this._jsonModel._dependents = undefined;
         }
         const handlers = this._callbacks[action.type] || [];
         handlers.forEach(x => {
-            x(new ActionImplWithTarget(action, this));
+            this.withDependencyTrackingControl(true, () => {
+                x(new ActionImplWithTarget(action, this));
+            });
         });
     }
     isEmpty(value = this._jsonModel.value) {
@@ -1574,7 +1705,9 @@ class BaseNode {
             }
             notifyChildren.call(this, changeAction);
             if (validationConstraintsList.includes(prop)) {
-                this.validate();
+                if (this.hasValueBeenSet === undefined || this.hasValueBeenSet) {
+                    this.validate();
+                }
             }
             return changeAction.payload.changes;
         }
@@ -1591,26 +1724,31 @@ class BaseNode {
             _data = NullDataValue;
         }
         else if (dataRef !== undefined && !this.repeatable) {
-            if (this._tokens.length === 0) {
-                this._tokens = tokenize(dataRef);
-            }
-            let searchData = contextualDataModel;
-            if (this._tokens[0].type === TOK_GLOBAL) {
-                searchData = this.form.getDataNode();
-            }
-            else if (this._tokens[0].type === TOK_REPEATABLE) {
-                let repeatRoot = this.parent;
-                while (!repeatRoot.repeatable && repeatRoot !== this.form) {
-                    repeatRoot = repeatRoot.parent;
+            try {
+                if (this._tokens.length === 0) {
+                    this._tokens = tokenize(dataRef);
                 }
-                searchData = repeatRoot.getDataNode();
+                let searchData = contextualDataModel;
+                if (this._tokens[0].type === TOK_GLOBAL) {
+                    searchData = this.form.getDataNode();
+                }
+                else if (this._tokens[0].type === TOK_REPEATABLE) {
+                    let repeatRoot = this.parent;
+                    while (!repeatRoot.repeatable && repeatRoot !== this.form) {
+                        repeatRoot = repeatRoot.parent;
+                    }
+                    searchData = repeatRoot.getDataNode();
+                }
+                if (typeof searchData !== 'undefined') {
+                    const name = this._tokens[this._tokens.length - 1].value;
+                    const create = this.defaultDataModel(name);
+                    _data = resolveData(searchData, this._tokens, create);
+                    _parent = resolveData(searchData, this._tokens.slice(0, -1));
+                    _key = name;
+                }
             }
-            if (typeof searchData !== 'undefined') {
-                const name = this._tokens[this._tokens.length - 1].value;
-                const create = this.defaultDataModel(name);
-                _data = resolveData(searchData, this._tokens, create);
-                _parent = resolveData(searchData, this._tokens.slice(0, -1));
-                _key = name;
+            catch (error) {
+                console.error(`Error parsing dataRef "${dataRef}" for field "${this.id}". The data of this field will not be exported.`);
             }
         }
         else {
@@ -1622,10 +1760,16 @@ class BaseNode {
                 if (key !== '') {
                     const create = this.defaultDataModel(key);
                     if (create !== undefined) {
-                        _data = contextualDataModel.$getDataNode(key);
-                        if (_data === undefined) {
-                            _data = create;
-                            contextualDataModel.$addDataNode(key, _data);
+                        if (typeof contextualDataModel.$getDataNode === 'function') {
+                            _data = contextualDataModel.$getDataNode(key);
+                            if (_data === undefined) {
+                                _data = create;
+                                contextualDataModel.$addDataNode(key, _data);
+                            }
+                        }
+                        else {
+                            console.error(`$getDataNode method is undefined for "${name}" with dataModel type "${contextualDataModel.$type}"`);
+                            _data = undefined;
                         }
                     }
                 }
@@ -1663,10 +1807,13 @@ class BaseNode {
         return this._lang;
     }
     get properties() {
-        return this._jsonModel.properties || {};
+        return this._propertiesManager.properties;
     }
     set properties(p) {
-        this._setProperty('properties', { ...p });
+        this._propertiesManager.properties = p;
+    }
+    getPropertiesManager() {
+        return this._propertiesManager;
     }
     getNonTransparentParent() {
         let nonTransparentParent = this.parent;
@@ -1674,6 +1821,13 @@ class BaseNode {
             nonTransparentParent = nonTransparentParent.parent;
         }
         return nonTransparentParent;
+    }
+    _isAncestorRepeatable() {
+        let parent = this.parent;
+        while (parent && !parent.repeatable) {
+            parent = parent.parent;
+        }
+        return Boolean(parent);
     }
     _initialize(mode) {
         if (typeof this._data === 'undefined') {
@@ -1703,13 +1857,17 @@ class BaseNode {
             return this[qualifiedName];
         }
         const parent = this.getNonTransparentParent();
+        let qn;
         if (parent && parent.type === 'array') {
-            this[qualifiedName] = `${parent.qualifiedName}[${this.index}]`;
+            qn = `${parent.qualifiedName}[${this.index}]`;
         }
         else {
-            this[qualifiedName] = `${parent.qualifiedName}.${this.name}`;
+            qn = `${parent.qualifiedName}.${this.name}`;
         }
-        return this[qualifiedName];
+        if (!this._isAncestorRepeatable()) {
+            this[qualifiedName] = qn;
+        }
+        return qn;
     }
     focus() {
         if (this.parent) {
@@ -1746,9 +1904,6 @@ __decorate([
 __decorate([
     dependencyTracked()
 ], BaseNode.prototype, "label", null);
-__decorate([
-    dependencyTracked()
-], BaseNode.prototype, "properties", null);
 class Scriptable extends BaseNode {
     _events = {};
     _rules = {};
@@ -1925,6 +2080,7 @@ class Scriptable extends BaseNode {
                 target: this.getRuleNode()
             }
         };
+        this.ruleEngine.setDependencyTracking(['change', 'executeRule'].includes(action.type));
         const eventName = action.isCustomEvent ? `custom:${action.type}` : action.type;
         const funcName = action.isCustomEvent ? `custom_${action.type}` : action.type;
         const node = this.getCompiledEvent(eventName);
@@ -2042,31 +2198,32 @@ class Container extends Scriptable {
         }) : [];
     }
     getItemsState(isRepeatableChild = false, forRestore = false) {
-        if (this._jsonModel.type === 'array' || isRepeatable$1(this._jsonModel) || isRepeatableChild) {
-            if (isRepeatableChild) {
-                return this._getFormAndSitesState(isRepeatableChild, forRestore);
-            }
-            else {
-                return this._children.map(x => {
-                    return { ...x.getState(true, forRestore) };
-                });
-            }
+        const isThisContainerRepeatable = this._jsonModel.type === 'array' || isRepeatable$1(this._jsonModel);
+        if (isThisContainerRepeatable) {
+            return this._children.map(x => {
+                return { ...x.getState(true, forRestore) };
+            });
         }
         else {
             return this._getFormAndSitesState(isRepeatableChild, forRestore);
         }
     }
     getState(isRepeatableChild = false, forRestore = false) {
-        return {
-            ...super.getState(forRestore),
-            ...(forRestore ? {
-                ':items': undefined,
-                ':itemsOrder': undefined
-            } : {}),
-            items: this.getItemsState(isRepeatableChild, forRestore),
-            enabled: this.enabled,
-            readOnly: this.readOnly
-        };
+        return this.withDependencyTrackingControl(true, () => {
+            return {
+                ...super.getState(forRestore),
+                ...(forRestore ? {
+                    ':items': undefined,
+                    ':itemsOrder': undefined
+                } : {}),
+                items: this.getItemsState(isRepeatableChild, forRestore),
+                ...((this._jsonModel.type === 'array' || isRepeatable$1(this._jsonModel)) && this._itemTemplate ? {
+                    _itemTemplate: { ...this._itemTemplate }
+                } : {}),
+                enabled: this.enabled,
+                readOnly: this.readOnly
+            };
+        });
     }
     _createChild(child, options) {
         return this.fieldFactory.createField(child, options);
@@ -2104,10 +2261,10 @@ class Container extends Scriptable {
             Object.defineProperty(parent._childrenReference, name, {
                 get: () => {
                     if (child.isContainer && child.hasDynamicItems()) {
-                        self.ruleEngine.trackDependency(child);
+                        self.ruleEngine.trackDependency(child, 'items');
                     }
                     if (self.hasDynamicItems()) {
-                        self.ruleEngine.trackDependency(self);
+                        self.ruleEngine.trackDependency(self, 'items');
                         if (this._children[name] !== undefined) {
                             return this._children[name].getRuleNode();
                         }
@@ -2172,7 +2329,8 @@ class Container extends Scriptable {
         const items = this._jsonModel.items || [];
         this._childrenReference = this._jsonModel.type == 'array' ? [] : {};
         if (this._canHaveRepeatingChildren(mode)) {
-            this._itemTemplate = deepClone(items[0]);
+            this._itemTemplate = this._jsonModel._itemTemplate || deepClone(items[0]);
+            this._jsonModel._itemTemplate = undefined;
             if (mode === 'restore') {
                 this._itemTemplate.repeatable = undefined;
             }
@@ -2335,6 +2493,9 @@ class Container extends Scriptable {
                 this.notifyDependents(propertyChange('items', null, item.getState()));
             });
         }
+        else if (typeof this._data === 'undefined') {
+            console.warn(`Data node is null, hence importData did not work for panel "${this.name}". Check if parent has a dataRef set to null.`);
+        }
     }
     syncDataAndFormModel(contextualDataModel) {
         const result = {
@@ -2357,9 +2518,8 @@ class Container extends Scriptable {
             if (items2Remove > 0) {
                 for (let i = 0; i < items2Remove; i++) {
                     this._childrenReference.pop();
-                    this._children.pop();
+                    result.removed.push(this._children.pop());
                 }
-                result.removed.push(...this._children);
             }
         }
         this._children.forEach(x => {
@@ -2417,7 +2577,7 @@ class Container extends Scriptable {
             for (const change of action.payload.changes) {
                 if (change.propertyName !== undefined && notifyChildrenAttributes.includes(change.propertyName)) {
                     this.items.forEach((child) => {
-                        if (change.currentValue !== child.getState()[change.propertyName]) {
+                        if (change.currentValue !== child._jsonModel[change.propertyName]) {
                             child._jsonModel[change.propertyName] = change.currentValue;
                             this.notifyDependents.call(child, propertyChange(change.propertyName, child.getState()[change.propertyName], null));
                         }
@@ -2499,6 +2659,9 @@ class Logger {
             console[level](msg);
         }
     }
+    isLevelEnabled(level) {
+        return this.logLevel !== 0 && this.logLevel <= levels[level];
+    }
     logLevel;
     constructor(logLevel = 'off') {
         this.logLevel = levels[logLevel];
@@ -2558,7 +2721,18 @@ class EventQueue {
             const evntNode = new EventNode(node, e);
             const counter = this._runningEventCount[evntNode.valueOf()] || 0;
             if (counter < EventQueue.MAX_EVENT_CYCLE_COUNT) {
-                this.logger.info(`Queued event : ${e.type} node: ${node.id} - ${node.name}`);
+                let payloadAsStr = '';
+                if (e?.type === 'change' && !e?.payload?.changes.map(_ => _.propertyName).includes('activeChild')) {
+                    payloadAsStr = JSON.stringify(e.payload.changes, null, 2);
+                }
+                else if (e?.type.includes('setProperty')) {
+                    payloadAsStr = JSON.stringify(e.payload, null, 2);
+                }
+                if (this.logger.isLevelEnabled('info')) {
+                    node.withDependencyTrackingControl(true, () => {
+                        this.logger.info(`Queued event : ${e.type} node: ${node.id} - ${node.qualifiedName} - ${payloadAsStr}`);
+                    });
+                }
                 if (priority) {
                     const index = this._isProcessing ? 1 : 0;
                     this._pendingEvents.splice(index, 0, evntNode);
@@ -2649,6 +2823,13 @@ const convertQueryString = (endpoint, payload) => {
     }
     return endpoint.includes('?') ? `${endpoint}&${params.join('&')}` : `${endpoint}?${params.join('&')}`;
 };
+function parsePropertyPath(keyStr) {
+    return keyStr
+        .replace(/\[/g, '.')
+        .replace(/\]/g, '')
+        .split('.')
+        .filter(Boolean);
+}
 const getCustomEventName = (name) => {
     const eName = name;
     if (eName.length > 0 && eName.startsWith('custom:')) {
@@ -2719,14 +2900,29 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
         method: httpVerb,
         ...encryptOutput
     };
+    const targetField = context.$field || null;
+    const targetEvent = context.$event || null;
+    response.submitter = targetField;
+    const enhancedPayload = {
+        request: response.originalRequest,
+        response,
+        targetField,
+        targetEvent
+    };
     if (response?.status >= 200 && response?.status <= 299) {
         const eName = getCustomEventName(success);
         if (success === 'submitSuccess') {
             context.form.dispatch(new SubmitSuccess(response, true));
         }
         else {
-            context.form.dispatch(new CustomEvent(eName, response, true));
+            if (context.field) {
+                context.field.dispatch(new CustomEvent(eName, response, true));
+            }
+            else {
+                context.form.dispatch(new CustomEvent(eName, response, true));
+            }
         }
+        context.form.dispatch(new RequestSuccess(enhancedPayload, false));
     }
     else {
         context.form.logger.error('Error invoking a rest API');
@@ -2736,9 +2932,16 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
             context.form.dispatch(new SubmitFailure(response, true));
         }
         else {
-            context.form.dispatch(new CustomEvent(eName, response, true));
+            if (context.field) {
+                context.field.dispatch(new CustomEvent(eName, response, true));
+            }
+            else {
+                context.form.dispatch(new CustomEvent(eName, response, true));
+            }
         }
+        context.form.dispatch(new RequestFailure(enhancedPayload, false));
     }
+    return response;
 };
 const urlEncoded = (data) => {
     const formData = new URLSearchParams();
@@ -3012,21 +3215,23 @@ class FunctionRuntimeImpl {
             },
             importData: {
                 _func: (args, data, interpreter) => {
-                    const inputData = args[0];
-                    const qualifiedName = args[1];
-                    if (typeof inputData === 'object' && inputData !== null && !qualifiedName) {
-                        interpreter.globals.form.importData(inputData);
-                    }
-                    else {
-                        const field = interpreter.globals.form.resolveQualifiedName(qualifiedName);
-                        if (field?.isContainer) {
-                            field.importData(inputData, qualifiedName);
+                    return interpreter.globals.form.withDependencyTrackingControl(true, () => {
+                        const inputData = args[0];
+                        const qualifiedName = args[1];
+                        if (typeof inputData === 'object' && inputData !== null && !qualifiedName) {
+                            interpreter.globals.form.importData(inputData);
                         }
                         else {
-                            interpreter.globals.form.logger.error('Invalid argument passed in importData. A container is expected');
+                            const field = interpreter.globals.form.resolveQualifiedName(qualifiedName);
+                            if (field?.isContainer) {
+                                field.importData(inputData, qualifiedName);
+                            }
+                            else {
+                                interpreter.globals.form.logger.error('Invalid argument passed in importData. A container is expected');
+                            }
                         }
-                    }
-                    return {};
+                        return {};
+                    });
                 },
                 _signature: []
             },
@@ -3091,6 +3296,49 @@ class FunctionRuntimeImpl {
                 },
                 _signature: []
             },
+            setVariable: {
+                _func: (args, data, interpreter) => {
+                    const variableName = toString(args[0]);
+                    let variableValue = args[1];
+                    const normalFieldOrPanel = args[2] || interpreter.globals.form;
+                    if (variableValue && typeof variableValue === 'object' && variableValue.$qualifiedName) {
+                        const variableValueElement = interpreter.globals.form.getElement(variableValue.$id);
+                        variableValue = variableValueElement._jsonModel.value;
+                    }
+                    const target = normalFieldOrPanel.$id ? interpreter.globals.form.getElement(normalFieldOrPanel.$id) : interpreter.globals.form;
+                    const propertiesManager = target.getPropertiesManager();
+                    propertiesManager.updateSimpleProperty(variableName, variableValue);
+                    return {};
+                },
+                _signature: []
+            },
+            getVariable: {
+                _func: (args, data, interpreter) => {
+                    const variableName = toString(args[0]);
+                    const normalFieldOrPanel = args[1] || interpreter.globals.form;
+                    if (!variableName) {
+                        return undefined;
+                    }
+                    const target = normalFieldOrPanel.$id ? interpreter.globals.form.getElement(normalFieldOrPanel.$id) : interpreter.globals.form;
+                    const propertiesManager = target.getPropertiesManager();
+                    if (variableName.includes('.')) {
+                        const properties = parsePropertyPath(variableName);
+                        let value = propertiesManager.properties;
+                        for (const prop of properties) {
+                            if (value === undefined || value === null) {
+                                return undefined;
+                            }
+                            value = value[prop];
+                        }
+                        return value;
+                    }
+                    else {
+                        propertiesManager.ensurePropertyDescriptor(variableName);
+                        return propertiesManager.properties[variableName];
+                    }
+                },
+                _signature: []
+            },
             request: {
                 _func: (args, data, interpreter) => {
                     const uri = toString(args[0]);
@@ -3123,6 +3371,77 @@ class FunctionRuntimeImpl {
                 },
                 _signature: []
             },
+            requestWithRetry: {
+                _func: (args, data, interpreter) => {
+                    const uri = toString(args[0]);
+                    const httpVerb = toString(args[1]);
+                    let success;
+                    let errorFn;
+                    let payload = valueOf(args[2]);
+                    if (typeof (args[3]) === 'string' && args.length === 5) {
+                        success = valueOf(args[3]);
+                        errorFn = valueOf(args[4]);
+                    }
+                    else if (typeof (args[4]) === 'string' && args.length === 6) {
+                        success = valueOf(args[4]);
+                        errorFn = valueOf(args[5]);
+                    }
+                    return async (retryOptions) => {
+                        try {
+                            if (payload instanceof Promise) {
+                                payload = await payload;
+                            }
+                        }
+                        catch (error) {
+                            console.error('Error resolving payload Promise:', error);
+                            throw error;
+                        }
+                        let finalHeaders = {};
+                        let finalBody = {};
+                        if (args.length === 5) {
+                            finalBody = payload.body || {};
+                            finalHeaders = payload.headers || {};
+                        }
+                        else {
+                            finalBody = payload || {};
+                            finalHeaders = args[3] || {};
+                        }
+                        if (retryOptions) {
+                            if (retryOptions.body) {
+                                finalBody = {
+                                    ...finalBody,
+                                    ...retryOptions.body
+                                };
+                            }
+                            if (retryOptions.headers) {
+                                finalHeaders = {
+                                    ...finalHeaders,
+                                    ...retryOptions.headers
+                                };
+                            }
+                        }
+                        const finalPayload = { 'body': finalBody, 'headers': finalHeaders };
+                        try {
+                            const response = await request(interpreter.globals, uri, httpVerb, finalPayload, success, errorFn, finalHeaders);
+                            return response;
+                        }
+                        catch (error) {
+                            if (error && typeof error === 'object' && 'status' in error && error.status >= 400) {
+                                throw error;
+                            }
+                            throw new Error('Request failed');
+                        }
+                    };
+                },
+                _signature: []
+            },
+            retryHandler: {
+                _func: (args, data, interpreter) => {
+                    const requestFn = valueOf(args[0]);
+                    return requestFn();
+                },
+                _signature: []
+            },
             awaitFn: {
                 _func: async (args, data, interpreter) => {
                     const success = args[1];
@@ -3144,7 +3463,7 @@ class FunctionRuntimeImpl {
             addInstance: {
                 _func: (args, data, interpreter) => {
                     const element = args[0];
-                    const payload = args.length > 2 ? valueOf(args[2]) : undefined;
+                    const payload = args.length > 1 ? valueOf(args[1]) : undefined;
                     try {
                         const formElement = interpreter.globals.form.getElement(element.$id);
                         const action = createAction('addInstance', payload);
@@ -3159,7 +3478,7 @@ class FunctionRuntimeImpl {
             removeInstance: {
                 _func: (args, data, interpreter) => {
                     const element = args[0];
-                    const payload = args.length > 2 ? valueOf(args[2]) : undefined;
+                    const payload = args.length > 1 ? valueOf(args[1]) : undefined;
                     try {
                         const formElement = interpreter.globals.form.getElement(element.$id);
                         const action = createAction('removeInstance', payload);
@@ -3228,12 +3547,108 @@ class FunctionRuntimeImpl {
                     return encData;
                 },
                 _signature: []
+            },
+            getQueryParameter: {
+                _func: (args, data, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getQueryParameter. A parameter is expected');
+                        return '';
+                    }
+                    if (interpreter.globals.form?.properties?.queryParams?.[param]) {
+                        return interpreter.globals.form.properties.queryParams[param];
+                    }
+                    try {
+                        const urlParams = new URLSearchParams(window?.location?.search || '');
+                        return urlParams.get(param);
+                    }
+                    catch (e) {
+                        interpreter.globals.form.logger.warn('Error reading URL parameters:', e);
+                    }
+                    return '';
+                },
+                _signature: []
+            },
+            getBrowserDetail: {
+                _func: (args, data, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getBrowserDetail. A parameter is expected');
+                        return '';
+                    }
+                    if (interpreter.globals.form?.properties?.browserDetails?.[param]) {
+                        return interpreter.globals.form.properties.browserDetails[param];
+                    }
+                    if (typeof navigator !== 'undefined' && param in navigator) {
+                        return navigator[param] || '';
+                    }
+                    else {
+                        interpreter.globals.form.logger.warn(`Invalid or unsupported browser detail requested: "${param}"`);
+                        return '';
+                    }
+                },
+                _signature: []
+            },
+            getURLDetail: {
+                _func: (args, data, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getURLDetail. A parameter is expected');
+                        return '';
+                    }
+                    if (interpreter.globals.form?.properties?.urlDetails?.[param]) {
+                        return interpreter.globals.form.properties.urlDetails[param];
+                    }
+                    if (typeof window !== 'undefined' && typeof window.location !== 'undefined' && param in window.location) {
+                        return window.location[param] || '';
+                    }
+                    else {
+                        interpreter.globals.form.logger.warn(`Invalid or unsupported url parameter requested: "${param}"`);
+                        return '';
+                    }
+                },
+                _signature: []
+            },
+            getRelativeInstanceIndex: {
+                _func: (args, data, interpreter) => {
+                    if (!Array.isArray(args[0]) || args[0].length === 0) {
+                        return -1;
+                    }
+                    const instanceManager = valueOf(args[0])[0].$parent;
+                    const field = interpreter.globals.$field;
+                    const baseName = instanceManager.$qualifiedName;
+                    const qn = field.$qualifiedName;
+                    if (qn.startsWith(baseName + '[')) {
+                        const startBracket = baseName.length + 1;
+                        const endBracket = qn.indexOf(']', startBracket);
+                        if (endBracket !== -1) {
+                            const idx = Number(qn.slice(startBracket, endBracket));
+                            if (!Number.isNaN(idx)) {
+                                return idx;
+                            }
+                        }
+                    }
+                    return instanceManager.length - 1;
+                },
+                _signature: []
+            },
+            today: {
+                _func: () => {
+                    const MS_IN_DAY = 24 * 60 * 60 * 1000;
+                    const now = new Date(Date.now());
+                    const _today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    return _today / MS_IN_DAY;
+                },
+                _signature: []
             }
         };
         return { ...defaultFunctions, ...FunctionRuntimeImpl.getInstance().customFunctions };
     }
 }
 const FunctionRuntime = FunctionRuntimeImpl.getInstance();
+const transformFieldName = (fieldName) => {
+    return fieldName.split('.').slice(1).map(p => p.match(/\[\d+\]$/) ? p : p !== '' ? `${p}[0]` : p).join('.');
+};
 class Version {
     #minor;
     #major;
@@ -3388,6 +3803,9 @@ class Form extends Container {
         }
     }
     resolveQualifiedName(qualifiedName) {
+        if (this.qualifiedName === qualifiedName) {
+            return this;
+        }
         let foundFormElement = null;
         this.visit(formElement => {
             if (formElement.qualifiedName === qualifiedName) {
@@ -3397,45 +3815,62 @@ class Form extends Container {
         return foundFormElement;
     }
     exportSubmitMetaData() {
-        const captchaInfoObj = {};
-        this.visit(field => {
-            if (field.fieldType === 'captcha') {
-                captchaInfoObj[field.qualifiedName] = field.value;
-            }
-        });
-        const draftId = this.properties['fd:draftId'] || '';
-        if (draftId) {
-            this.setAdditionalSubmitMetadata({
-                'fd:draftId': draftId
+        return this.withDependencyTrackingControl(true, () => {
+            const captchaInfoObj = {};
+            this.visit(field => {
+                if (field.fieldType === 'captcha') {
+                    captchaInfoObj[field.qualifiedName] = field.value;
+                }
             });
-        }
-        const options = {
-            lang: this.lang,
-            captchaInfo: captchaInfoObj,
-            ...this.additionalSubmitMetadata
-        };
-        return new SubmitMetaData(options);
+            const additionalMeta = {};
+            const draftId = this.properties['fd:draftId'] || '';
+            if (draftId) {
+                additionalMeta['fd:draftId'] = draftId;
+            }
+            const dorProps = this.properties['fd:dor'];
+            if (dorProps && dorProps.dorType !== 'none') {
+                const excludeFromDoRIfHidden = dorProps['fd:excludeFromDoRIfHidden'];
+                let excludeFromDoR = [];
+                excludeFromDoR = Object.values(this._fields)
+                    .filter(field => field.enabled === false || (excludeFromDoRIfHidden && field.visible === false))
+                    .map(field => transformFieldName(field.qualifiedName));
+                if (excludeFromDoR && excludeFromDoR.length > 0) {
+                    additionalMeta.excludeFromDoR = excludeFromDoR;
+                }
+            }
+            if (Object.keys(additionalMeta).length > 0) {
+                this.setAdditionalSubmitMetadata(additionalMeta);
+            }
+            const options = {
+                lang: this.lang,
+                captchaInfo: captchaInfoObj,
+                ...this.additionalSubmitMetadata
+            };
+            return new SubmitMetaData(options);
+        });
     }
     #getNavigableChildren(children) {
         return children.filter(child => child.visible === true);
     }
     #getFirstNavigableChild(container) {
-        const navigableChidren = this.#getNavigableChildren(container.items);
-        if (navigableChidren) {
-            return navigableChidren[0];
+        const navigableChildren = this.#getNavigableChildren(container.items);
+        if (navigableChildren && navigableChildren.length > 0) {
+            return navigableChildren[0];
         }
         return null;
     }
     #setActiveFirstDeepChild(currentField) {
         if (!currentField.isContainer) {
-            const parent = currentField.parent;
-            parent.activeChild = currentField;
+            currentField.parent.activeChild = currentField;
             return;
         }
         this.#clearCurrentFocus(currentField);
-        let currentActiveChild = currentField.activeChild;
-        currentActiveChild = (currentActiveChild === null) ? this.#getFirstNavigableChild(currentField) : currentField.activeChild;
-        this.#setActiveFirstDeepChild(currentActiveChild);
+        const activeChild = currentField.activeChild || this.#getFirstNavigableChild(currentField);
+        if (activeChild === null) {
+            currentField.parent.activeChild = currentField;
+            return;
+        }
+        this.#setActiveFirstDeepChild(activeChild);
     }
     #getNextItem(currIndex, navigableChidren) {
         if (currIndex < (navigableChidren.length - 1)) {
@@ -3515,11 +3950,20 @@ class Form extends Container {
     get ruleEngine() {
         return this._ruleEngine;
     }
-    getUniqueId() {
+    getUniqueId(id) {
+        if (id && !this._idSet?.has(id)) {
+            this._idSet?.add(id);
+            return id;
+        }
         if (this._ids == null) {
             return '';
         }
-        return this._ids.next().value;
+        const newId = this._ids.next().value;
+        this._idSet?.add(newId);
+        return newId;
+    }
+    clearIdRegistry() {
+        this._idSet?.clear();
     }
     fieldAdded(field) {
         if (field.fieldType === 'captcha' && !this._captcha) {
@@ -3726,9 +4170,9 @@ class RuleEngine {
         this._context = oldContext;
         return finalRes;
     }
-    trackDependency(subscriber) {
+    trackDependency(subscriber, propertyName) {
         if (this.dependencyTracking && this._context && this._context.field !== undefined && this._context.field !== subscriber) {
-            subscriber._addDependent(this._context.field);
+            subscriber._addDependent(this._context.field, propertyName);
         }
     }
     setDependencyTracking(track) {
@@ -3806,6 +4250,11 @@ __decorate([
 ], InstanceManager.prototype, "minOccur", null);
 const validTypes = ['string', 'number', 'integer', 'boolean', 'file', 'string[]', 'number[]', 'integer[]', 'boolean[]', 'file[]', 'array', 'object'];
 class Field extends Scriptable {
+    _ruleNodeReference = [];
+    _hasValueBeenSet = false;
+    get hasValueBeenSet() {
+        return this._hasValueBeenSet;
+    }
     constructor(params, _options) {
         super(params, _options);
         if (_options.mode !== 'restore') {
@@ -3819,7 +4268,6 @@ class Field extends Scriptable {
             }
         }
     }
-    _ruleNodeReference = [];
     _initialize() {
         super._initialize();
         this.setupRuleNode();
@@ -3866,6 +4314,7 @@ class Field extends Scriptable {
                     'multiline-input': 'string',
                     'number-input': 'number',
                     'date-input': 'string',
+                    'date-time': 'string',
                     'email': 'string',
                     'plain-text': 'string',
                     'image': 'string',
@@ -3933,14 +4382,19 @@ class Field extends Scriptable {
         }
         const props = ['minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum'];
         if (this._jsonModel.type !== 'string') {
-            this.unset('format', 'pattern', 'minLength', 'maxLength');
+            if (this._jsonModel.fieldType === 'file-input') {
+                this.unset('pattern', 'minLength', 'maxLength');
+            }
+            else {
+                this.unset('format', 'pattern', 'minLength', 'maxLength');
+            }
         }
         else if (this._jsonModel.fieldType === 'date-input') {
             this._jsonModel.format = 'date';
         }
         this.coerceParam('minLength', 'number');
         this.coerceParam('maxLength', 'number');
-        if (this._jsonModel.type !== 'number' && this._jsonModel.format !== 'date' && this._jsonModel.type !== 'integer') {
+        if (this._jsonModel.type !== 'number' && this._jsonModel.format !== 'date' && this._jsonModel.format !== 'date-time' && this._jsonModel.type !== 'integer') {
             this.unset('step', ...props);
         }
         props.forEach(c => {
@@ -4043,22 +4497,22 @@ class Field extends Scriptable {
         this._setProperty('required', r);
     }
     get maximum() {
-        if (this.type === 'number' || this.format === 'date' || this.type === 'integer') {
+        if (this.type === 'number' || this.format === 'date' || this.format === 'date-time' || this.type === 'integer') {
             return this._jsonModel.maximum;
         }
     }
     set maximum(m) {
-        if (this.type === 'number' || this.format === 'date' || this.type === 'integer') {
+        if (this.type === 'number' || this.format === 'date' || this.format === 'date-time' || this.type === 'integer') {
             this._setProperty('maximum', m);
         }
     }
     get minimum() {
-        if (this.type === 'number' || this.format === 'date' || this.type === 'integer') {
+        if (this.type === 'number' || this.format === 'date' || this.format === 'date-time' || this.type === 'integer') {
             return this._jsonModel.minimum;
         }
     }
     set minimum(m) {
-        if (this.type === 'number' || this.format === 'date' || this.type === 'integer') {
+        if (this.type === 'number' || this.format === 'date' || this.format === 'date-time' || this.type === 'integer') {
             this._setProperty('minimum', m);
         }
     }
@@ -4096,7 +4550,9 @@ class Field extends Scriptable {
             return this.executeExpression(this.displayValueExpression);
         }
         const df = this.displayFormat;
-        if (df && this.isNotEmpty(this.value) && this?.validity?.typeMismatch !== true) {
+        if (df && this.isNotEmpty(this.value) &&
+            this?.validity?.typeMismatch !== true &&
+            ((this.format === 'date' || this.format === 'date-time') ? this?.validity?.formatMismatch !== true : true)) {
             try {
                 return format(this.value, this.lang, df);
             }
@@ -4120,6 +4576,7 @@ class Field extends Scriptable {
         const typeRes = Constraints.type(this.getInternalType() || 'string', val);
         const changes = this._setProperty('value', typeRes.value, false);
         if (changes.length > 0) {
+            this._hasValueBeenSet = true;
             this._updateRuleNodeReference(typeRes.value);
             if (typeof dataNode !== 'undefined') {
                 dataNode.setValue(this.getDataNodeValue(this._jsonModel.value), this._jsonModel.value, this);
@@ -4221,7 +4678,7 @@ class Field extends Scriptable {
     valueOf() {
         const obj = this[target];
         const actualField = obj === undefined ? this : obj;
-        actualField.ruleEngine.trackDependency(actualField);
+        actualField.ruleEngine.trackDependency(actualField, 'value');
         return actualField._jsonModel.value || null;
     }
     toString() {
@@ -4303,6 +4760,8 @@ class Field extends Scriptable {
                 switch (this.format) {
                     case 'date':
                         return ValidConstraints.date;
+                    case 'date-time':
+                        return ValidConstraints.datetime;
                     case 'email':
                         return ValidConstraints.email;
                     case 'binary':
@@ -4330,8 +4789,8 @@ class Field extends Scriptable {
                     case 'date-input':
                         this._jsonModel.format = 'date';
                         break;
-                    case 'file-input':
-                        this._jsonModel.format = 'data-url';
+                    case 'date-time':
+                        this._jsonModel.format = 'date-time';
                         break;
                 }
             }
@@ -4553,7 +5012,7 @@ __decorate([
     dependencyTracked()
 ], Field.prototype, "errorMessage", null);
 __decorate([
-    include('text-input', 'date-input', 'file-input', 'email')
+    include('text-input', 'date-input', 'file-input', 'email', 'datetime-input')
 ], Field.prototype, "format", null);
 __decorate([
     include('text-input')
@@ -4839,6 +5298,18 @@ class DateField extends Field {
         }
     }
 }
+class DateTimeField extends DateField {
+    _dataFormat = 'yyyy-MM-ddTHH:mm';
+    _applyDefaults() {
+        super._applyDefaults();
+    }
+    get value() {
+        return super.value;
+    }
+    set value(value) {
+        super.value = value;
+    }
+}
 class EmailInput extends Field {
     _getDefaults() {
         return {
@@ -4949,6 +5420,9 @@ class FormFieldFactoryImpl {
             }
             else if (isDateField(child)) {
                 retVal = new DateField(child, options);
+            }
+            else if (isDateTimeField(child)) {
+                retVal = new DateTimeField(child, options);
             }
             else if (isCaptcha(child)) {
                 retVal = new Captcha(child, options);
