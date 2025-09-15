@@ -65,16 +65,18 @@ jobs:
 
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr create \
-            --title "chore:monthly sync from xwalk" \
-            --body "This PR syncs changes from [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) into this fork.
-            - Branch: $BRANCH_NAME
-            - All conflicts (if any) were auto-committed during rebase.
-            - Note: Workflow files (.github/workflows/) are reverted to match our main and must be synced manually if required." \
-            --base main \
-            --head "$BRANCH_NAME" \
-            --web \
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "title": "chore:monthly sync from xwalk",
+              "body": "This PR syncs changes from [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) into this fork.\n- Branch: '"$BRANCH_NAME"'\n- All conflicts (if any) were auto-committed during rebase.\n- Note: Workflow files (.github/workflows/) are reverted to match our main and must be synced manually if required.",
+              "head": "'"$BRANCH_NAME"'",
+              "base": "main"
+            }' \
+            https://api.github.com/repos/adobe-rnd/aem-boilerplate-forms/pulls \
             || echo "PR may already exist. Skipping..."
 
