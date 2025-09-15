@@ -54,9 +54,8 @@ jobs:
           # Revert any workflow file changes from upstream
           git checkout origin/main -- .github/workflows/
           
-          # If there are any changes to workflow files, commit the reversion
-          if ! git diff --quiet .github/workflows/; then
-            git add .github/workflows/
+          # If there are any staged changes to workflow files, commit the reversion
+          if ! git diff --cached --quiet .github/workflows/; then
             git commit -m "Revert workflow file changes from upstream sync"
           fi
 
