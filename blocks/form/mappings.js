@@ -1,7 +1,7 @@
 import { loadCSS } from '../../scripts/aem.js';
 
-let customComponents = [];
-const OOTBComponentDecorators = ['file-input', 'wizard', 'modal', 'tnc', 'toggleable-link', 'rating', 'datetime', 'list', 'location', 'accordion', 'password'];
+let customComponents = ['range'];
+const OOTBComponentDecorators = ['accordion', 'file', 'modal', 'password', 'rating', 'repeat', 'tnc', 'toggleable-link', 'wizard'];
 
 export function setCustomComponents(components) {
   customComponents = components;
@@ -16,8 +16,13 @@ export function getCustomComponents() {
 }
 
 /**
- * Loads JS and CSS for a block.
- * @param {Element} block The block element
+ * Loads a component from the components directory
+ * @param {string} componentName - The name of the component to load
+ * @param {HTMLElement} element - The DOM element to decorate
+ * @param {Object} fd - The form definition object
+ * @param {HTMLElement} container - The container element
+ * @param {string} formId - The form ID
+ * @returns {Promise<HTMLElement>} The decorated element
  */
 async function loadComponent(componentName, element, fd, container, formId) {
   const status = element.dataset.componentStatus;

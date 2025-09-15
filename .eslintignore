@@ -8,5 +8,7 @@ blocks/form/rules/model/*
 blocks/form/rules/functions.js
 scripts/editor-support.js
 scripts/editor-support-rte.js
+tools/forms-scaffolder.js
+tools/update-mappings.js
 /test
 >>>>>>> b9d7a93 (feat: Adding Form block along with embed)
