@@ -63,15 +63,11 @@ jobs:
           echo "BRANCH_NAME=$BRANCH" >> $GITHUB_ENV
 
       - name: Create Pull Request
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr create \
-            --title "chore:monthly sync from xwalk" \
-            --body "This PR syncs changes from [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) into this fork.  
-            - Branch: $BRANCH_NAME  
-            - All conflicts (if any) were auto-committed during rebase.
-            - **Note**: Workflow files (.github/workflows/) are excluded from this sync and need to be synced manually if needed." \
-            --base main \
-            --head "$BRANCH_NAME" \
-            || echo "PR may already exist. Skipping..."
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH }}
+          base: main
+          title: "chore:monthly sync from xwalk"
+          body: "This PR syncs changes from [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) into this fork. All conflicts (if any) were auto-committed during rebase. **Note**: Workflow files (.github/workflows/) are excluded from this sync and need to be synced manually if needed."
+
