@@ -23,7 +23,7 @@ module.exports = {
     }],
     'xwalk/max-cells': ['error', {
       '*': 4, // default limit for all models
-      form: 14,
+      form: 15,
       wizard: 12,
       'form-button': 7,
       'checkbox-group': 20,
@@ -31,7 +31,7 @@ module.exports = {
       'date-input': 21,
       'drop-down': 19,
       email: 22,
-      'file-input': 18,
+      'file-input': 20,
       'form-fragment': 15,
       'form-image': 7,
       'multiline-input': 23,
