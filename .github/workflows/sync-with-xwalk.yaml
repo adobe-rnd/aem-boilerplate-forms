@@ -35,7 +35,7 @@ jobs:
 
       - name: Create sync branch and rebase
         run: |
-          BRANCH="sync-xwalk-$(date +'%Y-%m-%d')"
+          BRANCH="sync-xwalk"
           git checkout -b "$BRANCH" origin/main
 
           set +e
