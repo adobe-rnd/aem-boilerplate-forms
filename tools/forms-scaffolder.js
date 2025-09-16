@@ -10,7 +10,25 @@ import { logger, createSpinner } from './utils.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// CLI Colors and Emojis
+// Command line argument detection
+const args = process.argv.slice(2);
+const isSimpleMode = args[0] === '--simple';
+const isCompositeMode = args[0] === '--composite';
+const isProgrammatic = isSimpleMode || isCompositeMode;
+
+// Validate arguments for programmatic modes
+if (isProgrammatic) {
+  if (isSimpleMode && args.length !== 3) {
+    console.error('Usage: node forms-scaffolder.js --simple component-name base-component');
+    process.exit(1);
+  }
+  if (isCompositeMode && args.length < 3) {
+    console.error('Usage: node forms-scaffolder.js --composite component-name component1,component2,...');
+    console.error('   or: node forms-scaffolder.js --composite component-name component1 component2 ...');
+    process.exit(1);
+  }
+}
+
 const colors = {
   reset: '\x1b[0m',
   bright: '\x1b[1m',
@@ -40,15 +58,11 @@ const emojis = {
   celebration: '🎉',
 };
 
-// Component types
 const COMPONENT_TYPES = {
   SIMPLE: 'simple',
   COMPOSITE: 'composite'
 };
 
-// File templates (removed - using direct strings instead)
-
-// Error messages
 const ERROR_MESSAGES = {
   NO_COMPONENTS_SIMPLE: 'No suitable base components found for simple extension!',
   NO_COMPONENTS_COMPOSITE: 'No suitable components found for composite creation!',
@@ -58,10 +72,8 @@ const ERROR_MESSAGES = {
   MISSING_SELECTED_COMPONENTS: (names) => `Selected components not found: ${names.join(', ')}`
 };
 
-// Component definition cache
 const componentCache = new Map();
 
-// Error handling utilities
 function handleFatalError(message, context = null) {
   const errorMsg = context ? `Failed to ${context}: ${message}` : message;
   logError(errorMsg);
@@ -69,7 +81,6 @@ function handleFatalError(message, context = null) {
 }
 
 
-// Utility functions
 function colorize(text, color) {
   return `${color}${text}${colors.reset}`;
 }
@@ -124,9 +135,6 @@ function mapComponentNames(componentNames, availableComponents) {
   return { mappedComponents, missingComponents };
 }
 
-// Generate JS template metadata (removed - using generic template instead)
-
-// Generate JS file content (simplified - generic template)
 function generateJSContent(componentName) {
   return `/**
  * Custom ${componentName} component
@@ -172,24 +180,20 @@ function transformComponentPaths(obj) {
   return obj;
 }
 
-// Generic component definition loader functions
 /**
  * Load component definition by ID or filename
  * @param {string} identifier - Component ID (e.g., 'panel', 'text-input') or filename (e.g., '_panel.json')
  * @returns {Object} Complete component data with definitions and models
  */
 async function getComponentDefinition(identifier) {
-  // Check cache first
   if (componentCache.has(identifier)) {
     return componentCache.get(identifier);
   }
   
   const formComponentsDir = path.join(__dirname, '../blocks/form/models/form-components');
   
-  // Determine filename from identifier
   let filename;
   if (identifier.startsWith('_') && identifier.endsWith('.json')) {
-    // Already a filename
     filename = identifier;
   } else {
     // Convert ID to filename (e.g., 'panel' -> '_panel.json', 'text-input' -> '_text-input.json')
@@ -214,12 +218,10 @@ async function getComponentDefinition(identifier) {
       identifier: identifier,
       definitions: componentData.definitions,
       models: componentData.models || [],
-      // Convenience accessors for first definition (most common case)
       definition: componentData.definitions[0],
       model: componentData.models?.[0]
     };
     
-    // Cache for future use
     componentCache.set(identifier, result);
     
     return result;
@@ -250,7 +252,6 @@ async function getAllFormComponents() {
       try {
         const componentData = await getComponentDefinition(filename);
         
-        // Skip files with invalid structure but don't block the entire process
         if (!componentData.definition) {
           skippedFiles.push({ filename, reason: 'Missing or invalid definition' });
           continue;
@@ -259,28 +260,21 @@ async function getAllFormComponents() {
         const definition = componentData.definition;
         const template = definition.plugins?.xwalk?.page?.template;
         
-        // Only add components with valid structure
         if (definition.title && definition.id) {
           components.push({
-            // Basic info
             name: definition.title,
             id: definition.id,
             filename: filename,
-            
-            // Type info
             fieldType: template?.fieldType || definition.id,
             resourceType: definition.plugins?.xwalk?.page?.resourceType,
             template: template || {},
-            
-            // Full data
-            ...componentData // includes definitions, models, definition, model
+            ...componentData
           });
         } else {
           skippedFiles.push({ filename, reason: 'Missing title or id' });
         }
         
       } catch (error) {
-        // Skip this file and continue with others
         skippedFiles.push({ filename, reason: error.message });
         continue;
       }
@@ -294,12 +288,6 @@ async function getAllFormComponents() {
   }
 }
 
-// Load all components for both simple and composite usage (no filtering)
-async function getAvailableComponents() {
-  return await getAllFormComponents();
-}
-
-// Component type selection function
 async function selectComponentType() {
   const result = await enquirer.prompt({
     type: 'select',
@@ -322,8 +310,6 @@ async function selectComponentType() {
   return result.componentType;
 }
 
-// Single-select for simple components
-// Note: enquirer always returns component names as strings, not full objects
 async function selectBaseComponent(availableComponents) {
   const result = await enquirer.prompt({
     type: 'select',
@@ -332,7 +318,7 @@ async function selectBaseComponent(availableComponents) {
     hint: 'Use arrow keys to navigate, Enter to confirm.',
     choices: availableComponents.map((comp) => ({
       name: comp.name,
-      value: comp // Note: enquirer returns comp.name (string) regardless of value
+      value: comp
     })),
     limit: 7,
     footer() {
@@ -361,7 +347,6 @@ async function selectCompositeComponents(availableComponents) {
       short: comp.name
     })),
     
-    // Custom indicator function (official Enquirer.js way)  
     indicator(state, choice) {
       return choice.enabled ? '● ' : '○ ';
     },
@@ -376,24 +361,19 @@ async function selectCompositeComponents(availableComponents) {
       return true;
     },
 
-    // Override keypress to track chronological selection order
     keypress(input, key) {
       const wasEnabled = this.focused.enabled;
       
-      // Call the original keypress handler first
       const result = this.constructor.prototype.keypress.call(this, input, key);
       
-      // Track selection changes on space key
       if (key && key.name === 'space') {
         const choiceName = this.focused.name;
         
         if (!wasEnabled && this.focused.enabled) {
-          // Item was just selected - add to end of selection order
           if (!selectionOrder.includes(choiceName)) {
             selectionOrder.push(choiceName);
           }
         } else if (wasEnabled && !this.focused.enabled) {
-          // Item was just deselected - remove from selection order
           selectionOrder = selectionOrder.filter(name => name !== choiceName);
         }
       }
@@ -404,21 +384,19 @@ async function selectCompositeComponents(availableComponents) {
     footer() {
       let footer = '';
       
-      // Add scroll indicator at top of footer
       const hasBelow = this.index + this.limit < this.choices.length;
       const scrollFooter = createScrollIndicators(false, hasBelow).footer;
       if (scrollFooter) {
         footer += scrollFooter;
       }
       
-      // Add selection order if any selections exist
       if (selectionOrder.length > 0) {
         const selectionLines = selectionOrder
           .map((choiceName, index) => 
             `  ${colors.cyan}${(index + 1).toString().padStart(2)}.${colors.reset} ${colors.bright}${choiceName}${colors.reset}`
           );
         
-        if (footer) footer += '\n\n'; // Add spacing between scroll indicator and selection
+        if (footer) footer += '\n\n';
         footer += `${colors.bright}Selection Order:${colors.reset}\n${selectionLines.join('\n')}`;
       }
       
@@ -426,29 +404,24 @@ async function selectCompositeComponents(availableComponents) {
     }
   });
   
-  // Return chronological order directly as array
   return selectionOrder;
 }
 
 // Generate composite JSON structure
 async function generateCompositeJSON(componentName, selectedComponents) {
-  // Load panel definition dynamically using generic loader
   const panelComponentData = await getComponentDefinition('panel');
   const basePanelDefinition = panelComponentData.definition;
   const basePanelModel = panelComponentData.model;
   
-  // Create template based on panel structure
   const template = {
     ...basePanelDefinition.plugins.xwalk.page.template,
     "jcr:title": componentName.charAt(0).toUpperCase() + componentName.slice(1).replace(/-/g, ' '),
     "fd:viewType": componentName
-    // Keep all panel template properties like minOccur, etc.
   };
   
-  // Add each selected element to template with sensible defaults
   selectedComponents.forEach((element, index) => {
-    // Generate element name from component ID and index
-    const elementName = selectedComponents.length > 1 ? `${element.id}${index + 1}` : element.id;
+    const baseElementName = element.id.replace(/-/g, '_');
+    const elementName = selectedComponents.length > 1 ? `${baseElementName}${index + 1}` : baseElementName;
     
     template[elementName] = {
       "jcr:title": element.name,
@@ -458,7 +431,7 @@ async function generateCompositeJSON(componentName, selectedComponents) {
     };
   });
   
-  // Create composite definition using panel as base (deep clone to avoid mutations)
+  // Create composite definition using panel as base
   const compositeDefinition = JSON.parse(JSON.stringify(basePanelDefinition));
   compositeDefinition.title = componentName.charAt(0).toUpperCase() + componentName.slice(1).replace(/-/g, ' ');
   compositeDefinition.id = componentName;
@@ -525,7 +498,6 @@ async function createComponentFiles(componentName, componentData, targetDir) {
   let jsonContent;
   
   if (componentData.type === COMPONENT_TYPES.SIMPLE) {
-    // Simple component: Use base component definition with error handling
     const baseComponent = componentData.baseComponent;
     
     if (!baseComponent) {
@@ -540,7 +512,6 @@ async function createComponentFiles(componentName, componentData, targetDir) {
       }
 
 
-    // Modify the base component configuration
     const customJson = {
         definitions: baseComponentData.definitions.map((def) => ({
         ...def,
@@ -574,7 +545,6 @@ async function createComponentFiles(componentName, componentData, targetDir) {
     }
     
   } else {
-    // Composite component: Generate panel-based structure with error handling
     const selectedComponents = componentData.selectedComponents;
     
     if (!selectedComponents || selectedComponents.length === 0) {
@@ -589,12 +559,10 @@ async function createComponentFiles(componentName, componentData, targetDir) {
     }
   }
 
-  // Create CSS file (same for both types)
   const cssContent = `/* ${componentName.charAt(0).toUpperCase() + componentName.slice(1)} component styles */
 /* Add your custom styles here */
 `;
 
-  // Write files
   writeFileSync(path.join(targetDir, files.js), jsContent);
   writeFileSync(path.join(targetDir, files.css), cssContent);
   writeFileSync(path.join(targetDir, files.json), jsonContent);
@@ -607,32 +575,25 @@ function updateFormJson(componentName) {
   const formJsonPath = path.join(__dirname, '../blocks/form/_form.json');
   
   try {
-    // Read current _form.json as text
     let formJsonContent = readFileSync(formJsonPath, 'utf-8');
     
-    // Find the filters section with regex
     const filtersRegex = /"filters":\s*\[\s*\{\s*"id":\s*"form",\s*"components":\s*\[([^\]]*)\]/;
     const match = formJsonContent.match(filtersRegex);
     
     if (match) {
-      // Parse the current components array
       const componentsString = match[1];
       const currentComponents = componentsString
         .split(',')
         .map(comp => comp.trim().replace(/['"]/g, ''))
         .filter(comp => comp.length > 0);
       
-      // Check if component already exists
       if (!currentComponents.includes(componentName)) {
-        // Add component to the array
         currentComponents.push(componentName);
         
-        // Create new components string (keep original formatting)
         const newComponentsString = currentComponents
           .map(comp => `\n        "${comp}"`)
           .join(',');
         
-        // Replace only the components array
         const newFiltersSection = `"filters": [
     {
       "id": "form",
@@ -644,7 +605,6 @@ function updateFormJson(componentName) {
           newFiltersSection
         );
         
-        // Write back to file
         writeFileSync(formJsonPath, formJsonContent);
         
         logSuccess(`Updated _form.json to include '${componentName}' in form filters`);
@@ -668,28 +628,22 @@ function updateComponentDefinition(componentName) {
   const componentDefPath = path.join(__dirname, '../models/_component-definition.json');
   
   try {
-    // Read current component definition
     const componentDef = JSON.parse(readFileSync(componentDefPath, 'utf-8'));
     
-    // Find the custom components group
     const customGroup = componentDef.groups.find(group => group.id === 'custom-components');
     
     if (customGroup) {
-      // Create the new component entry
       const newComponentEntry = {
         "...": `../blocks/form/components/${componentName}/_${componentName}.json#/definitions`
       };
       
-      // Check if this component path already exists to avoid duplicates
       const existingEntry = customGroup.components.find(comp => 
         comp["..."] === newComponentEntry["..."]
       );
       
       if (!existingEntry) {
-        // Append the new component to the existing array
         customGroup.components.push(newComponentEntry);
         
-        // Write back to file with proper formatting
         writeFileSync(componentDefPath, JSON.stringify(componentDef, null, 2));
         
         logSuccess(`Added '${componentName}' to _component-definition.json`);
@@ -708,11 +662,9 @@ function updateComponentDefinition(componentName) {
   }
 }
 
-// Main scaffolding function
-async function scaffoldComponent() {
+async function runInteractive() {
   console.clear();
 
-  // ASCII Art Banner - Ocean theme colors
   console.log(colorize(`
   █████╗  ███████╗ ███╗   ███╗     ███████╗  ██████╗  ██████╗  ███╗   ███╗ ███████╗
  ██╔══██╗ ██╔════╝ ████╗ ████║     ██╔════╝ ██╔═══██╗ ██╔══██╗ ████╗ ████║ ██╔════╝
@@ -722,17 +674,15 @@ async function scaffoldComponent() {
  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝     ╚═╝       ╚═════╝  ╚═╝  ╚═╝ ╚═╝     ╚═╝ ╚══════╝
   `, colors.cyan + colors.bright));
 
-  // Welcome message
   logTitle(' AEM Forms Custom Component Scaffolding Tool');
   log(`${emojis.magic}  This tool will help you set up all the necessary files to create a new custom component.`, colors.green);
   log(`${emojis.rocket} Let's create a new custom component!\n`, colors.cyan);
 
 
   try {
-    // Step 1: Component type selection  
     const componentType = await selectComponentType();
 
-    console.log(''); // Add spacing
+    console.log('');
       
     const { componentName: rawComponentName } = await enquirer.prompt({
       type: 'input',
@@ -741,7 +691,6 @@ async function scaffoldComponent() {
       hint: 'lowercase, no spaces (e.g., icon-radio)',
       validate: validateComponentName,
       format: (value) => {
-        // Auto-convert input to proper format (display only)
         return value.trim()
           .toLowerCase()
           .replace(/\s+/g, '-')      // Replace spaces with hyphens
@@ -749,7 +698,6 @@ async function scaffoldComponent() {
       },
     });
 
-    // Apply same transformation to actual value (not just display)
     const componentName = rawComponentName.trim()
       .toLowerCase()
       .replace(/\s+/g, '-')      // Replace spaces with hyphens
@@ -761,10 +709,9 @@ async function scaffoldComponent() {
 
     let componentData;
     if (componentType.toLowerCase() === COMPONENT_TYPES.SIMPLE) {
-      // Simple component flow - load only simple-extendable components
       let simpleComponents;
       try {
-        simpleComponents = await getAvailableComponents();
+        simpleComponents = await getAllFormComponents();
         
         if (simpleComponents.length === 0) {
           handleFatalError(ERROR_MESSAGES.NO_COMPONENTS_SIMPLE);
@@ -774,9 +721,8 @@ async function scaffoldComponent() {
       }
       
       const baseComponentResult = await selectBaseComponent(simpleComponents);
-      const baseComponentName = baseComponentResult.baseComponent; // Always a string
+      const baseComponentName = baseComponentResult.baseComponent;
       
-      // Convert string name to full component object
       const baseComponent = simpleComponents.find(comp => comp.name === baseComponentName);
       
       if (!baseComponent) {
@@ -789,10 +735,9 @@ async function scaffoldComponent() {
       };
       
     } else {
-      // Composite component flow - load only composite-compatible components
       let compositeComponents;
       try {
-        compositeComponents = await getAvailableComponents();
+        compositeComponents = await getAllFormComponents();
         
         if (compositeComponents.length === 0) {
           handleFatalError(ERROR_MESSAGES.NO_COMPONENTS_COMPOSITE);
@@ -801,9 +746,8 @@ async function scaffoldComponent() {
         handleFatalError(error.message, 'load composite components');
       }
       
-      const selectedComponentNames = await selectCompositeComponents(compositeComponents); // Chronological order as strings
+      const selectedComponentNames = await selectCompositeComponents(compositeComponents);
       
-      // Convert chronological order to full component objects (preserving order)
       const { mappedComponents: selectedComponents, missingComponents } = 
         mapComponentNames(selectedComponentNames, compositeComponents);
       
@@ -817,9 +761,8 @@ async function scaffoldComponent() {
       };
     }
 
-    console.log(''); // Add spacing
+    console.log('');
 
-    // Show summary and confirm
     log(`${emojis.sparkles} Summary:`, colors.cyan + colors.bright);
     log(`   Component name: ${colorize(componentName, colors.green)}`, colors.white);
     
@@ -834,13 +777,13 @@ async function scaffoldComponent() {
       });
     }
 
-    log(''); // Add spacing
+    log(''); 
 
     const { confirm } = await enquirer.prompt({
       type: 'confirm',
       name: 'confirm',
       message: `${emojis.check} Create this custom component?`,
-      prefix: '', // Remove question mark prefix
+      prefix: '',
       initial: true,
     });
 
@@ -849,12 +792,12 @@ async function scaffoldComponent() {
       return;
     }
 
-    // Create component files with spinner
+   
     const creationSpinner = createSpinner('Creating component structure...');
     let files;
 
     try {
-    // Create directory structure
+   
     const targetDir = path.join(__dirname, '../blocks/form/components', componentName);
 
     if (checkComponentExists(componentName)) {
@@ -864,7 +807,7 @@ async function scaffoldComponent() {
 
     mkdirSync(targetDir, { recursive: true });
 
-    // Create files
+   
       files = await createComponentFiles(componentName, componentData, targetDir);
     creationSpinner.stop('✅ Component files created successfully');
     } catch (error) {
@@ -897,7 +840,7 @@ async function scaffoldComponent() {
     log(`        ├── ${files.css}`, colors.dim);
     log(`        └── ${files.json}`, colors.dim);
 
-    // Type-specific guidance
+   
     log(`\n${emojis.sparkles} Next steps:`, colors.bright);
     
     log(`1. Edit ${files.js} to implement your component logic`, colors.white);
@@ -906,9 +849,97 @@ async function scaffoldComponent() {
 
     log(`\n${emojis.celebration} Enjoy building with your new component!`, colors.green + colors.bright);
   } catch (error) {
-    console.log(''); // Add spacing
+    console.log('');
     logWarning('Operation cancelled.');
     process.exit(0);
+  }
+}
+
+async function runProgrammatic() {
+  const componentName = args[1];
+  
+  try {
+    // Validate component name using existing function
+    const validation = validateComponentName(componentName);
+    if (validation !== true) {
+      throw new Error(validation);
+    }
+
+    let componentData;
+    const allComponents = await getAllFormComponents();
+
+    if (isSimpleMode) {
+      // Handle simple component
+      const baseComponentSpec = args[2];
+      const baseComponent = allComponents.find(comp => 
+        comp.name === baseComponentSpec || comp.id === baseComponentSpec
+      );
+      if (!baseComponent) {
+        const availableIds = allComponents.map(c => c.id).sort().join(', ');
+        throw new Error(`Base component '${baseComponentSpec}' not found. Available: ${availableIds}`);
+      }
+      componentData = { type: COMPONENT_TYPES.SIMPLE, baseComponent };
+      
+    } else {
+      // Handle composite component - detect format and parse
+      const componentSpec = args[2];
+      let componentNames;
+      
+      if (componentSpec.includes(',')) {
+        // Comma-separated format
+        componentNames = componentSpec.split(',').map(s => s.trim());
+        
+        // Validate no mixed format (no additional args after comma-separated)
+        if (args.length > 3) {
+          throw new Error('Mixed comma and space separation not allowed. Use either "comp1,comp2" or "comp1 comp2"');
+        }
+      } else {
+        // Space-separated format - take all remaining args
+        componentNames = args.slice(2);
+      }
+      
+      // Resolve component names to objects
+      const selectedComponents = [];
+      for (const name of componentNames) {
+        const comp = allComponents.find(c => c.name === name || c.id === name);
+        if (!comp) {
+          const availableIds = allComponents.map(c => c.id).sort().join(', ');
+          throw new Error(`Component '${name}' not found. Available: ${availableIds}`);
+        }
+        selectedComponents.push(comp);
+      }
+      componentData = { type: COMPONENT_TYPES.COMPOSITE, selectedComponents };
+    }
+
+    // Create component files using existing functions
+    const targetDir = path.join(__dirname, '../blocks/form/components', componentName);
+    
+    if (checkComponentExists(componentName)) {
+      throw new Error(ERROR_MESSAGES.COMPONENT_EXISTS(componentName));
+    }
+    
+    mkdirSync(targetDir, { recursive: true });
+    const files = await createComponentFiles(componentName, componentData, targetDir);
+    
+    // Update configurations using existing functions
+    updateComponentDefinition(componentName);
+    updateMappings();
+    updateFormJson(componentName);
+    
+    console.log(`✅ Successfully created '${componentName}' component`);
+    return { success: true, component: componentName, files };
+    
+  } catch (error) {
+    console.error(`❌ Error: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+async function scaffoldComponent() {
+  if (isProgrammatic) {
+    return await runProgrammatic();
+  } else {
+    return await runInteractive();
   }
 }
 
