@@ -101,9 +101,7 @@ onmessage = async (e) => {
   if (!customFunctionRegistered) {
     const codeBasePath = e?.data?.codeBasePath;
     registerCustomFunctions(
-      e?.data?.payload?.properties?.customFunctionsPath,
-      codeBasePath
-    ).then(() => {
+      e?.data?.payload?.properties?.customFunctionsPath, codeBasePath).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
     });
