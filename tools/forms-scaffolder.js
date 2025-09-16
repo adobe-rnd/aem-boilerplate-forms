@@ -25,6 +25,8 @@ if (isProgrammatic) {
   if (isCompositeMode && args.length < 3) {
     console.error('Usage: node forms-scaffolder.js --composite component-name component1,component2,...');
     console.error('   or: node forms-scaffolder.js --composite component-name component1 component2 ...');
+    console.error('   or: node forms-scaffolder.js --composite component-name "component1:Custom Name" component2');
+    console.error('   or: node forms-scaffolder.js --composite component-name "comp1:Name1,comp2:Name2"');
     process.exit(1);
   }
 }
@@ -58,12 +60,12 @@ const emojis = {
   celebration: '🎉',
 };
 
-const COMPONENT_TYPES = {
+export const COMPONENT_TYPES = {
   SIMPLE: 'simple',
   COMPOSITE: 'composite'
 };
 
-const ERROR_MESSAGES = {
+export const ERROR_MESSAGES = {
   NO_COMPONENTS_SIMPLE: 'No suitable base components found for simple extension!',
   NO_COMPONENTS_COMPOSITE: 'No suitable components found for composite creation!',
   COMPONENT_EXISTS: (name) => `Component '${name}' already exists. Please choose a different name.`,
@@ -185,7 +187,7 @@ function transformComponentPaths(obj) {
  * @param {string} identifier - Component ID (e.g., 'panel', 'text-input') or filename (e.g., '_panel.json')
  * @returns {Object} Complete component data with definitions and models
  */
-async function getComponentDefinition(identifier) {
+export async function getComponentDefinition(identifier) {
   if (componentCache.has(identifier)) {
     return componentCache.get(identifier);
   }
@@ -238,7 +240,7 @@ async function getComponentDefinition(identifier) {
  * Get all available form components with their definitions
  * @returns {Array} Array of component objects with full definitions
  */
-async function getAllFormComponents() {
+export async function getAllFormComponents() {
   const formComponentsDir = path.join(__dirname, '../blocks/form/models/form-components');
   
   try {
@@ -407,8 +409,104 @@ async function selectCompositeComponents(availableComponents) {
   return selectionOrder;
 }
 
+// Prompt for custom component names with better UX
+async function promptForComponentNames(selectedComponents) {
+  console.log(`\n${emojis.gear} ${colorize('Customize Display Names for Selected Components:', colors.cyan + colors.bright)}`);
+  console.log(`${colors.dim}┌${'─'.repeat(55)}┐${colors.reset}`);
+  console.log(`${colors.dim}│ Use Tab/Shift+Tab to navigate between fields          │${colors.reset}`);
+  console.log(`${colors.dim}│ Press Enter when all names are set                    │${colors.reset}`);  
+  console.log(`${colors.dim}└${'─'.repeat(55)}┘${colors.reset}\n`);
+  
+  const choices = selectedComponents.map((component, index) => ({
+    name: `component_${index}`,
+    message: `${colorize(component.name.padEnd(20), colors.bright)}`,
+    initial: component.name,
+    hint: colors.dim + 'Press Tab to navigate' + colors.reset
+  }));
+  
+  const result = await enquirer.prompt({
+    type: 'form',
+    name: 'componentNames',
+    message: colorize('Component Display Names:', colors.cyan),
+    choices,
+    validate(answers) {
+      const emptyEntries = Object.entries(answers)
+        .filter(([_, value]) => !value || !value.trim())
+        .map(([key]) => {
+          const index = parseInt(key.replace('component_', ''));
+          return selectedComponents[index].name;
+        });
+        
+      if (emptyEntries.length > 0) {
+        return `Please provide names for: ${colorize(emptyEntries.join(', '), colors.yellow)}`;
+      }
+      return true;
+    }
+  });
+  
+  // Map the answers back to component objects with custom names
+  const namedComponents = selectedComponents.map((component, index) => {
+    const customName = result.componentNames[`component_${index}`].trim();
+    return {
+      component,
+      customName: customName || component.name
+    };
+  });
+  
+  return namedComponents;
+}
+
+// Parse component specifications with optional custom names for programmatic mode
+function parseComponentSpecs(args, allComponents) {
+  const specs = args.slice(2);
+  const selectedComponents = [];
+  
+  // Handle comma-separated format
+  let componentSpecs;
+  if (specs.length === 1 && specs[0].includes(',')) {
+    componentSpecs = specs[0].split(',').map(s => s.trim());
+  } else {
+    componentSpecs = specs;
+  }
+  
+  for (const spec of componentSpecs) {
+    let componentId, customName;
+    
+    if (spec.includes(':')) {
+      const [id, ...nameParts] = spec.split(':');
+      componentId = id.trim();
+      customName = nameParts.join(':').trim(); // Handle colons in names
+    } else {
+      componentId = spec.trim();
+      customName = null;
+    }
+    
+    // Validate component exists
+    const component = allComponents.find(comp => 
+      comp.name === componentId || comp.id === componentId
+    );
+    
+    if (!component) {
+      const availableIds = allComponents.map(c => c.id).sort().join(', ');
+      throw new Error(`Component '${componentId}' not found. Available: ${availableIds}`);
+    }
+    
+    // Validate custom name is not empty if provided
+    if (customName !== null && customName === '') {
+      throw new Error(`Custom name cannot be empty for component '${componentId}'. Use 'component:name' or just 'component'.`);
+    }
+    
+    selectedComponents.push({
+      component,
+      customName: customName || component.name
+    });
+  }
+  
+  return selectedComponents;
+}
+
 // Generate composite JSON structure
-async function generateCompositeJSON(componentName, selectedComponents) {
+export async function generateCompositeJSON(componentName, selectedComponents) {
   const panelComponentData = await getComponentDefinition('panel');
   const basePanelDefinition = panelComponentData.definition;
   const basePanelModel = panelComponentData.model;
@@ -420,14 +518,14 @@ async function generateCompositeJSON(componentName, selectedComponents) {
   };
   
   selectedComponents.forEach((element, index) => {
-    const baseElementName = element.id.replace(/-/g, '_');
+    const baseElementName = element.component.id.replace(/-/g, '_');
     const elementName = selectedComponents.length > 1 ? `${baseElementName}${index + 1}` : baseElementName;
     
     template[elementName] = {
-      "jcr:title": element.name,
-      "sling:resourceType": element.resourceType,
-      "fieldType": element.fieldType,
-      ...element.template // merge any existing template properties
+      "sling:resourceType": element.component.resourceType,
+      "fieldType": element.component.fieldType,
+      ...element.component.template, // merge any existing template properties first
+      "jcr:title": element.customName || element.component.name
     };
   });
   
@@ -450,13 +548,13 @@ async function generateCompositeJSON(componentName, selectedComponents) {
 
 
 // Check if component directory already exists
-function checkComponentExists(componentName) {
+export function checkComponentExists(componentName) {
   const targetDir = path.join(__dirname, '../blocks/form/components', componentName);
   return existsSync(targetDir);
 }
 
 // Component name validation (simplified)
-function validateComponentName(name) {
+export function validateComponentName(name) {
   if (!name || typeof name !== 'string') {
     return 'Component name is required';
   }
@@ -485,7 +583,7 @@ function validateComponentName(name) {
 }
 
 // Create component files
-async function createComponentFiles(componentName, componentData, targetDir) {
+export async function createComponentFiles(componentName, componentData, targetDir) {
   const files = {
     js: `${componentName}.js`,
     css: `${componentName}.css`,
@@ -571,7 +669,7 @@ async function createComponentFiles(componentName, componentData, targetDir) {
 }
 
 // Update _form.json to include the new component in filters
-function updateFormJson(componentName) {
+export function updateFormJson(componentName) {
   const formJsonPath = path.join(__dirname, '../blocks/form/_form.json');
   
   try {
@@ -624,7 +722,7 @@ function updateFormJson(componentName) {
 }
 
 // Update _component-definition.json to include the new custom component
-function updateComponentDefinition(componentName) {
+export function updateComponentDefinition(componentName) {
   const componentDefPath = path.join(__dirname, '../models/_component-definition.json');
   
   try {
@@ -755,9 +853,12 @@ async function runInteractive() {
         handleFatalError(ERROR_MESSAGES.MISSING_SELECTED_COMPONENTS(missingComponents));
       }
       
+      // Prompt for custom component names
+      const namedComponents = await promptForComponentNames(selectedComponents);
+      
       componentData = { 
         type: COMPONENT_TYPES.COMPOSITE, 
-        selectedComponents 
+        selectedComponents: namedComponents 
       };
     }
 
@@ -771,9 +872,14 @@ async function runInteractive() {
       log(`   Base component: ${colorize(componentData.baseComponent.name, colors.green)}`, colors.white);
     } else {
       log(`   Type: ${colorize('Composite Custom Component', colors.green)}`, colors.white);
-      log(`   Contains:`, colors.white);
-      componentData.selectedComponents.forEach((comp, i) => {
-        log(`     ${i + 1}. ${colorize(comp.name, colors.green)}`);
+      log(`   Component mappings:`, colors.white);
+      componentData.selectedComponents.forEach((item, i) => {
+        const hasCustomName = item.customName !== item.component.name;
+        if (hasCustomName) {
+          log(`     ${i + 1}. ${colorize(item.component.name, colors.dim)} → ${colorize(item.customName, colors.green)}`);
+        } else {
+          log(`     ${i + 1}. ${colorize(item.component.name, colors.green)}`);
+        }
       });
     }
 
@@ -881,33 +987,8 @@ async function runProgrammatic() {
       componentData = { type: COMPONENT_TYPES.SIMPLE, baseComponent };
       
     } else {
-      // Handle composite component - detect format and parse
-      const componentSpec = args[2];
-      let componentNames;
-      
-      if (componentSpec.includes(',')) {
-        // Comma-separated format
-        componentNames = componentSpec.split(',').map(s => s.trim());
-        
-        // Validate no mixed format (no additional args after comma-separated)
-        if (args.length > 3) {
-          throw new Error('Mixed comma and space separation not allowed. Use either "comp1,comp2" or "comp1 comp2"');
-        }
-      } else {
-        // Space-separated format - take all remaining args
-        componentNames = args.slice(2);
-      }
-      
-      // Resolve component names to objects
-      const selectedComponents = [];
-      for (const name of componentNames) {
-        const comp = allComponents.find(c => c.name === name || c.id === name);
-        if (!comp) {
-          const availableIds = allComponents.map(c => c.id).sort().join(', ');
-          throw new Error(`Component '${name}' not found. Available: ${availableIds}`);
-        }
-        selectedComponents.push(comp);
-      }
+      // Handle composite component with new colon syntax support
+      const selectedComponents = parseComponentSpecs(args, allComponents);
       componentData = { type: COMPONENT_TYPES.COMPOSITE, selectedComponents };
     }
 
@@ -943,7 +1024,10 @@ async function scaffoldComponent() {
   }
 }
 
-// Run the scaffolding tool
-scaffoldComponent().catch((error) => {
-  handleFatalError(error.message, 'run scaffolding tool');
-});
+
+// Run the scaffolding tool (only when run directly, not when imported)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  scaffoldComponent().catch((error) => {
+    handleFatalError(error.message, 'run scaffolding tool');
+  });
+}
