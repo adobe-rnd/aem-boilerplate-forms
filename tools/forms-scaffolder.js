@@ -1024,10 +1024,7 @@ async function scaffoldComponent() {
   }
 }
 
-
-// Run the scaffolding tool (only when run directly, not when imported)
-if (import.meta.url === `file://${process.argv[1]}`) {
-  scaffoldComponent().catch((error) => {
-    handleFatalError(error.message, 'run scaffolding tool');
-  });
-}
+// Run the scaffolding tool
+scaffoldComponent().catch((error) => {
+  handleFatalError(error.message, 'run scaffolding tool');
+});
