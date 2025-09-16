@@ -987,7 +987,6 @@ async function runProgrammatic() {
       componentData = { type: COMPONENT_TYPES.SIMPLE, baseComponent };
       
     } else {
-      // Handle composite component with new colon syntax support
       const selectedComponents = parseComponentSpecs(args, allComponents);
       componentData = { type: COMPONENT_TYPES.COMPOSITE, selectedComponents };
     }
