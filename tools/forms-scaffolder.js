@@ -457,7 +457,7 @@ async function promptForComponentNames(selectedComponents) {
 }
 
 // Parse component specifications with optional custom names for programmatic mode
-function parseComponentSpecs(args, allComponents) {
+export function parseComponentSpecs(args, allComponents) {
   const specs = args.slice(2);
   const selectedComponents = [];
   
