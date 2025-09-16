@@ -358,7 +358,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       ...formDef,
       search: window.location.search || '',
     },
-   codeBasePath: window.hlx.codeBasePath,
+    codeBasePath: window.hlx.codeBasePath,
   });
 
   return new Promise((resolve) => {

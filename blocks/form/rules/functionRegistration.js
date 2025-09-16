@@ -38,12 +38,13 @@ export default async function registerCustomFunctions(customFunctionsPath, codeB
 
     const ootbFunctionModule = await import('./functions.js');
     registerFunctionsInRuntime(ootbFunctionModule);
-    if (codeBasePath != null && codeBasePath !== undefined && customFunctionsPath 
+    if (codeBasePath != null && codeBasePath !== undefined && customFunctionsPath
       && customFunctionsPath !== undefined) {
       const customFunctionModule = await import(`${codeBasePath}${customFunctionsPath}`);
       registerFunctionsInRuntime(customFunctionModule);
     }
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.log(`error occured while registering custom functions in web worker ${e.message}`);
   }
 }

@@ -298,20 +298,6 @@
           },
           {
             "component": "text",
-            "name": "cc",
-            "label": "CC",
-            "valueType": "string",
-            "multi": true
-          },
-          {
-            "component": "text",
-            "name": "bcc",
-            "label": "BCC",
-            "valueType": "string",
-            "multi": true
-          },
-          {
-            "component": "text",
             "name": "subject",
             "label": "Subject",
             "valueType": "string"
