@@ -19,7 +19,7 @@
  ************************************************************************ */
 import { registerFunctions } from './model/afb-runtime.js';
 
-export default async function registerCustomFunctions(customFunctionsPath,codeBasePath) {
+export default async function registerCustomFunctions(customFunctionsPath, codeBasePath) {
   try {
     // eslint-disable-next-line no-inner-declarations
     function registerFunctionsInRuntime(module) {
@@ -38,7 +38,8 @@ export default async function registerCustomFunctions(customFunctionsPath,codeBa
 
     const ootbFunctionModule = await import('./functions.js');
     registerFunctionsInRuntime(ootbFunctionModule);
-    if (codeBasePath != null && codeBasePath !== undefined && customFunctionsPath && customFunctionsPath !== undefined) {
+    if (codeBasePath != null && codeBasePath !== undefined && customFunctionsPath 
+      && customFunctionsPath !== undefined) {
       const customFunctionModule = await import(`${codeBasePath}${customFunctionsPath}`);
       registerFunctionsInRuntime(customFunctionModule);
     }
