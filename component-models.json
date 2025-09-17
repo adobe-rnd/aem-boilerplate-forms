@@ -236,12 +236,6 @@
       },
       {
         "component": "text",
-        "name": "customFunctionsPath",
-        "label": "Custom Functions Path",
-        "valueType": "string"
-    },
-      {
-        "component": "text",
         "name": "restEndpointPostUrl",
         "label": "URL For POST request",
         "valueType": "string",
@@ -295,6 +289,20 @@
             "valueType": "string",
             "multi": true,
             "required": true
+          },
+          {
+            "component": "text",
+            "name": "cc",
+            "label": "CC",
+            "valueType": "string",
+            "multi": true
+          },
+          {
+            "component": "text",
+            "name": "bcc",
+            "label": "BCC",
+            "valueType": "string",
+            "multi": true
           },
           {
             "component": "text",
