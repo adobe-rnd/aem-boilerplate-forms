@@ -2,7 +2,7 @@ import assert from 'assert';
 
 export const sample = {
   properties: {
-    customFunctionsPath: '/blocks/form/functions.js',
+    customFunctionsPath: '../functions.js',
   },
   items: [
     {
