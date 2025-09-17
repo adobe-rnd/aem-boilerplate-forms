@@ -1,6 +1,9 @@
 import assert from 'assert';
 
 export const sample = {
+  properties: {
+    customFunctionsPath: '/blocks/form/functions.js',
+  },
   items: [
     {
       id: 'textinput-9ae7fb61e4',
