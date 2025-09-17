@@ -16,6 +16,8 @@ function parseCommandLineArgs() {
   const options = {
     componentName: null,
     baseType: null,
+    customEventName: null,
+    propertyChanges: null,
     help: false,
   };
 
@@ -30,10 +32,20 @@ function parseCommandLineArgs() {
     } else if (arg === '--base-type' || arg === '-b') {
       options.baseType = args[i + 1];
       i++; // Skip next argument as it's the value
+    } else if (arg === '--custom-event-name' || arg === '-e') {
+      options.customEventName = args[i + 1];
+      i++; // Skip next argument as it's the value
+    } else if (arg === '--property-changes' || arg === '-p') {
+      options.propertyChanges = args[i + 1];
+      i++; // Skip next argument as it's the value
     } else if (arg.startsWith('--component-name=')) {
       options.componentName = arg.split('=')[1];
     } else if (arg.startsWith('--base-type=')) {
       options.baseType = arg.split('=')[1];
+    } else if (arg.startsWith('--custom-event-name=')) {
+      options.customEventName = arg.split('=')[1];
+    } else if (arg.startsWith('--property-changes=')) {
+      options.propertyChanges = arg.split('=')[1];
     }
   }
 
@@ -52,21 +64,29 @@ ${colors.bright}Usage:${colors.reset}
 ${colors.bright}Options:${colors.reset}
   -c, --component-name <name>    Name of the custom component (required)
   -b, --base-type <type>         Base component type to extend (required)
+  -e, --custom-event-name <name> Custom event name for the component (optional)
+  -p, --property-changes <list>  Comma-separated list of properties to monitor (optional)
   -h, --help                     Display this help message
 
 ${colors.bright}Examples:${colors.reset}
   node tools/forms-scaffolder.js --component-name icon-radio --base-type "Radio Group"
-  npm run create:custom-component -- -c my-custom-input -b "Text Input"
-  node tools/forms-scaffolder.js --component-name=rating-stars --base-type="Rating"
+  npm run create:custom-component -- -c my-custom-input -b "Text Input" -e "custom-change"
+  node tools/forms-scaffolder.js --component-name=rating-stars --base-type="Rating" --custom-event-name="rating-updated"
+  node tools/forms-scaffolder.js --component-name=smart-input --base-type="Text Input" --property-changes="value,visible,enabled"
 
 ${colors.bright}Available Base Types:${colors.reset}
   Button, Checkbox, Checkbox Group, Date Input, Drop Down, Email,
   File Input, Image, Number Input, Panel, Radio Group, Reset Button,
   Submit Button, Telephone Input, Text, Text Input
 
+${colors.bright}Available Property Changes:${colors.reset}
+  value, visible, enabled, readOnly, required, valid, enum, enumNames,
+  maximum, minimum, placeholder, tooltip, description, label,
+  errorMessage, constraintMessage
+
 ${colors.bright}Interactive Mode:${colors.reset}
   If no arguments are provided, the tool will run in interactive mode
-  and prompt for component name and base type selection.
+  and prompt for component name, base type, and property changes selection.
 `, colors.cyan));
 }
 
@@ -99,6 +119,26 @@ const emojis = {
   magic: '🪄',
   celebration: '🎉',
 };
+
+// Field properties that can be monitored for changes
+const FIELD_PROPERTIES = [
+  'value',
+  'visible',
+  'enabled',
+  'readOnly',
+  'required',
+  'valid',
+  'enum',
+  'enumNames',
+  'maximum',
+  'minimum',
+  'placeholder',
+  'tooltip',
+  'description',
+  'label',
+  'errorMessage',
+  'constraintMessage',
+];
 
 // Utility functions
 function colorize(text, color) {
@@ -208,36 +248,61 @@ function validateComponentName(name) {
   return true;
 }
 
+
+// Parse property changes from CLI argument
+function parsePropertyChanges(propertyChangesString) {
+  if (!propertyChangesString || typeof propertyChangesString !== 'string') {
+    return [];
+  }
+
+  // Split by comma and clean up
+  const properties = propertyChangesString
+    .split(',')
+    .map(prop => prop.trim())
+    .filter(prop => prop.length > 0);
+
+  // Validate each property
+  const invalidProperties = properties.filter(prop => !FIELD_PROPERTIES.includes(prop));
+  
+  if (invalidProperties.length > 0) {
+    throw new Error(`Invalid properties: ${invalidProperties.join(', ')}. Available properties: ${FIELD_PROPERTIES.join(', ')}`);
+  }
+
+  return properties;
+}
+
+// Get all available properties as choices for interactive mode
+function getPropertyChoices() {
+  return FIELD_PROPERTIES.map(prop => ({
+    name: prop,
+    value: prop,
+  }));
+}
+
 // Create component files
-function createComponentFiles(componentName, baseComponent, targetDir) {
+function createComponentFiles(componentName, baseComponent, targetDir, customEventName = '', propertyChanges = []) {
   const files = {
     js: `${componentName}.js`,
     css: `${componentName}.css`,
     json: `_${componentName}.json`,
   };
 
-  // Create JS file
-  const jsContent = `/**
- * Custom ${componentName} component
- * Based on: ${baseComponent.name}
- */
-
-/**
- * Decorates a custom form field component
- * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper.
- * @param {Object} fieldJson - The form json object for the component.
- * @param {HTMLElement} parentElement - The parent element of the field.
- * @param {string} formId - The unique identifier of the form.
- */
-export default async function decorate(fieldDiv, fieldJson, parentElement, formId) {
-  console.log('${emojis.gear} Decorating ${componentName} component:', fieldDiv, fieldJson, parentElement, formId);
+  // Create JS file - read template from js-content.txt
+  const jsTemplatePath = path.join(__dirname, 'js-content.txt');
+  const jsTemplate = readFileSync(jsTemplatePath, 'utf8');
   
-  // TODO: Implement your custom component logic here
-  // You can access the field properties via fieldJson.properties
+  // Format property changes array for JS
+  const propertyChangesString = propertyChanges.length > 0 
+    ? `['${propertyChanges.join("', '")}']`
+    : '[]';
   
-  return fieldDiv;
-}
-`;
+  // Replace template variables
+  const jsContent = jsTemplate
+    .replace(/\$\{componentName\}/g, componentName)
+    .replace(/\$\{baseComponent\.name\}/g, baseComponent.name)
+    .replace(/\$\{custom_event_name\}/g, customEventName)
+    .replace(/\$\{propertyChanges\}/g, propertyChangesString)
+    .replace(/\$\{emojis\.gear\}/g, '⚙️');
 
   // Create CSS file (empty)
   const cssContent = `/* ${componentName.charAt(0).toUpperCase() + componentName.slice(1)} component styles */
@@ -498,7 +563,7 @@ async function scaffoldComponent(cliOptions = null) {
   log(`${emojis.rocket} Let's create a new custom component!`, colors.cyan);
 
   const baseComponents = getBaseComponents();
-  let componentName, baseComponent;
+  let componentName, baseComponent, customEventName, propertyChanges;
 
   try {
     // Handle CLI mode vs Interactive mode
@@ -526,9 +591,43 @@ async function scaffoldComponent(cliOptions = null) {
         process.exit(1);
       }
 
+      // Handle custom event name if provided
+      if (options.customEventName) {
+        const customEventValidation = validateCustomEventName(options.customEventName);
+        if (customEventValidation !== true) {
+          logError(`Invalid custom event name: ${customEventValidation}`);
+          process.exit(1);
+        }
+        customEventName = options.customEventName.trim()
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-_]/g, '')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      } else {
+        customEventName = '';
+      }
+
+      // Handle property changes if provided
+      propertyChanges = [];
+      if (options.propertyChanges) {
+        try {
+          propertyChanges = parsePropertyChanges(options.propertyChanges);
+        } catch (error) {
+          logError(`Invalid property changes: ${error.message}`);
+          process.exit(1);
+        }
+      }
+
       log(`${emojis.gear} Using CLI arguments:`, colors.cyan);
       log(`   Component name: ${colorize(componentName, colors.green)}`, colors.white);
       log(`   Base component: ${colorize(baseComponent.name, colors.green)}`, colors.white);
+      if (customEventName) {
+        log(`   Custom event name: ${colorize(customEventName, colors.green)}`, colors.white);
+      }
+      if (propertyChanges.length > 0) {
+        log(`   Property changes: ${colorize(propertyChanges.join(', '), colors.green)}`, colors.white);
+      }
       console.log(''); // Add spacing
 
     } else {
@@ -571,10 +670,62 @@ async function scaffoldComponent(cliOptions = null) {
       baseComponent = baseComponentResponse.baseComponent;
       console.log(''); // Add spacing
 
+      // Prompt for custom event name
+      const customEventNameResponse = await enquirer.prompt({
+        type: 'input',
+        name: 'customEventName',
+        message: `${emojis.sparkles} Enter the name of the custom event if any dispatched from Rule Editor?`,
+        hint: 'This is optional - skip by pressing Enter',
+        validate: (value) => {
+          if (!value || value.trim() === '') {
+            return true; // Allow empty values
+          }
+          return validateCustomEventName(value);
+        },
+        format: (value) => {
+          if (!value || value.trim() === '') {
+            return '';
+          }
+          // Auto-convert input to proper format
+          return value.trim()
+            .toLowerCase()
+            .replace(/\s+/g, '-')      // Replace spaces with hyphens
+            .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
+            .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
+            .replace(/^-+|-+$/g, '');  // Remove leading/trailing hyphens
+        },
+      });
+
+      customEventName = customEventNameResponse.customEventName;
+      console.log(''); // Add spacing
+
+      // Prompt for property changes
+      const propertyChangesResponse = await enquirer.prompt({
+        type: 'multiselect',
+        name: 'propertyChanges',
+        message: `${emojis.gear} Which field property changes should your component monitor for view updates?`,
+        hint: 'Use arrow keys to navigate, space to select/deselect, Enter to confirm',
+        limit: 10,
+        choices: getPropertyChoices(),
+        validate: (value) => {
+          // Allow empty selection
+          return true;
+        },
+      });
+
+      propertyChanges = propertyChangesResponse.propertyChanges || [];
+      console.log(''); // Add spacing
+
       // Show summary and confirm
       log(`${emojis.sparkles} Summary:`, colors.cyan + colors.bright);
       log(`   Custom Component name: ${colorize(componentName, colors.green)}`, colors.white);
       log(`   Base component: ${colorize(baseComponent.name, colors.green)}`, colors.white);
+      if (customEventName) {
+        log(`   Custom event name: ${colorize(customEventName, colors.green)}`, colors.white);
+      }
+      if (propertyChanges.length > 0) {
+        log(`   Property changes: ${colorize(propertyChanges.join(', '), colors.green)}`, colors.white);
+      }
 
       const { confirm } = await enquirer.prompt({
         type: 'confirm',
@@ -604,7 +755,7 @@ async function scaffoldComponent(cliOptions = null) {
     mkdirSync(targetDir, { recursive: true });
 
     // Create files
-    const files = createComponentFiles(componentName, baseComponent, targetDir);
+    const files = createComponentFiles(componentName, baseComponent, targetDir, customEventName, propertyChanges);
     creationSpinner.stop('✅ Component files created successfully');
 
     // Update _component-definition.json to include the new custom component
