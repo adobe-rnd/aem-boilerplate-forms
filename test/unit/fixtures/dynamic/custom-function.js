@@ -89,3 +89,5 @@ export function op(block) {
 export function expect(block) {
   assert.equal(getValue(block, '#textinput-a01ceb1c74'), 'fname lname');
 }
+
+export const opDelay = 200;
