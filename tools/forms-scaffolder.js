@@ -570,26 +570,23 @@ function transformComponentName(rawName) {
     .replace(/^-+|-+$/g, '');  // Remove leading/trailing hyphens
 }
 
-// Component name validation (simplified)
+// Component name validation for transformed names
 export function validateComponentName(name) {
   if (!name || typeof name !== 'string') {
     return 'Component name is required';
   }
 
-  // Use unified transformation function
-  const cleanName = transformComponentName(name);
-
-  if (!cleanName) {
+  if (!name.trim()) {
     return 'Component name must contain at least one letter or number';
   }
 
-  if (!/^[a-z]/.test(cleanName)) {
+  if (!/^[a-z]/.test(name)) {
     return 'Component name must start with a letter';
   }
 
   // Check if component already exists
-  if (checkComponentExists(cleanName)) {
-    return ERROR_MESSAGES.COMPONENT_EXISTS(cleanName);
+  if (checkComponentExists(name)) {
+    return ERROR_MESSAGES.COMPONENT_EXISTS(name);
   }
 
   return true;
@@ -795,14 +792,34 @@ async function runInteractive() {
 
     log('');
       
-    const { componentName } = await enquirer.prompt({
+    const { rawComponentName } = await enquirer.prompt({
       type: 'input',
-      name: 'componentName',
+      name: 'rawComponentName',
       message: `${emojis.gear} What would you like to name the custom component?`,
-      hint: 'lowercase, no spaces (e.g., icon-radio)',
-      validate: validateComponentName,
-      format: transformComponentName,
+      hint: 'Enter any name (spaces and capitals are fine)',
+      validate: (input) => {
+        if (!input || typeof input !== 'string' || !input.trim()) {
+          return 'Component name is required';
+        }
+        return true;
+      },
     });
+
+    // Transform the component name and show the result
+    const componentName = transformComponentName(rawComponentName);
+    
+    // Show the transformed name
+    if (rawComponentName !== componentName) {
+      log(`${emojis.magic} Transformed component name: ${colorize(componentName, colors.green + colors.bright)}`, colors.white);
+    } else {
+      log(`${emojis.check} Component name: ${colorize(componentName, colors.green + colors.bright)}`, colors.white);
+    }
+
+    // Validate the final component name
+    const nameValidation = validateComponentName(componentName);
+    if (nameValidation !== true) {
+      handleFatalError(nameValidation);
+    }
 
     log(''); // Add spacing
 
@@ -963,9 +980,17 @@ async function runInteractive() {
 }
 
 async function runProgrammatic() {
-  const componentName = args[1];
+  const rawComponentName = args[1];
   
   try {
+    // Transform component name for consistency
+    const componentName = transformComponentName(rawComponentName);
+    
+    // Show transformation if it occurred
+    if (rawComponentName !== componentName) {
+      log(`🪄 Transformed '${rawComponentName}' to '${componentName}'`);
+    }
+    
     // Validate component name using existing function
     const validation = validateComponentName(componentName);
     if (validation !== true) {
