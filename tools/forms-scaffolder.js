@@ -556,18 +556,28 @@ export function checkComponentExists(componentName) {
   return existsSync(targetDir);
 }
 
+// Unified component name transformation - single source of truth
+function transformComponentName(rawName) {
+  if (!rawName || typeof rawName !== 'string') {
+    return '';
+  }
+  
+  return rawName.trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')      // Replace spaces with hyphens
+    .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
+    .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
+    .replace(/^-+|-+$/g, '');  // Remove leading/trailing hyphens
+}
+
 // Component name validation (simplified)
 export function validateComponentName(name) {
   if (!name || typeof name !== 'string') {
     return 'Component name is required';
   }
 
-  // Convert and clean the name first
-  const cleanName = name.toLowerCase()
-    .replace(/\s+/g, '-')  // Replace spaces with hyphens
-    .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
-    .replace(/-+/g, '-')   // Replace multiple hyphens with single hyphen
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+  // Use unified transformation function
+  const cleanName = transformComponentName(name);
 
   if (!cleanName) {
     return 'Component name must contain at least one letter or number';
@@ -785,26 +795,14 @@ async function runInteractive() {
 
     log('');
       
-    const { componentName: rawComponentName } = await enquirer.prompt({
+    const { componentName } = await enquirer.prompt({
       type: 'input',
       name: 'componentName',
       message: `${emojis.gear} What would you like to name the custom component?`,
       hint: 'lowercase, no spaces (e.g., icon-radio)',
       validate: validateComponentName,
-      format: (value) => {
-        return value.trim()
-          .toLowerCase()
-          .replace(/\s+/g, '-')      // Replace spaces with hyphens
-          .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
-      },
+      format: transformComponentName,
     });
-
-    const componentName = rawComponentName.trim()
-      .toLowerCase()
-      .replace(/\s+/g, '-')      // Replace spaces with hyphens
-      .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
-      .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
-      .replace(/^-+|-+$/g, '');  // Remove leading/trailing hyphens
 
     log(''); // Add spacing
 
