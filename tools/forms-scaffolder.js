@@ -248,6 +248,30 @@ function validateComponentName(name) {
   return true;
 }
 
+// Custom event name validation
+function validateCustomEventName(name) {
+  if (!name || typeof name !== 'string') {
+    return 'Custom event name is required';
+  }
+
+  // Convert and clean the name first
+  const cleanName = name.toLowerCase()
+    .replace(/\s+/g, '-')  // Replace spaces with hyphens
+    .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
+    .replace(/-+/g, '-')   // Replace multiple hyphens with single hyphen
+    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+
+  if (!cleanName) {
+    return 'Custom event name must contain at least one letter or number';
+  }
+
+  if (!/^[a-z]/.test(cleanName)) {
+    return 'Custom event name must start with a letter';
+  }
+
+  return true;
+}
+
 
 // Parse property changes from CLI argument
 function parsePropertyChanges(propertyChangesString) {
@@ -296,9 +320,16 @@ function createComponentFiles(componentName, baseComponent, targetDir, customEve
     ? `['${propertyChanges.join("', '")}']`
     : '[]';
   
+  // Generate component class name (PascalCase)
+  const componentClassName = componentName
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
+
   // Replace template variables
   const jsContent = jsTemplate
     .replace(/\$\{componentName\}/g, componentName)
+    .replace(/\$\{componentClassName\}/g, componentClassName)
     .replace(/\$\{baseComponent\.name\}/g, baseComponent.name)
     .replace(/\$\{custom_event_name\}/g, customEventName)
     .replace(/\$\{propertyChanges\}/g, propertyChangesString)
@@ -670,6 +701,23 @@ async function scaffoldComponent(cliOptions = null) {
       baseComponent = baseComponentResponse.baseComponent;
       console.log(''); // Add spacing
 
+      // Prompt for property changes
+      const propertyChangesResponse = await enquirer.prompt({
+        type: 'multiselect',
+        name: 'propertyChanges',
+        message: `${emojis.gear} Which field property changes should your component monitor for view updates?`,
+        hint: 'Use arrow keys to navigate, space to select/deselect, Enter to confirm',
+        limit: 10,
+        choices: getPropertyChoices(),
+        validate: (value) => {
+          // Allow empty selection
+          return true;
+        },
+      });
+
+      propertyChanges = propertyChangesResponse.propertyChanges || [];
+      console.log(''); // Add spacing
+
       // Prompt for custom event name
       const customEventNameResponse = await enquirer.prompt({
         type: 'input',
@@ -697,23 +745,6 @@ async function scaffoldComponent(cliOptions = null) {
       });
 
       customEventName = customEventNameResponse.customEventName;
-      console.log(''); // Add spacing
-
-      // Prompt for property changes
-      const propertyChangesResponse = await enquirer.prompt({
-        type: 'multiselect',
-        name: 'propertyChanges',
-        message: `${emojis.gear} Which field property changes should your component monitor for view updates?`,
-        hint: 'Use arrow keys to navigate, space to select/deselect, Enter to confirm',
-        limit: 10,
-        choices: getPropertyChoices(),
-        validate: (value) => {
-          // Allow empty selection
-          return true;
-        },
-      });
-
-      propertyChanges = propertyChangesResponse.propertyChanges || [];
       console.log(''); // Add spacing
 
       // Show summary and confirm

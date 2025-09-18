@@ -27,12 +27,16 @@ base_type = [
   ]
 ```
 
-2. Run the scaffolder tool with *custom_component_name* and *base_type* as command line arguments. 
+2. Ask the user to specify the name of the custom event that need to be listened to update view. This would be *custom_event_name*. This is optional.
+
+3. Again propmt the user to specify the property changes that need to be listened to update view. This would be *property_changes*. If there are multiple events specified by the user *property_changes* would be a comma separated string. This is optional.
+
+3. Run the scaffolder tool with *custom_component_name*, *base_type*, *custom_event_name* and *property_changes* as command line arguments as shown below: 
 
 ```sh
-npm run create:custom-component -- --component-name={custom_component_name} --base-type={base_type}
+npm run create:custom-component -- --component-name={custom_component_name} --base-type={base_type} --custom-event-name={custom_event_name} --property-changes={property_changes}
 ```
-3. Register the json component json file change by running the following command
+4. Register the json component json file change by running the following command
 ```sh
 npm run build:json
 ```
@@ -52,27 +56,96 @@ Say you want to capture the date in authoring then you should be looking for `da
 
 The component runtime follows an MVC (Model-View-Controller) architecture.
 - **Model:** Defined by the JSON schema for each field/component. Authorable properties are specified in the corresponding JSON file (see `blocks/form/models/form-components`).
-- **View:** The HTML structure for each field type is described in [form-field-types.md](./form-field-types.md). This is the base structure your component will extend or modify.
+- **View:** The HTML structure for each field type is described in [form-field-component-structure](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/implementing/developing/universal-editor/field-types#fields). This is the base structure your component will extend or modify.
 - **Controller/Component Logic:** Implemented in JavaScript, either as OOTB (out-of-the-box) or custom components.
 
-The `blocks/form/components/{custom_component_name}/{custom_component_name}.js` file defines the component logic, It must export a default method usually called `decorate` as shown below:
+The component logic resides in `/blocks/form/components/{custom_component_name}/{custom_component_name}.js`.
 
-**Signature:**
-  ```js
-  export default function decorate(fieldDiv, fieldJson, parentElement, formId) {
-    // fieldDiv: The HTML structure of the OOTB component you are extending
-    // fieldJson: The JSON field definition (all authorable properties)
-    // parentElement: The parent element (fieldset or form)
-    // formId: The id of the form
-    // ... your logic here ...
+
+
+## Anatomy of `component.js`
+
+The scaffolder creates the following boilerplate code inside `component.js`.
+
+```js
+/* eslint-disable no-unused-vars */
+import { subscribe } from '../../rules/index.js';
+
+// configuration
+const propertyChanges = []; // comma separated list of fieldModel properties that needs to be listened.
+const customEvent = ''; // the name of the custom event if any to listen to
+
+let fieldModel = null;
+
+/**
+ * Update form field html based on current state
+ * @param {HTMLElement} element - The DOM element to update
+ * @param {Object} state - The current state data containing field values and properties
+ */
+function updateView(element, state) {
+  if (element && state) {
+    // logic to update view goes here..
   }
-  ```
+}
 
-### Understanding Decorate 
+/**
+ * Utility function to attach event listeners to the form model
+ * Listens to property changes and custom events and updates the view accordingly.
+ * @param {Object} model - The form field model instance
+ * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper
+ */
+function attachEventListeners(model, fieldDiv) {
+  model.subscribe((event) => {
+    event?.payload?.changes?.forEach((change) => {
+      if (propertyChanges.includes(change?.propertyName)) {
+        updateView(fieldDiv, model.getState()); // updating the view on property change
+      }
+    });
+  }, 'change');
 
-- The decorate method is called when the component is initialising. 
-- `fieldDiv` is the default html rendition of the base component that needs to be extended.
-- `fieldJson` contains all the properties configured in authoring, including the custom properties.
+  if (customEvent) {
+    model.subscribe(() => {
+      updateView(fieldDiv, model.getState()); // updating the view on custom event trigger
+    }, customEvent);
+  }
+}
+
+/**
+ * Decorates a custom form field component
+ * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper.
+ * @param {Object} fieldJson - The form json object for the component.
+ * @param {HTMLElement} parentElement - The parent element of the field.
+ * @param {string} formId - The unique identifier of the form.
+ */
+export default async function decorate(fieldDiv, fieldJson, parentElement, formId) {
+  updateView(fieldDiv, fieldJson); // updating the view on initalise
+  subscribe(fieldDiv, formId, (element, model) => {
+    fieldModel = model; // persisting the field model in global scope
+    attachEventListeners(model, fieldDiv);
+  });
+}
+
+```
+
+### 1. `decorate` 
+
+The `component.js` file must export a default method usually called `decorate`.  
+Arguments:
+  - `fieldDiv` is the default html rendition of the base component that needs to be extended.
+  - `fieldJson` contains all the properties configured in authoring, including the custom properties.
+  - `parentElement` and `formId` which should be obvious from the jsdocs.
+
+Functionality:
+  - This method is the starting point of component initalisation. 
+  - It invokes the `updateView` method initially to provide the initial rendering.
+  - It invokes the `subscribe` method and registers 
+
+
+
+
+
+
+
 
 
 ### Listening to `fieldModel` changes

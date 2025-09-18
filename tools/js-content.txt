@@ -1,56 +1,98 @@
 /* eslint-disable no-unused-vars */
 import { subscribe } from '../../rules/index.js';
 
-// configuration
-const propertyChanges = ${propertyChanges};
-const customEvent = '${custom_event_name}';
-
-let fieldModel = null;
-
 /**
- * Update form field html based on current state
- * @param {HTMLElement} element - The DOM element to update
- * @param {Object} state - The current state data containing field values and properties
+ * ${componentClassName}Component - A class-based implementation of a ${componentName} component extending ${baseComponent.name}
+ * This class encapsulates all the functionality for managing a form field's state,
+ * view updates, and event handling.
  */
-function updateView(element, state) {
-  if (element && state) {
-    // logic to update view goes here..
+class ${componentClassName}Component {
+  /**
+   * Creates an instance of ${componentClassName}Component
+   * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper
+   * @param {Object} fieldJson - The form json object for the component
+   * @param {HTMLElement} parentElement - The parent element of the field
+   * @param {string} formId - The unique identifier of the form
+   */
+  constructor(fieldDiv, fieldJson, parentElement, formId) {
+    this.fieldDiv = fieldDiv;
+    this.fieldJson = fieldJson;
+    this.parentElement = parentElement;
+    this.formId = formId;
+    this.fieldModel = null;
+
+    // Configuration properties
+    this.propertyChanges = ${propertyChanges};
+    this.customEvent = '${custom_event_name}';
   }
-}
 
-/**
- * Utility function to attach event listeners to the form model
- * Listens to property changes and custom events and updates the view accordingly.
- * @param {Object} model - The form field model instance
- * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper
- */
-function attachEventListeners(model, fieldDiv) {
-  model.subscribe((event) => {
-    event?.payload?.changes?.forEach((change) => {
-      if (propertyChanges.includes(change?.propertyName)) {
-        updateView(fieldDiv, model.getState()); // updating the view on property change
-      }
+  /**
+   * This method is where you can update the fieldModel based on view changes.
+   */
+  updateModel() {
+    // here you can listen to view changes and update the fieldModel pr
+  }
+
+  /**
+   * Updates the form field HTML based on current state
+   */
+  updateView() {
+    if (this.fieldDiv && this.fieldModel) {
+      const state = this.fieldModel.getState();
+      // logic to update view goes here..
+    }
+  }
+
+  /**
+   * Attaches event listeners to the form model
+   * Listens to property changes and custom events and updates the view accordingly
+   */
+  attachEventListeners() {
+    if (!this.fieldModel) {
+      return;
+    }
+
+    // Listen for property changes
+    this.fieldModel.subscribe((event) => {
+      event?.payload?.changes?.forEach((change) => {
+        if (this.propertyChanges.includes(change?.propertyName)) {
+          this.updateView();
+        }
+      });
+    }, 'change');
+
+    // Listen for custom events
+    if (this.customEvent) {
+      this.fieldModel.subscribe(() => {
+        this.updateView();
+      }, this.customEvent);
+    }
+  }
+
+  /**
+   * Initializes the form field component
+   * Sets up the initial view and subscribes to form model changes
+   */
+  async initialize() {
+    // Update the view with initial data
+    this.updateView();
+
+    // Subscribe to form model changes
+    subscribe(this.fieldDiv, this.formId, (element, model) => {
+      this.fieldModel = model;
+      this.attachEventListeners();
     });
-  }, 'change');
-
-  if (customEvent) {
-    model.subscribe(() => {
-      updateView(fieldDiv, model.getState()); // updating the view on custom event trigger
-    }, customEvent);
   }
 }
 
 /**
  * Decorates a custom form field component
- * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper.
- * @param {Object} fieldJson - The form json object for the component.
- * @param {HTMLElement} parentElement - The parent element of the field.
- * @param {string} formId - The unique identifier of the form.
+ * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper
+ * @param {Object} fieldJson - The form json object for the component
+ * @param {HTMLElement} parentElement - The parent element of the field
+ * @param {string} formId - The unique identifier of the form
  */
 export default async function decorate(fieldDiv, fieldJson, parentElement, formId) {
-  updateView(fieldDiv, fieldJson); // updating the view on initalise
-  subscribe(fieldDiv, formId, (element, model) => {
-    fieldModel = model; // persisting the field model in global scope
-    attachEventListeners(model, fieldDiv);
-  });
+  const field = new ${componentClassName}Component(fieldDiv, fieldJson, parentElement, formId);
+  await field.initialize();
 }

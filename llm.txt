@@ -1,0 +1,14 @@
+# AEM Boilerplate Forms - External Documentation
+
+This repository contains Adobe Experience Manager (AEM) Forms boilerplate code. The following external documentation should be indexed for comprehensive development support:
+
+## Form Block Documentation
+
+- [Form Field HTML Structure and Styling](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/build-forms/getting-started-edge-delivery-services-forms/style-theme-forms#components-structure)
+- [Universal Editor authoring component types](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/implementing/developing/universal-editor/field-types#fields)
+
+## Local Documentation
+
+The following local files contain important project-specific documentation:
+- blocks/form/docs/custom-components-agent.md - Custom component creation guide
+
