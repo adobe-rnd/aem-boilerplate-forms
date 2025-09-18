@@ -68,7 +68,9 @@
       "text-input",
       "tnc",
       "wizard",
-      "range"
+      "range",
+      "simple-custom-comp",
+      "composite-addr"
     ]
   }
 ]

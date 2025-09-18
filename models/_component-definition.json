@@ -42,6 +42,12 @@
       "components": [
         {
           "...": "../blocks/form/components/range/_range.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/simple-custom-comp/_simple-custom-comp.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/composite-addr/_composite-addr.json#/definitions"
         }
       ]
     }

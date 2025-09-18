@@ -1,0 +1,196 @@
+{
+  "definitions": [
+    {
+      "title": "Composite addr",
+      "id": "composite-addr",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+            "template": {
+              "jcr:title": "Composite addr",
+              "fieldType": "panel",
+              "minOccur": 1,
+              "fd:viewType": "composite-addr",
+              "checkbox_group1": {
+                "sling:resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                "fieldType": "checkbox-group",
+                "jcr:title": "Are you human?",
+                "enum": [
+                  "0",
+                  "1"
+                ],
+                "enumNames": [
+                  "Item 1",
+                  "Item 2"
+                ],
+                "orientation": "horizontal",
+                "type": "string[]"
+              },
+              "email2": {
+                "sling:resourceType": "core/fd/components/form/emailinput/v1/emailinput",
+                "fieldType": "email",
+                "jcr:title": "mail address"
+              },
+              "form_button3": {
+                "sling:resourceType": "core/fd/components/form/button/v1/button",
+                "fieldType": "button",
+                "jcr:title": "Press here"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "composite-addr",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Repeat Panel",
+          "name": "repeat"
+        },
+        {
+          "component": "boolean",
+          "name": "repeatable",
+          "label": "Make panel repeatable",
+          "valueType": "boolean"
+        },
+        {
+          "component": "number",
+          "name": "minOccur",
+          "label": "Minimum repetitions",
+          "valueType": "number",
+          "description": "Minimum number of times the panel appears on the form",
+          "condition": {
+            "===": [
+              {
+                "var": "repeatable"
+              },
+              true
+            ]
+          }
+        },
+        {
+          "component": "number",
+          "name": "maxOccur",
+          "label": "Maximum repetitions",
+          "valueType": "number",
+          "placeholder": "No Limit",
+          "description": "Maximum number of times the panel can appear on the form. No value indicates no limit.",
+          "condition": {
+            "and": [
+              {
+                "===": [
+                  {
+                    "var": "repeatable"
+                  },
+                  true
+                ]
+              },
+              {
+                "!==": [
+                  {
+                    "var": "variant"
+                  },
+                  "noButtons"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "component": "select",
+          "name": "variant",
+          "label": "Variant",
+          "options": [
+            {
+              "name": "No Actions",
+              "value": "noButtons"
+            },
+            {
+              "name": "Add & Delete Buttons",
+              "value": "addDeleteButtons"
+            }
+          ],
+          "value": "addDeleteButtons",
+          "condition": {
+            "===": [
+              {
+                "var": "repeatable"
+              },
+              true
+            ]
+          }
+        },
+        {
+          "component": "text",
+          "name": "repeatAddButtonLabel",
+          "label": "Add Button Label",
+          "valueType": "string",
+          "value": "Add",
+          "condition": {
+            "and": [
+              {
+                "===": [
+                  {
+                    "var": "variant"
+                  },
+                  "addDeleteButtons"
+                ]
+              },
+              {
+                "===": [
+                  {
+                    "var": "repeatable"
+                  },
+                  true
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "component": "text",
+          "name": "repeatDeleteButtonLabel",
+          "label": "Delete Button Label",
+          "valueType": "string",
+          "value": "Delete",
+          "condition": {
+            "and": [
+              {
+                "===": [
+                  {
+                    "var": "variant"
+                  },
+                  "addDeleteButtons"
+                ]
+              },
+              {
+                "===": [
+                  {
+                    "var": "repeatable"
+                  },
+                  true
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        }
+      ]
+    }
+  ]
+}
