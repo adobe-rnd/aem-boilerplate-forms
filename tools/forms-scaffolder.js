@@ -92,7 +92,7 @@ function log(text, color = colors.white) {
 }
 
 function logTitle(text) {
-  console.log(`\n${colorize(`${emojis.aem} ${text}`, colors.cyan + colors.bright)}`);
+  log(`\n${emojis.aem} ${text}`, colors.cyan + colors.bright);
 }
 
 function logSuccess(text) {
@@ -317,7 +317,7 @@ async function selectBaseComponent(availableComponents) {
     type: 'select',
     name: 'baseComponent', 
     message: `${emojis.magic} Which base component should this extend?\n`,
-    hint: 'Use arrow keys to navigate, Enter to confirm.',
+    hint: 'Use ↑/↓ to navigate, Enter to confirm.',
     choices: availableComponents.map((comp) => ({
       name: comp.name,
       value: comp
@@ -341,7 +341,7 @@ async function selectCompositeComponents(availableComponents) {
     type: 'multiselect',
     name: 'selectedComponents',
     message: `${emojis.sparkles} Select base components for your composite custom component: \n`,
-    hint: 'Order matters! Use arrow keys to navigate, Spacebar to select/deselect, Enter to confirm.',
+    hint: 'Order matters! Use ↑/↓ to navigate, Spacebar to select/deselect, Enter to confirm.',
     limit: 7,
     choices: availableComponents.map(comp => ({
       name: comp.name,
@@ -392,13 +392,16 @@ async function selectCompositeComponents(availableComponents) {
         footer += scrollFooter;
       }
       
+      if (footer) footer += '\n\n';
+      footer += `${colors.dim}💡 Tip: You can add multiple instances of the same component later by editing the generated JSON file.${colors.reset}`;
+      
       if (selectionOrder.length > 0) {
         const selectionLines = selectionOrder
           .map((choiceName, index) => 
             `  ${colors.cyan}${(index + 1).toString().padStart(2)}.${colors.reset} ${colors.bright}${choiceName}${colors.reset}`
           );
         
-        if (footer) footer += '\n\n';
+        footer += '\n\n';
         footer += `${colors.bright}Selection Order:${colors.reset}\n${selectionLines.join('\n')}`;
       }
       
@@ -411,11 +414,11 @@ async function selectCompositeComponents(availableComponents) {
 
 // Prompt for custom component names with better UX
 async function promptForComponentNames(selectedComponents) {
-  console.log(`\n${emojis.gear} ${colorize('Customize Display Names for Selected Components:', colors.cyan + colors.bright)}`);
-  console.log(`${colors.dim}┌${'─'.repeat(55)}┐${colors.reset}`);
-  console.log(`${colors.dim}│ Use Tab/Shift+Tab to navigate between fields          │${colors.reset}`);
-  console.log(`${colors.dim}│ Press Enter when all names are set                    │${colors.reset}`);  
-  console.log(`${colors.dim}└${'─'.repeat(55)}┘${colors.reset}\n`);
+  log(`\n${emojis.gear} Customize Display Names for Selected Components:`, colors.cyan + colors.bright);
+  log(`┌${'─'.repeat(37)}┐`, colors.dim);
+  log(`│ Use ↑/↓ to navigate between fields  │`, colors.dim);
+  log(`│ Press Enter when all names are set  │`, colors.dim);  
+  log(`└${'─'.repeat(37)}┘\n`, colors.dim);
   
   const choices = selectedComponents.map((component, index) => ({
     name: `component_${index}`,
@@ -763,14 +766,14 @@ export function updateComponentDefinition(componentName) {
 async function runInteractive() {
   console.clear();
 
-  console.log(colorize(`
+  log(`
   █████╗  ███████╗ ███╗   ███╗     ███████╗  ██████╗  ██████╗  ███╗   ███╗ ███████╗
  ██╔══██╗ ██╔════╝ ████╗ ████║     ██╔════╝ ██╔═══██╗ ██╔══██╗ ████╗ ████║ ██╔════╝
  ███████║ █████╗   ██╔████╔██║     █████╗   ██║   ██║ ██████╔╝ ██╔████╔██║ ███████╗
  ██╔══██║ ██╔══╝   ██║╚██╔╝██║     ██╔══╝   ██║   ██║ ██╔══██╗ ██║╚██╔╝██║ ╚════██║
  ██║  ██║ ███████╗ ██║ ╚═╝ ██║     ██║      ╚██████╔╝ ██║  ██║ ██║ ╚═╝ ██║ ███████║
  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝     ╚═╝       ╚═════╝  ╚═╝  ╚═╝ ╚═╝     ╚═╝ ╚══════╝
-  `, colors.cyan + colors.bright));
+  `, colors.cyan + colors.bright);
 
   logTitle(' AEM Forms Custom Component Scaffolding Tool');
   log(`${emojis.magic}  This tool will help you set up all the necessary files to create a new custom component.`, colors.green);
@@ -780,7 +783,7 @@ async function runInteractive() {
   try {
     const componentType = await selectComponentType();
 
-    console.log('');
+    log('');
       
     const { componentName: rawComponentName } = await enquirer.prompt({
       type: 'input',
@@ -803,7 +806,7 @@ async function runInteractive() {
       .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
       .replace(/^-+|-+$/g, '');  // Remove leading/trailing hyphens
 
-    console.log(''); // Add spacing
+    log(''); // Add spacing
 
     let componentData;
     if (componentType.toLowerCase() === COMPONENT_TYPES.SIMPLE) {
@@ -862,7 +865,7 @@ async function runInteractive() {
       };
     }
 
-    console.log('');
+    log('');
 
     log(`${emojis.sparkles} Summary:`, colors.cyan + colors.bright);
     log(`   Component name: ${colorize(componentName, colors.green)}`, colors.white);
@@ -872,7 +875,7 @@ async function runInteractive() {
       log(`   Base component: ${colorize(componentData.baseComponent.name, colors.green)}`, colors.white);
     } else {
       log(`   Type: ${colorize('Composite Custom Component', colors.green)}`, colors.white);
-      log(`   Component mappings:`, colors.white);
+      log(`   Component Names:`, colors.white);
       componentData.selectedComponents.forEach((item, i) => {
         const hasCustomName = item.customName !== item.component.name;
         if (hasCustomName) {
@@ -894,7 +897,7 @@ async function runInteractive() {
     });
 
     if (!confirm) {
-      logWarning(`${emojis.warning} Operation cancelled.`);
+      logWarning(`Operation cancelled.`);
       return;
     }
 
@@ -955,7 +958,7 @@ async function runInteractive() {
 
     log(`\n${emojis.celebration} Enjoy building with your new component!`, colors.green + colors.bright);
   } catch (error) {
-    console.log('');
+    log('');
     logWarning('Operation cancelled.');
     process.exit(0);
   }
@@ -1006,11 +1009,11 @@ async function runProgrammatic() {
     updateMappings();
     updateFormJson(componentName);
     
-    console.log(`✅ Successfully created '${componentName}' component`);
+    log(`✅ Successfully created '${componentName}' component`);
     return { success: true, component: componentName, files };
     
   } catch (error) {
-    console.error(`❌ Error: ${error.message}`);
+    logError(`Error: ${error.message}`);
     process.exit(1);
   }
 }
