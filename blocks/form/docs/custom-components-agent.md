@@ -210,9 +210,11 @@ input.addEventListener('change', (e) => {
   e.stopPropagation();
 })
 ```
+*Reasoning: there is a `change` listener at the form level, which again tries to upadate the fieldModel. This needs to be prevented.*
 
 
-**Note:** `updateView` and `updateModel` is the code that you need to update based on the user prompt. Other methods need not be touched for most of the
+
+**Note:** `updateView` and `updateModel` is the code that you need to update based on the user prompt. Other methods need not be touched for most of the usecases
 
 
 ###  `fieldModel` API reference
