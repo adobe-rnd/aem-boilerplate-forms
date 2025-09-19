@@ -1,0 +1,160 @@
+/* Pan-input component styles */
+
+/* PAN Input Field Styling */
+.pan-input input[type="text"] {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 12px 16px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Focus state */
+.pan-input input[type="text"]:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  background-color: #f8f9ff;
+}
+
+/* Valid state */
+.pan-input input[type="text"]:valid {
+  border-color: #28a745;
+  background-color: #f8fff9;
+}
+
+/* Invalid state */
+.pan-input input[type="text"]:invalid {
+  border-color: #dc3545;
+  background-color: #fff8f8;
+}
+
+/* Placeholder styling */
+.pan-input input[type="text"]::placeholder {
+  color: #6c757d;
+  opacity: 0.7;
+  font-weight: 300;
+}
+
+/* Error message styling */
+.pan-input .field-error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.pan-input .field-error-message::before {
+  content: "⚠️";
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+/* Success indicator */
+.pan-input .field-success {
+  color: #28a745;
+  font-size: 14px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.pan-input .field-success::before {
+  content: "✅";
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+/* Field wrapper */
+.pan-input {
+  margin-bottom: 20px;
+}
+
+/* Label styling */
+.pan-input label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Help text styling */
+.pan-input .field-help {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pan-input input[type="text"] {
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 10px 12px;
+  }
+}
+
+/* Animation for validation state changes */
+.pan-input input[type="text"] {
+  animation: none;
+}
+
+.pan-input input[type="text"]:focus {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* Character position indicators (optional enhancement) */
+.pan-input .character-indicators {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10px;
+  color: #6c757d;
+}
+
+.pan-input .character-indicators span {
+  flex: 1;
+  text-align: center;
+  padding: 2px;
+}
+
+.pan-input .character-indicators .letters {
+  color: #0066cc;
+  font-weight: bold;
+}
+
+.pan-input .character-indicators .numbers {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.pan-input .character-indicators .fourth-char {
+  color: #ffc107;
+  font-weight: bold;
+  background-color: rgba(255, 193, 7, 0.1);
+  border-radius: 2px;
+}
