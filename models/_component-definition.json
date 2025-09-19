@@ -42,9 +42,6 @@
       "components": [
         {
           "...": "../blocks/form/components/range/_range.json#/definitions"
-        },
-        {
-          "...": "../blocks/form/components/pan-input/_pan-input.json#/definitions"
         }
       ]
     }
