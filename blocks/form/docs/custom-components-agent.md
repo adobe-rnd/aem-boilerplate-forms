@@ -71,120 +71,141 @@ The scaffolder creates the following boilerplate code inside `component.js`.
 /* eslint-disable no-unused-vars */
 import { subscribe } from '../../rules/index.js';
 
-// configuration
-const propertyChanges = []; // comma separated list of fieldModel properties that needs to be listened.
-const customEvent = ''; // the name of the custom event if any to listen to
-
-let fieldModel = null;
-
 /**
- * Update form field html based on current state
- * @param {HTMLElement} element - The DOM element to update
- * @param {Object} state - The current state data containing field values and properties
+ * SampleComponent - A class-based implementation of a sample component extending Checkbox Group
+ * This class encapsulates all the functionality for managing a form field's state,
+ * view updates, and event handling.
  */
-function updateView(element, state) {
-  if (element && state) {
-    // logic to update view goes here..
+class SampleComponent {
+  /**
+   * Creates an instance of SampleComponent
+   * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper
+   * @param {Object} fieldJson - The form json object for the component
+   * @param {HTMLElement} parentElement - The parent element of the field
+   * @param {string} formId - The unique identifier of the form
+   */
+  constructor(fieldDiv, fieldJson, parentElement, formId) {
+    this.fieldDiv = fieldDiv;
+    this.fieldJson = fieldJson;
+    this.parentElement = parentElement;
+    this.formId = formId;
+    this.fieldModel = null;
+
+    // Configuration properties
+    this.propertyChanges = []; // comma separated list of fieldModel properties that needs to be listened.
+    this.customEvent = ''; // the name of the custom event if any to listen to for updating view
   }
-}
 
-/**
- * Utility function to attach event listeners to the form model
- * Listens to property changes and custom events and updates the view accordingly.
- * @param {Object} model - The form field model instance
- * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper
- */
-function attachEventListeners(model, fieldDiv) {
-  model.subscribe((event) => {
-    event?.payload?.changes?.forEach((change) => {
-      if (propertyChanges.includes(change?.propertyName)) {
-        updateView(fieldDiv, model.getState()); // updating the view on property change
-      }
+  /**
+   * This method is where you can update the fieldModel based on view changes.
+   */
+  updateModel() {
+    // here you can listen to view changes and update the fieldModel
+  }
+
+  /**
+   * Updates the form field HTML based on current state
+   */
+  updateView(state) {
+    if (state) {
+      // logic to update view goes here..
+    }
+  }
+
+  /**
+   * Attaches event listeners to the form model
+   * Listens to property changes and custom events and updates the view accordingly
+   */
+  attachEventListeners() {
+    if (!this.fieldModel) {
+      return;
+    }
+
+    // Listen for property changes
+    this.fieldModel.subscribe((event) => {
+      event?.payload?.changes?.forEach((change) => {
+        if (this.propertyChanges.includes(change?.propertyName)) {
+          this.updateView(this.fieldModel.getState());
+        }
+      });
+    }, 'change');
+
+    // Listen for custom events
+    if (this.customEvent) {
+      this.fieldModel.subscribe(() => {
+        this.updateView(this.fieldModel.getState());
+      }, this.customEvent);
+    }
+  }
+
+  /**
+   * Initializes the form field component
+   * Sets up the initial view and subscribes to form model changes
+   */
+  async initialize() {
+    // Update the view with initial data
+    this.updateView(this.fieldJson);
+
+    // Subscribe to form model changes
+    subscribe(this.fieldDiv, this.formId, (element, model) => {
+      this.fieldModel = model;
+      this.attachEventListeners();
     });
-  }, 'change');
-
-  if (customEvent) {
-    model.subscribe(() => {
-      updateView(fieldDiv, model.getState()); // updating the view on custom event trigger
-    }, customEvent);
   }
 }
 
 /**
  * Decorates a custom form field component
- * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper.
- * @param {Object} fieldJson - The form json object for the component.
- * @param {HTMLElement} parentElement - The parent element of the field.
- * @param {string} formId - The unique identifier of the form.
+ * @param {HTMLElement} fieldDiv - The DOM element containing the field wrapper
+ * @param {Object} fieldJson - The form json object for the component
+ * @param {HTMLElement} parentElement - The parent element of the field
+ * @param {string} formId - The unique identifier of the form
  */
 export default async function decorate(fieldDiv, fieldJson, parentElement, formId) {
-  updateView(fieldDiv, fieldJson); // updating the view on initalise
-  subscribe(fieldDiv, formId, (element, model) => {
-    fieldModel = model; // persisting the field model in global scope
-    attachEventListeners(model, fieldDiv);
-  });
+  const field = new SampleComponent(fieldDiv, fieldJson, parentElement, formId);
+  await field.initialize();
 }
 
 ```
 
+## Architecture
+
+The component runtime follows an MVC pattern. 
+
+- **Model**: The fieldModel object that holds the field's state, properties, and data
+- **View**: The HTML DOM elements (fieldDiv) that users see and interact with
+- **Controller**: This Component class defined orchestrates between model and view.
+
+
+## Order of Execution 
+
+
 ### 1. `decorate` 
 
-The `component.js` file must export a default method usually called `decorate`.  
-Arguments:
-  - `fieldDiv` is the default html rendition of the base component that needs to be extended.
-  - `fieldJson` contains all the properties configured in authoring, including the custom properties.
-  - `parentElement` and `formId` which should be obvious from the jsdocs.
-
-Functionality:
-  - This method is the starting point of component initalisation. 
-  - It invokes the `updateView` method initially to provide the initial rendering.
-  - It invokes the `subscribe` method and registers 
+- The `component.js` file must export a default method usually called `decorate`.  
+- This method is the starting point of component initalisation.
 
 
+### 2. `initialize`
+
+- It creates the view with the inital fieldJson properties configured by the user.
+- Invokes `subscribe` to receieve the `fieldModel` in a callback whenever its ready.
+- The callback is triggered when `fieldModel` is finally initalised.
+- Once `fieldModel` is available we store it globally and attachEventListeners.
+
+### 3. `attachEventListeners`
+- Here we subscribe to `change` on `fieldModel` which is triggered every time a field property value changes and then update the view with the new state.
+- If a custom event is configured by the user we add a listener for that as well to update view.
+
+### 4. `updateView`
+- This is where the view is extended/updated for the custom component.
+
+### 5. `updateModel`
+- If there is a usecase to update the model based on an input recieved from view that code needs to be updated here.
 
 
+**Note:** `updateView` and `updateModel` is the code that you need to update based on the user prompt. Other methods need not be touched for most of the
 
-
-
-
-
-### Listening to `fieldModel` changes
-
-- The `subscribe` method allows you to access the `fieldModel` inside `decorate`.
-- The callback passed to subscribe gets invoked only when the `fieldModel` is initalised. View is initalised before `fieldModel`.
-- `fieldModel` has its own `subscribe` method which can be used to listen to changes in field value, properties or events. 
-- Refer the following code example to understand the usage:
-
-  ```js
-  import { subscribe } from '../../rules/index.js';
-
-  export default function decorate(fieldDiv, fieldJson, container, formId) {
-
-    // ... setup logic ...
-    subscribe(fieldDiv, formId, (_fieldDiv, fieldModel) => {
-      fieldModel.subscribe((event) => {
-        
-      }, 'change');
-    });
-  }
-  ```
-
-- The `event` object passed in the fieldModel `subscribe` has the following structure:
-  ```js
-    {
-        "payload": {
-            "changes": [
-            {
-                "propertyName": "visible",
-                "currentValue": true,
-                "prevValue": false
-            }
-        ]
-        },
-    "type": "change",
-    "isCustomEvent": false
-    }
-  ```
 
 ###  `fieldModel` API reference
 
