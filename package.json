@@ -52,7 +52,12 @@
   },
   "homepage": "https://github.com/adobe/aem-boilerplate#readme",
   "devDependencies": {
+    "@adobe/json-formula": "0.1.50",
+    "@aemforms/af-core": "0.22.150",
+    "@aemforms/af-formatters": "0.22.150",
+    "@aemforms/af-custom-functions": "1.0.14",
     "@babel/eslint-parser": "7.28.0",
+    "@playwright/test": "^1.43.1",
     "@testing-library/dom": "9.3.4",
     "@testing-library/user-event": "14.3.0",
     "@types/node": "20.12.7",
@@ -83,12 +88,7 @@
     "rollup-plugin-terser": "^7.0.2",
     "sinon": "^17.0.1",
     "stylelint": "16.21.1",
-    "stylelint-config-standard": "38.0.0",
-    "@adobe/json-formula": "0.1.50",
-    "@aemforms/af-core": "0.22.150",
-    "@aemforms/af-formatters": "0.22.150",
-    "@aemforms/af-custom-functions": "1.0.14",
-    "@playwright/test": "^1.43.1"
+    "stylelint-config-standard": "38.0.0"
   },
   "mocha": {
     "spec": "test/**/*.test.js",
