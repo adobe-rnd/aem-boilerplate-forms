@@ -201,7 +201,15 @@ The component runtime follows an MVC pattern.
 - This is where the view is extended/updated for the custom component.
 
 ### 5. `updateModel`
-- If there is a usecase to update the model based on an input recieved from view that code needs to be updated here.
+- If there is a usecase to update the model based on an input recieved from view that code needs to be updated here. 
+- If you are attaching an event listener to update field model its advised to override the ootb change listener in view as shown below:
+
+```js
+const input = element.querySelector('input');
+input.addEventListener('change', (e) => {
+  e.stopPropagation();
+})
+```
 
 
 **Note:** `updateView` and `updateModel` is the code that you need to update based on the user prompt. Other methods need not be touched for most of the
@@ -252,14 +260,13 @@ The `fieldModel` object passed to your `subscribe` callback is an instance of th
 - **`focus()`** - Set focus to the field
 - **`reset()`** - Reset field to default state
 - **`validate()`** - Trigger field validation
-- **`markAsInvalid(message, constraint)`** - Mark field as invalid with custom message
+- **`markAsInvalid(message)`** - Mark field as invalid with custom message
 
 ### Important Notes
 
 1. **Property Access**: All properties are reactive - updating them will trigger a `change` event and update the form model.
 2. **Custom Properties**: Access custom properties defined in your JSON schema via `fieldModel.properties.propertyName`.
-3. **Event Subscription**: The `subscribe` method returns an object with an `unsubscribe()` method for cleanup.
-4. **Validation**: Use `markAsInvalid()` to set custom error messages, or modify `errorMessage` property.
+3. **Validation**: Use `markAsInvalid()` to set custom error messages, or modify `errorMessage` property.
 
 
 ## Best Practices
@@ -269,6 +276,13 @@ The `fieldModel` object passed to your `subscribe` callback is an instance of th
 - **Use authorable properties**: Expose configurable options via the JSON schema.
 - **Namespace your CSS**: Avoid style collisions by using unique class names.
 - **Reuse existing utility functions**: Always check `util.js` and `form.js` for existing functions before implementing custom logic.
+
+
+## Custom component styling 
+
+The component styling goes inside `/blocks/form/components/{custom_component_name}/{custom_component_name}.css`.
+
+Refer [Form Field HTML Structure and Styling](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/build-forms/getting-started-edge-delivery-services-forms/style-theme-forms#components-structure) to understand styling guidelines fields.
 
 
 
