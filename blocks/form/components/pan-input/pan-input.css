@@ -1,0 +1,102 @@
+/* Pan-input component styles */
+
+/* Main input styling */
+.pan-input input[data-pan-input="true"] {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 12px;
+  width: 100%;
+  max-width: 200px;
+  transition: border-color 0.3s ease;
+}
+
+/* Focus state */
+.pan-input input[data-pan-input="true"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Valid state */
+.pan-input input[data-pan-input="true"]:valid {
+  border-color: #28a745;
+}
+
+/* Invalid state */
+.pan-input input[data-pan-input="true"]:invalid {
+  border-color: #dc3545;
+}
+
+/* Placeholder styling */
+.pan-input input[data-pan-input="true"]::placeholder {
+  color: #999;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+/* Error message styling */
+.pan-input .field-error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Help text styling */
+.pan-input .field-help {
+  color: #6c757d;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Format hint styling */
+.pan-input .format-hint {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #495057;
+}
+
+.pan-input .format-hint::before {
+  content: "💡 ";
+  margin-right: 4px;
+}
+
+/* Character position indicators (optional visual enhancement) */
+.pan-input .character-indicators {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10px;
+  color: #6c757d;
+}
+
+.pan-input .character-indicators span {
+  flex: 1;
+  text-align: center;
+  padding: 2px;
+}
+
+.pan-input .character-indicators span:nth-child(4) {
+  background-color: #e3f2fd;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pan-input input[data-pan-input="true"] {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    max-width: 100%;
+  }
+}

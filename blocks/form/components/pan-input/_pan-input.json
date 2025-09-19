@@ -1,0 +1,63 @@
+{
+  "definitions": [
+    {
+      "title": "Pan input",
+      "id": "pan-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/textinput/v1/textinput",
+            "template": {
+              "jcr:title": "Pan input",
+              "fieldType": "text-input",
+              "fd:viewType": "pan-input"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "pan-input",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-default-value-fields.json#/fields"
+        },
+        {
+          "component": "boolean",
+          "name": "multiLine",
+          "label": "Allow multiple lines",
+          "valueType": "boolean"
+        },
+        {
+          "component": "text",
+          "name": "fourthCharacter",
+          "label": "Fourth Character",
+          "description": "The character that should be in the 4th position (default: P)",
+          "valueType": "string",
+          "default": "P"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_string-validation-fields.json#/fields"
+        }
+      ]
+    }
+  ]
+}
