@@ -1,0 +1,28 @@
+/* Pan-input component styles */
+.pan-input input {
+  text-transform: uppercase;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.pan-input input:invalid {
+  border-color: #e74c3c;
+}
+
+.pan-input input:valid {
+  border-color: #27ae60;
+}
+
+/* PAN format hint */
+.pan-input .pan-format-hint {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+/* Error message styling */
+.pan-input .error-message {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
