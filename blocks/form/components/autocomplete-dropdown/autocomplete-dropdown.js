@@ -39,9 +39,9 @@ class AutocompleteDropdownComponent {
    */
   updateModel() {
     // Handle input changes and update the field model
-    if (this.inputElement && this.fieldModel) {
+    if (this.inputElement) {
       const input = this.inputElement.querySelector('input');
-      if (input) {
+      if (input && !input.hasAttribute('data-listeners-attached')) {
         input.addEventListener('input', (e) => {
           e.stopPropagation();
           this.filterOptions(e.target.value);
@@ -65,6 +65,9 @@ class AutocompleteDropdownComponent {
           e.stopPropagation();
           this.handleKeydown(e);
         });
+
+        // Mark that listeners have been attached to prevent duplicates
+        input.setAttribute('data-listeners-attached', 'true');
       }
     }
   }
@@ -103,7 +106,8 @@ class AutocompleteDropdownComponent {
 
     // Set initial value
     if (fieldData.value) {
-      const selectedOption = AutocompleteDropdownComponent.findOptionByValue(fieldData.value, fieldData);
+      const selectedOption = AutocompleteDropdownComponent
+        .findOptionByValue(fieldData.value, fieldData);
       input.value = selectedOption ? selectedOption.label : fieldData.value;
     }
 
@@ -140,23 +144,27 @@ class AutocompleteDropdownComponent {
   /**
    * Populates the dropdown with options
    */
-  populateDropdown(fieldData) {
+  populateDropdown(fieldData = null) {
     if (!this.dropdownList) return;
 
     this.dropdownList.innerHTML = '';
 
     const options = this.filteredOptions || this.allOptions;
-    const optionNames = fieldData.enumNames || this.allOptionNames;
+    const optionNames = fieldData?.enumNames || this.allOptionNames;
 
     options.forEach((value, index) => {
       const optionElement = document.createElement('div');
       optionElement.className = 'autocomplete-option';
-      optionElement.textContent = optionNames[index] || value;
+
+      // Find the correct option name for this value
+      const originalIndex = this.allOptions.indexOf(value);
+      const optionName = originalIndex !== -1 ? optionNames[originalIndex] : value;
+      optionElement.textContent = optionName || value;
       optionElement.dataset.value = value;
 
       optionElement.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.selectOption(value, optionNames[index] || value);
+        this.selectOption(value, optionName || value);
       });
 
       this.dropdownList.appendChild(optionElement);
@@ -170,17 +178,25 @@ class AutocompleteDropdownComponent {
     if (!searchText || searchText.trim() === '') {
       this.filteredOptions = [...this.allOptions];
     } else {
-      const searchLower = searchText.toLowerCase();
+      const searchLower = searchText.toLowerCase().trim();
+
       this.filteredOptions = this.allOptions.filter((value, index) => {
-        const optionName = (this.allOptionNames[index] || value).toLowerCase();
-        return optionName.includes(searchLower) || value.toLowerCase().includes(searchLower);
+        const optionName = (this.allOptionNames[index] || value).toLowerCase().trim();
+        const optionValue = value.toLowerCase().trim();
+
+        // Check if search text is contained in either the display name or the value
+        return optionName.includes(searchLower) || optionValue.includes(searchLower);
       });
     }
 
-    // Update dropdown if field model is available
-    if (this.fieldModel) {
-      const fieldData = this.fieldModel.getState();
-      this.populateDropdown(fieldData);
+    // Always update dropdown immediately after filtering
+    this.populateDropdown();
+
+    // Show dropdown if there are filtered options
+    if (this.filteredOptions.length > 0) {
+      this.showDropdown();
+    } else {
+      this.hideDropdown();
     }
   }
 
