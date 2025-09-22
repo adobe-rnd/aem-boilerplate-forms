@@ -1,0 +1,100 @@
+{
+  "definitions": [
+    {
+      "title": "Autocomplete dropdown",
+      "id": "autocomplete-dropdown",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
+            "template": {
+              "jcr:title": "Autocomplete dropdown",
+              "fieldType": "drop-down",
+              "enum": [
+                "0",
+                "1"
+              ],
+              "enumNames": [
+                "Item 1",
+                "Item 2"
+              ],
+              "type": "string",
+              "fd:viewType": "autocomplete-dropdown"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "autocomplete-dropdown",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-select-fields.json#/fields"
+        },
+        {
+          "component": "boolean",
+          "label": "Allow multiple selection",
+          "name": "multiSelect",
+          "valueType": "boolean"
+        },
+        {
+          "component": "select",
+          "label": "Data type of submitted value",
+          "name": "type",
+          "valueType": "string",
+          "value": "number",
+          "options": [
+            {
+              "name": "String",
+              "value": "string"
+            },
+            {
+              "name": "Boolean",
+              "value": "boolean"
+            },
+            {
+              "name": "Number",
+              "value": "number"
+            },
+            {
+              "name": "String[]",
+              "value": "string[]"
+            },
+            {
+              "name": "Boolean[]",
+              "value": "boolean[]"
+            },
+            {
+              "name": "Number[]",
+              "value": "number[]"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "name": "placeholder",
+          "label": "Placeholder text",
+          "valueType": "string"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        }
+      ]
+    }
+  ]
+}

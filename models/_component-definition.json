@@ -48,6 +48,9 @@
         },
         {
           "...": "../blocks/form/components/radio-card/_radio-card.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/autocomplete-dropdown/_autocomplete-dropdown.json#/definitions"
         }
       ]
     }

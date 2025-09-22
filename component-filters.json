@@ -70,7 +70,8 @@
       "wizard",
       "range",
       "pan-input",
-      "radio-card"
+      "radio-card",
+      "autocomplete-dropdown"
     ]
   }
 ]

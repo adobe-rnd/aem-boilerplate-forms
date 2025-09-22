@@ -724,6 +724,31 @@
               }
             }
           }
+        },
+        {
+          "title": "Autocomplete dropdown",
+          "id": "autocomplete-dropdown",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
+                "template": {
+                  "jcr:title": "Autocomplete dropdown",
+                  "fieldType": "drop-down",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Item 1",
+                    "Item 2"
+                  ],
+                  "type": "string",
+                  "fd:viewType": "autocomplete-dropdown"
+                }
+              }
+            }
+          }
         }
       ]
     }

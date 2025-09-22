@@ -1,0 +1,104 @@
+/* Autocomplete-dropdown component styles */
+.autocomplete-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+.autocomplete-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.autocomplete-input:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.autocomplete-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.autocomplete-option:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-option:hover,
+.autocomplete-option.active {
+  background-color: #f8f9fa;
+}
+
+.autocomplete-option:active {
+  background-color: #e9ecef;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .autocomplete-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .autocomplete-option {
+    padding: 12px;
+    font-size: 16px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .autocomplete-input {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+  
+  .autocomplete-input:focus {
+    border-color: #3182ce;
+    box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.25);
+  }
+  
+  .autocomplete-dropdown-list {
+    background-color: #2d3748;
+    border-color: #4a5568;
+  }
+  
+  .autocomplete-option {
+    color: #e2e8f0;
+    border-bottom-color: #4a5568;
+  }
+  
+  .autocomplete-option:hover,
+  .autocomplete-option.active {
+    background-color: #4a5568;
+  }
+}
