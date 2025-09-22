@@ -26,7 +26,6 @@ import {
 export const DELAY_MS = 0;
 let captchaField;
 let afModule;
-
 const withFieldWrapper = (element) => (fd) => {
   const wrapper = createFieldWrapper(fd);
   wrapper.append(element(fd));
