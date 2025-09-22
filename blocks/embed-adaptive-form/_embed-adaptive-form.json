@@ -21,7 +21,7 @@
             "id": "embed-adaptive-form",
             "fields": [
               {
-                  "component": "aem-content",
+                  "component": "select-form",
                   "valueType": "string",
                   "name": "formPath",
                   "value": "",
