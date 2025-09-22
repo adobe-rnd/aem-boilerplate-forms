@@ -1,0 +1,163 @@
+/* Radio-card component styles */
+.radio-card-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  position: relative;
+}
+
+/* Background pattern */
+.radio-card-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle at 50% 50%, rgba(135, 206, 235, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+/* Question section */
+.radio-card-question {
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.radio-card-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+}
+
+.radio-card-description {
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Options container */
+.radio-card-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Individual option cards */
+.radio-card-option {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.radio-card-option:hover {
+  border-color: #3498db;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+}
+
+.radio-card-option.selected {
+  background: #f0f8ff;
+  border-color: #3498db;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+/* Card icon */
+.radio-card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #16a085;
+}
+
+/* Card label */
+.radio-card-label {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+/* Card description */
+.radio-card-option-description {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+/* Radio button indicator */
+.radio-card-radio {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #bdc3c7;
+  border-radius: 50%;
+  margin: 0 auto;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.radio-card-option.selected .radio-card-radio {
+  border-color: #3498db;
+  background: #3498db;
+}
+
+.radio-card-option.selected .radio-card-radio::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .radio-card-container {
+    padding: 1rem;
+  }
+  
+  .radio-card-options {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .radio-card-title {
+    font-size: 1.5rem;
+  }
+  
+  .radio-card-option {
+    min-height: 160px;
+    padding: 1rem;
+  }
+}
+
+/* Focus states for accessibility */
+.radio-card-option:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+.radio-card-option:focus-visible {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}

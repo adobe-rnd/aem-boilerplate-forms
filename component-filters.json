@@ -69,7 +69,8 @@
       "tnc",
       "wizard",
       "range",
-      "pan-input"
+      "pan-input",
+      "radio-card"
     ]
   }
 ]

@@ -1,0 +1,120 @@
+{
+  "definitions": [
+    {
+      "title": "Radio card",
+      "id": "radio-card",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
+            "template": {
+              "jcr:title": "Radio card",
+              "fieldType": "radio-group",
+              "enum": [
+                "no",
+                "yes"
+              ],
+              "enumNames": [
+                "No",
+                "Yes"
+              ],
+              "orientation": "horizontal",
+              "fd:viewType": "radio-card"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "radio-card",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-select-fields.json#/fields"
+        },
+        {
+          "component": "text-input",
+          "name": "questionText",
+          "label": "Question Text",
+          "value": "Do you have a NZ driver licence?",
+          "description": "The main question text displayed above the options"
+        },
+        {
+          "component": "multiline-input",
+          "name": "questionDescription",
+          "label": "Question Description",
+          "value": "This will go in your new CV and help match you with jobs. If you don't have a licence, that's totally fine – many roles don't need it.",
+          "description": "Additional descriptive text below the question"
+        },
+        {
+          "component": "text-input",
+          "name": "noOptionDescription",
+          "label": "No Option Description",
+          "value": "I don't have a driver licence",
+          "description": "Description text for the No option"
+        },
+        {
+          "component": "text-input",
+          "name": "yesOptionDescription",
+          "label": "Yes Option Description",
+          "value": "I have a driver licence",
+          "description": "Description text for the Yes option"
+        },
+        {
+          "component": "select",
+          "label": "Data type of submitted value",
+          "name": "type",
+          "valueType": "string",
+          "options": [
+            {
+              "name": "String",
+              "value": "string"
+            },
+            {
+              "name": "Boolean",
+              "value": "boolean"
+            },
+            {
+              "name": "Number",
+              "value": "number"
+            }
+          ]
+        },
+        {
+          "component": "radio-group",
+          "label": "Display Options",
+          "name": "orientation",
+          "valueType": "string",
+          "value": "horizontal",
+          "options": [
+            {
+              "name": "Horizontally",
+              "value": "horizontal"
+            },
+            {
+              "name": "Vertically",
+              "value": "vertical"
+            }
+          ]
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        }
+      ]
+    }
+  ]
+}

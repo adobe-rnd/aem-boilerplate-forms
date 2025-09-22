@@ -45,6 +45,9 @@
         },
         {
           "...": "../blocks/form/components/pan-input/_pan-input.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/radio-card/_radio-card.json#/definitions"
         }
       ]
     }

@@ -699,6 +699,31 @@
               }
             }
           }
+        },
+        {
+          "title": "Radio card",
+          "id": "radio-card",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/radiobutton/v1/radiobutton",
+                "template": {
+                  "jcr:title": "Radio card",
+                  "fieldType": "radio-group",
+                  "enum": [
+                    "no",
+                    "yes"
+                  ],
+                  "enumNames": [
+                    "No",
+                    "Yes"
+                  ],
+                  "orientation": "horizontal",
+                  "fd:viewType": "radio-card"
+                }
+              }
+            }
+          }
         }
       ]
     }
