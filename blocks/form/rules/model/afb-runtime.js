@@ -2092,6 +2092,9 @@ class Scriptable extends BaseNode {
         const funcName = action.isCustomEvent ? `custom_${action.type}` : action.type;
         const node = this.getCompiledEvent(eventName);
         const events = this._jsonModel.events?.[eventName];
+        if(eventName === 'submit'){
+            action.payload.action = '/adobe/forms/af/submit/' + btoa(this.form?._jsonModel?.properties['fd:path']);
+        }
         if (funcName in this && typeof this[funcName] === 'function') {
             this[funcName](action, context);
         }
