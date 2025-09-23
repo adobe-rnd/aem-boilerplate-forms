@@ -181,7 +181,11 @@ async function fieldChanged(payload, form, generateFormRendition) {
         if (fieldWrapper) {
           let labelEl = fieldWrapper.querySelector('.field-label');
           if (labelEl) {
-            labelEl.textContent = currentValue.value;
+            if (currentValue.richText === true) {
+              labelEl.innerHTML = currentValue.value;
+            } else {
+              labelEl.textContent = currentValue.value;
+            }
             labelEl.setAttribute('data-visible', currentValue.visible);
           } else if (fieldType === 'button') {
             field.textContent = currentValue.value;
