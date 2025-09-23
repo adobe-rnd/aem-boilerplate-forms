@@ -36,7 +36,8 @@
                     "component": "container",
                     "name": "accordion_label",
                     "label": "Accordion ",
-                    "collapsible": false
+                    "collapsible": false,
+                    "...": "../../models/form-common/_basic-input-fields.json"
                 },
                 {
                     "component": "tab",
