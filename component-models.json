@@ -4015,7 +4015,7 @@
       {
         "component": "container",
         "name": "accordion_label",
-        "label": "Accordion ",
+        "label": "Accordion",
         "collapsible": false,
         "fields": [
           {
