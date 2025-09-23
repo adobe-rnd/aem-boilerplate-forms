@@ -199,6 +199,7 @@ The component runtime follows an MVC pattern.
 
 ### 4. `updateView`
 - This is where the view is extended/updated for the custom component.
+- **Important:** always use the state passed to this method for updating the view. Don't rely on the class variables.
 
 ### 5. `updateModel`
 - If there is a usecase to update the model based on an input recieved from view that code needs to be updated here. 
