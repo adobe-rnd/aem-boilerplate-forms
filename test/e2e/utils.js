@@ -56,20 +56,6 @@ const openPage = async (page, relativeURL, type='xwalk') => {
   }
   const url = `https://${getCurrentBranch()}${site}${relativeURL}`;
   await page.goto(url, { waitUntil: 'networkidle' });
-  
-  // Wait for form initialization based on form type
-  if (type === 'docbased') {
-    // Doc-based forms - wait for form element to be rendered and rules applied
-    await page.waitForSelector('form[data-source="sheet"]', { timeout: 60000 });
-    // Give a moment for rule engine to initialize
-    await page.waitForTimeout(1000);
-  } else {
-    // X-walk forms - wait for myForm to be available
-    await page.waitForFunction(
-      () => typeof myForm !== 'undefined' && myForm !== null,
-      { timeout: 60000 }
-    );
-  }
 };
 
 export { openPage, getCurrentBranch };
