@@ -1,0 +1,27 @@
+/* Others-checkbox component styles */
+.others-text-input-container {
+  margin-top: 8px;
+  margin-left: 24px; /* Indent to align with checkbox content */
+}
+
+.others-text-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.others-text-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.others-text-input::placeholder {
+  color: #6c757d;
+  font-style: italic;
+}

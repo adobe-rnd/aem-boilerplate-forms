@@ -51,6 +51,9 @@
         },
         {
           "...": "../blocks/form/components/autocomplete-dropdown/_autocomplete-dropdown.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/others-checkbox/_others-checkbox.json#/definitions"
         }
       ]
     }

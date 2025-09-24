@@ -217,7 +217,8 @@
         "range",
         "pan-input",
         "radio-card",
-        "autocomplete-dropdown"
+        "autocomplete-dropdown",
+        "others-checkbox"
       ]
     }
   ]
