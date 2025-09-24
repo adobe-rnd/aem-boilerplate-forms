@@ -107,6 +107,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
         }
         break;
       case 'value':
+        if (componentType) {
+          return;
+        }
         // Handle undefined currentValue to prevent "undefined" appearing in form fields
         // eslint-disable-next-line no-case-declarations
         const valueToSet = currentValue === undefined ? '' : currentValue;
