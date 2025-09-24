@@ -21,83 +21,78 @@
             "id": "number-input",
             "fields": [
                 {
-                    "component": "container",
-                    "name": "basic",
+                    "component": "tab",
                     "label": "Basic",
-                    "collapsible": false,
-                    "fields": [
+                    "name": "basic"
+                },
+                {
+                    "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                },
+                {
+                    "component": "number",
+                    "name": "default",
+                    "label": "Default Value",
+                    "valueType": "number"
+                },
+                {
+                    "component": "select",
+                    "name": "type",
+                    "label": "Number type",
+                    "valueType": "string",
+                    "options": [
                         {
-                            "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
+                            "name": "Integer (1234)",
+                            "value": "integer"
                         },
                         {
-                            "component": "number",
-                            "name": "default",
-                            "label": "Default Value",
-                            "valueType": "number"
-                        },
-                        {
-                            "component": "select",
-                            "name": "type",
-                            "label": "Number type",
-                            "valueType": "string",
-                            "options": [
-                                {
-                                    "name": "Integer (1234)",
-                                    "value": "integer"
-                                },
-                                {
-                                    "name": "Decimal (1234.000)",
-                                    "value": "number"
-                                }
-                            ]
+                            "name": "Decimal (1234.000)",
+                            "value": "number"
                         }
                     ]
                 },
                 {
-                    "...": "../form-common/_help-container.json"
-                },
-                {
-                    "component": "container",
-                    "name": "validation",
+                    "component": "tab",
                     "label": "Validation",
-                    "collapsible": true,
-                    "...": "../form-common/_number-validation-fields.json"
+                    "name": "validation"
                 },
                 {
-                    "component": "container",
-                    "name": "formats",
+                    "...": "../form-common/_number-validation-fields.json#/fields"
+                },
+                {
+                    "component": "tab",
                     "label": "Formats",
-                    "collapsible": true,
-                    "fields": [
+                    "name": "formats"
+                },
+                {
+                    "component": "select",
+                    "label": "Display Format",
+                    "name": "displayFormat",
+                    "valueType": "string",
+                    "options": [
                         {
-                            "component": "select",
-                            "label": "Display Format",
-                            "name": "displayFormat",
-                            "valueType": "string",
-                            "options": [
-                                {
-                                    "name": "No Pattern",
-                                    "value": ""
-                                },
-                                {
-                                    "name": "$1,234.21",
-                                    "value": "¤#,##0.00"
-                                },
-                                {
-                                    "name": "$1234.21",
-                                    "value": "¤####0.00"
-                                },
-                                {
-                                    "name": "1,234.210",
-                                    "value": "#,###,##0.000"
-                                },
-                                {
-                                    "name": "123,421%",
-                                    "value": "#,###,##0%"
-                                }
-                            ]
+                            "name": "No Pattern",
+                            "value": ""
+                        },
+                        {
+                            "name": "$1,234.21",
+                            "value": "¤#,##0.00"
+                        },
+                        {
+                            "name": "$1234.21",
+                            "value": "¤####0.00"
+                        },
+                        {
+                            "name": "1,234.210",
+                            "value": "#,###,##0.000"
+                        },
+                        {
+                            "name": "123,421%",
+                            "value": "#,###,##0%"
                         }
                     ]
+                },
+                {
+                    "...": "../form-common/_help-container.json#/fields"
                 }
             ]
         }

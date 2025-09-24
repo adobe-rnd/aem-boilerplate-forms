@@ -21,28 +21,26 @@
       "id": "telephone-input",
       "fields": [
         {
-          "component": "container",
-          "name": "basic",
+          "component": "tab",
           "label": "Basic",
-          "collapsible": false,
-          "fields": [
-            {
-              "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
-            },
-            {
-              "...": "../form-common/_basic-input-default-value-fields.json#/fields"
-            }
-          ]
+          "name": "basic"
         },
         {
-          "...": "../form-common/_help-container.json"
+          "...": "../form-common/_basic-input-placeholder-fields.json#/fields"
         },
         {
-          "component": "container",
-          "name": "validation",
+          "...": "../form-common/_basic-input-default-value-fields.json#/fields"
+        },
+        {
+          "component": "tab",
           "label": "Validation",
-          "collapsible": true,
-          "...": "../form-common/_number-validation-fields.json"
+          "name": "validation"
+        },
+        {
+          "...": "../form-common/_number-validation-fields.json#/fields"
+        },
+        {
+          "...": "../form-common/_help-container.json#/fields"
         }
       ]
     }
