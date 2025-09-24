@@ -19,9 +19,7 @@ test.describe('Form with Submit Button', async () => {
   test('Clicking the button should submit the form', async ({ page }) => {
     await openPage(page, testURL);
     await page.evaluate((actionUrl) => {
-      // Update both the jsonModel and the form's action property
       window.myForm._jsonModel.action = actionUrl;
-      window.myForm.action = actionUrl;
     }, actionUrl);
 
     for (const title of titles) {
