@@ -43,13 +43,45 @@ npm run lint
 
 ## Custom Form Components
 
-Create custom form components using the interactive scaffolder:
+Create custom form components using the scaffolder tool with both interactive and programmatic modes:
+
+### Interactive Mode
 
 ```sh
 npm run create:custom-component
 ```
 
-This will guide you through creating a new custom component with:
-- Interactive prompts for component name and base type
-- Automatic file generation (JS, CSS, JSON)
-- Automatic integration in form block with mappings
+This will guide you through creating custom components with:
+- **Simple Components**: Extend a single base component with custom styling and logic
+- **Composite Components**: Combine multiple base components into one reusable component
+- **Custom Display Names**: Set custom display names for each component in composite creation
+- Automatic file generation (JS, CSS, JSON) and form integration
+
+### Programmatic Mode
+
+#### Simple Components
+```sh
+# Create a simple component extending a base component
+node tools/forms-scaffolder.js --simple my-custom-input text-input
+```
+
+#### Composite Components
+
+**Syntax:** `node tools/forms-scaffolder.js --composite component-name componentId1 componentId2 ...`
+- **componentId**: OOTB component IDs (eg. text-input, checkbox, etc.)
+    - `"componentId:Custom Name"` allows for custom names (overrides display names)
+- _Note: Comma-separated format also supported: `"componentId1,componentId2"`_
+
+```sh
+# Original component names (space-separated)
+node tools/forms-scaffolder.js --composite contact-form text-input email form-button
+
+# Custom display names (quotes required for names with spaces)
+node tools/forms-scaffolder.js --composite registration-form "text-input:Full Name" "email:Email Address" "form-button:Create Account"
+```
+
+_Comma-separated alternative:_
+```sh
+node tools/forms-scaffolder.js --composite contact-form "text-input,email,form-button"
+node tools/forms-scaffolder.js --composite registration-form "text-input:Full Name,email:Email Address,form-button:Create Account"
+```
