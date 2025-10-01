@@ -1,2 +1,12 @@
 helix-importer-ui
+<<<<<<< HEAD
 dompurify.min.js
+=======
+rollup/*
+blocks/form/rules/formula/*
+blocks/form/rules/model/*
+blocks/form/rules/functions.js
+scripts/editor-support.js
+scripts/editor-support-rte.js
+/test
+>>>>>>> b9d7a93 (feat: Adding Form block along with embed)
