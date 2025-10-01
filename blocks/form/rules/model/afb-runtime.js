@@ -20,9 +20,9 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.145
+ *  Version: 0.22.150
  */
-import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, RequestSuccess, SubmitError, SubmitFailure, RequestFailure, Submit, Save, Reset, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
+import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, RequestSuccess, RequestFailure, SubmitError, Submit, Save, Reset, SubmitFailure, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
@@ -1617,7 +1617,14 @@ class BaseNode {
         };
     }
     _addDependent(dependent, propertyName) {
-        if (this._dependents.find(({ node }) => node === dependent) === undefined) {
+        const existingDependency = this._dependents.find(({ node, propertyName: existingProp }) => {
+            let isExistingDependent = node === dependent;
+            if (isExistingDependent && propertyName && propertyName.startsWith('properties.')) {
+                isExistingDependent = existingProp === propertyName;
+            }
+            return isExistingDependent;
+        });
+        if (existingDependency === undefined) {
             const subscription = this.subscribe((change) => {
                 const changes = change.payload.changes;
                 const propsToLook = [...dynamicProps, 'items'];
@@ -2542,7 +2549,7 @@ class Container extends Scriptable {
                 activeChild.activeChild = null;
                 activeChild = temp;
             }
-            const change = propertyChange('activeChild', c, this._activeChild);
+            const change = propertyChange('activeChild', c?.getState(), this._activeChild?.getState());
             this._activeChild = c;
             if (this.parent && c !== null) {
                 this.parent.activeChild = this;
@@ -2793,6 +2800,9 @@ const request$1 = (url, data = null, options = {}) => {
             body,
             headers
         };
+    }).catch((error) => {
+        console.error(`Network error while fetching from ${url}:`, error);
+        throw error;
     });
 };
 const defaultRequestOptions = {
@@ -2894,40 +2904,9 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
             inputPayload = String(payload);
         }
     }
-    const response = await request$1(endpoint, inputPayload, requestOptions);
-    response.originalRequest = {
-        url: endpoint,
-        method: httpVerb,
-        ...encryptOutput
-    };
-    const targetField = context.$field || null;
-    const targetEvent = context.$event || null;
-    response.submitter = targetField;
-    const enhancedPayload = {
-        request: response.originalRequest,
-        response,
-        targetField,
-        targetEvent
-    };
-    if (response?.status >= 200 && response?.status <= 299) {
-        const eName = getCustomEventName(success);
-        if (success === 'submitSuccess') {
-            context.form.dispatch(new SubmitSuccess(response, true));
-        }
-        else {
-            if (context.field) {
-                context.field.dispatch(new CustomEvent(eName, response, true));
-            }
-            else {
-                context.form.dispatch(new CustomEvent(eName, response, true));
-            }
-        }
-        context.form.dispatch(new RequestSuccess(enhancedPayload, false));
-    }
-    else {
-        context.form.logger.error('Error invoking a rest API');
-        const eName = getCustomEventName(error);
-        if (error === 'submitError') {
+    const dispatchErrorEvents = (response, errorType, enhancedPayload) => {
+        const eName = getCustomEventName(errorType);
+        if (errorType === 'submitError') {
             context.form.dispatch(new SubmitError(response, true));
             context.form.dispatch(new SubmitFailure(response, true));
         }
@@ -2940,8 +2919,61 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
             }
         }
         context.form.dispatch(new RequestFailure(enhancedPayload, false));
+    };
+    const targetField = context.$field || null;
+    const baseEnhancedPayload = {
+        request: { url: endpoint, method: httpVerb, ...encryptOutput },
+        targetField: targetField,
+        targetEvent: context.$event || null
+    };
+    try {
+        const response = await request$1(endpoint, inputPayload, requestOptions);
+        response.originalRequest = {
+            url: endpoint,
+            method: httpVerb,
+            ...encryptOutput
+        };
+        response.submitter = targetField;
+        const enhancedPayload = {
+            ...baseEnhancedPayload,
+            response,
+            request: response.originalRequest
+        };
+        if (response?.status >= 200 && response?.status <= 299) {
+            const eName = getCustomEventName(success);
+            if (success === 'submitSuccess') {
+                context.form.dispatch(new SubmitSuccess(response, true));
+            }
+            else {
+                if (context.field) {
+                    context.field.dispatch(new CustomEvent(eName, response, true));
+                }
+                else {
+                    context.form.dispatch(new CustomEvent(eName, response, true));
+                }
+            }
+            context.form.dispatch(new RequestSuccess(enhancedPayload, false));
+        }
+        else {
+            context.form.logger.error('Error invoking a rest API');
+            dispatchErrorEvents(response, error, enhancedPayload);
+        }
+        return response;
     }
-    return response;
+    catch (networkError) {
+        context.form.logger.error('Network error while invoking a rest API:', networkError);
+        const networkErrorResponse = {
+            body: null,
+            headers: {},
+            error: networkError instanceof Error ? networkError.message : String(networkError)
+        };
+        const enhancedPayload = {
+            ...baseEnhancedPayload,
+            response: networkErrorResponse
+        };
+        dispatchErrorEvents(networkErrorResponse, error, enhancedPayload);
+        context.form.dispatch(new RequestFailure(enhancedPayload, false));
+    }
 };
 const urlEncoded = (data) => {
     const formData = new URLSearchParams();
@@ -3555,12 +3587,26 @@ class FunctionRuntimeImpl {
                         interpreter.globals.form.logger.error('Argument is missing in getQueryParameter. A parameter is expected');
                         return '';
                     }
-                    if (interpreter.globals.form?.properties?.queryParams?.[param]) {
-                        return interpreter.globals.form.properties.queryParams[param];
+                    const queryParams = interpreter.globals.form?.properties?.queryParams;
+                    if (queryParams) {
+                        if (queryParams[param] !== undefined) {
+                            return queryParams[param];
+                        }
+                        const lowerParam = param.toLowerCase();
+                        for (const [key, value] of Object.entries(queryParams)) {
+                            if (key.toLowerCase() === lowerParam) {
+                                return value;
+                            }
+                        }
                     }
                     try {
                         const urlParams = new URLSearchParams(window?.location?.search || '');
-                        return urlParams.get(param);
+                        const urlValue = urlParams.get(param) ||
+                            Array.from(urlParams.entries())
+                                .find(([key]) => key.toLowerCase() === param.toLowerCase())?.[1];
+                        if (urlValue !== null && urlValue !== undefined) {
+                            return urlValue;
+                        }
                     }
                     catch (e) {
                         interpreter.globals.form.logger.warn('Error reading URL parameters:', e);
@@ -4702,6 +4748,24 @@ class Field extends Scriptable {
         this._setProperty('errorMessage', e);
         this._setProperty('validationMessage', e);
     }
+    set constraintMessage(constraint) {
+        if (Array.isArray(constraint)) {
+            const updatedConstraintMessages = {
+                ...this._jsonModel.constraintMessages
+            };
+            constraint.forEach(({ type, message }) => {
+                updatedConstraintMessages[type] = message;
+            });
+            this._setProperty('constraintMessages', updatedConstraintMessages);
+        }
+        else {
+            const updatedConstraintMessages = {
+                ...this._jsonModel.constraintMessages,
+                [constraint.type]: constraint.message
+            };
+            this._setProperty('constraintMessages', updatedConstraintMessages);
+        }
+    }
     _getConstraintObject() {
         return Constraints;
     }
@@ -5544,6 +5608,8 @@ const fetchForm = (url, headers = {}) => {
                 }
                 resolve(jsonString(formObj));
             }
+        }).catch((error) => {
+            reject(`Network error: ${error.message || error}`);
         });
     });
 };
