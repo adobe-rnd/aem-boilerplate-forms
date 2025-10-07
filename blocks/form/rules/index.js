@@ -71,7 +71,25 @@ async function fieldChanged(payload, form, generateFormRendition) {
     activeChild, qualifiedName,
   } = fieldModel;
   const field = form.querySelector(`#${id}`);
+  
   if (!field) {
+    // Special handling for 'items' changes which have no DOM element (prefill usecase)
+    const itemsChange = changes.find((change) => change.propertyName === 'items');
+    if (itemsChange) {
+      const firstInstance = form.querySelector(`#${CSS.escape(id)}\\[0\\]`);
+      const repeatWrapper = firstInstance?.closest('.repeat-wrapper');
+      if (repeatWrapper) {
+        const { currentValue, prevValue } = itemsChange;
+        if (currentValue === null) {
+          repeatWrapper.querySelector(`#${CSS.escape(prevValue.id)}`)?.remove();
+        } else {
+          const promise = generateFormRendition({ items: [currentValue] }, repeatWrapper, form.dataset?.id);
+          renderPromises[currentValue?.qualifiedName] = promise;
+        }
+        return;
+      }
+    }
+    
     // Check if there's a pending render promise where qualifiedName is a substring
     if (qualifiedName) {
       const matchingKey = Object.keys(renderPromises).find((key) => qualifiedName.includes(key));
@@ -86,6 +104,31 @@ async function fieldChanged(payload, form, generateFormRendition) {
     return;
   }
   const fieldWrapper = field?.closest('.field-wrapper');
+  
+  // For radio/checkbox groups, check if there's a pending render that might affect names
+  // This prevents value changes from interfering when instances share the same name temporarily (in prefill usecases)
+  const hasValueChange = changes.some((c) => c.propertyName === 'value');
+  if (hasValueChange && (fieldType === 'radio-group' || fieldType === 'checkbox-group')) {
+    // Extract container name from qualifiedName (e.g., "$form.panel[0].radio" -> "$form.panel")
+    const containerMatch = qualifiedName?.match(/^(.*?)\[\d+\]/);
+    const containerName = containerMatch ? containerMatch[1] : null;
+    
+    // Check if any pending render is for this container (any instance)
+    const matchingKey = Object.keys(renderPromises).find((key) => {
+      return containerName && key.startsWith(containerName + '[');
+    });
+    
+    if (matchingKey) {
+      await renderPromises[matchingKey];
+      // Wait one more frame to ensure requestAnimationFrame callback in repeat.js has executed
+      await new Promise((resolve) => { requestAnimationFrame(resolve); });
+      delete renderPromises[matchingKey];
+      // Retry field changed after names are updated
+      await fieldChanged(payload, form, generateFormRendition);
+      return;
+    }
+  }
+  
   changes.forEach((change) => {
     const { propertyName, currentValue, prevValue } = change;
     switch (propertyName) {
@@ -118,7 +161,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
             field.value = displayValue;
           }
         } else if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
-          field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
+          const inputType = fieldType === 'radio-group' ? 'radio' : 'checkbox';
+          field.querySelectorAll(`input[type="${inputType}"]`).forEach((el) => {
             const exists = (Array.isArray(valueToSet)
               && valueToSet.some((x) => compare(x, el.value, type.replace('[]', ''))))
               || compare(valueToSet, el.value, type);
@@ -148,7 +192,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
         // If checkboxgroup/radiogroup/drop-down is readOnly then it should remain disabled.
         if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
           if (readOnly === false) {
-            field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
+            const inputType = fieldType === 'radio-group' ? 'radio' : 'checkbox';
+            field.querySelectorAll(`input[type="${inputType}"]`).forEach((el) => {
               disableElement(el, !currentValue);
             });
           }
@@ -166,7 +211,8 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'readOnly':
         if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
-          field.querySelectorAll(`input[name=${name}]`).forEach((el) => {
+          const inputType = fieldType === 'radio-group' ? 'radio' : 'checkbox';
+          field.querySelectorAll(`input[type="${inputType}"]`).forEach((el) => {
             disableElement(el, currentValue);
           });
         } else if (fieldType === 'drop-down') {

@@ -2487,18 +2487,11 @@ class Container extends Scriptable {
                 return;
             }
             this._data = dataGroup;
-            const result = this.syncDataAndFormModel(dataGroup);
+            this.syncDataAndFormModel(dataGroup);
             const newLength = this.items.length;
-            result.added.forEach((item) => {
-                this.notifyDependents(propertyChange('items', item.getState(), null));
-                item.dispatch(new Initialize());
-            });
             for (let i = 0; i < newLength; i += 1) {
                 this._children[i].dispatch(new ExecuteRule());
             }
-            result.removed.forEach((item) => {
-                this.notifyDependents(propertyChange('items', null, item.getState()));
-            });
         }
         else if (typeof this._data === 'undefined') {
             console.warn(`Data node is null, hence importData did not work for panel "${this.name}". Check if parent has a dataRef set to null.`);
@@ -2528,6 +2521,14 @@ class Container extends Scriptable {
                     result.removed.push(this._children.pop());
                 }
             }
+            // Send notifications for added/removed items
+            result.added.forEach((item) => {
+                this.notifyDependents(propertyChange('items', item.getState(), null));
+                item.dispatch(new Initialize());
+            });
+            result.removed.forEach((item) => {
+                this.notifyDependents(propertyChange('items', null, item.getState()));
+            });
         }
         this._children.forEach(x => {
             let dataModel = x.bindToDataModel(contextualDataModel);
