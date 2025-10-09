@@ -214,8 +214,7 @@
         "text-input",
         "tnc",
         "wizard",
-        "range",
-        "countdown-timer"
+        "range"
       ]
     }
   ]
