@@ -72,27 +72,6 @@ async function fieldChanged(payload, form, generateFormRendition) {
   } = fieldModel;
   const field = form.querySelector(`#${id}`);
   if (!field) {
-    // Special handling for 'items' changes which have no DOM element (prefill usecase)
-    const itemsChange = changes.find((change) => change.propertyName === 'items');
-    if (itemsChange) {
-      const firstInstance = form.querySelector(`#${CSS.escape(id)}\\[0\\]`);
-      const repeatWrapper = firstInstance?.closest('.repeat-wrapper');
-      if (repeatWrapper) {
-        const { currentValue, prevValue } = itemsChange;
-        if (currentValue === null) {
-          repeatWrapper.querySelector(`#${CSS.escape(prevValue.id)}`)?.remove();
-        } else {
-          const promise = generateFormRendition(
-            { items: [currentValue] },
-            repeatWrapper,
-            form.dataset?.id,
-          );
-          renderPromises[currentValue?.qualifiedName] = promise;
-        }
-        return;
-      }
-    }
-
     // Check if there's a pending render promise where qualifiedName is a substring
     if (qualifiedName) {
       const matchingKey = Object.keys(renderPromises).find((key) => qualifiedName.includes(key));
