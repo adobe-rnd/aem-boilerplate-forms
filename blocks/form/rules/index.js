@@ -67,7 +67,7 @@ function handleActiveChild(id, form) {
 async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
-    id, name, fieldType, ':type': componentType, readOnly, type, displayValue, displayFormat, displayValueExpression,
+    id, fieldType, ':type': componentType, readOnly, type, displayValue, displayFormat, displayValueExpression,
     activeChild, qualifiedName,
   } = fieldModel;
   const field = form.querySelector(`#${id}`);
