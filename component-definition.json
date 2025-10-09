@@ -683,6 +683,22 @@
               }
             }
           }
+        },
+        {
+          "title": "Countdown timer",
+          "id": "countdown-timer",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                "template": {
+                  "jcr:title": "Countdown timer",
+                  "fieldType": "number-input",
+                  "fd:viewType": "countdown-timer"
+                }
+              }
+            }
+          }
         }
       ]
     }
