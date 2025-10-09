@@ -42,9 +42,6 @@
       "components": [
         {
           "...": "../blocks/form/components/range/_range.json#/definitions"
-        },
-        {
-          "...": "../blocks/form/components/countdowntimer/_countdowntimer.json#/definitions"
         }
       ]
     }
