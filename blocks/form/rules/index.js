@@ -272,6 +272,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'valid':
         if (currentValue === true) {
           updateOrCreateInvalidMsg(field, '');
+          if (field.validity.customError) {
+            field?.setCustomValidity('');
+          }
         }
         break;
       case 'enum':
