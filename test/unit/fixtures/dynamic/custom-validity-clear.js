@@ -38,8 +38,6 @@ export function op(block) {
   
   // Click submit to trigger validation
   btn.click();
-  form.dispatchEvent(new Event('submit'));
-  
   // Now set a valid value to trigger the 'valid' case
   setValue(block, '#f1', 'valid value');
   
