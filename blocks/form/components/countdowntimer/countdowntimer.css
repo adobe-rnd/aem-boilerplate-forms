@@ -1,0 +1,119 @@
+/* Countdowntimer component styles */
+.countdown-timer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: #000;
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  margin: 20px auto;
+  position: relative;
+}
+
+.countdown-progress-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-progress-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.countdown-bg-circle {
+  fill: none;
+  stroke: #333;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.countdown-progress-circle {
+  fill: none;
+  stroke: url(#countdown-gradient);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+/* Create gradient for progress circle */
+.countdown-progress-svg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: conic-gradient(from 0deg, #ff0000 0%, #ff6600 25%, #ffaa00 50%, #ffff00 75%, #ffaa00 100%);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+.countdown-timer-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 2;
+}
+
+.countdown-time-number {
+  font-size: 48px;
+  font-weight: bold;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 5px;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+.countdown-time-label {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+  letter-spacing: 1px;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+/* Add gradient definition for SVG */
+.countdown-progress-svg defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* Alternative approach using CSS custom properties for gradient */
+.countdown-progress-circle {
+  stroke: #ff0000;
+  background: linear-gradient(45deg, #ff0000, #ff6600, #ffaa00, #ffff00);
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .countdown-timer-container {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .countdown-progress-container {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .countdown-time-number {
+    font-size: 36px;
+  }
+  
+  .countdown-time-label {
+    font-size: 12px;
+  }
+}
