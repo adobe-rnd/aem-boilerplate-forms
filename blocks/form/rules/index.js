@@ -222,6 +222,9 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'valid':
         if (currentValue === true) {
           updateOrCreateInvalidMsg(field, '');
+          if (field.validity.customError) {
+            field?.setCustomValidity('');
+          }
         }
         break;
       case 'enum':
@@ -358,6 +361,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       ...formDef,
       search: window.location.search || '',
     },
+    codeBasePath: window.hlx.codeBasePath,
   });
 
   return new Promise((resolve) => {
@@ -397,7 +401,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
 }
 
 export async function initAdaptiveForm(formDef, createForm) {
-  await registerCustomFunctions();
+  await registerCustomFunctions(formDef?.properties?.customFunctionsPath, window.hlx?.codeBasePath);
   const response = await initializeRuleEngineWorker(formDef, createForm);
   return response?.form;
 }
