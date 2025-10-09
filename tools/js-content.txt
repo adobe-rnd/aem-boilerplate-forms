@@ -23,7 +23,7 @@ class ${componentClassName}Component {
 
     // Configuration properties
     this.propertyChanges = ${propertyChanges};
-    this.customEvent = '${custom_event_name}';
+    this.customEvents = ${custom_event_name};
   }
 
   /**
@@ -61,10 +61,12 @@ class ${componentClassName}Component {
     }, 'change');
 
     // Listen for custom events
-    if (this.customEvent) {
-      this.fieldModel.subscribe(() => {
-        this.updateView(this.fieldModel.getState());
-      }, this.customEvent);
+    if (this.customEvents && this.customEvents.length > 0) {
+      this.customEvents.forEach(eventName => {
+        this.fieldModel.subscribe(() => {
+          this.updateView(this.fieldModel.getState());
+        }, eventName);
+      });
     }
   }
 

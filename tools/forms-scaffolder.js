@@ -273,6 +273,35 @@ function validateCustomEventName(name) {
 }
 
 
+// Parse custom event names from CLI argument
+function parseCustomEventNames(customEventNameString) {
+  if (!customEventNameString || typeof customEventNameString !== 'string') {
+    return [];
+  }
+
+  // Split by comma and clean up
+  const eventNames = customEventNameString
+    .split(',')
+    .map(event => event.trim())
+    .filter(event => event.length > 0);
+
+  // Validate each event name
+  const invalidEventNames = eventNames.filter(event => {
+    const validation = validateCustomEventName(event);
+    return validation !== true;
+  });
+
+  if (invalidEventNames.length > 0) {
+    const errorMessages = invalidEventNames.map(event => {
+      const validation = validateCustomEventName(event);
+      return `"${event}": ${validation}`;
+    });
+    throw new Error(`Invalid custom event names:\n${errorMessages.join('\n')}`);
+  }
+
+  return eventNames;
+}
+
 // Parse property changes from CLI argument
 function parsePropertyChanges(propertyChangesString) {
   if (!propertyChangesString || typeof propertyChangesString !== 'string') {
@@ -304,7 +333,7 @@ function getPropertyChoices() {
 }
 
 // Create component files
-function createComponentFiles(componentName, baseComponent, targetDir, customEventName = '', propertyChanges = []) {
+function createComponentFiles(componentName, baseComponent, targetDir, customEventName = [], propertyChanges = []) {
   const files = {
     js: `${componentName}.js`,
     css: `${componentName}.css`,
@@ -320,6 +349,11 @@ function createComponentFiles(componentName, baseComponent, targetDir, customEve
     ? `['${propertyChanges.join("', '")}']`
     : '[]';
   
+  // Format custom event name array for JS
+  const customEventNameString = customEventName.length > 0 
+    ? `['${customEventName.join("', '")}']`
+    : '[]';
+  
   // Generate component class name (PascalCase)
   const componentClassName = componentName
     .split('-')
@@ -331,7 +365,7 @@ function createComponentFiles(componentName, baseComponent, targetDir, customEve
     .replace(/\$\{componentName\}/g, componentName)
     .replace(/\$\{componentClassName\}/g, componentClassName)
     .replace(/\$\{baseComponent\.name\}/g, baseComponent.name)
-    .replace(/\$\{custom_event_name\}/g, customEventName)
+    .replace(/\$\{custom_event_name\}/g, customEventNameString)
     .replace(/\$\{propertyChanges\}/g, propertyChangesString)
     .replace(/\$\{emojis\.gear\}/g, '⚙️');
 
@@ -622,21 +656,15 @@ async function scaffoldComponent(cliOptions = null) {
         process.exit(1);
       }
 
-      // Handle custom event name if provided
+      // Handle custom event names if provided
+      customEventName = [];
       if (options.customEventName) {
-        const customEventValidation = validateCustomEventName(options.customEventName);
-        if (customEventValidation !== true) {
-          logError(`Invalid custom event name: ${customEventValidation}`);
+        try {
+          customEventName = parseCustomEventNames(options.customEventName);
+        } catch (error) {
+          logError(`Invalid custom event names: ${error.message}`);
           process.exit(1);
         }
-        customEventName = options.customEventName.trim()
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^a-z0-9-_]/g, '')
-          .replace(/-+/g, '-')
-          .replace(/^-+|-+$/g, '');
-      } else {
-        customEventName = '';
       }
 
       // Handle property changes if provided
@@ -653,8 +681,8 @@ async function scaffoldComponent(cliOptions = null) {
       log(`${emojis.gear} Using CLI arguments:`, colors.cyan);
       log(`   Component name: ${colorize(componentName, colors.green)}`, colors.white);
       log(`   Base component: ${colorize(baseComponent.name, colors.green)}`, colors.white);
-      if (customEventName) {
-        log(`   Custom event name: ${colorize(customEventName, colors.green)}`, colors.white);
+      if (customEventName.length > 0) {
+        log(`   Custom event names: ${colorize(customEventName.join(', '), colors.green)}`, colors.white);
       }
       if (propertyChanges.length > 0) {
         log(`   Property changes: ${colorize(propertyChanges.join(', '), colors.green)}`, colors.white);
@@ -718,41 +746,58 @@ async function scaffoldComponent(cliOptions = null) {
       propertyChanges = propertyChangesResponse.propertyChanges || [];
       console.log(''); // Add spacing
 
-      // Prompt for custom event name
+      // Prompt for custom event names
       const customEventNameResponse = await enquirer.prompt({
         type: 'input',
         name: 'customEventName',
-        message: `${emojis.sparkles} Enter the name of the custom event if any dispatched from Rule Editor?`,
-        hint: 'This is optional - skip by pressing Enter',
+        message: `${emojis.sparkles} Enter the names of custom events if any dispatched from Rule Editor?`,
+        hint: 'Comma-separated list (e.g., startTimer,stopTimer) - optional, skip by pressing Enter',
         validate: (value) => {
           if (!value || value.trim() === '') {
             return true; // Allow empty values
           }
-          return validateCustomEventName(value);
+          try {
+            parseCustomEventNames(value);
+            return true;
+          } catch (error) {
+            return error.message;
+          }
         },
         format: (value) => {
           if (!value || value.trim() === '') {
             return '';
           }
-          // Auto-convert input to proper format
-          return value.trim()
-            .toLowerCase()
-            .replace(/\s+/g, '-')      // Replace spaces with hyphens
-            .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
-            .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
-            .replace(/^-+|-+$/g, '');  // Remove leading/trailing hyphens
+          // Auto-convert input to proper format for each event name
+          return value.split(',')
+            .map(event => event.trim()
+              .toLowerCase()
+              .replace(/\s+/g, '-')      // Replace spaces with hyphens
+              .replace(/[^a-z0-9-_]/g, '') // Remove invalid characters (allow underscores)
+              .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
+              .replace(/^-+|-+$/g, ''))  // Remove leading/trailing hyphens
+            .filter(event => event.length > 0)
+            .join(', ');
         },
       });
 
-      customEventName = customEventNameResponse.customEventName;
+      // Parse custom event names into array
+      customEventName = [];
+      if (customEventNameResponse.customEventName) {
+        try {
+          customEventName = parseCustomEventNames(customEventNameResponse.customEventName);
+        } catch (error) {
+          logError(`Invalid custom event names: ${error.message}`);
+          process.exit(1);
+        }
+      }
       console.log(''); // Add spacing
 
       // Show summary and confirm
       log(`${emojis.sparkles} Summary:`, colors.cyan + colors.bright);
       log(`   Custom Component name: ${colorize(componentName, colors.green)}`, colors.white);
       log(`   Base component: ${colorize(baseComponent.name, colors.green)}`, colors.white);
-      if (customEventName) {
-        log(`   Custom event name: ${colorize(customEventName, colors.green)}`, colors.white);
+      if (customEventName.length > 0) {
+        log(`   Custom event names: ${colorize(customEventName.join(', '), colors.green)}`, colors.white);
       }
       if (propertyChanges.length > 0) {
         log(`   Property changes: ${colorize(propertyChanges.join(', '), colors.green)}`, colors.white);
