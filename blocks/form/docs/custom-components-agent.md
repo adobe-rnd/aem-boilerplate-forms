@@ -26,7 +26,7 @@ base_type = [
     'Text Input',
   ]
 ```
-
+**Note**: In case of doubt decide the baseType based on the value type that need to be captured.
 2. Ask the user to specify the name of the custom event that need to be listened to update view. This would be *custom_event_name*. This is optional.
 
 3. Again propmt the user to specify the property changes that need to be listened to update view. This would be *property_changes*. If there are multiple events specified by the user *property_changes* would be a comma separated string. This is optional.
