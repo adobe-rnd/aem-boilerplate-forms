@@ -1,5 +1,4 @@
 import { chromium, expect } from '@playwright/test';
-import fs from 'fs';
 
 const filePath = './LoginAuth.json';
 const baseUrl = 'https://author-p133911-e1313554.adobeaemcloud.com/aem/start.html';
@@ -8,37 +7,30 @@ const password = process.env.AEM_password;
 
 const selectors = {
   iFrame: 'iframe[id*="exc-app-sandbox"]',
-  SubmitButton: 'div[class$="PasswordPage"] button[type="submit"]'
+  continueButton : 'div[class*="EmailPage"] button[type="submit"]',
+  submitButton: 'div[class$="PasswordPage"] button[type="submit"]'
 };
 
 async function globalSetup() {
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    recordVideo: { dir: 'test-results/' }
-  });
+  const context = await browser.newContext();
   const page = await context.newPage();
-  try {
-    await page.goto(baseUrl, { waitUntil: 'networkidle' });
-    await page.getByRole('button', { name: 'Sign in with Adobe' }).click();
-    await expect(page.getByText('Create an account').last()).toBeVisible();
-    await page.getByLabel('Email address').fill(emailId);
-    await page.getByRole('button', { name: 'Continue' }).click();
-    await expect(page.getByText('Enter your password')).toBeVisible();
-    await page.getByLabel('Password').first().fill(password);
-    await page.locator(selectors.SubmitButton).click();
+  await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Sign in with Adobe' }).click();
+  await expect(page.getByText('Create an account').last()).toBeVisible();
+  await page.getByLabel('Email address').fill(emailId);
+  await page.locator(selectors.continueButton).click();
+  await expect(page.getByText('Enter your password')).toBeVisible();
+  await page.getByLabel('Password').first().fill(password);
+  await page.locator(selectors.submitButton).click();
 
-    const finalUrlPattern = '**/aem/aem/start.html?appId=aemshell';
-    await page.waitForURL(finalUrlPattern, { timeout: 45000 });
-    const frame = page.frameLocator(selectors.iFrame);
-    await expect(frame.getByLabel('Navigation')).toBeVisible();
-    await page.context().storageState({ path: filePath });
-  } catch (error) {
-    // Video will be saved automatically in test-results/
-    throw error;
-  } finally {
-    await context.close();
-    await browser.close();
-  }
+  const finalUrlPattern = '**/aem/aem/start.html?appId=aemshell';
+  await page.waitForURL(finalUrlPattern, { timeout: 45000 });
+  const frame = page.frameLocator(selectors.iFrame);
+  await expect(frame.getByLabel('Navigation')).toBeVisible();
+  await page.context().storageState({ path: filePath });
+  await context.close();
+  await browser.close();
 }
 
 export default globalSetup;
