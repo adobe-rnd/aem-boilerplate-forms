@@ -1,0 +1,97 @@
+/* Countdown-timer component styles */
+.countdown-timer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #000;
+  border-radius: 8px;
+  min-height: 200px;
+}
+
+.countdown-timer-circle {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-timer-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.countdown-timer-bg {
+  fill: none;
+  stroke: #333;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.countdown-timer-progress {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 283; /* 2 * π * 45 */
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 0.3s ease;
+  /* Gradient effect using multiple stroke colors */
+  stroke: url(#timerGradient);
+}
+
+/* Gradient will be defined in SVG defs */
+
+.countdown-timer-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  z-index: 10;
+}
+
+.countdown-timer-display {
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 5px;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+.countdown-timer-label {
+  font-size: 14px;
+  font-weight: normal;
+  letter-spacing: 1px;
+  opacity: 0.9;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+/* Disabled state */
+.countdown-timer-container.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.countdown-timer-container.disabled .countdown-timer-progress {
+  stroke: #666;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .countdown-timer-circle {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .countdown-timer-display {
+    font-size: 36px;
+  }
+  
+  .countdown-timer-label {
+    font-size: 12px;
+  }
+}
