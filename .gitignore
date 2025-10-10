@@ -17,3 +17,7 @@ helix-importer-ui
 /playwright/.cache/
 test/e2e/reports/
 LoginAuth.json
+
+# CI generated files
+deps.json
+result.txt
