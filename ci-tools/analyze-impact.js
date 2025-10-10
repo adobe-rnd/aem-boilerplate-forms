@@ -7,9 +7,14 @@ try {
   const deps = JSON.parse(fs.readFileSync("./deps.json", "utf8"));
 
   // Step 2: Get changed files from PR base to head
-  const baseSha = process.env.GITHUB_BASE_REF 
-    ? `origin/${process.env.GITHUB_BASE_REF}` 
-    : "HEAD~1";
+  // In GitHub Actions PRs, use the base ref; locally use HEAD~1
+  let baseSha = "HEAD~1";
+  if (process.env.GITHUB_BASE_REF) {
+    baseSha = `origin/${process.env.GITHUB_BASE_REF}`;
+  } else if (process.env.GITHUB_EVENT_NAME === 'pull_request' && process.env.GITHUB_BASE_REF) {
+    // Fallback: use refs/remotes/origin/{base_ref}
+    baseSha = `refs/remotes/origin/${process.env.GITHUB_BASE_REF}`;
+  }
   
   const changedFiles = execSync(`git diff --name-only ${baseSha} HEAD`)
     .toString()

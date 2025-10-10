@@ -10,6 +10,11 @@ jobs:
       pull-requests: write  # Needed to comment
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
