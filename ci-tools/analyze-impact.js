@@ -28,7 +28,7 @@ try {
     );
 
   if (changedFiles.length === 0) {
-    console.log("✅ No relevant source files changed in blocks/, scripts/, or tools/.");
+    console.log("No relevant source files changed in blocks/, scripts/, or tools/.");
     process.exit(0);
   }
 
@@ -154,7 +154,7 @@ try {
   //  */
 
   // Step 5: Human-readable summary with context
-  console.log("## 📦 Direct Changes\n");
+  console.log("##  Direct Changes\n");
   changedFiles.forEach((f) => {
     const context = getFileContext(f);
     const contextStr = context ? ` → ${context}` : "";
@@ -166,15 +166,15 @@ try {
   const businessFeatures = getBusinessFeatures(allAffectedFiles);
   
   if (businessFeatures.length > 0) {
-    console.log("\n## 🎯 Business Features Potentially Affected\n");
+    console.log("\n## Business Features Potentially Affected\n");
     businessFeatures.forEach(feature => console.log(`- ${feature}`));
   }
 
   if (impactedSource.size === 0 && impactedTests.size === 0) {
-    console.log("\n✅ No dependent modules appear to be impacted by these changes.");
+    console.log("\nNo dependent modules appear to be impacted by these changes.");
   } else {
     if (impactedSource.size > 0) {
-      console.log("\n## ⚠️ Potentially Impacted Modules\n");
+      console.log("\n##  Potentially Impacted Modules\n");
       [...impactedSource].forEach((f) => {
         const context = getFileContext(f);
         const contextStr = context ? ` → ${context}` : "";
@@ -183,19 +183,19 @@ try {
     }
 
     if (impactedTests.size > 0) {
-      console.log("\n## 🧪 Tests to Review\n");
+      console.log("\n##  Tests to Review\n");
       [...impactedTests].forEach((f) => console.log(`- \`${f}\``));
     }
 
     if (businessFeatures.length > 0) {
       const topFeatures = businessFeatures.slice(0, 2).join(", ");
       const suffix = businessFeatures.length > 2 ? ` + ${businessFeatures.length - 2} more` : "";
-      console.log(`\n💡 **Focus testing on:** ${topFeatures}${suffix}`);
+      console.log(`\n **Focus testing on:** ${topFeatures}${suffix}`);
     } else {
-      console.log("\n💡 Review impacted modules and run tests before merging");
+      console.log("\n Review impacted modules and run tests before merging");
     }
   }
 } catch (err) {
-  console.error("❌ Error running dependency impact analysis:", err.message);
+  console.error("Error running dependency impact analysis:", err.message);
   process.exit(1);
 }
