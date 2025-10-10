@@ -68,4 +68,12 @@ export const expectedDiffs = [
     node: 'FORM/FIELDSET/DIV/FIELDSET[@id=\'uniqueId2\']/FIELDSET/LEGEND',
     attribute: 'for',
   },
+  {
+    node: 'FORM/FIELDSET/DIV/FIELDSET[@id=\'uniqueId2\']/FIELDSET/DIV[1]/INPUT',
+    attribute: 'name',
+  },
+  {
+    node: 'FORM/FIELDSET/DIV/FIELDSET[@id=\'uniqueId2\']/FIELDSET/DIV[2]/INPUT',
+    attribute: 'name',
+  },
 ]; 
