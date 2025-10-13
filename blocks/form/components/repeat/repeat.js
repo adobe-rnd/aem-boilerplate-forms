@@ -2,6 +2,40 @@ import { getId } from '../../util.js';
 import { subscribe } from '../../rules/index.js';
 
 /**
+ * Updates radio button and checkbox names to ensure proper grouping within repeatable instances.
+ * Radio buttons and checkboxes in the same instance share the same name,
+ * but different instances have different group names.
+ * @param {HTMLElement} instance - The repeatable instance element
+ * @param {number} index - The index of the instance
+ */
+function updateSelectFieldNames(instance, index) {
+  // Only update if this is actually a repeatable instance
+  if (!instance.dataset.repeatable || instance.dataset.repeatable !== 'true') {
+    return;
+  }
+
+  // Update radio button names
+  instance.querySelectorAll('input[type="radio"]').forEach((radio) => {
+    const baseName = radio.name.replace(/-\d+$/, '');
+    const expectedName = index > 0 ? `${baseName}-${index}` : baseName;
+
+    if (radio.name !== expectedName) {
+      radio.name = expectedName;
+    }
+  });
+
+  // Update checkbox names
+  instance.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+    const baseName = checkbox.name.replace(/-\d+$/, '');
+    const expectedName = index > 0 ? `${baseName}-${index}` : baseName;
+
+    if (checkbox.name !== expectedName) {
+      checkbox.name = expectedName;
+    }
+  });
+}
+
+/**
  * Updates a fieldset instance with proper IDs and labels.
  * @param {HTMLElement} fieldset - The fieldset element to update
  * @param {number} index - The index of the instance
@@ -164,6 +198,7 @@ const repeatStrategies = {
       const newFieldset = fieldset.cloneNode(true);
       newFieldset.setAttribute('data-index', childCount);
       update(newFieldset, childCount, wrapper['#repeat-template-label']);
+      updateSelectFieldNames(newFieldset, childCount);
 
       const actions = wrapper.querySelector('.repeat-actions');
       actions.insertAdjacentElement('beforebegin', newFieldset);
@@ -196,6 +231,9 @@ const repeatStrategies = {
       fieldset.remove();
       wrapper.querySelectorAll('[data-repeatable="true"]').forEach((el, index) => {
         update(el, index, wrapper['#repeat-template-label']);
+      });
+      wrapper.querySelectorAll('[data-repeatable="true"]').forEach((el, index) => {
+        updateSelectFieldNames(el, index);
       });
       updateButtonVisibility(wrapper);
     },
@@ -327,6 +365,13 @@ export default function transferRepeatableDOM(form, formDef, container, formId) 
     // Setup form-specific logic using strategy pattern
     const repeatHandler = repeatStrategies[isDocBased ? 'doc' : 'af'];
     repeatHandler.setup(wrapper, form, formId);
+
+    // Update radio button and checkbox names for doc-based forms only
+    if (isDocBased) {
+      wrapper.querySelectorAll('[data-repeatable="true"]').forEach((instance, index) => {
+        updateSelectFieldNames(instance, index);
+      });
+    }
 
     // Add remove buttons only if there are more instances than minimum
     const min = parseInt(wrapper.dataset.min || 0, 10);
