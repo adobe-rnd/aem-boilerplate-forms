@@ -65,7 +65,7 @@ function update(fieldset, index, labelTemplate) {
  * @param {string} icon - The icon class name (add/remove)
  * @returns {HTMLButtonElement} The created button element
  */
-function createButton(label, icon) {
+export function createButton(label, icon) {
   const button = document.createElement('button');
   button.className = `item-${icon}`;
   button.type = 'button';
@@ -187,7 +187,7 @@ const repeatStrategies = {
 
       // Add remove button to the new instance
       // eslint-disable-next-line no-use-before-define
-      insertRemoveButton(newFieldset, wrapper, form, repeatStrategies.doc);
+      insertRemoveButton(newFieldset, wrapper, repeatStrategies.doc);
 
       // Add remove buttons to all existing instances that don't have them
       // (this handles the case where we started with min instances and no buttons)
@@ -233,10 +233,9 @@ const repeatStrategies = {
  * Inserts a remove button into a fieldset instance.
  * @param {HTMLElement} fieldset - The fieldset to add the button to
  * @param {HTMLElement} wrapper - The repeat wrapper element
- * @param {HTMLElement} form - The form element
- * @param {Object} strategy - The repeat strategy object (af or doc)
+ * @param {Object} strategy - The repeat strategy object (af or doc), defaults to af strategy
  */
-function insertRemoveButton(fieldset, wrapper, form, strategy) {
+export function insertRemoveButton(fieldset, wrapper, strategy = repeatStrategies.af) {
   const label = wrapper.dataset?.repeatDeleteButtonLabel || fieldset.dataset?.repeatDeleteButtonLabel || 'Delete';
   const removeButton = createButton(label, 'remove');
 
@@ -271,7 +270,7 @@ function addRemoveButtons(wrapper, form, strategy) {
       return; // Skip instances that already have remove buttons
     }
 
-    insertRemoveButton(instance, wrapper, form, strategy);
+    insertRemoveButton(instance, wrapper, strategy);
   });
 }
 
@@ -281,7 +280,7 @@ function addRemoveButtons(wrapper, form, strategy) {
  * @param {HTMLElement} form - The form element
  * @param {Object} strategy - The repeat strategy object (af or doc)
  */
-function addInstance(wrapper, form, strategy) {
+export function addInstance(wrapper, form, strategy) {
   strategy.addInstance(wrapper, form);
 }
 
@@ -289,9 +288,9 @@ function addInstance(wrapper, form, strategy) {
  * Inserts an add button into the repeat wrapper.
  * @param {HTMLElement} wrapper - The repeat wrapper element
  * @param {HTMLElement} form - The form element
- * @param {Object} strategy - The repeat strategy object (af or doc)
+ * @param {Object} strategy - The repeat strategy object (af or doc), defaults to af strategy
  */
-export function insertAddButton(wrapper, form, strategy) {
+export function insertAddButton(wrapper, form, strategy = repeatStrategies.af) {
   const actions = document.createElement('div');
   actions.className = 'repeat-actions';
   const addLabel = wrapper?.dataset?.repeatAddButtonLabel || 'Add';
@@ -367,7 +366,3 @@ export default function transferRepeatableDOM(form, formDef, container, formId) 
     updateRepeatState(wrapper);
   });
 }
-
-export {
-  insertRemoveButton, addInstance, createButton,
-};
