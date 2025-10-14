@@ -14,23 +14,13 @@ function updateSelectFieldNames(instance, index) {
     return;
   }
 
-  // Update radio button names
-  instance.querySelectorAll('input[type="radio"]').forEach((radio) => {
-    const baseName = radio.name.replace(/-\d+$/, '');
+  // Update radio button and checkbox names
+  instance.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach((element) => {
+    const baseName = element.name.replace(/-\d+$/, '');
     const expectedName = index > 0 ? `${baseName}-${index}` : baseName;
 
-    if (radio.name !== expectedName) {
-      radio.name = expectedName;
-    }
-  });
-
-  // Update checkbox names
-  instance.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-    const baseName = checkbox.name.replace(/-\d+$/, '');
-    const expectedName = index > 0 ? `${baseName}-${index}` : baseName;
-
-    if (checkbox.name !== expectedName) {
-      checkbox.name = expectedName;
+    if (element.name !== expectedName) {
+      element.name = expectedName;
     }
   });
 }
