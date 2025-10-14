@@ -45,6 +45,14 @@ export const expectedDiffs = [
     attribute: 'id',
   },
   {
+    node: 'FORM/FIELDSET/DIV/FIELDSET[@id=\'repeatable-panel-id\']/FIELDSET/DIV[1]/INPUT',
+    attribute: 'name',
+  },
+  {
+    node: 'FORM/FIELDSET/DIV/FIELDSET[@id=\'repeatable-panel-id\']/FIELDSET/DIV[2]/INPUT',
+    attribute: 'name',
+  },
+  {
     node: 'FORM/FIELDSET/DIV/FIELDSET[@id=\'uniqueId2\']',
     attribute: 'data-id',
   },
