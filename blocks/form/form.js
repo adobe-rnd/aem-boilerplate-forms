@@ -1,5 +1,5 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
-import transferRepeatableDOM, { insertAddButton, insertRemoveButton, createButton as createRepeatButton } from './components/repeat/repeat.js';
+import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
@@ -251,36 +251,6 @@ function decoratePanelContainer(panelDefinition, panelContainer) {
       const legend = createLegend(panelDefinition);
       if (legend) {
         panelContainer.insertAdjacentElement('afterbegin', legend);
-      }
-    }
-
-    const form = panelContainer.closest('form');
-    const isEditMode = form && form.classList.contains('edit-mode');
-    const isRepeatable = panelDefinition.repeatable === true || panelContainer.dataset.repeatable === 'true';
-
-    if (isEditMode && isRepeatable) {
-      const hasAddButton = panelContainer.querySelector('.repeat-actions .item-add');
-      const hasRemoveButton = panelContainer.querySelector('.item-remove');
-
-      if (!hasAddButton) {
-        let repeatActions = panelContainer.querySelector('.repeat-actions');
-        if (!repeatActions) {
-          repeatActions = document.createElement('div');
-          repeatActions.className = 'repeat-actions';
-          const legend = panelContainer.querySelector('legend');
-          if (legend) {
-            legend.insertAdjacentElement('afterend', repeatActions);
-          } else {
-            panelContainer.insertAdjacentElement('afterbegin', repeatActions);
-          }
-        }
-        const addButton = createRepeatButton('Add', 'add');
-        repeatActions.appendChild(addButton);
-      }
-
-      if (!hasRemoveButton) {
-        const removeButton = createRepeatButton('Delete', 'remove');
-        panelContainer.appendChild(removeButton);
       }
     }
   }
