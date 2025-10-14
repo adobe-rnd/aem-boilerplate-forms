@@ -33,30 +33,30 @@ export function op(block) {
 }
 
 export function expect(block) {
+  const wrapper = block.querySelector('.repeat-wrapper');
+  
   // Final state: should be back to 1 instance (min)
   const instances = block.querySelectorAll('.repeat-wrapper > fieldset[data-repeatable="true"]');
   assert.equal(instances.length, 1, 'Should have 1 instance at end (min)');
   
-  // Add button should be visible (below max)
-  const addBtn = block.querySelector('.repeat-wrapper > .repeat-actions > .item-add');
-  assert.notEqual(addBtn.style.display, 'none', 'Add button should be visible when below max');
-  
-  // Remove button should be hidden (at min)
-  const removeButtons = block.querySelectorAll('.item-remove');
-  removeButtons.forEach(btn => {
-    assert.equal(btn.style.display, 'none', 'Remove buttons should be hidden when at min');
-  });
+  // At min: verify data attributes
+  assert.equal(wrapper.dataset.atMin, 'true', 'Should be at min');
+  assert.equal(wrapper.dataset.atMax, 'false', 'Should not be at max');
+  assert.equal(wrapper.dataset.instanceCount, '1', 'Instance count should be 1');
   
   // Test adding back to max to verify max limit behavior
+  const addBtn = block.querySelector('.repeat-wrapper > .repeat-actions > .item-add');
   addBtn.click(); // 1 -> 2
+  
+  // At 2 (between min and max): verify data attributes
+  assert.equal(wrapper.dataset.atMin, 'false', 'Should not be at min');
+  assert.equal(wrapper.dataset.atMax, 'false', 'Should not be at max');
+  assert.equal(wrapper.dataset.instanceCount, '2', 'Instance count should be 2');
+  
   addBtn.click(); // 2 -> 3 (max)
   
-  // At max, add button should be hidden
-  assert.equal(addBtn.style.display, 'none', 'Add button should be hidden when at max');
-  
-  // Remove buttons should be visible (above min)
-  const newRemoveButtons = block.querySelectorAll('.item-remove');
-  newRemoveButtons.forEach(btn => {
-    assert.notEqual(btn.style.display, 'none', 'Remove buttons should be visible when above min');
-  });
+  // At max: verify data attributes
+  assert.equal(wrapper.dataset.atMax, 'true', 'Should be at max');
+  assert.equal(wrapper.dataset.atMin, 'false', 'Should not be at min');
+  assert.equal(wrapper.dataset.instanceCount, '3', 'Instance count should be 3');
 } 

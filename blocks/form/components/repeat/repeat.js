@@ -76,28 +76,20 @@ function createButton(label, icon) {
 }
 
 /**
- * Updates the visibility of add/remove buttons based on min/max constraints.
+ * Updates repeat wrapper state based on current instance count and min/max constraints.
+ * Sets data attributes that CSS uses to control button visibility.
  * @param {HTMLElement} wrapper - The repeat wrapper element
  */
-function updateButtonVisibility(wrapper) {
+function updateRepeatState(wrapper) {
   const instances = wrapper.querySelectorAll('[data-repeatable="true"]');
   const count = instances.length;
   const min = parseInt(wrapper.dataset.min || 0, 10);
   const max = parseInt(wrapper.dataset.max || -1, 10);
 
-  const addButton = wrapper.querySelector('.item-add');
-  if (addButton) {
-    if (max !== -1 && count >= max) {
-      addButton.style.display = 'none';
-    } else {
-      addButton.style.display = '';
-    }
-  }
-
-  const removeButtons = wrapper.querySelectorAll('.item-remove');
-  removeButtons.forEach((btn) => {
-    btn.style.display = count <= min ? 'none' : '';
-  });
+  // Set data attributes for CSS to react to
+  wrapper.dataset.atMax = (max !== -1 && count >= max) ? 'true' : 'false';
+  wrapper.dataset.atMin = (count <= min) ? 'true' : 'false';
+  wrapper.dataset.instanceCount = count;
 }
 
 /**
@@ -167,7 +159,7 @@ const repeatStrategies = {
               requestAnimationFrame(() => {
                 // eslint-disable-next-line no-use-before-define
                 addRemoveButtons(wrapper, form, repeatStrategies.af);
-                updateButtonVisibility(wrapper);
+                updateRepeatState(wrapper);
               });
             }
           });
@@ -202,7 +194,7 @@ const repeatStrategies = {
       // eslint-disable-next-line no-use-before-define
       addRemoveButtons(wrapper, form, repeatStrategies.doc);
 
-      updateButtonVisibility(wrapper);
+      updateRepeatState(wrapper);
 
       const event = new CustomEvent('item:add', {
         detail: { item: { name: newFieldset.name, id: newFieldset.id } },
@@ -225,7 +217,7 @@ const repeatStrategies = {
       wrapper.querySelectorAll('[data-repeatable="true"]').forEach((el, index) => {
         updateSelectFieldNames(el, index);
       });
-      updateButtonVisibility(wrapper);
+      updateRepeatState(wrapper);
     },
 
     /**
@@ -372,11 +364,10 @@ export default function transferRepeatableDOM(form, formDef, container, formId) 
       insertAddButton(wrapper, form, strategy);
     }
 
-    updateButtonVisibility(wrapper);
+    updateRepeatState(wrapper);
   });
 }
 
-// Export functions for external use
 export {
-  insertRemoveButton, addInstance, updateButtonVisibility, createButton,
+  insertRemoveButton, addInstance, createButton,
 };
