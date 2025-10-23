@@ -29,9 +29,9 @@ export default class RuleEngine {
 
   fieldChanges = [];
 
-  constructor(formDef) {
+  constructor(formDef, url) {
     const logLevel = getLogLevelFromURL(url);
-    this.form = createFormInstance(formDef, undefined, LOG_LEVEL);
+    this.form = createFormInstance(formDef, undefined, logLevel);
     this.form.subscribe((e) => {
       const { payload } = e;
       this.fieldChanges.push(payload);
@@ -70,9 +70,8 @@ onmessage = async (e) => {
           postMessage(msg);
         };
         break;
-      }
-      default:
-        break;
+    default:
+      break;
     }
   }
   // prefills form data, waits for all async operations
