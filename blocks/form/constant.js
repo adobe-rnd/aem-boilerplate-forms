@@ -6,47 +6,53 @@ export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you for your submission.';
 // Logging Configuration
 // Control logging via URL parameter: ?log=<level>
 // ?log=on → returns 'warn'
-// ?log=debug → returns 'debug'
-// ?log=info → returns 'info'
-// OR automatically enabled for AEM preview URLs (*.page) → returns 'debug'
+// ?log=debug, info, error, off, warn → returns that level
+// Invalid values return 'warn' (fallback)
+// OR automatically enabled for AEM preview URLs (*.page) → returns 'warn'
+const VALID_LOG_LEVELS = ['error', 'debug', 'warn', 'info', 'off'];
+
 export const getLogLevelFromURL = (urlString = null) => {
+  // Semantic constants for log level defaults
+  const DEFAULT_LOG_LEVEL = 'off'; // Used when no logging is explicitly requested
+  const FALLBACK_LOG_LEVEL = 'warn'; // Used for invalid/empty values or AEM preview
+  
   try {
-    let searchParams = '';
-    let hostname = '';
-
+    // Extract URL object from either parameter or current context
+    let url;
     if (urlString) {
-      // For worker context - use passed URL string
-      const url = new URL(urlString);
-      searchParams = url.search;
-      hostname = url.hostname;
+      // Explicit URL string provided (for workers - they need page URL passed from main thread)
+      url = new URL(urlString);
     } else if (typeof window !== 'undefined' && window.location) {
-      // For main thread context - use window.location
-      searchParams = window.location.search;
-      hostname = window.location.hostname;
+      // Main thread context - use page URL
+      url = new URL(window.location.href);
+    } else {
+      return DEFAULT_LOG_LEVEL; // No URL available
     }
 
-    // Check for explicit log level parameter
-    if (searchParams) {
-      const urlParams = new URLSearchParams(searchParams);
-      const logParam = urlParams.get('log');
-      if (logParam !== null) {
-        // If log=on, return 'warn'
-        if (logParam === 'on') {
-          return 'warn';
-        }
-        // Otherwise return whatever value is provided
-        return logParam || 'error';
+    const { searchParams, hostname } = url;
+
+    // Priority 1: Check for explicit log parameter
+    const logParam = searchParams.get('log');
+    if (logParam !== null) {
+      // Special case: log=on means warn
+      if (logParam === 'on') {
+        return FALLBACK_LOG_LEVEL;
       }
+      // Validate and return log level, or fallback for invalid/empty values
+      return VALID_LOG_LEVELS.includes(logParam) ? logParam : FALLBACK_LOG_LEVEL;
     }
 
-    // Auto-enable debug logs for AEM preview URLs (*.page)
-    if (hostname && hostname.match(/\.page$/)) {
-      return 'warn';
+    // Priority 2: Auto-enable for AEM preview URLs (*.page)
+    if (hostname.match(/\.page$/)) {
+      return FALLBACK_LOG_LEVEL;
     }
+
+    // Priority 3: Default - no logging
+    return DEFAULT_LOG_LEVEL;
   } catch (error) {
     // Fallback to default if URL parsing fails
+    return DEFAULT_LOG_LEVEL;
   }
-  return 'off'; // Default: no logging
 };
 // Logging Configuration
 // To set log level, modify this constant:

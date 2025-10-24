@@ -19,8 +19,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "warn" when log=on', () => {
       global.window = {
         location: {
-          search: '?log=on',
-          hostname: 'example.com',
+          href: 'https://example.com/form?log=on',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -30,8 +29,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "debug" when log=debug', () => {
       global.window = {
         location: {
-          search: '?log=debug',
-          hostname: 'example.com',
+          href: 'https://example.com/form?log=debug',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -41,8 +39,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "info" when log=info', () => {
       global.window = {
         location: {
-          search: '?log=info',
-          hostname: 'example.com',
+          href: 'https://example.com/form?log=info',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -52,8 +49,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "error" when log=error', () => {
       global.window = {
         location: {
-          search: '?log=error',
-          hostname: 'example.com',
+          href: 'https://example.com/form?log=error',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -63,45 +59,51 @@ describe('getLogLevelFromURL', () => {
     it('should return "off" when log=off', () => {
       global.window = {
         location: {
-          search: '?log=off',
-          hostname: 'example.com',
+          href: 'https://example.com/form?log=off',
         },
       };
       const logLevel = getLogLevelFromURL();
       assert.strictEqual(logLevel, 'off');
     });
 
-    it('should return custom level when log=custom', () => {
+    it('should return "warn" when log=warn', () => {
       global.window = {
         location: {
-          search: '?log=custom',
-          hostname: 'example.com',
+          href: 'https://example.com/form?log=warn',
         },
       };
       const logLevel = getLogLevelFromURL();
-      assert.strictEqual(logLevel, 'custom');
+      assert.strictEqual(logLevel, 'warn');
+    });
+
+    it('should return "warn" for invalid log level', () => {
+      global.window = {
+        location: {
+          href: 'https://example.com/form?log=invalid',
+        },
+      };
+      const logLevel = getLogLevelFromURL();
+      assert.strictEqual(logLevel, 'warn');
     });
 
     it('should work with log parameter among other params', () => {
       global.window = {
         location: {
-          search: '?foo=bar&log=debug&baz=qux',
-          hostname: 'example.com',
+          href: 'https://example.com/form?foo=bar&log=debug&baz=qux',
         },
       };
       const logLevel = getLogLevelFromURL();
       assert.strictEqual(logLevel, 'debug');
     });
 
-    it('should return "error" when log= (empty value)', () => {
+    it('should return "warn" when log= (empty value)', () => {
       global.window = {
         location: {
-          search: '?log=',
-          hostname: 'example.com',
+          href: 'https://example.com/form?log=',
         },
       };
       const logLevel = getLogLevelFromURL();
-      assert.strictEqual(logLevel, 'error');
+      assert.strictEqual(logLevel, 'warn');
     });
   });
 
@@ -109,8 +111,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "warn" for .page domain (AEM preview)', () => {
       global.window = {
         location: {
-          search: '',
-          hostname: 'main--site--org.aem.page',
+          href: 'https://main--site--org.aem.page/form',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -120,8 +121,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "warn" for any subdomain with .page', () => {
       global.window = {
         location: {
-          search: '',
-          hostname: 'feature-branch--mysite--company.aem.page',
+          href: 'https://feature-branch--mysite--company.aem.page/form',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -131,8 +131,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "off" for .live domain (production)', () => {
       global.window = {
         location: {
-          search: '',
-          hostname: 'main--site--org.aem.live',
+          href: 'https://main--site--org.aem.live/form',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -142,8 +141,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "off" for custom production domains', () => {
       global.window = {
         location: {
-          search: '',
-          hostname: 'www.example.com',
+          href: 'https://www.example.com/form',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -155,8 +153,7 @@ describe('getLogLevelFromURL', () => {
     it('should allow log=error to override .page domain default', () => {
       global.window = {
         location: {
-          search: '?log=error',
-          hostname: 'main--site--org.aem.page',
+          href: 'https://main--site--org.aem.page/form?log=error',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -166,8 +163,7 @@ describe('getLogLevelFromURL', () => {
     it('should allow log=off to disable logs on .page domain', () => {
       global.window = {
         location: {
-          search: '?log=off',
-          hostname: 'main--site--org.aem.page',
+          href: 'https://main--site--org.aem.page/form?log=off',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -177,8 +173,7 @@ describe('getLogLevelFromURL', () => {
     it('should allow log=debug to enable debug on production domains', () => {
       global.window = {
         location: {
-          search: '?log=debug',
-          hostname: 'www.production.com',
+          href: 'https://www.production.com/form?log=debug',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -188,8 +183,7 @@ describe('getLogLevelFromURL', () => {
     it('should prioritize log parameter over .page domain', () => {
       global.window = {
         location: {
-          search: '?log=warn',
-          hostname: 'main--site--org.aem.page',
+          href: 'https://main--site--org.aem.page/form?log=warn',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -256,8 +250,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "off" when empty search params on non-.page domain', () => {
       global.window = {
         location: {
-          search: '',
-          hostname: 'localhost',
+          href: 'http://localhost:3000/form',
         },
       };
       const logLevel = getLogLevelFromURL();
@@ -267,8 +260,7 @@ describe('getLogLevelFromURL', () => {
     it('should return "off" when no log parameter is provided', () => {
       global.window = {
         location: {
-          search: '?other=param',
-          hostname: 'example.com',
+          href: 'https://example.com/form?other=param',
         },
       };
       const logLevel = getLogLevelFromURL();
