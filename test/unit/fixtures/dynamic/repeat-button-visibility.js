@@ -40,8 +40,8 @@ export function expect(block) {
   assert.equal(instances.length, 1, 'Should have 1 instance at end (min)');
   
   // At min: verify data attributes
-  assert.equal(wrapper.dataset.atMin, 'true', 'Should be at min');
-  assert.equal(wrapper.dataset.atMax, 'false', 'Should not be at max');
+  assert.equal(wrapper.dataset.removeInstance, 'false', 'Should not be able to remove (at min)');
+  assert.equal(wrapper.dataset.addInstance, 'true', 'Should be able to add (not at max)');
   assert.equal(wrapper.dataset.instanceCount, '1', 'Instance count should be 1');
   
   // Test adding back to max to verify max limit behavior
@@ -49,14 +49,14 @@ export function expect(block) {
   addBtn.click(); // 1 -> 2
   
   // At 2 (between min and max): verify data attributes
-  assert.equal(wrapper.dataset.atMin, 'false', 'Should not be at min');
-  assert.equal(wrapper.dataset.atMax, 'false', 'Should not be at max');
+  assert.equal(wrapper.dataset.removeInstance, 'true', 'Should be able to remove (not at min)');
+  assert.equal(wrapper.dataset.addInstance, 'true', 'Should be able to add (not at max)');
   assert.equal(wrapper.dataset.instanceCount, '2', 'Instance count should be 2');
   
   addBtn.click(); // 2 -> 3 (max)
   
   // At max: verify data attributes
-  assert.equal(wrapper.dataset.atMax, 'true', 'Should be at max');
-  assert.equal(wrapper.dataset.atMin, 'false', 'Should not be at min');
+  assert.equal(wrapper.dataset.addInstance, 'false', 'Should not be able to add (at max)');
+  assert.equal(wrapper.dataset.removeInstance, 'true', 'Should be able to remove (not at min)');
   assert.equal(wrapper.dataset.instanceCount, '3', 'Instance count should be 3');
 } 

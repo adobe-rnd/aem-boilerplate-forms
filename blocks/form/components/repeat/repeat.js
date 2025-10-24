@@ -8,7 +8,7 @@ import { subscribe } from '../../rules/index.js';
  * @param {HTMLElement} instance - The repeatable instance element
  * @param {number} index - The index of the instance
  */
-function updateSelectFieldNames(instance, index) {
+function updateRadioCheckboxNames(instance, index) {
   // Only update if this is actually a repeatable instance
   if (!instance.dataset.repeatable || instance.dataset.repeatable !== 'true') {
     return;
@@ -83,12 +83,12 @@ export function createButton(label, icon) {
 function updateRepeatState(wrapper) {
   const instances = wrapper.querySelectorAll('[data-repeatable="true"]');
   const count = instances.length;
-  const min = parseInt(wrapper.dataset.min || 0, 10);
-  const max = parseInt(wrapper.dataset.max || -1, 10);
+  const min = Number(wrapper.dataset.min) || 0;
+  const max = Number(wrapper.dataset.max) || -1;
 
   // Set data attributes for CSS to react to
-  wrapper.dataset.atMax = (max !== -1 && count >= max) ? 'true' : 'false';
-  wrapper.dataset.atMin = (count <= min) ? 'true' : 'false';
+  wrapper.dataset.addInstance = (max === -1 || count < max) ? 'true' : 'false';
+  wrapper.dataset.removeInstance = (count > min) ? 'true' : 'false';
   wrapper.dataset.instanceCount = count;
 }
 
@@ -180,7 +180,7 @@ const repeatStrategies = {
       const newFieldset = fieldset.cloneNode(true);
       newFieldset.setAttribute('data-index', childCount);
       update(newFieldset, childCount, wrapper['#repeat-template-label']);
-      updateSelectFieldNames(newFieldset, childCount);
+      updateRadioCheckboxNames(newFieldset, childCount);
 
       const actions = wrapper.querySelector('.repeat-actions');
       actions.insertAdjacentElement('beforebegin', newFieldset);
@@ -215,16 +215,9 @@ const repeatStrategies = {
         update(el, index, wrapper['#repeat-template-label']);
       });
       wrapper.querySelectorAll('[data-repeatable="true"]').forEach((el, index) => {
-        updateSelectFieldNames(el, index);
+        updateRadioCheckboxNames(el, index);
       });
       updateRepeatState(wrapper);
-    },
-
-    /**
-     * No setup needed for document-based forms.
-     */
-    setup: () => {
-      // No setup required for doc-based forms
     },
   },
 };
@@ -319,7 +312,9 @@ export default function transferRepeatableDOM(form, formDef, container, formId) 
 
     const wrapper = document.createElement('div');
     wrapper.dataset.min = el.dataset.min || 0;
-    wrapper.dataset.max = el.dataset.max;
+    if (el.dataset.max) {
+      wrapper.dataset.max = el.dataset.max;
+    }
     wrapper.dataset.variant = el.dataset.variant || 'addDeleteButtons';
     wrapper.dataset.repeatAddButtonLabel = el.dataset?.repeatAddButtonLabel ? el.dataset.repeatAddButtonLabel : 'Add';
     wrapper.dataset.repeatDeleteButtonLabel = el.dataset?.repeatDeleteButtonLabel ? el.dataset.repeatDeleteButtonLabel : 'Delete';
@@ -344,17 +339,19 @@ export default function transferRepeatableDOM(form, formDef, container, formId) 
     }
 
     // Setup form-specific logic using strategy pattern
-    strategy.setup(wrapper, form, formId);
+    if (strategy.setup) {
+      strategy.setup(wrapper, form, formId);
+    }
 
     // Update radio button and checkbox names for doc-based forms only
     if (isDocBased) {
       wrapper.querySelectorAll('[data-repeatable="true"]').forEach((instance, index) => {
-        updateSelectFieldNames(instance, index);
+        updateRadioCheckboxNames(instance, index);
       });
     }
 
     // Add remove buttons only if there are more instances than minimum
-    const min = parseInt(wrapper.dataset.min || 0, 10);
+    const min = Number(wrapper.dataset.min) || 0;
     if (instances.length > min) {
       addRemoveButtons(wrapper, form, strategy);
     }
