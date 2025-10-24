@@ -5,10 +5,9 @@ export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you for your submission.';
 
 // Logging Configuration
 // Control logging via URL parameter: ?log=<level>
-// ?log=on → returns 'warn'
-// ?log=debug, info, error, off, warn → returns that level
-// Invalid values return 'warn' (fallback)
-// OR automatically enabled for AEM preview URLs (*.page) → returns 'warn'
+// Valid levels: debug, info, error, off, warn → returns that level
+// Invalid/empty values (including 'on') → returns 'warn' (fallback)
+// AEM preview URLs (*.page) → returns 'warn'
 const VALID_LOG_LEVELS = ['error', 'debug', 'warn', 'info', 'off'];
 
 export const getLogLevelFromURL = (urlString = null) => {
@@ -31,23 +30,15 @@ export const getLogLevelFromURL = (urlString = null) => {
 
     const { searchParams, hostname } = url;
 
-    // Priority 1: Check for explicit log parameter
+    // Check if logging should be enabled (explicit param or AEM preview)
     const logParam = searchParams.get('log');
-    if (logParam !== null) {
-      // Special case: log=on means warn
-      if (logParam === 'on') {
-        return FALLBACK_LOG_LEVEL;
-      }
-      // Validate and return log level, or fallback for invalid/empty values
-      return VALID_LOG_LEVELS.includes(logParam) ? logParam : FALLBACK_LOG_LEVEL;
-    }
-
-    // Priority 2: Auto-enable for AEM preview URLs (*.page)
-    if (hostname.match(/\.page$/)) {
+    if (logParam !== null || hostname.match(/\.page$/)) {
+      // Return valid log level or fallback to warn for invalid/empty values
+      if (VALID_LOG_LEVELS.includes(logParam)) return logParam;
       return FALLBACK_LOG_LEVEL;
     }
 
-    // Priority 3: Default - no logging
+    // Default - no logging
     return DEFAULT_LOG_LEVEL;
   } catch (error) {
     // Fallback to default if URL parsing fails
