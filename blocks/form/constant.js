@@ -4,8 +4,11 @@ export const dragDropText = 'Drag and Drop To Upload';
 export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you for your submission.';
 
 // Logging Configuration
-// Enable verbose logging via URL parameter: ?afdebug=true
-// OR automatically enabled for AEM preview URLs (*.page)
+// Control logging via URL parameter: ?log=<level>
+// ?log=on → returns 'warn'
+// ?log=debug → returns 'debug'
+// ?log=info → returns 'info'
+// OR automatically enabled for AEM preview URLs (*.page) → returns 'debug'
 export const getLogLevelFromURL = (urlString = null) => {
   try {
     let searchParams = '';
@@ -22,27 +25,28 @@ export const getLogLevelFromURL = (urlString = null) => {
       hostname = window.location.hostname;
     }
 
-    // Check for explicit debug parameter
+    // Check for explicit log level parameter
     if (searchParams) {
       const urlParams = new URLSearchParams(searchParams);
-      const afdebug = urlParams.get('afdebug');
-      if (afdebug === 'true') {
-        return 'debug'; // Debug for verbose logging
-      }
-      // Allow explicitly disabling debug with ?afdebug=false
-      if (afdebug === 'false') {
-        return 'error';
+      const logParam = urlParams.get('log');
+      if (logParam !== null) {
+        // If log=on, return 'warn'
+        if (logParam === 'on') {
+          return 'warn';
+        }
+        // Otherwise return whatever value is provided
+        return logParam || 'error';
       }
     }
 
     // Auto-enable debug logs for AEM preview URLs (*.page)
     if (hostname && hostname.includes('.page')) {
-      return 'debug';
+      return 'warn';
     }
   } catch (error) {
     // Fallback to default if URL parsing fails
   }
-  return 'error'; // Normal logging (default)
+  return 'off'; // Default: no logging
 };
 // Logging Configuration
 // To set log level, modify this constant:
