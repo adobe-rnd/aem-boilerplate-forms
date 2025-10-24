@@ -314,7 +314,7 @@ function applyRuleEngine(htmlForm, form, captcha) {
 
 export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
   const ruleEngine = await import('./model/afb-runtime.js');
-  const form = ruleEngine.restoreFormInstance(formDef, data);
+  const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];

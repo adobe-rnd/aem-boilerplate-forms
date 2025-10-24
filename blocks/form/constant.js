@@ -40,7 +40,7 @@ export const getLogLevelFromURL = (urlString = null) => {
     }
 
     // Auto-enable debug logs for AEM preview URLs (*.page)
-    if (hostname && hostname.includes('.page')) {
+    if (hostname && hostname.match(/\.page$/)) {
       return 'warn';
     }
   } catch (error) {
