@@ -1,0 +1,40 @@
+name: Cross-Repo Test Execution
+
+on:
+  pull_request:
+    branches:
+      - run-hdfc-tests
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch (aem-boilerplate-forms)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          path: aem-boilerplate-forms
+
+      - name: Checkout test repo (forms-test-automation)
+        uses: actions/checkout@v4
+        with:
+          repository: hdfc-forms/forms-test-automation
+          token: ${{ secrets.GH_PAT }}
+          path: forms-test-automation
+          ref: development
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Maven TestNG tests
+        run: |
+          cd forms-test-automation
+          mvn clean test -DsuiteXmlFile=src/test/resources/testng/cards/SEMI_TestNG.xml
