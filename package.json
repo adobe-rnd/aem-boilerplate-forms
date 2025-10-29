@@ -52,6 +52,7 @@
   },
   "homepage": "https://github.com/adobe/aem-boilerplate#readme",
   "devDependencies": {
+<<<<<<< HEAD
     "@adobe/json-formula": "0.1.50",
     "@aemforms/af-core": "0.22.157",
     "@aemforms/af-formatters": "0.22.157",
@@ -65,6 +66,9 @@
     "chai": "5.1.0",
     "dom-compare": "0.6.0",
     "enquirer": "2.4.1",
+=======
+    "@babel/eslint-parser": "7.28.0",
+>>>>>>> upstream/main
     "eslint": "8.57.1",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.32.0",
@@ -80,6 +84,7 @@
     "nock": "13.5.4",
     "node-fetch": "^3.3.2",
     "npm-run-all": "4.1.5",
+<<<<<<< HEAD
     "nyc": "^15.1.0",
     "parse-multipart-data": "^1.5.0",
     "rollup": "^2.79.1",
@@ -94,5 +99,9 @@
     "spec": "test/**/*.test.js",
     "require": "test/unit/setup-env.js",
     "recursive": "true"
+=======
+    "stylelint": "16.21.1",
+    "stylelint-config-standard": "38.0.0"
+>>>>>>> upstream/main
   }
 }
