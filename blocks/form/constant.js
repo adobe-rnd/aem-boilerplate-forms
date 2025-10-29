@@ -7,7 +7,7 @@ export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you for your submission.';
 // Control logging via URL parameter: ?log=<level>
 // Valid levels: debug, info, error, off, warn → returns that level
 // Invalid/empty values (including 'on') → returns 'warn' (fallback)
-// AEM preview URLs (*.page) → returns 'warn'
+// AEM preview/live URLs (*.page, *.live) or localhost → returns 'warn'
 const VALID_LOG_LEVELS = ['error', 'debug', 'warn', 'info', 'off'];
 
 export const getLogLevelFromURL = (urlString = null) => {
@@ -32,7 +32,7 @@ export const getLogLevelFromURL = (urlString = null) => {
 
     // Check if logging should be enabled (explicit param or AEM preview)
     const logParam = searchParams.get('log');
-    if (logParam !== null || hostname.match(/\.page$/)) {
+    if (logParam !== null || hostname.match(/\.(page|live)$|^localhost$/)) {
       // Return valid log level or fallback to warn for invalid/empty values
       if (VALID_LOG_LEVELS.includes(logParam)) return logParam;
       return FALLBACK_LOG_LEVEL;
