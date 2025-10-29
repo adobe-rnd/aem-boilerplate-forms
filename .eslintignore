@@ -1,13 +1,5 @@
 helix-importer-ui
-<<<<<<< HEAD
-<<<<<<< HEAD
 dompurify.min.js
-=======
-=======
-
-dompurify.min.js
-
->>>>>>> cd081e8 (chore:monthly sync from xwalk (#112))
 rollup/*
 blocks/form/rules/formula/*
 blocks/form/rules/model/*
@@ -17,4 +9,3 @@ scripts/editor-support-rte.js
 tools/forms-scaffolder.js
 tools/update-mappings.js
 /test
->>>>>>> b9d7a93 (feat: Adding Form block along with embed)
