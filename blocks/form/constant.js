@@ -14,7 +14,7 @@ export const getLogLevelFromURL = (urlString = null) => {
   // Semantic constants for log level defaults
   const DEFAULT_LOG_LEVEL = 'off'; // Used when no logging is explicitly requested
   const FALLBACK_LOG_LEVEL = 'warn'; // Used for invalid/empty values or AEM preview
-  
+
   try {
     // Extract URL object from either parameter or current context
     let url;
@@ -47,7 +47,8 @@ export const getLogLevelFromURL = (urlString = null) => {
 };
 // Logging Configuration
 // To set log level, modify this constant:
-export const LOG_LEVEL = getLogLevelFromURL(); // Available options: 'off', 'debug', 'info', 'warn', 'error'
+// Available options: 'off', 'debug', 'info', 'warn', 'error'
+export const LOG_LEVEL = getLogLevelFromURL();
 
 export const defaultErrorMessages = {
   accept: 'The specified file type not supported.',

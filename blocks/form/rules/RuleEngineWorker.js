@@ -55,7 +55,7 @@ let ruleEngine; let initPayload;
 onmessage = async (e) => {
   async function handleMessageEvent(event) {
     switch (event.data.name) {
-      case 'init':
+      case 'init': {
         const { search, ...formDef } = event.data.payload;
         initPayload = event.data.payload;
         ruleEngine = new RuleEngine(formDef, event.data.url);
@@ -70,8 +70,9 @@ onmessage = async (e) => {
           postMessage(msg);
         };
         break;
-    default:
-      break;
+      }
+      default:
+        break;
     }
   }
   // prefills form data, waits for all async operations
