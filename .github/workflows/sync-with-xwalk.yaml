@@ -39,17 +39,29 @@ jobs:
           git checkout -b "$BRANCH" origin/main
 
           set +e
-          git merge upstream/main --no-edit -m "Merge upstream xwalk changes"
+          git merge upstream/main --no-edit -m "Merge upstream xwalk changes" -X theirs
           MERGE_STATUS=$?
           
           if [ $MERGE_STATUS -ne 0 ]; then
-            echo "Merge conflicts detected — auto-committing resolution..."
+            echo "Merge conflicts detected — auto-resolving with upstream preference..."
+            
+            # Accept upstream changes for all conflicted files except .github/
+            git diff --name-only --diff-filter=U | while read file; do
+              if [[ ! "$file" =~ ^\.github/ ]]; then
+                echo "Accepting upstream version of: $file"
+                git checkout --theirs "$file"
+              else
+                echo "Keeping our version of: $file"
+                git checkout --ours "$file"
+              fi
+            done
+            
             git add -A
-            git commit -m "Auto-resolve conflicts during monthly sync with xwalk"
+            git commit -m "Auto-resolve conflicts during monthly sync with xwalk (favoring upstream)"
           fi
           set -e
 
-          # Revert any workflow file changes from upstream
+          # Ensure workflow files match our main branch
           git checkout origin/main -- .github/
           
           # If there are any changes to workflow files, commit the reversion
@@ -71,7 +83,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{
               "title": "chore:monthly sync from xwalk",
-              "body": "This PR syncs changes from [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) into this fork.\n- Branch: '"$BRANCH_NAME"'\n- All conflicts (if any) were auto-committed during rebase.\n- Note: Workflow files (.github/workflows/) are reverted to match our main and must be synced manually if required.",
+              "body": "This PR syncs changes from [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) into this fork.\n- Branch: '"$BRANCH_NAME"'\n- Merge strategy: Automatic merge with preference for upstream changes.\n- All conflicts (if any) were auto-resolved favoring upstream.\n- Note: Workflow files (.github/workflows/) are kept from our main branch and not synced.",
               "head": "'"$BRANCH_NAME"'",
               "base": "main"
             }' \
