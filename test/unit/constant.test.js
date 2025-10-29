@@ -128,14 +128,14 @@ describe('getLogLevelFromURL', () => {
       assert.strictEqual(logLevel, 'warn');
     });
 
-    it('should return "off" for .live domain (production)', () => {
+    it('should return "warn" for .live domain (AEM live)', () => {
       global.window = {
         location: {
           href: 'https://main--site--org.aem.live/form',
         },
       };
       const logLevel = getLogLevelFromURL();
-      assert.strictEqual(logLevel, 'off');
+      assert.strictEqual(logLevel, 'warn');
     });
 
     it('should return "off" for custom production domains', () => {
@@ -149,7 +149,7 @@ describe('getLogLevelFromURL', () => {
     });
   });
 
-  describe('URL parameter override of .page domain', () => {
+  describe('URL parameter override of special domains', () => {
     it('should allow log=error to override .page domain default', () => {
       global.window = {
         location: {
@@ -168,6 +168,26 @@ describe('getLogLevelFromURL', () => {
       };
       const logLevel = getLogLevelFromURL();
       assert.strictEqual(logLevel, 'off');
+    });
+
+    it('should allow log=off to disable logs on .live domain', () => {
+      global.window = {
+        location: {
+          href: 'https://main--site--org.aem.live/form?log=off',
+        },
+      };
+      const logLevel = getLogLevelFromURL();
+      assert.strictEqual(logLevel, 'off');
+    });
+
+    it('should allow log=debug to override localhost default', () => {
+      global.window = {
+        location: {
+          href: 'http://localhost:3000/form?log=debug',
+        },
+      };
+      const logLevel = getLogLevelFromURL();
+      assert.strictEqual(logLevel, 'debug');
     });
 
     it('should allow log=debug to enable debug on production domains', () => {
@@ -222,10 +242,16 @@ describe('getLogLevelFromURL', () => {
       assert.strictEqual(logLevel, 'off');
     });
 
-    it('should return "off" when passed .live URL', () => {
+    it('should return "warn" when passed .live URL', () => {
       const urlString = 'https://main--site--org.aem.live/form';
       const logLevel = getLogLevelFromURL(urlString);
-      assert.strictEqual(logLevel, 'off');
+      assert.strictEqual(logLevel, 'warn');
+    });
+
+    it('should return "warn" when passed localhost URL', () => {
+      const urlString = 'http://localhost:3000/form';
+      const logLevel = getLogLevelFromURL(urlString);
+      assert.strictEqual(logLevel, 'warn');
     });
   });
 
@@ -247,14 +273,14 @@ describe('getLogLevelFromURL', () => {
       assert.strictEqual(logLevel, 'off');
     });
 
-    it('should return "off" when empty search params on non-.page domain', () => {
+    it('should return "warn" for localhost', () => {
       global.window = {
         location: {
           href: 'http://localhost:3000/form',
         },
       };
       const logLevel = getLogLevelFromURL();
-      assert.strictEqual(logLevel, 'off');
+      assert.strictEqual(logLevel, 'warn');
     });
 
     it('should return "off" when no log parameter is provided', () => {
