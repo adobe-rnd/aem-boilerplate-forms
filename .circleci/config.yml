@@ -83,3 +83,6 @@ workflows:
     jobs:
       - unit-tests
       - e2e-tests
+  check-coverage:
+    jobs:
+      - check-coverage
