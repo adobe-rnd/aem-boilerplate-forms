@@ -1,7 +1,9 @@
 version: 2.1
+
 orbs:
   node: circleci/node@5
   browser-tools: circleci/browser-tools@1.2.3
+
 jobs:
   lint:
     executor: node/default
@@ -12,8 +14,8 @@ jobs:
       - run:
           name: Run lint
           command: npm run lint
+
   unit-tests:
-    # Install node dependencies and run tests
     executor: node/default
     steps:
       - checkout
@@ -36,6 +38,12 @@ jobs:
       - run:
           name: Run unit tests
           command: npm run test:unit --passWithNoTests
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage
+            - .nyc_output
+
   e2e-tests:
     docker:
       - image: mcr.microsoft.com/playwright:v1.40.0-jammy
@@ -44,14 +52,19 @@ jobs:
       - run:
           name: Install Playwright
           command: |
-              npm i -D @playwright/test
-              npx playwright install
+            npm i -D @playwright/test
+            npx playwright install
       - run:
           name: Install browsers
           command: npx playwright install chrome
       - run:
           name: Run end-to-end
-          command:  npm run test:e2e
+          command: npm run test:e2e
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage
+            - .nyc_output
       - store_artifacts:
           path: test/e2e/reports
           destination: test-results
@@ -61,28 +74,37 @@ jobs:
       - store_artifacts:
           path: ./error-screenshot.png
           destination: screenshots
+
   check-coverage:
     executor: node/default
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: npm
+      - attach_workspace:
+          at: .
       - run:
           name: Install Dependencies
           command: npm i
       - run:
-          name : check coverage
-          command:  npm run coverage
+          name: Merge and Check Coverage
+          command: |
+            npx nyc merge .nyc_output .nyc_output/coverage.json
+            npx nyc report --reporter=text-lcov --report-dir=coverage
+            npx nyc check-coverage --lines 90 --functions 90 --branches 90
       - store_artifacts:
           path: coverage
+
 workflows:
   lint:
     jobs:
       - lint
+
   build-and-test:
     jobs:
       - unit-tests
       - e2e-tests
-  check-coverage:
-    jobs:
-      - check-coverage
+      - check-coverage:
+          requires:
+            - unit-tests
+            - e2e-tests
