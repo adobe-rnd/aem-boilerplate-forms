@@ -5,6 +5,10 @@
   "description": "Starter project for Adobe Helix",
   "type": "module",
   "scripts": {
+    "test": "mocha & playwright test",
+    "coverage:unit": "c8 --check-coverage --reporter=html --reporter=text --lines 89 --functions 93 --branches 87 mocha",
+    "coverage:e2e": "c8 --check-coverage --reporter=html --reporter=text --lines 89 --functions 93 --branches 87 playwright test --project='chromium'",
+    "coverage": "node ./test/merge-coverage.js",
     "lint:js": "eslint . --ext .json,.js,.mjs",
     "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
@@ -31,7 +35,9 @@
       "blocks/form/rules/model/*.js",
       "blocks/form/rules/formula/*.js",
       "blocks/form/rules/worker.js",
-      "blocks/form/rules-doc/parser/*.js"
+      "blocks/form/rules-doc/parser/*.js",
+      "blocks/form/rules/functions.js",
+      "blocks/form/functions.js"
     ],
     "include": [
       "blocks/form/**/*.js",
