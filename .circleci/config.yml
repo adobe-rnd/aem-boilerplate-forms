@@ -129,19 +129,15 @@ check-coverage:
           set -e
           echo "🔹 Merging coverage from unit & e2e tests..."
           mkdir -p coverage
-          
           npx nyc merge .nyc_output/unit .nyc_output/e2e coverage/merged.json
-          
           echo "🔹 Generating final reports (text-summary, lcov, html)..."
           npx nyc report \
             --temp-dir .nyc_output/unit \
             --reporter=text-summary \
             --reporter=lcov \
             --reporter=html
-          
           echo "🔹 Enforcing minimum coverage thresholds..."
           npx nyc check-coverage --lines=90 --branches=90 --functions=90 --statements=90
-          
           echo "✅ Combined coverage report successfully generated and validated!"
     - store_artifacts:
         path: coverage
