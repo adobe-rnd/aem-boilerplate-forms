@@ -115,24 +115,28 @@ jobs:
           name: Debug coverage files
           command: |
             echo "🔍 Checking what coverage files we have..."
-            ls -la .nyc_output/unit/ || echo "No unit coverage"
-            ls -la .nyc_output/e2e/ || echo "No e2e coverage"
+            ls -la .nyc_output/unit/ || echo "No unit coverage files"
+            ls -la .nyc_output/e2e/ || echo "No e2e coverage files"
       - run:
-          name: Merge and generate coverage reports
+          name: Merge and generate final coverage
           command: |
             set -e
             echo "🔹 Merging unit coverage..."
-            mkdir -p coverage
-            npx nyc merge .nyc_output/unit > coverage/unit.json
+            mkdir -p .nyc_output/merged
+            npx nyc merge .nyc_output/unit > .nyc_output/merged/unit.json
 
             echo "🔹 Merging e2e coverage..."
-            npx nyc merge .nyc_output/e2e > coverage/e2e.json
+            npx nyc merge .nyc_output/e2e > .nyc_output/merged/e2e.json
 
             echo "🔹 Merging unit + e2e into final coverage..."
-            npx nyc merge coverage > coverage/merged.json
+            npx nyc merge .nyc_output/merged > .nyc_output/merged/coverage.json
 
             echo "🔹 Generating final reports (text-summary, lcov, html)..."
-            npx nyc report --temp-dir coverage --reporter=text-summary --reporter=lcov --reporter=html
+            npx nyc report \
+              --temp-dir .nyc_output/merged \
+              --reporter=text-summary \
+              --reporter=lcov \
+              --reporter=html
 
             echo "🔹 Enforcing minimum coverage thresholds..."
             npx nyc check-coverage --lines=90 --branches=90 --functions=90 --statements=90
@@ -141,7 +145,6 @@ jobs:
       - store_artifacts:
           path: coverage
           destination: merged-coverage
-
 
 # ---------------- WORKFLOWS ----------------
 workflows:
