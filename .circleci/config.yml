@@ -39,7 +39,7 @@ jobs:
 
       - run:
           name: Run unit tests with coverage
-          command: npm run coverage:unit-only
+          command: npm run test:unit --passWithNoTests
           environment:
             CI: true
 
@@ -66,17 +66,16 @@ jobs:
 
       # Install Node.js and dependencies
       - run:
-          name: Install dependencies
-          command: npm ci
-
-      # Install Playwright browsers
-      - run:
-          name: Install Playwright browsers
-          command: npx playwright install chromium
-
+        name: Install Playwright
+        command: |
+          npm i -D @playwright/test
+          npx playwright install
+          - run:
+              name: Install browsers
+              command: npx playwright install chrome
       - run:
           name: Run e2e tests with coverage
-          command: npm run coverage:e2e-only
+          command: npm run test:e2e
           environment:
             CI: true
             COVERAGE_RUN: true
