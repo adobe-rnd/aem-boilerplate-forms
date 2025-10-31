@@ -55,7 +55,7 @@ jobs:
           root: .
           paths:
             - coverage
-            - .nyc_output
+            - .nyc_output/unit
 
   # ---------------- E2E TEST JOB ----------------
   e2e-tests:
@@ -97,7 +97,7 @@ jobs:
           name: Ensure coverage directories exist
           command: |
             mkdir -p coverage
-            mkdir -p .nyc_output
+            mkdir -p .nyc_output/e2e
 
       # Persist coverage results for merge step
       - persist_to_workspace:
@@ -107,47 +107,45 @@ jobs:
             - .nyc_output
 
   # ---------------- MERGE + REPORT COVERAGE ----------------
-  check-coverage:
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - attach_workspace:
-          at: .
-
-      - run:
-          name: Debug coverage files
-          command: |
-            echo "🔍 Checking what coverage files we have..."
-            ls -la coverage/ || echo "No coverage directory"
-            ls -la coverage/*.json || echo "No JSON files in coverage"
-            ls -la .nyc_output/ || echo "No .nyc_output directory"
-
-      - run:
-          name: Merge and generate coverage reports
-          command: |
-            set -e
-            echo "🔹 Merging coverage from unit & e2e tests..."
-            mkdir -p coverage .nyc_output
-
-            npx nyc merge coverage coverage/merged.json
-
-            echo "🔹 Generating final reports (text-summary, lcov, html)..."
-            npx nyc report \
-              --temp-dir .nyc_output \
-              --reporter=text-summary \
-              --reporter=lcov \
-              --reporter=html
-
-            echo "🔹 Enforcing minimum coverage thresholds..."
-            npx nyc check-coverage --lines=90 --branches=90 --functions=90 --statements=90
-
-            echo "✅ Combined coverage report successfully generated and validated!"
-
-      - store_artifacts:
-          path: coverage
-          destination: merged-coverage
+check-coverage:
+  executor: node/default
+  steps:
+    - checkout
+    - node/install-packages:
+        pkg-manager: npm
+    - attach_workspace:
+        at: .
+    - run:
+        name: Debug coverage files
+        command: |
+          echo "🔍 Checking what coverage files we have..."
+          ls -la coverage/ || echo "No coverage directory"
+          ls -la coverage/*.json || echo "No JSON files in coverage"
+          ls -la .nyc_output/unit/ || echo "No unit coverage"
+          ls -la .nyc_output/e2e/ || echo "No e2e coverage"
+    - run:
+        name: Merge and generate coverage reports
+        command: |
+          set -e
+          echo "🔹 Merging coverage from unit & e2e tests..."
+          mkdir -p coverage
+          
+          npx nyc merge .nyc_output/unit .nyc_output/e2e coverage/merged.json
+          
+          echo "🔹 Generating final reports (text-summary, lcov, html)..."
+          npx nyc report \
+            --temp-dir .nyc_output/unit \
+            --reporter=text-summary \
+            --reporter=lcov \
+            --reporter=html
+          
+          echo "🔹 Enforcing minimum coverage thresholds..."
+          npx nyc check-coverage --lines=90 --branches=90 --functions=90 --statements=90
+          
+          echo "✅ Combined coverage report successfully generated and validated!"
+    - store_artifacts:
+        path: coverage
+        destination: merged-coverage
 
 # ---------------- WORKFLOWS ----------------
 workflows:

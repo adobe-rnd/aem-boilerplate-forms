@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "mocha & playwright test",
-    "coverage:unit": "c8 --check-coverage --reporter=html --reporter=text --lines 85 --functions 88 --branches 85 mocha",
-    "coverage:e2e": "c8 --check-coverage --reporter=html --reporter=text --lines 80 --functions 80 --branches 70 playwright test --project='chromium'",
+    "coverage:unit": "c8 --reporter=html --reporter=text --temp-dir=./.nyc_output/unit --lines 85 --functions 88 --branches 85 mocha",
+    "coverage:e2e": "c8 --reporter=html --reporter=text --temp-dir=./.nyc_output/e2e --lines 80 --functions 80 --branches 70 playwright test --project='chromium'",
     "coverage": "node ./test/merge-coverage.js",
     "lint:js": "eslint . --ext .json,.js,.mjs",
     "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
