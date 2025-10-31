@@ -47,14 +47,12 @@ jobs:
       - run:
           name: Ensure coverage directories exist
           command: |
-            mkdir -p coverage
             mkdir -p .nyc_output/unit
 
       # Persist coverage results for later merge
       - persist_to_workspace:
           root: .
           paths:
-            - coverage
             - .nyc_output/unit
 
   # ---------------- E2E TEST JOB ----------------
@@ -96,14 +94,12 @@ jobs:
       - run:
           name: Ensure coverage directories exist
           command: |
-            mkdir -p coverage
             mkdir -p .nyc_output/e2e
 
       # Persist coverage results for merge step
       - persist_to_workspace:
           root: .
           paths:
-            - coverage
             - .nyc_output/e2e
 
   # ---------------- MERGE + REPORT COVERAGE ----------------
@@ -119,8 +115,6 @@ jobs:
           name: Debug coverage files
           command: |
             echo "🔍 Checking what coverage files we have..."
-            ls -la coverage/ || echo "No coverage directory"
-            ls -la coverage/*.json || echo "No JSON files in coverage"
             ls -la .nyc_output/unit/ || echo "No unit coverage"
             ls -la .nyc_output/e2e/ || echo "No e2e coverage"
       - run:
@@ -132,7 +126,7 @@ jobs:
             npx nyc merge .nyc_output/unit .nyc_output/e2e coverage/merged.json
             echo "🔹 Generating final reports (text-summary, lcov, html)..."
             npx nyc report \
-              --temp-dir .nyc_output/unit \
+              --temp-dir coverage \
               --reporter=text-summary \
               --reporter=lcov \
               --reporter=html
