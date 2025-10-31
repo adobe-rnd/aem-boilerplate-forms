@@ -151,12 +151,15 @@ jobs:
 
 # ---------------- WORKFLOWS ----------------
 workflows:
-  lint-and-test:
+  lint:
     jobs:
       - lint
+  build-and-test:
+    jobs:
       - unit-tests
       - e2e-tests
       - check-coverage:
           requires:
             - unit-tests
             - e2e-tests
+
