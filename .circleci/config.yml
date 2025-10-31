@@ -48,7 +48,7 @@ jobs:
           name: Ensure coverage directories exist
           command: |
             mkdir -p coverage
-            mkdir -p .nyc_output
+            mkdir -p .nyc_output/unit
 
       # Persist coverage results for later merge
       - persist_to_workspace:
@@ -104,7 +104,7 @@ jobs:
           root: .
           paths:
             - coverage
-            - .nyc_output
+            - .nyc_output/e2e
 
   # ---------------- MERGE + REPORT COVERAGE ----------------
   check-coverage:
