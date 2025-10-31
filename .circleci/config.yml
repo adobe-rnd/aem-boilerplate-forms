@@ -24,8 +24,6 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
-
-      # Helpful install error instructions
       - run:
           name: Print node install help instructions
           command: |-
@@ -36,14 +34,12 @@ jobs:
               3. Configure jobs to use the context with NPM_TOKEN
               4. Inject NPM_TOKEN before install-packages"
           when: on_fail
-
       - run:
           name: Run unit tests with coverage
           command: |
             npm run build:json --silent
             npm run coverage:unit
 
-            # Rename coverage file to avoid conflicts
             if [ -f "coverage/coverage-final.json" ]; then
               mv coverage/coverage-final.json coverage/coverage-final-unit.json
               echo "✅ Unit coverage saved as coverage-final-unit.json"
@@ -53,8 +49,6 @@ jobs:
             fi
           environment:
             CI: true
-
-      # Persist only the JSON coverage file
       - persist_to_workspace:
           root: .
           paths:
@@ -66,43 +60,32 @@ jobs:
       - image: mcr.microsoft.com/playwright:v1.40.0-jammy
     steps:
       - checkout
-
-      # Install Node.js and dependencies
       - run:
           name: Install dependencies
           command: npm ci
-
-      # Install Playwright browsers
       - run:
           name: Install Playwright browsers
           command: npx playwright install chromium
-
       - run:
           name: Run e2e tests with coverage
           command: |
-            # Allow e2e tests to fail (flaky tests) but still collect coverage
             npm run coverage:e2e || echo "E2E tests had failures but continuing..."
 
-            # Rename coverage file to avoid conflicts
             if [ -f "coverage/coverage-final.json" ]; then
               mv coverage/coverage-final.json coverage/coverage-final-e2e.json
               echo "✅ E2E coverage saved as coverage-final-e2e.json"
             else
-              echo "⚠️ E2E coverage not generated (tests may have failed completely)"
+              echo "⚠️ E2E coverage not generated"
             fi
           environment:
             CI: true
             COVERAGE_RUN: true
-
-      # Store artifacts for debugging
       - store_artifacts:
           path: test/e2e/reports
           destination: test-results
       - store_artifacts:
           path: coverage/tmp
           destination: e2e-raw-coverage
-
-      # Persist only the JSON coverage file
       - persist_to_workspace:
           root: .
           paths:
@@ -123,58 +106,42 @@ jobs:
             echo "🔍 Checking what coverage files we have..."
             ls -la coverage/ || echo "No coverage directory"
             find coverage -name "*.json" -type f || echo "No JSON files found"
-
       - run:
           name: Merge and generate final coverage
           command: |
             echo "🔹 Preparing coverage merge..."
             mkdir -p coverage .nyc_output
 
-            # Check which coverage files exist
             UNIT_FILE="coverage/coverage-final-unit.json"
             E2E_FILE="coverage/coverage-final-e2e.json"
 
             if [ -f "$UNIT_FILE" ]; then
-              echo "✅ Found unit test coverage: $UNIT_FILE"
-              cat "$UNIT_FILE" | head -5  # Debug: show first few lines
-            else
-              echo "❌ Missing unit test coverage: $UNIT_FILE"
+              echo "✅ Found unit test coverage"
+              cp "$UNIT_FILE" .nyc_output/unit.json
             fi
 
             if [ -f "$E2E_FILE" ]; then
-              echo "✅ Found e2e test coverage: $E2E_FILE"
-              cat "$E2E_FILE" | head -5  # Debug: show first few lines
-            else
-              echo "❌ Missing e2e test coverage: $E2E_FILE"
+              echo "✅ Found e2e test coverage"
+              cp "$E2E_FILE" .nyc_output/e2e.json
             fi
 
-            # Merge available coverage files
-            if [ -f "$UNIT_FILE" ] || [ -f "$E2E_FILE" ]; then
+            if ls .nyc_output/*.json 1> /dev/null 2>&1; then
               echo "🔹 Merging coverage files..."
-              npx nyc merge coverage .nyc_output/coverage.json
+              npx nyc merge .nyc_output .nyc_output/coverage.json
 
-              # Verify merged file
               if [ -f ".nyc_output/coverage.json" ]; then
                 echo "✅ Merged coverage file created"
-                cat .nyc_output/coverage.json | head -5  # Debug
+                head -5 .nyc_output/coverage.json
               else
                 echo "❌ Failed to create merged coverage"
                 exit 1
               fi
 
               echo "🔹 Generating reports..."
-              npx nyc report \
-                --reporter=html \
-                --reporter=lcov \
-                --reporter=text-summary
+              npx nyc report --reporter=html --reporter=lcov --reporter=text-summary
 
               echo "🔹 Checking coverage thresholds..."
-              npx nyc report \
-                --check-coverage \
-                --lines=80 \
-                --functions=85 \
-                --branches=75 \
-                --statements=80
+              npx nyc report --check-coverage --lines=80 --functions=85 --branches=75 --statements=80
 
               echo "✅ Combined coverage report generated successfully!"
             else
