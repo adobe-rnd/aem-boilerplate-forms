@@ -121,21 +121,27 @@ jobs:
           name: Merge and generate coverage reports
           command: |
             set -e
-            echo "🔹 Merging coverage from unit & e2e tests..."
+            echo "🔹 Merging unit coverage..."
             mkdir -p coverage
-            npx nyc merge .nyc_output/unit .nyc_output/e2e coverage/merged.json
+            npx nyc merge .nyc_output/unit > coverage/unit.json
+
+            echo "🔹 Merging e2e coverage..."
+            npx nyc merge .nyc_output/e2e > coverage/e2e.json
+
+            echo "🔹 Merging unit + e2e into final coverage..."
+            npx nyc merge coverage > coverage/merged.json
+
             echo "🔹 Generating final reports (text-summary, lcov, html)..."
-            npx nyc report \
-              --temp-dir coverage \
-              --reporter=text-summary \
-              --reporter=lcov \
-              --reporter=html
+            npx nyc report --temp-dir coverage --reporter=text-summary --reporter=lcov --reporter=html
+
             echo "🔹 Enforcing minimum coverage thresholds..."
             npx nyc check-coverage --lines=90 --branches=90 --functions=90 --statements=90
+
             echo "✅ Combined coverage report successfully generated and validated!"
       - store_artifacts:
           path: coverage
           destination: merged-coverage
+
 
 # ---------------- WORKFLOWS ----------------
 workflows:
