@@ -172,7 +172,43 @@ jobs:
             # Merge and show combined results
             if [ -f "$UNIT_FILE" ] || [ -f "$E2E_FILE" ]; then
               echo "🔄 Merging coverage files..."
+
+              # DEBUG: Check what files will be merged
+              echo "🔍 DEBUG: Files that nyc merge will process:"
+              find coverage -name "*.json" -type f
+              echo "Files found: $(find coverage -name "*.json" -type f | wc -l)"
+
+              # DEBUG: Check file sizes before merge
+              if [ -f "$UNIT_FILE" ]; then
+                echo "Unit file size: $(wc -c < "$UNIT_FILE") bytes"
+                echo "Unit file content check: $(head -1 "$UNIT_FILE" | cut -c1-50)..."
+              fi
+
+              if [ -f "$E2E_FILE" ]; then
+                echo "E2E file size: $(wc -c < "$E2E_FILE") bytes"
+                echo "E2E file content check: $(head -1 "$E2E_FILE" | cut -c1-50)..."
+              fi
+
+              # Run the merge
+              echo "Running: npx nyc merge coverage .nyc_output/coverage.json"
               npx nyc merge coverage .nyc_output/coverage.json
+
+              # DEBUG: Check if merge actually combined data
+              if [ -f ".nyc_output/coverage.json" ]; then
+                MERGED_SIZE=$(wc -c < ".nyc_output/coverage.json")
+                echo "Merged file size: $MERGED_SIZE bytes"
+
+                # If e2e exists, merged should be larger than unit alone
+                if [ -f "$E2E_FILE" ] && [ -f "$UNIT_FILE" ]; then
+                  UNIT_SIZE=$(wc -c < "$UNIT_FILE")
+                  if [ "$MERGED_SIZE" -le "$UNIT_SIZE" ]; then
+                    echo "❌ PROBLEM: Merged file ($MERGED_SIZE) is not larger than unit file ($UNIT_SIZE)"
+                    echo "    This means E2E coverage was not included in merge!"
+                  else
+                    echo "✅ Merge appears to have combined both files"
+                  fi
+                fi
+              fi
 
               if [ -f ".nyc_output/coverage.json" ] && [ -s ".nyc_output/coverage.json" ]; then
                 echo "✅ Merged successfully ($(wc -c < .nyc_output/coverage.json) bytes)"
