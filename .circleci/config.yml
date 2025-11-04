@@ -69,7 +69,7 @@ jobs:
       - run:
           name: Run e2e tests with coverage
           command: |
-            npm run coverage:e2e || echo "E2E tests had failures but continuing..."
+            npm run coverage:e2e || echo "⚠️ E2E tests had failures but continuing..."
 
             if [ -f "coverage/coverage-final.json" ]; then
               mv coverage/coverage-final.json coverage/coverage-final-e2e.json
@@ -106,7 +106,6 @@ jobs:
             echo "🔍 Checking what coverage files we have..."
             ls -la coverage/ || echo "No coverage directory"
             find coverage -name "*.json" -type f || echo "No JSON files found"
-
       - run:
           name: Merge and generate final coverage
           command: |
@@ -118,16 +117,16 @@ jobs:
 
             if [ -f "$UNIT_FILE" ]; then
               echo "✅ Found unit test coverage"
-              npx c8 normalize-coverage "$UNIT_FILE" > .nyc_output/unit.json
+              cp "$UNIT_FILE" .nyc_output/unit.json
             fi
 
             if [ -f "$E2E_FILE" ]; then
               echo "✅ Found e2e test coverage"
-              npx c8 normalize-coverage "$E2E_FILE" > .nyc_output/e2e.json
+              cp "$E2E_FILE" .nyc_output/e2e.json
             fi
 
             if ls .nyc_output/*.json 1> /dev/null 2>&1; then
-              echo "🔹 Merging normalized coverage files..."
+              echo "🔹 Merging coverage files..."
               npx c8 merge .nyc_output .nyc_output/coverage.json
 
               if [ -f ".nyc_output/coverage.json" ]; then
@@ -158,6 +157,7 @@ workflows:
   lint:
     jobs:
       - lint
+
   build-and-test:
     jobs:
       - unit-tests
