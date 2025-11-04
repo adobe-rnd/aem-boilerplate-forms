@@ -37,29 +37,24 @@ jobs:
       - run:
           name: Run unit tests with coverage
           command: |
-            # Use npx c8 (same commands as local merge-coverage.js)
-            npx c8 --reporter=json --lines 85 npm run test:unit || echo "Unit tests completed"
+            # Use exact same command as local merge-coverage.js
+            npx c8 --reporter=json --reporter=text --lines 85 npm run test:unit || true
 
             if [ -f "coverage/coverage-final.json" ]; then
+              echo ""
+              echo "📊 === UNIT TEST COVERAGE (CircleCI Individual) ==="
+              # Show coverage using c8's text output that was just generated
+              echo "✅ Unit test coverage generated successfully"
+
               mv coverage/coverage-final.json coverage/coverage-final-unit.json
-              echo "✅ Unit coverage saved as coverage-final-unit.json"
+              echo "✅ Saved as coverage-final-unit.json"
             else
-              echo "❌ Unit coverage not generated - checking coverage directory"
-              ls -la coverage/ || echo "No coverage directory"
-              ls -la . || echo "Current directory contents"
-              # Don't fail - continue to persist whatever we have
+              mkdir -p coverage
+              echo '{}' > coverage/coverage-final-unit.json
+              echo "⚠️ Unit coverage not generated, created empty file"
             fi
           environment:
             CI: true
-      # Create empty file if coverage wasn't generated to avoid persist errors
-      - run:
-          name: Ensure unit coverage file exists for persist
-          command: |
-            if [ ! -f "coverage/coverage-final-unit.json" ]; then
-              mkdir -p coverage
-              echo '{}' > coverage/coverage-final-unit.json
-              echo "⚠️ Created empty unit coverage file"
-            fi
 
       - persist_to_workspace:
           root: .
@@ -81,16 +76,21 @@ jobs:
       - run:
           name: Run e2e tests with coverage
           command: |
-            # Use npx c8 (same commands as local merge-coverage.js)
-            npx c8 --reporter=json --lines 45 npx playwright test --project='chromium' || echo "⚠️ E2E tests had failures but continuing..."
+            # Use exact same command as local merge-coverage.js
+            npx c8 --reporter=json --reporter=text --lines 45 npx playwright test --project='chromium' || true
 
             if [ -f "coverage/coverage-final.json" ]; then
+              echo ""
+              echo "📊 === E2E TEST COVERAGE (CircleCI Individual) ==="
+              # Show coverage using c8's text output that was just generated
+              echo "✅ E2E test coverage generated successfully"
+
               mv coverage/coverage-final.json coverage/coverage-final-e2e.json
-              echo "✅ E2E coverage saved as coverage-final-e2e.json"
+              echo "✅ Saved as coverage-final-e2e.json"
             else
-              echo "⚠️ E2E coverage not generated - checking directory"
-              ls -la coverage/ || echo "No coverage directory"
-              ls -la coverage/tmp/ || echo "No coverage/tmp directory"
+              mkdir -p coverage
+              echo '{}' > coverage/coverage-final-e2e.json
+              echo "⚠️ E2E coverage not generated, created empty file"
             fi
           environment:
             CI: true
@@ -101,16 +101,6 @@ jobs:
       - store_artifacts:
           path: coverage/tmp
           destination: e2e-raw-coverage
-
-      # Create empty file if e2e coverage wasn't generated to avoid persist errors
-      - run:
-          name: Ensure e2e coverage file exists for persist
-          command: |
-            if [ ! -f "coverage/coverage-final-e2e.json" ]; then
-              mkdir -p coverage
-              echo '{}' > coverage/coverage-final-e2e.json
-              echo "⚠️ Created empty e2e coverage file"
-            fi
 
       - persist_to_workspace:
           root: .
@@ -127,67 +117,67 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Debug coverage files
-          command: |
-            echo "🔍 Checking what coverage files we have..."
-            ls -la coverage/ || echo "No coverage directory"
-            find coverage -name "*.json" -type f || echo "No JSON files found"
-      - run:
           name: Merge and generate final coverage
           command: |
-            echo "🔹 Preparing coverage merge..."
-            mkdir -p coverage .nyc_output
+            echo "🔍 === COVERAGE DEBUGGING: CircleCI vs Local ==="
+            echo "🏠 LOCAL RESULTS (Reference):"
+            echo "   Combined: 94.39% lines | 92.33% branches | 96.51% functions"
+            echo ""
 
+            mkdir -p coverage .nyc_output
             UNIT_FILE="coverage/coverage-final-unit.json"
             E2E_FILE="coverage/coverage-final-e2e.json"
 
-            if [ -f "$UNIT_FILE" ]; then
-              echo "✅ Found unit test coverage: $UNIT_FILE"
-              wc -l "$UNIT_FILE"  # Show file size
+            # Show individual coverage files for comparison
+            echo "☁️  CircleCI INDIVIDUAL COVERAGE:"
+            if [ -f "$UNIT_FILE" ] && [ -s "$UNIT_FILE" ]; then
+              echo "✅ Unit test coverage: $(wc -c < "$UNIT_FILE") bytes"
             else
-              echo "❌ Missing unit test coverage: $UNIT_FILE"
+              echo "❌ Unit coverage missing or empty"
             fi
 
-            if [ -f "$E2E_FILE" ]; then
-              echo "✅ Found e2e test coverage: $E2E_FILE"
-              wc -l "$E2E_FILE"  # Show file size
+            if [ -f "$E2E_FILE" ] && [ -s "$E2E_FILE" ]; then
+              echo "✅ E2E test coverage: $(wc -c < "$E2E_FILE") bytes"
             else
-              echo "❌ Missing e2e test coverage: $E2E_FILE"
+              echo "❌ E2E coverage missing or empty"
             fi
+            echo ""
 
-            # Use NYC for merging (like local script does)
+            # Merge and show combined results
             if [ -f "$UNIT_FILE" ] || [ -f "$E2E_FILE" ]; then
-              echo "🔹 Merging coverage files with nyc (same as local)..."
+              echo "🔄 Merging coverage files..."
               npx nyc merge coverage .nyc_output/coverage.json
 
-              # Verify merged file exists and has data
               if [ -f ".nyc_output/coverage.json" ] && [ -s ".nyc_output/coverage.json" ]; then
-                echo "✅ Merged coverage file created successfully"
-                echo "File size: $(wc -c < .nyc_output/coverage.json) bytes"
+                echo "✅ Merged successfully ($(wc -c < .nyc_output/coverage.json) bytes)"
 
-                echo "🔹 Generating combined reports with nyc (same as local)..."
-                npx nyc report \
-                  --reporter=html \
-                  --reporter=lcov \
-                  --reporter=text-summary
+                echo ""
+                echo "📊 === CIRCLECI COMBINED COVERAGE (Final Merged) ==="
+                npx nyc report --reporter=text-summary
 
-                echo "🔹 Checking coverage thresholds (matching local: 90/85/90)..."
-                npx nyc report \
-                  --check-coverage \
-                  --lines=90 \
-                  --functions=85 \
-                  --branches=90
+                echo ""
+                echo "🔍 === COVERAGE COMPARISON SUMMARY ==="
+                echo "🏠 Local Combined:     94.39% lines | 92.33% branches | 96.51% functions"
+                echo "☁️  CircleCI Combined: (see report above for exact numbers)"
+                echo ""
+                echo "💡 To diagnose coverage differences:"
+                echo "   1. Compare UNIT coverage: Local vs CircleCI individual unit results"
+                echo "   2. Compare E2E coverage: Local vs CircleCI individual e2e results"
+                echo "   3. If both are similar but merge drops: Check include/exclude patterns"
+                echo "   4. If individual tests are lower: Environment/dependency differences"
+                echo ""
 
-                echo "✅ Combined coverage report generated successfully!"
+                echo "🔹 Checking thresholds (90% lines, 85% functions, 90% branches)..."
+                npx nyc report --reporter=html --reporter=lcov
+                npx nyc report --check-coverage --lines=90 --functions=85 --branches=90
+
               else
-                echo "❌ Merged coverage file is empty or missing"
-                echo "Debug info:"
-                ls -la .nyc_output/
-                ls -la coverage/
+                echo "❌ Merge failed"
+                ls -la .nyc_output/ coverage/
                 exit 1
               fi
             else
-              echo "❌ No coverage files found to merge"
+              echo "❌ No coverage files to merge"
               exit 1
             fi
       - store_artifacts:
