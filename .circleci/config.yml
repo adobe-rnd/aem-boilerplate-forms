@@ -106,6 +106,7 @@ jobs:
             echo "🔍 Checking what coverage files we have..."
             ls -la coverage/ || echo "No coverage directory"
             find coverage -name "*.json" -type f || echo "No JSON files found"
+
       - run:
           name: Merge and generate final coverage
           command: |
@@ -117,17 +118,17 @@ jobs:
 
             if [ -f "$UNIT_FILE" ]; then
               echo "✅ Found unit test coverage"
-              cp "$UNIT_FILE" .nyc_output/unit.json
+              npx c8 normalize-coverage "$UNIT_FILE" > .nyc_output/unit.json
             fi
 
             if [ -f "$E2E_FILE" ]; then
               echo "✅ Found e2e test coverage"
-              cp "$E2E_FILE" .nyc_output/e2e.json
+              npx c8 normalize-coverage "$E2E_FILE" > .nyc_output/e2e.json
             fi
 
             if ls .nyc_output/*.json 1> /dev/null 2>&1; then
-              echo "🔹 Merging coverage files..."
-              npx nyc merge .nyc_output .nyc_output/coverage.json
+              echo "🔹 Merging normalized coverage files..."
+              npx c8 merge .nyc_output .nyc_output/coverage.json
 
               if [ -f ".nyc_output/coverage.json" ]; then
                 echo "✅ Merged coverage file created"
@@ -137,11 +138,11 @@ jobs:
                 exit 1
               fi
 
-              echo "🔹 Generating reports..."
-              npx nyc report --reporter=html --reporter=lcov --reporter=text-summary
+              echo "🔹 Generating final reports..."
+              npx c8 report --reporter=html --reporter=lcov --reporter=text-summary
 
               echo "🔹 Checking coverage thresholds..."
-              npx nyc report --check-coverage --lines=80 --functions=85 --branches=75 --statements=80
+              npx c8 report --check-coverage --lines=80 --functions=85 --branches=75 --statements=80
 
               echo "✅ Combined coverage report generated successfully!"
             else
