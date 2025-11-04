@@ -189,24 +189,49 @@ jobs:
                 echo "E2E file content check: $(head -1 "$E2E_FILE" | cut -c1-50)..."
               fi
 
-              # Run the merge
-              echo "Running: npx nyc merge coverage .nyc_output/coverage.json"
-              npx nyc merge coverage .nyc_output/coverage.json
+              # FIX: Normalize paths before merge to fix the path mismatch issue
+              echo "🔧 Normalizing file paths to enable proper merge..."
+              mkdir -p coverage/normalized
 
-              # DEBUG: Check if merge actually combined data
+              if [ -f "$UNIT_FILE" ]; then
+                echo "  → Normalizing unit paths: /home/circleci/project/ → /project/"
+                sed 's|"/home/circleci/project/|"/project/|g' "$UNIT_FILE" > coverage/normalized/unit.json
+              fi
+
+              if [ -f "$E2E_FILE" ]; then
+                echo "  → Normalizing e2e paths: /root/project/ → /project/"
+                sed 's|"/root/project/|"/project/|g' "$E2E_FILE" > coverage/normalized/e2e.json
+              fi
+
+              # Now merge the normalized files
+              echo "Running: npx nyc merge coverage/normalized .nyc_output/coverage.json"
+              npx nyc merge coverage/normalized .nyc_output/coverage.json
+
+              # DEBUG: Verify merge results after path normalization
               if [ -f ".nyc_output/coverage.json" ]; then
                 MERGED_SIZE=$(wc -c < ".nyc_output/coverage.json")
                 echo "Merged file size: $MERGED_SIZE bytes"
 
-                # If e2e exists, merged should be larger than unit alone
+                # Check if paths were successfully normalized and merge worked
                 if [ -f "$E2E_FILE" ] && [ -f "$UNIT_FILE" ]; then
                   UNIT_SIZE=$(wc -c < "$UNIT_FILE")
-                  if [ "$MERGED_SIZE" -le "$UNIT_SIZE" ]; then
-                    echo "❌ PROBLEM: Merged file ($MERGED_SIZE) is not larger than unit file ($UNIT_SIZE)"
-                    echo "    This means E2E coverage was not included in merge!"
+                  EXPECTED_MIN_SIZE=$((UNIT_SIZE + 50000))  # Expect at least 50KB more
+
+                  if [ "$MERGED_SIZE" -gt "$EXPECTED_MIN_SIZE" ]; then
+                    echo "✅ SUCCESS: Path normalization fixed the merge!"
+                    echo "    Unit: $UNIT_SIZE bytes → Merged: $MERGED_SIZE bytes"
+                    echo "    E2E coverage successfully included!"
                   else
-                    echo "✅ Merge appears to have combined both files"
+                    echo "❌ Path normalization didn't fix merge issue"
+                    echo "    Merged ($MERGED_SIZE) still too close to unit ($UNIT_SIZE)"
                   fi
+                fi
+
+                # Show normalized file verification
+                if [ -f "coverage/normalized/unit.json" ] && [ -f "coverage/normalized/e2e.json" ]; then
+                  echo "✅ Normalized files created successfully"
+                  echo "   Normalized unit: $(wc -c < coverage/normalized/unit.json) bytes"
+                  echo "   Normalized e2e: $(wc -c < coverage/normalized/e2e.json) bytes"
                 fi
               fi
 
