@@ -145,6 +145,7 @@ jobs:
           destination: merged-coverage
 
 # ---------------- WORKFLOWS ----------------
+
 workflows:
   lint:
     jobs:
