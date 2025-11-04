@@ -43,11 +43,19 @@ jobs:
             if [ -f "coverage/coverage-final.json" ]; then
               echo ""
               echo "📊 === UNIT TEST COVERAGE (CircleCI Individual) ==="
-              # Show coverage using c8's text output that was just generated
               echo "✅ Unit test coverage generated successfully"
 
               mv coverage/coverage-final.json coverage/coverage-final-unit.json
               echo "✅ Saved as coverage-final-unit.json"
+
+              # Generate HTML report for unit tests as artifact
+              echo "🔹 Generating Unit Test HTML Coverage Report..."
+              mkdir -p .nyc_output coverage/unit-artifacts
+              cp coverage/coverage-final-unit.json .nyc_output/coverage.json
+              npx nyc report --reporter=html --report-dir=coverage/unit-artifacts
+              npx nyc report --reporter=text-summary > coverage/unit-artifacts/unit-text-summary.txt
+              cp coverage/unit-artifacts/index.html coverage/unit-artifacts/indexUnit.html
+              echo "✅ Unit coverage HTML report generated: indexUnit.html"
             else
               mkdir -p coverage
               echo '{}' > coverage/coverage-final-unit.json
@@ -55,6 +63,11 @@ jobs:
             fi
           environment:
             CI: true
+
+      # Store unit test coverage artifacts
+      - store_artifacts:
+          path: coverage/unit-artifacts
+          destination: unit-test-coverage
 
       - persist_to_workspace:
           root: .
@@ -82,11 +95,19 @@ jobs:
             if [ -f "coverage/coverage-final.json" ]; then
               echo ""
               echo "📊 === E2E TEST COVERAGE (CircleCI Individual) ==="
-              # Show coverage using c8's text output that was just generated
               echo "✅ E2E test coverage generated successfully"
 
               mv coverage/coverage-final.json coverage/coverage-final-e2e.json
               echo "✅ Saved as coverage-final-e2e.json"
+
+              # Generate HTML report for e2e tests as artifact
+              echo "🔹 Generating E2E Test HTML Coverage Report..."
+              mkdir -p .nyc_output coverage/e2e-artifacts
+              cp coverage/coverage-final-e2e.json .nyc_output/coverage.json
+              npx nyc report --reporter=html --report-dir=coverage/e2e-artifacts
+              npx nyc report --reporter=text-summary > coverage/e2e-artifacts/e2e-text-summary.txt
+              cp coverage/e2e-artifacts/index.html coverage/e2e-artifacts/indexE2e.html
+              echo "✅ E2E coverage HTML report generated: indexE2e.html"
             else
               mkdir -p coverage
               echo '{}' > coverage/coverage-final-e2e.json
@@ -101,6 +122,11 @@ jobs:
       - store_artifacts:
           path: coverage/tmp
           destination: e2e-raw-coverage
+
+      # Store e2e test coverage artifacts
+      - store_artifacts:
+          path: coverage/e2e-artifacts
+          destination: e2e-test-coverage
 
       - persist_to_workspace:
           root: .
@@ -153,7 +179,17 @@ jobs:
 
                 echo ""
                 echo "📊 === CIRCLECI COMBINED COVERAGE (Final Merged) ==="
+
+                # Generate combined coverage artifacts
+                echo "🔹 Generating Combined HTML Coverage Report..."
+                mkdir -p coverage/combined-artifacts
+                npx nyc report --reporter=html --report-dir=coverage/combined-artifacts
+                npx nyc report --reporter=text-summary > coverage/combined-artifacts/combined-text-summary.txt
                 npx nyc report --reporter=text-summary
+
+                # Create named copy of combined HTML report
+                cp coverage/combined-artifacts/index.html coverage/combined-artifacts/indexCombined.html
+                echo "✅ Combined coverage HTML report generated: indexCombined.html"
 
                 echo ""
                 echo "🔍 === COVERAGE COMPARISON SUMMARY ==="
@@ -168,7 +204,7 @@ jobs:
                 echo ""
 
                 echo "🔹 Checking thresholds (90% lines, 85% functions, 90% branches)..."
-                npx nyc report --reporter=html --reporter=lcov
+                npx nyc report --reporter=lcov --report-dir=coverage/combined-artifacts
                 npx nyc report --check-coverage --lines=90 --functions=85 --branches=90
 
               else
@@ -180,9 +216,14 @@ jobs:
               echo "❌ No coverage files to merge"
               exit 1
             fi
+
+      # Store all coverage artifacts
+      - store_artifacts:
+          path: coverage/combined-artifacts
+          destination: combined-coverage-reports
       - store_artifacts:
           path: coverage
-          destination: merged-coverage
+          destination: all-coverage-files
 
 # ---------------- WORKFLOWS ----------------
 
