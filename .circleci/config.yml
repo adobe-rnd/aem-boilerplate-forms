@@ -207,6 +207,30 @@ jobs:
               echo "Running: npx nyc merge coverage/normalized .nyc_output/coverage.json"
               npx nyc merge coverage/normalized .nyc_output/coverage.json
 
+              # CRITICAL FIX: Convert paths back to actual CircleCI paths for reporting
+              echo "🔧 Converting merged file paths back to CircleCI paths for reporting..."
+              if [ -f ".nyc_output/coverage.json" ]; then
+                # Convert /project/ paths back to /home/circleci/project/ so NYC can find source files
+                sed 's|"/project/|"/home/circleci/project/|g' .nyc_output/coverage.json > .nyc_output/coverage-final.json
+                mv .nyc_output/coverage-final.json .nyc_output/coverage.json
+                echo "✅ Paths converted back to /home/circleci/project/ for source file access"
+
+                # DEBUG: Verify paths in final merged file and check if source files exist
+                echo "🔍 Final merged file path check:"
+                echo "   Sample paths in merged file:"
+                grep -o '"/home/circleci/project/[^"]*"' .nyc_output/coverage.json | head -3
+
+                echo "   Checking if source files exist:"
+                SAMPLE_FILE=$(grep -o '"/home/circleci/project/[^"]*"' .nyc_output/coverage.json | head -1 | tr -d '"')
+                if [ -f "$SAMPLE_FILE" ]; then
+                  echo "   ✅ Source file exists: $SAMPLE_FILE"
+                else
+                  echo "   ❌ Source file missing: $SAMPLE_FILE"
+                  echo "   Working directory: $(pwd)"
+                  echo "   Available files: $(find blocks -name "*.js" | head -3)"
+                fi
+              fi
+
               # DEBUG: Verify merge results after path normalization
               if [ -f ".nyc_output/coverage.json" ]; then
                 MERGED_SIZE=$(wc -c < ".nyc_output/coverage.json")
