@@ -63,7 +63,9 @@ jobs:
       - run:
           name: Install dependencies
           command: npm ci
-      # Removed redundant Playwright browser install (postinstall already runs npx playwright install chromium)
+      - run:
+          name: Install Playwright browsers
+          command: npx playwright install chromium
       - run:
           name: Run e2e tests with coverage
           command: |
@@ -124,19 +126,11 @@ jobs:
             fi
 
             if ls .nyc_output/*.json 1> /dev/null 2>&1; then
-              echo "🔹 Merging coverage files..."
-              # Use c8's merge implementation via Node import (works for c8@9.x)
-              node -e "import('c8/merge.js').then(({ merge }) => merge(['.nyc_output'], '.nyc_output/coverage.json')).catch(err => { console.error(err); process.exit(2); })"
+              echo "🔹 Coverage files ready in .nyc_output/:"
+              ls -la .nyc_output/
 
-              if [ -f ".nyc_output/coverage.json" ]; then
-                echo "✅ Merged coverage file created"
-                head -5 .nyc_output/coverage.json
-              else
-                echo "❌ Failed to create merged coverage"
-                exit 1
-              fi
-
-              echo "🔹 Generating final reports..."
+              echo "🔹 Generating combined reports..."
+              # c8 automatically combines all coverage files in .nyc_output when generating reports
               npx c8 report --reporter=html --reporter=lcov --reporter=text-summary
 
               echo "🔹 Checking coverage thresholds..."
