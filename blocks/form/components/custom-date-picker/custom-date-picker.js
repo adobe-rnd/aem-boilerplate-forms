@@ -97,11 +97,13 @@ class CustomDatePickerComponent {
     inputContainer.appendChild(separator2);
     inputContainer.appendChild(this.yearInput);
 
-    // Create calendar icon button
+    // Create calendar icon button (decorative, actual interaction is on pickerInput)
     const calendarButton = document.createElement('button');
     calendarButton.type = 'button';
     calendarButton.className = 'calendar-icon-btn';
-    calendarButton.setAttribute('aria-label', 'Open calendar picker');
+    // Hide from screen readers since the actual input above it is accessible
+    calendarButton.setAttribute('aria-hidden', 'true');
+    calendarButton.setAttribute('tabindex', '-1');
     calendarButton.innerHTML = `
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -121,22 +123,25 @@ class CustomDatePickerComponent {
     const pickerInput = document.createElement('input');
     pickerInput.type = 'date';
     pickerInput.className = 'date-picker-input';
-    pickerInput.setAttribute('aria-hidden', 'true');
-    pickerInput.setAttribute('tabindex', '-1');
+    // Accessible label for screen readers
+    pickerInput.setAttribute('aria-label', 'Select date from calendar');
+    // Keep in normal tab order for keyboard accessibility
+    pickerInput.setAttribute('tabindex', '0');
 
-    // Position the picker input in the same container but visibly (for showPicker to work)
-    // Make it tiny and transparent at the button location
+    // Position the picker input directly over the calendar button
+    // This allows native clicks to work on mobile Safari without showPicker()
     pickerInput.style.position = 'absolute';
     pickerInput.style.right = '4px';
     pickerInput.style.top = '50%';
     pickerInput.style.transform = 'translateY(-50%)';
-    pickerInput.style.width = '1px';
-    pickerInput.style.height = '1px';
-    pickerInput.style.opacity = '0';
-    pickerInput.style.pointerEvents = 'none';
+    pickerInput.style.width = '32px'; // Cover the button area
+    pickerInput.style.height = '32px'; // Cover the button area
+    pickerInput.style.opacity = '0.01'; // Nearly invisible but not 0 (iOS requirement)
+    pickerInput.style.cursor = 'pointer';
     pickerInput.style.border = 'none';
     pickerInput.style.padding = '0';
     pickerInput.style.margin = '0';
+    pickerInput.style.zIndex = '2'; // Above the calendar button
 
     // Store reference
     this.pickerInput = pickerInput;
@@ -153,24 +158,56 @@ class CustomDatePickerComponent {
     nativeDateInput.setAttribute('tabindex', '-1');
     this.hiddenInput = nativeDateInput;
 
-    // Set up calendar button click handler
-    calendarButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      /* eslint-disable-next-line no-console */
+    // Handle focus on the picker input
+    pickerInput.addEventListener('focus', (e) => {
+      // On mobile Safari, focus may trigger the picker automatically
+      // For other browsers, we'll handle it in the click event
+    });
 
-      // Use showPicker if available (modern browsers)
+    // Handle clicks on the picker input to open the calendar
+    pickerInput.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      // Ensure input is focused first (important for mobile)
+      if (document.activeElement !== pickerInput) {
+        pickerInput.focus();
+      }
+
+      // Try showPicker for desktop browsers
       if (pickerInput.showPicker) {
         try {
           pickerInput.showPicker();
         } catch (error) {
-          // Fallback to click
+          // showPicker not supported or failed
+          // Mobile Safari should open naturally on click/focus
+        }
+      }
+    });
+
+    // Handle keyboard interaction (Enter/Space) on the picker input
+    pickerInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (pickerInput.showPicker) {
+          try {
+            pickerInput.showPicker();
+          } catch (error) {
+            // Fallback to click
+            pickerInput.click();
+          }
+        } else {
           pickerInput.click();
         }
-      } else {
-        // Fallback for older browsers
-        pickerInput.click();
       }
+    });
+
+    // Handle clicks on the decorative button - delegate to pickerInput
+    calendarButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Trigger click on the picker input
+      pickerInput.click();
+      pickerInput.focus();
     });
 
     // Listen to changes on the picker input (from calendar selection)
@@ -371,7 +408,7 @@ class CustomDatePickerComponent {
       if (this.dayInput) this.dayInput.disabled = disabled;
       if (this.monthInput) this.monthInput.disabled = disabled;
       if (this.yearInput) this.yearInput.disabled = disabled;
-      if (this.calendarButton) this.calendarButton.disabled = disabled;
+      // Disable picker input (calendar button is decorative)
       if (this.pickerInput) this.pickerInput.disabled = disabled;
     }
 
@@ -380,8 +417,7 @@ class CustomDatePickerComponent {
       if (this.dayInput) this.dayInput.readOnly = state.readOnly;
       if (this.monthInput) this.monthInput.readOnly = state.readOnly;
       if (this.yearInput) this.yearInput.readOnly = state.readOnly;
-      // Disable calendar button and picker when in readOnly mode
-      if (this.calendarButton) this.calendarButton.disabled = state.readOnly;
+      // Disable picker input when in readOnly mode (calendar button is decorative)
       if (this.pickerInput) this.pickerInput.disabled = state.readOnly;
     }
 
