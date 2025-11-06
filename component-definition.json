@@ -684,6 +684,22 @@
               }
             }
           }
+        },
+        {
+          "title": "Custom date picker",
+          "id": "custom-date-picker",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
+                "template": {
+                  "jcr:title": "Custom date picker",
+                  "fieldType": "date-input",
+                  "fd:viewType": "custom-date-picker"
+                }
+              }
+            }
+          }
         }
       ]
     }
