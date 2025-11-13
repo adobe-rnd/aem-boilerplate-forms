@@ -244,6 +244,60 @@ function dateToDaysSinceEpoch(date) {
   return Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * Private function to parse a key string that may contain dot notation and array brackets
+ * Converts something like "p1[0].t1" to ["p1", "0", "t1"]
+ * @private
+ * @param {string} keyStr - The key string to parse
+ * @returns {string[]} Array of property names and indices
+ */
+function parsePropertyPath(keyStr) {
+  // Replace '[' with '.' and remove ']', then split on '.' and filter out empty strings
+  return keyStr
+      .replace(/\[/g, '.')
+      .replace(/\]/g, '')
+      .split('.')
+      .filter(Boolean);
+}
+
+/**
+* Export form data as a JSON string
+* @param {boolean} [stringify] - Convert the form data to a JSON string, defaults to true
+* @param {string} [key] - The key to get the value for (supports dot notation and array brackets e.g. 'address.city' or 'items[0].name'), defaults to all form data
+* @param {scope} globals - Global scope object containing form context
+* @returns {string|object} The complete form data as a JSON string
+*/
+function exportFormData(stringify, key, globals) {
+  if (stringify === undefined || stringify === null) {
+      stringify = true;
+  }
+
+  const data = globals.functions.exportData();
+  if (!data) {
+      return undefined;
+  }
+
+  // Return all data if no key is provided
+  if (key === undefined || key === null) {
+      return stringify && typeof data === 'object' ? JSON.stringify(data) : data;
+  }
+
+  const properties = parsePropertyPath(key);
+  let value = data;
+
+  for (const prop of properties) {
+      if (value === undefined || value === null) {
+          return undefined;
+      }
+      value = value[prop];
+  }
+
+  if (value && typeof value === 'object' && stringify) {
+      return JSON.stringify(value);
+  }
+  return value;
+}
+
 export {
   externalize,
   validateURL,
@@ -254,4 +308,5 @@ export {
   defaultSubmitErrorHandler,
   fetchCaptchaToken,
   dateToDaysSinceEpoch,
+  exportFormData
 };
