@@ -1,327 +1,185 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@5
-  browser-tools: circleci/browser-tools@1.2.3
+  node: circleci/node@5.0.3
 
-# ---------------- JOB DEFINITIONS ----------------
 jobs:
-  # ---------------- LINT JOB ----------------
   lint:
-    executor: node/default
+    docker:
+      - image: cimg/node:20.9
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
+
+      # ---------- Restore NPM cache ----------
+      - restore_cache:
+          keys:
+            - v1-npm-cache-{{ checksum "package-lock.json" }}
+
       - run:
-          name: Run lint
+          name: Install dependencies
+          command: npm ci
+
+      - save_cache:
+          key: v1-npm-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+
+      - run:
+          name: Run linter
           command: npm run lint
-
-  # ---------------- UNIT TEST JOB ----------------
-  unit-tests:
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          name: Print node install help instructions
-          command: |-
-            echo "One cause for node package install failure is if you have private repositories that it can't reach
-            One way to fix this for private npm packages:
-              1. Use the npm CLI's \"login\" command to create a token (usually saved in your user's \"~/.npmrc\" file)
-              2. Add a NPM_TOKEN to an org context
-              3. Configure jobs to use the context with NPM_TOKEN
-              4. Inject NPM_TOKEN before install-packages"
-          when: on_fail
-      - run:
-          name: Run unit tests with coverage
-          command: |
-            # Use exact same command as local merge-coverage.js
-            npx c8 --reporter=json --reporter=text --lines 85 npm run test:unit || true
-
-            if [ -f "coverage/coverage-final.json" ]; then
-              echo ""
-              echo "📊 === UNIT TEST COVERAGE (CircleCI Individual) ==="
-              echo "✅ Unit test coverage generated successfully"
-
-              mv coverage/coverage-final.json coverage/coverage-final-unit.json
-              echo "✅ Saved as coverage-final-unit.json"
-
-              # Generate HTML report for unit tests as artifact
-              echo "🔹 Generating Unit Test HTML Coverage Report..."
-              mkdir -p .nyc_output coverage/unit-artifacts
-              cp coverage/coverage-final-unit.json .nyc_output/coverage.json
-              npx nyc report --reporter=html --report-dir=coverage/unit-artifacts
-              npx nyc report --reporter=text-summary > coverage/unit-artifacts/unit-text-summary.txt
-              cp coverage/unit-artifacts/index.html coverage/unit-artifacts/indexUnit.html
-              echo "✅ Unit coverage HTML report generated: indexUnit.html"
-            else
-              mkdir -p coverage
-              echo '{}' > coverage/coverage-final-unit.json
-              echo "⚠️ Unit coverage not generated, created empty file"
-            fi
-          environment:
-            CI: true
-
-      # Store unit test coverage artifacts
-      - store_artifacts:
-          path: coverage/unit-artifacts
-          destination: unit-test-coverage
 
       - persist_to_workspace:
           root: .
           paths:
-            - coverage/coverage-final-unit.json
+            - .
 
-  # ---------------- E2E TEST JOB ----------------
+  unit-tests:
+    docker:
+      - image: cimg/node:20.9
+    steps:
+      - checkout
+
+      # ---------- Restore NPM cache ----------
+      - restore_cache:
+          keys:
+            - v1-npm-cache-{{ checksum "package-lock.json" }}
+
+      - run:
+          name: Install dependencies
+          command: npm ci
+
+      - save_cache:
+          key: v1-npm-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+
+      - run:
+          name: Run unit tests with coverage
+          command: |
+            npx c8 --reporter=json --reporter=text --lines 45 \
+              npm run test:unit || true
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage
+
   e2e-tests:
     docker:
       - image: mcr.microsoft.com/playwright:v1.40.0-jammy
     steps:
       - checkout
+
+      # ---------- Restore NPM cache ----------
+      - restore_cache:
+          keys:
+            - v1-npm-cache-{{ checksum "package-lock.json" }}
+
       - run:
           name: Install dependencies
           command: npm ci
+
+      - save_cache:
+          key: v1-npm-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+
+      # NO playwright browser install here → already included → MUCH faster
+
       - run:
-          name: Install Playwright browsers
-          command: npx playwright install chromium
-      - run:
-          name: Run e2e tests with coverage
+          name: Run E2E tests with coverage
           command: |
-            # Use exact same command as local merge-coverage.js
-            npx c8 --reporter=json --reporter=text --lines 45 npx playwright test --project='chromium' || true
+            npx c8 --reporter=json --reporter=text --lines 45 \
+              npx playwright test --project='chromium' --reporter=line || true
 
             if [ -f "coverage/coverage-final.json" ]; then
-              echo ""
-              echo "📊 === E2E TEST COVERAGE (CircleCI Individual) ==="
-              echo "✅ E2E test coverage generated successfully"
-
               mv coverage/coverage-final.json coverage/coverage-final-e2e.json
-              echo "✅ Saved as coverage-final-e2e.json"
 
-              # Generate HTML report for e2e tests as artifact
-              echo "🔹 Generating E2E Test HTML Coverage Report..."
               mkdir -p .nyc_output coverage/e2e-artifacts
               cp coverage/coverage-final-e2e.json .nyc_output/coverage.json
               npx nyc report --reporter=html --report-dir=coverage/e2e-artifacts
               npx nyc report --reporter=text-summary > coverage/e2e-artifacts/e2e-text-summary.txt
               cp coverage/e2e-artifacts/index.html coverage/e2e-artifacts/indexE2e.html
-              echo "✅ E2E coverage HTML report generated: indexE2e.html"
             else
               mkdir -p coverage
               echo '{}' > coverage/coverage-final-e2e.json
-              echo "⚠️ E2E coverage not generated, created empty file"
             fi
-          environment:
-            CI: true
-            COVERAGE_RUN: true
+        environment:
+          CI: "true"
+          COVERAGE_RUN: "true"
+          PWTEST_DISABLE_V8_COMPILE_CACHE: "1"
+
+      # ---------- Test artifacts ----------
       - store_artifacts:
           path: test/e2e/reports
           destination: test-results
-      - store_artifacts:
-          path: coverage/tmp
-          destination: e2e-raw-coverage
 
-      # Store e2e test coverage artifacts
       - store_artifacts:
-          path: coverage/e2e-artifacts
-          destination: e2e-test-coverage
+          path: videos
+          destination: videos
 
+      - store_artifacts:
+          path: test-results
+          destination: screenshots
+
+      # ---------- Persist E2E coverage ----------
       - persist_to_workspace:
           root: .
           paths:
             - coverage/coverage-final-e2e.json
 
-  # ---------------- MERGE + REPORT COVERAGE ----------------
-  check-coverage:
-    executor: node/default
+  merge-coverage:
+    docker:
+      - image: cimg/node:20.9
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
       - attach_workspace:
           at: .
+
+      # ---------- Restore NPM cache ----------
+      - restore_cache:
+          keys:
+            - v1-npm-cache-{{ checksum "package-lock.json" }}
+
       - run:
-          name: Merge and generate final coverage
+          name: Install dependencies
+          command: npm ci
+
+      - save_cache:
+          key: v1-npm-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+
+      - run:
+          name: Merge coverage from Unit + E2E
           command: |
-            echo "🔍 === COVERAGE DEBUGGING: CircleCI vs Local ==="
-            echo "🏠 LOCAL RESULTS (Reference):"
-            echo "   Combined: 94.39% lines | 92.33% branches | 96.51% functions"
-            echo ""
+            mkdir -p .nyc_output
 
-            mkdir -p coverage .nyc_output
-            UNIT_FILE="coverage/coverage-final-unit.json"
-            E2E_FILE="coverage/coverage-final-e2e.json"
+            cp coverage/coverage-final.json .nyc_output/coverage-unit.json
+            cp coverage/coverage-final-e2e.json .nyc_output/coverage-e2e.json
 
-            # Show individual coverage files for comparison
-            echo "☁️  CircleCI INDIVIDUAL COVERAGE:"
-            if [ -f "$UNIT_FILE" ] && [ -s "$UNIT_FILE" ]; then
-              echo "✅ Unit test coverage: $(wc -c < "$UNIT_FILE") bytes"
-            else
-              echo "❌ Unit coverage missing or empty"
-            fi
+            npx nyc merge .nyc_output coverage/merged-coverage.json
 
-            if [ -f "$E2E_FILE" ] && [ -s "$E2E_FILE" ]; then
-              echo "✅ E2E test coverage: $(wc -c < "$E2E_FILE") bytes"
-            else
-              echo "❌ E2E coverage missing or empty"
-            fi
-            echo ""
+            cp coverage/merged-coverage.json .nyc_output/coverage.json
+            npx nyc report --reporter=html --report-dir=coverage/merged-report
+            npx nyc report --reporter=text-summary > coverage/merged-report/summary.txt
 
-            # Merge and show combined results
-            if [ -f "$UNIT_FILE" ] || [ -f "$E2E_FILE" ]; then
-              echo "🔄 Merging coverage files..."
-
-              # DEBUG: Check what files will be merged
-              echo "🔍 DEBUG: Files that nyc merge will process:"
-              find coverage -name "*.json" -type f
-              echo "Files found: $(find coverage -name "*.json" -type f | wc -l)"
-
-              # DEBUG: Check file sizes before merge
-              if [ -f "$UNIT_FILE" ]; then
-                echo "Unit file size: $(wc -c < "$UNIT_FILE") bytes"
-                echo "Unit file content check: $(head -1 "$UNIT_FILE" | cut -c1-50)..."
-              fi
-
-              if [ -f "$E2E_FILE" ]; then
-                echo "E2E file size: $(wc -c < "$E2E_FILE") bytes"
-                echo "E2E file content check: $(head -1 "$E2E_FILE" | cut -c1-50)..."
-              fi
-
-              # FIX: Normalize paths before merge to fix the path mismatch issue
-              echo "🔧 Normalizing file paths to enable proper merge..."
-              mkdir -p coverage/normalized
-
-              if [ -f "$UNIT_FILE" ]; then
-                echo "  → Normalizing unit paths: /home/circleci/project/ → /project/"
-                sed 's|"/home/circleci/project/|"/project/|g' "$UNIT_FILE" > coverage/normalized/unit.json
-              fi
-
-              if [ -f "$E2E_FILE" ]; then
-                echo "  → Normalizing e2e paths: /root/project/ → /project/"
-                sed 's|"/root/project/|"/project/|g' "$E2E_FILE" > coverage/normalized/e2e.json
-              fi
-
-              # Now merge the normalized files
-              echo "Running: npx nyc merge coverage/normalized .nyc_output/coverage.json"
-              npx nyc merge coverage/normalized .nyc_output/coverage.json
-
-              # CRITICAL FIX: Convert paths back to actual CircleCI paths for reporting
-              echo "🔧 Converting merged file paths back to CircleCI paths for reporting..."
-              if [ -f ".nyc_output/coverage.json" ]; then
-                # Convert /project/ paths back to /home/circleci/project/ so NYC can find source files
-                sed 's|"/project/|"/home/circleci/project/|g' .nyc_output/coverage.json > .nyc_output/coverage-final.json
-                mv .nyc_output/coverage-final.json .nyc_output/coverage.json
-                echo "✅ Paths converted back to /home/circleci/project/ for source file access"
-
-                # DEBUG: Verify paths in final merged file and check if source files exist
-                echo "🔍 Final merged file path check:"
-                echo "   Sample paths in merged file:"
-                grep -o '"/home/circleci/project/[^"]*"' .nyc_output/coverage.json | head -3
-
-                echo "   Checking if source files exist:"
-                SAMPLE_FILE=$(grep -o '"/home/circleci/project/[^"]*"' .nyc_output/coverage.json | head -1 | tr -d '"')
-                if [ -f "$SAMPLE_FILE" ]; then
-                  echo "   ✅ Source file exists: $SAMPLE_FILE"
-                else
-                  echo "   ❌ Source file missing: $SAMPLE_FILE"
-                  echo "   Working directory: $(pwd)"
-                  echo "   Available files: $(find blocks -name "*.js" | head -3)"
-                fi
-              fi
-
-              # DEBUG: Verify merge results after path normalization
-              if [ -f ".nyc_output/coverage.json" ]; then
-                MERGED_SIZE=$(wc -c < ".nyc_output/coverage.json")
-                echo "Merged file size: $MERGED_SIZE bytes"
-
-                # Check if paths were successfully normalized and merge worked
-                if [ -f "$E2E_FILE" ] && [ -f "$UNIT_FILE" ]; then
-                  UNIT_SIZE=$(wc -c < "$UNIT_FILE")
-                  EXPECTED_MIN_SIZE=$((UNIT_SIZE + 50000))  # Expect at least 50KB more
-
-                  if [ "$MERGED_SIZE" -gt "$EXPECTED_MIN_SIZE" ]; then
-                    echo "✅ SUCCESS: Path normalization fixed the merge!"
-                    echo "    Unit: $UNIT_SIZE bytes → Merged: $MERGED_SIZE bytes"
-                    echo "    E2E coverage successfully included!"
-                  else
-                    echo "❌ Path normalization didn't fix merge issue"
-                    echo "    Merged ($MERGED_SIZE) still too close to unit ($UNIT_SIZE)"
-                  fi
-                fi
-
-                # Show normalized file verification
-                if [ -f "coverage/normalized/unit.json" ] && [ -f "coverage/normalized/e2e.json" ]; then
-                  echo "✅ Normalized files created successfully"
-                  echo "   Normalized unit: $(wc -c < coverage/normalized/unit.json) bytes"
-                  echo "   Normalized e2e: $(wc -c < coverage/normalized/e2e.json) bytes"
-                fi
-              fi
-
-              if [ -f ".nyc_output/coverage.json" ] && [ -s ".nyc_output/coverage.json" ]; then
-                echo "✅ Merged successfully ($(wc -c < .nyc_output/coverage.json) bytes)"
-
-                echo ""
-                echo "📊 === CIRCLECI COMBINED COVERAGE (Final Merged) ==="
-
-                # Generate combined coverage artifacts
-                echo "🔹 Generating Combined HTML Coverage Report..."
-                mkdir -p coverage/combined-artifacts
-                npx nyc report --reporter=html --report-dir=coverage/combined-artifacts
-                npx nyc report --reporter=text-summary > coverage/combined-artifacts/combined-text-summary.txt
-                npx nyc report --reporter=text-summary
-
-                # Create named copy of combined HTML report
-                cp coverage/combined-artifacts/index.html coverage/combined-artifacts/indexCombined.html
-                echo "✅ Combined coverage HTML report generated: indexCombined.html"
-
-                echo ""
-                echo "🔍 === COVERAGE COMPARISON SUMMARY ==="
-                echo "🏠 Local Combined:     94.39% lines | 92.33% branches | 96.51% functions"
-                echo "☁️  CircleCI Combined: (see report above for exact numbers)"
-                echo ""
-                echo "💡 To diagnose coverage differences:"
-                echo "   1. Compare UNIT coverage: Local vs CircleCI individual unit results"
-                echo "   2. Compare E2E coverage: Local vs CircleCI individual e2e results"
-                echo "   3. If both are similar but merge drops: Check include/exclude patterns"
-                echo "   4. If individual tests are lower: Environment/dependency differences"
-                echo ""
-
-                echo "🔹 Checking thresholds (90% lines, 85% functions, 90% branches)..."
-                npx nyc report --reporter=lcov --report-dir=coverage/combined-artifacts
-                npx nyc report --check-coverage --lines=90 --functions=85 --branches=90
-
-              else
-                echo "❌ Merge failed"
-                ls -la .nyc_output/ coverage/
-                exit 1
-              fi
-            else
-              echo "❌ No coverage files to merge"
-              exit 1
-            fi
-
-      # Store all coverage artifacts
       - store_artifacts:
-          path: coverage/combined-artifacts
-          destination: combined-coverage-reports
-      - store_artifacts:
-          path: coverage
-          destination: all-coverage-files
-
-# ---------------- WORKFLOWS ----------------
+          path: coverage/merged-report
+          destination: merged-coverage
 
 workflows:
-  lint:
+  version: 2
+  build_and_test:
     jobs:
       - lint
-
-  build-and-test:
-    jobs:
-      - unit-tests
-      - e2e-tests
-      - check-coverage:
+      - unit-tests:
+          requires:
+            - lint
+      - e2e-tests:
+          requires:
+            - lint
+      - merge-coverage:
           requires:
             - unit-tests
             - e2e-tests

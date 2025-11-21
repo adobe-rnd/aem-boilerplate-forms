@@ -34,7 +34,6 @@
     "exclude": [
       "blocks/form/rules/model/*.js",
       "blocks/form/rules/formula/*.js",
-      "blocks/form/rules/worker.js",
       "blocks/form/rules-doc/parser/*.js",
       "blocks/form/rules/functions.js",
       "blocks/form/functions.js"
@@ -100,9 +99,7 @@
     "exclude": [
       "blocks/form/rules/model/*.js",
       "blocks/form/rules/formula/*.js",
-      "blocks/form/rules/worker.js",
-      "blocks/form/rules-doc/parser/*.js",
-      "scripts/form-editor-support.js"
+      "blocks/form/rules-doc/parser/*.js"
     ],
     "include": [
       "blocks/form/**/*.js",
