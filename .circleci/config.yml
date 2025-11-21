@@ -1,96 +1,80 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@5.0.3
+  node: circleci/node@5
+  browser-tools: circleci/browser-tools@1.2.3
 
+# ------------------------------------------------
+# JOB DEFINITIONS
+# ------------------------------------------------
 jobs:
+  # ---------------- LINT JOB ----------------
   lint:
-    docker:
-      - image: cimg/node:20.9
+    executor: node/default
     steps:
       - checkout
-
-      # ---------- Restore NPM cache ----------
-      - restore_cache:
-          keys:
-            - v1-npm-cache-{{ checksum "package-lock.json" }}
-
+      - node/install-packages:
+          pkg-manager: npm
       - run:
-          name: Install dependencies
-          command: npm ci
-
-      - save_cache:
-          key: v1-npm-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - ~/.npm
-
-      - run:
-          name: Run linter
+          name: Run lint
           command: npm run lint
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
+  # ---------------- UNIT TEST JOB ----------------
   unit-tests:
-    docker:
-      - image: cimg/node:20.9
+    executor: node/default
     steps:
       - checkout
-
-      # ---------- Restore NPM cache ----------
-      - restore_cache:
-          keys:
-            - v1-npm-cache-{{ checksum "package-lock.json" }}
-
-      - run:
-          name: Install dependencies
-          command: npm ci
-
-      - save_cache:
-          key: v1-npm-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - ~/.npm
-
+      - node/install-packages:
+          pkg-manager: npm
       - run:
           name: Run unit tests with coverage
           command: |
-            npx c8 --reporter=json --reporter=text --lines 45 \
-              npm run test:unit || true
+            npx c8 --reporter=json --reporter=text --lines 85 npm run test:unit || true
+
+            if [ -f "coverage/coverage-final.json" ]; then
+              mv coverage/coverage-final.json coverage/coverage-final-unit.json
+
+              mkdir -p .nyc_output coverage/unit-artifacts
+              cp coverage/coverage-final-unit.json .nyc_output/coverage.json
+              npx nyc report --reporter=html --report-dir=coverage/unit-artifacts
+              npx nyc report --reporter=text-summary > coverage/unit-artifacts/unit-text-summary.txt
+              cp coverage/unit-artifacts/index.html coverage/unit-artifacts/indexUnit.html
+            else
+              mkdir -p coverage
+              echo '{}' > coverage/coverage-final-unit.json
+            fi
+          environment:
+            CI: true
+
+      - store_artifacts:
+          path: coverage/unit-artifacts
+          destination: unit-test-coverage
 
       - persist_to_workspace:
           root: .
           paths:
-            - coverage
+            - coverage/coverage-final-unit.json
 
+  # ---------------- E2E TEST JOB ----------------
   e2e-tests:
     docker:
       - image: mcr.microsoft.com/playwright:v1.40.0-jammy
     steps:
       - checkout
 
-      # ---------- Restore NPM cache ----------
-      - restore_cache:
-          keys:
-            - v1-npm-cache-{{ checksum "package-lock.json" }}
-
       - run:
           name: Install dependencies
           command: npm ci
 
-      - save_cache:
-          key: v1-npm-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - ~/.npm
-
-      # NO playwright browser install here → already included → MUCH faster
+      - run:
+          name: Install Playwright browsers
+          command: npx playwright install chromium
 
       - run:
           name: Run E2E tests with coverage
           command: |
             npx c8 --reporter=json --reporter=text --lines 45 \
-              npx playwright test --project='chromium' --reporter=line || true
+              npx playwright test --project='chromium' || true
 
             if [ -f "coverage/coverage-final.json" ]; then
               mv coverage/coverage-final.json coverage/coverage-final-e2e.json
@@ -104,12 +88,10 @@ jobs:
               mkdir -p coverage
               echo '{}' > coverage/coverage-final-e2e.json
             fi
-        environment:
-          CI: "true"
-          COVERAGE_RUN: "true"
-          PWTEST_DISABLE_V8_COMPILE_CACHE: "1"
+          environment:
+            CI: true
+            COVERAGE_RUN: true
 
-      # ---------- Test artifacts ----------
       - store_artifacts:
           path: test/e2e/reports
           destination: test-results
@@ -122,64 +104,76 @@ jobs:
           path: test-results
           destination: screenshots
 
-      # ---------- Persist E2E coverage ----------
       - persist_to_workspace:
           root: .
           paths:
             - coverage/coverage-final-e2e.json
 
-  merge-coverage:
-    docker:
-      - image: cimg/node:20.9
+  # ---------------- MERGE + REPORT COVERAGE ----------------
+  check-coverage:
+    executor: node/default
     steps:
       - checkout
+      - node/install-packages:
+          pkg-manager: npm
       - attach_workspace:
           at: .
 
-      # ---------- Restore NPM cache ----------
-      - restore_cache:
-          keys:
-            - v1-npm-cache-{{ checksum "package-lock.json" }}
-
       - run:
-          name: Install dependencies
-          command: npm ci
-
-      - save_cache:
-          key: v1-npm-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - ~/.npm
-
-      - run:
-          name: Merge coverage from Unit + E2E
+          name: Merge and generate final coverage
           command: |
-            mkdir -p .nyc_output
+            mkdir -p coverage .nyc_output coverage/normalized
 
-            cp coverage/coverage-final.json .nyc_output/coverage-unit.json
-            cp coverage/coverage-final-e2e.json .nyc_output/coverage-e2e.json
+            UNIT_FILE="coverage/coverage-final-unit.json"
+            E2E_FILE="coverage/coverage-final-e2e.json"
 
-            npx nyc merge .nyc_output coverage/merged-coverage.json
+            # Normalize paths (needed for correct merging)
+            if [ -f "$UNIT_FILE" ]; then
+              sed 's|"/home/circleci/project/|"/project/|g' "$UNIT_FILE" > coverage/normalized/unit.json
+            fi
 
-            cp coverage/merged-coverage.json .nyc_output/coverage.json
-            npx nyc report --reporter=html --report-dir=coverage/merged-report
-            npx nyc report --reporter=text-summary > coverage/merged-report/summary.txt
+            if [ -f "$E2E_FILE" ]; then
+              sed 's|"/root/project/|"/project/|g' "$E2E_FILE" > coverage/normalized/e2e.json
+            fi
+
+            # Merge
+            npx nyc merge coverage/normalized .nyc_output/coverage.json
+
+            # Convert back so NYC can resolve sources
+            sed 's|"/project/|"/home/circleci/project/|g' .nyc_output/coverage.json > .nyc_output/coverage-final.json
+            mv .nyc_output/coverage-final.json .nyc_output/coverage.json
+
+            # Generate final combined coverage reports
+            mkdir -p coverage/combined-artifacts
+            npx nyc report --reporter=html --report-dir=coverage/combined-artifacts
+            npx nyc report --reporter=text-summary > coverage/combined-artifacts/combined-text-summary.txt
+            cp coverage/combined-artifacts/index.html coverage/combined-artifacts/indexCombined.html
+
+            # Enforce coverage thresholds
+            npx nyc report --reporter=lcov --report-dir=coverage/combined-artifacts
+            npx nyc report --check-coverage --lines=90 --functions=85 --branches=90
 
       - store_artifacts:
-          path: coverage/merged-report
-          destination: merged-coverage
+          path: coverage/combined-artifacts
+          destination: combined-coverage-reports
 
+      - store_artifacts:
+          path: coverage
+          destination: all-coverage-files
+
+# ------------------------------------------------
+# WORKFLOWS
+# ------------------------------------------------
 workflows:
-  version: 2
-  build_and_test:
+  lint:
     jobs:
       - lint
-      - unit-tests:
-          requires:
-            - lint
-      - e2e-tests:
-          requires:
-            - lint
-      - merge-coverage:
+
+  build-and-test:
+    jobs:
+      - unit-tests
+      - e2e-tests
+      - check-coverage:
           requires:
             - unit-tests
             - e2e-tests
