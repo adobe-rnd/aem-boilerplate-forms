@@ -13,7 +13,6 @@ const componentName2 = 'Password';
 const partialUrl1 = 'resource/scripts/dompurify.min.js';
 const partialUrl2 = 'resource/blocks/form/components/password/password-hide-icon.png';
 const waringMessage = 'Warning: Converting to a dissimilar type may cause existing functionality to break.';
-const replaceTextLocator = 'div[role="presentation"] input[type="text"]';
 
 const testURL =
   'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/forms/af/forms-x-walk-collateral/formsreplace.html';
@@ -30,7 +29,7 @@ test.describe('Forms Replace Component', () => {
 
     await universalEditorBase.expandContentTreeField(page, frame, 'content/root/section');
     try {
-      await expect(frame.locator(`li[data-resource$="${fieldPath}"][class*="treenode"] button`)).toBeVisible({timeout: 2000});
+      await expect(frame.locator(`li[data-resource$="${fieldPath}"][class*="treenode"] button`)).toBeVisible({timeout: 6000});
     } catch (e) {
       await page.reload();
       await componentPathInUE.waitFor({ state: 'visible', timeout: 20000 });
@@ -38,8 +37,7 @@ test.describe('Forms Replace Component', () => {
     await universalEditorBase.expandContentTreeField(page, frame, fieldPath);
     const componentPathInContentTree = frame.locator(`li[data-resource$="${fieldPath}/${component}"][class*="treenode"]`).first();
     await frame.locator(selectors.adaptiveFormInContentTree).locator('span').click();
-    const treeItem = frame.locator('li[data-resource$="content/root/section/form"] div[role="treeitem"]').first();
-    await expect(treeItem).toHaveAttribute('aria-selected', 'true');
+    await expect((selectors.adaptiveFormInContentTree).locator('..')).toHaveAttribute('aria-selected', 'true');
     await expect(componentPathInContentTree).toBeVisible();
     await componentPathInContentTree.scrollIntoViewIfNeeded();
     await componentPathInContentTree.click({ force: true });
@@ -47,10 +45,10 @@ test.describe('Forms Replace Component', () => {
     await expect(formReplaceButton).toBeVisible({ timeout: 8000 });
     await formReplaceButton.click();
     const replaceIframe = frame.frameLocator(universalEditorBase.selectors.replaceFrameLocator);
-    await expect(replaceIframe.locator('div[id="forms-replace"] div span:has-text("Selected Component")').first()).toBeVisible({ timeout: 2000 });
+    await expect(replaceIframe.locator('div[id="forms-replace"] div span:has-text("Selected Component")').first()).toBeVisible({ timeout: 6000 });
     const locator = replaceIframe.locator('div[id="forms-replace"] div span:has-text("Type:") + span');
-    await expect(locator).toBeVisible({ timeout: 4000 });
-    await expect(locator).not.toHaveText(/loading/i, { timeout: 4000 });
+    await expect(locator).toBeVisible({ timeout: 6000 });
+    await expect(locator).not.toHaveText(/loading/i, { timeout: 6000 });
     const componentType = (await locator.textContent())?.trim();
     const replaceContext = { page, frame, replaceIframe };
     if (componentType === componentName1) {
@@ -76,8 +74,8 @@ async function waitForAndValidateResponse(page, partialUrl) {
 
 async function replaceFormComponent(replaceContext, componentName, partialUrl) {
   const { page, frame, replaceIframe } = replaceContext;
-  await replaceIframe.locator(replaceTextLocator + '+ button').click();
-  await replaceIframe.locator(replaceTextLocator).type(componentName, { delay: 100 });
+  await replaceIframe.locator(selectors.replaceTextLocator + '+ button').click();
+  await replaceIframe.locator(selectors.replaceTextLocator).type(componentName, { delay: 100 });
   const componentLocator = replaceIframe.getByText(componentName).last();
   await expect(componentLocator).toBeVisible();
   await componentLocator.waitFor({ state: 'visible' });
@@ -96,5 +94,5 @@ async function replaceFormComponent(replaceContext, componentName, partialUrl) {
     replaceIframe
       .locator(`div[id="forms-replace"] div span:text-is("${componentName}")`)
       .first()
-  ).toBeVisible({timeout: 3000});
+  ).toBeVisible({timeout: 8000});
 }

@@ -30,6 +30,7 @@ export class UniversalEditorBase {
     deleteButton: 'button[aria-label="Delete"]',
     deleteConfirmationButton: '[data-variant="negative"][class*="aaz5ma_spectrum-ButtonGroup-Button"]',
     deletePopup: 'section[class*="spectrum-Dialog--destructive"]',
+    replaceTextLocator: 'div[role="presentation"] input[type="text"]'
   };
 
   componentUtils = new ComponentUtils();
