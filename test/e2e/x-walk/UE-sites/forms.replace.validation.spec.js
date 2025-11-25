@@ -16,7 +16,7 @@ const waringMessage = 'Warning: Converting to a dissimilar type may cause existi
 const replaceTextLocator = 'div[role="presentation"] input[type="text"]';
 
 const testURL =
-  'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/forms/af/al-serach-testing/replace/test123.html';
+  'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/forms/af/forms-x-walk-collateral/formsreplace.html';
 
 test.describe('Forms Replace Component', () => {
 
