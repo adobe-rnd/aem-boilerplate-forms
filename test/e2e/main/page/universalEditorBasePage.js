@@ -5,6 +5,7 @@ import { CanvasUtils } from '../utils/canvasUtils.js';
 export class UniversalEditorBase {
   selectors = {
     ruleEditor: 'button[aria-label="Rule Editor"]',
+    dataSource: 'button[aria-label="Data Sources"]',
     preview: '[aria-label="Preview"]',
     contentTree: 'button[aria-label="Content tree"]',
     mainInContentTree: 'li > [class*="content expandable collapsed"]',
@@ -28,6 +29,17 @@ export class UniversalEditorBase {
     deleteConfirmationButton: '[data-variant="negative"][class*="aaz5ma_spectrum-ButtonGroup-Button"]',
     deletePopup: 'section[class*="spectrum-Dialog--destructive"]',
   };
+
+  datasource  = {
+    expandAllButton : 'button[type="button"][aria-label="Expand All"]',
+    addButton : 'button[type="button"] span:has-text("Add")',
+    bindRef: 'label:has-text("Bind Reference")',
+    dataSourceFrame : 'iframe[name*="AEM Forms Datasource"]',
+    datasourceIFrame: 'div[id="datasource"] iframe[id*="datasource"]',
+    bindRefInput: 'div[id="datasource"] input[type="text"]',
+    bindRefSelectButton: 'button[type="button"][aria-label="Select Bindref from Tree"]',
+    selectButton : 'button[type="button"] span:has-text("Select")',
+  }
 
   componentUtils = new ComponentUtils();
   canvasUtils = new CanvasUtils();
