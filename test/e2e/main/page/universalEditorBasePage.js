@@ -5,12 +5,13 @@ import { CanvasUtils } from '../utils/canvasUtils.js';
 export class UniversalEditorBase {
   selectors = {
     ruleEditor: 'button[aria-label="Rule Editor"]',
-    dataSource: 'button[aria-label="Data Sources"]',
     preview: '[aria-label="Preview"]',
     contentTree: 'button[aria-label="Content tree"]',
+    dataSource: 'button[aria-label="Data Sources"]',
     mainInContentTree: 'li > [class*="content expandable collapsed"]',
     adaptiveFormPathInUE: 'main[class="Canvas"] button[data-resource$="content/root/section/form"]',
     adaptiveFormDropdown: 'li[data-resource*="content/root/section/form"] button[aria-label]',
+    adaptiveFormInContentTree: 'li[data-resource*="content/root/section/form"] label[title="Adaptive Form"]',
     componentPath: 'div[class="form block edit-mode"] [data-aue-resource*="/',
     componentSelectorValidation: 'li[data-resource*="/textinput"] [class="node-content selected"]',
     insertComponent: 'div[data-testid="right-rail-tools"] button[aria-haspopup]',
@@ -19,6 +20,8 @@ export class UniversalEditorBase {
     sectionTwoPath: 'li[data-resource*="content/root/section"] div[class*="content expandable"]',
     defaultAndBlockMenu: 'div[role="presentation"][class*="Submenu-wrapper"]',
     adaptiveFormPathInBlockMenu: 'div[role="presentation"] div[data-key="blocks_form"]',
+    formReplace: 'button[aria-label="Forms Replace"]',
+    replaceFrameLocator: 'iframe[name="uix-guest-Forms"]',
     iFrame: 'iframe[name="Main Content"]',
     iFrameEditor: 'iframe[title="Editable app frame"]',
     iFrameInPreview: 'iframe[class="penpal"]',
@@ -28,6 +31,7 @@ export class UniversalEditorBase {
     deleteButton: 'button[aria-label="Delete"]',
     deleteConfirmationButton: '[data-variant="negative"][class*="aaz5ma_spectrum-ButtonGroup-Button"]',
     deletePopup: 'section[class*="spectrum-Dialog--destructive"]',
+    replaceTextLocator: 'div[role="presentation"] input[type="text"]'
   };
 
   datasource  = {
@@ -82,5 +86,26 @@ export class UniversalEditorBase {
       count = await componentPathInUE.count();
     }
     await expect(componentPathInUE).toHaveCount(0);
+  }
+
+  // This function expands the tree nodes in the content tree to reach a specific field.
+  // Do not include leaf nodes (fields) in the path that do not have an expand/collapse button.
+  // Only intermediate nodes with expandable behavior should be part of the path.
+  async expandContentTreeField(page, frame,  path) {
+    const contentTree = frame.locator(this.selectors.contentTree);
+    await expect(contentTree).toBeVisible({ timeout: 10000 });
+    await contentTree.click();
+    const nodeNames = path.split('/').filter(Boolean);
+    for (const nodeName of nodeNames) {
+      const expandButtonSelector = `li[data-resource$="${nodeName}"][class*="treenode"] button`;
+      const expandButton = frame.locator(expandButtonSelector).first();
+      await expect(expandButton).toBeVisible({ timeout: 5000 });
+
+      const ariaLabel = await expandButton.getAttribute('aria-label');
+      if (ariaLabel.includes('Expand Node')) {
+        await expandButton.click();
+        await expect(expandButton).toHaveAttribute('aria-label', 'Collapse Node');
+      }
+    }
   }
 }

@@ -28,7 +28,7 @@ test.describe('Component properties validation in UE', () => {
     await expect(contentTree).toBeVisible({ timeout: 10000 });
     await contentTree.click();
     const componentPathInContentTree = frame.locator(`li[data-resource$="${fieldPath}/${component}"][class*="treenode"]`).first();
-    await expandContentTreeField(page, frame, fieldPath);
+    await universalEditorBase.expandContentTreeField(page, frame, fieldPath);
     await expect(componentPathInContentTree).toBeVisible();
     await componentPathInContentTree.scrollIntoViewIfNeeded();
     await componentPathInContentTree.click({ force: true });
@@ -52,24 +52,3 @@ test.describe('Component properties validation in UE', () => {
     await expect(componentTitlePathInUE).toHaveText(componentTitle, { timeout: 5000 });
   });
 });
-
-// This function expands the tree nodes in the content tree to reach a specific field.
-// Do not include leaf nodes (fields) in the path that do not have an expand/collapse button.
-// Only intermediate nodes with expandable behavior should be part of the path.
-async function expandContentTreeField(page, frame,  path) {
-  const nodeNames = path.split('/').filter(Boolean);
-  for (const nodeName of nodeNames) {
-    const expandButtonSelector = `li[data-resource$="${nodeName}"][class*="treenode"] button`;
-    const expandButton = frame.locator(expandButtonSelector).first();
-    await expect(expandButton).toBeVisible({ timeout: 5000 });
-
-    const ariaLabel = await expandButton.getAttribute('aria-label');
-    if (ariaLabel.includes('Expand Node')) {
-      await expandButton.click();
-      await expect(expandButton).toHaveAttribute('aria-label', 'Collapse Node');
-    }
-  }
-}
-
-
-
