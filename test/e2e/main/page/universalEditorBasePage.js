@@ -7,6 +7,7 @@ export class UniversalEditorBase {
     ruleEditor: 'button[aria-label="Rule Editor"]',
     preview: '[aria-label="Preview"]',
     contentTree: 'button[aria-label="Content tree"]',
+    dataSource: 'button[aria-label="Data Sources"]',
     mainInContentTree: 'li > [class*="content expandable collapsed"]',
     adaptiveFormPathInUE: 'main[class="Canvas"] button[data-resource$="content/root/section/form"]',
     adaptiveFormDropdown: 'li[data-resource*="content/root/section/form"] button[aria-label]',
@@ -32,6 +33,17 @@ export class UniversalEditorBase {
     deletePopup: 'section[class*="spectrum-Dialog--destructive"]',
     replaceTextLocator: 'div[role="presentation"] input[type="text"]'
   };
+
+  datasource  = {
+    expandAllButton : 'button[type="button"][aria-label="Expand All"]',
+    addButton : 'button[type="button"] span:has-text("Add")',
+    bindRef: 'label:has-text("Bind Reference")',
+    dataSourceFrame : 'iframe[name*="AEM Forms Datasource"]',
+    datasourceIFrame: 'div[id="datasource"] iframe[id*="datasource"]',
+    bindRefInput: 'div[id="datasource"] input[type="text"]',
+    bindRefSelectButton: 'button[type="button"][aria-label="Select Bindref from Tree"]',
+    selectButton : 'button[type="button"] span:has-text("Select")',
+  }
 
   componentUtils = new ComponentUtils();
   canvasUtils = new CanvasUtils();
