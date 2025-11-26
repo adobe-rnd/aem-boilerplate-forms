@@ -36,8 +36,8 @@ test.describe('Forms Replace Component', () => {
     }
     await universalEditorBase.expandContentTreeField(page, frame, fieldPath);
     const componentPathInContentTree = frame.locator(`li[data-resource$="${fieldPath}/${component}"][class*="treenode"]`).first();
-    await frame.locator(selectors.adaptiveFormInContentTree).locator('span').click();
-    await expect((selectors.adaptiveFormInContentTree).locator('..')).toHaveAttribute('aria-selected', 'true');
+    await frame.locator(universalEditorBase.selectors.adaptiveFormInContentTree).locator('span').click();
+    await expect((universalEditorBase.selectors.adaptiveFormInContentTree).locator('..')).toHaveAttribute('aria-selected', 'true');
     await expect(componentPathInContentTree).toBeVisible();
     await componentPathInContentTree.scrollIntoViewIfNeeded();
     await componentPathInContentTree.click({ force: true });
