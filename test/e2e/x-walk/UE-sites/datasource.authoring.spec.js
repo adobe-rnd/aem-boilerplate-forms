@@ -17,6 +17,7 @@ const expectedRefs = {
 };
 
 test.describe('Validating datasource in UE', () => {
+  test.describe.configure({ mode: "serial" });
   const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/forms/af/forms-x-walk-collateral/datasource.html';
   let frame, editorFrame, propertiesPanel, componentPathUE, componentPathTree, adaptiveFormPath;
 
