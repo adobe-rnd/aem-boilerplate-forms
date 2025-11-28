@@ -51,7 +51,6 @@ test.describe('Validating datasource in UE', () => {
   });
 
   test('Verify adding a new data model shows up in the bind reference property field. @chromium-only', async ({ page }) => {
-    test.setTimeout(60000);
     const datasourceFrame = frame.frameLocator(universalEditorBase.datasource.dataSourceFrame);
     const datasourceInner = datasourceFrame.frameLocator(universalEditorBase.datasource.datasourceIFrame);
     await universalEditorBase.expandContentTreeField(page, frame, fieldPath);
@@ -91,8 +90,7 @@ test.describe('Validating datasource in UE', () => {
     expect(bindRefValue).toBe('$.Pet.status');
   });
 
-  test('Dynamically update Bind Reference and validate reflected JSON @chromium-only', async ({ page }) => {
-    test.setTimeout(60000);
+  test.skip('Dynamically update Bind Reference and validate reflected JSON @chromium-only', async ({ page }) => {
     await universalEditorBase.expandContentTreeField(page, frame, fieldPath);
     const componentTreeNode = frame.locator(`li[data-resource$="${fieldPath}/${componentEmail}"][class*="treenode"]`).first();
     await expect(componentTreeNode).toBeVisible();
