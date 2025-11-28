@@ -15,7 +15,7 @@ export class CanvasUtils {
   }
 
   async selectComponent(frame, component) {
-    await this.getComponentLocator(frame, component).first().click();
+    await this.getComponentLocator(frame, component).first().click({ force: true });
   }
 
   async isComponentSelected(frame, component, timeout) {
