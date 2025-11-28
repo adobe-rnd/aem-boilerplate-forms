@@ -10,14 +10,13 @@ const nestedFieldPath = 'content/root/section/form/panelcontainer';
 const componentEmail = 'emailinput';
 const componentNameStatus = 'Status';
 const petModal = 'Pet  Form Data  Model';
-const jsonURL = 'https://author-p133911-e1313554.adobeaemcloud.com/content/forms/af/al-serach-testing/replace/datasource1.-1.json';
+const jsonURL = 'https://author-p133911-e1313554.adobeaemcloud.com/content/forms/af/forms-x-walk-collateral/datasource.-1.json';
 const expectedRefs = {
-  'Photo Urls': '#.photoUrls',
+  'Tags': '#.tags',
   'Category': '$.Pet.category',
 };
 
 test.describe('Validating datasource in UE', () => {
-  test.describe.configure({ mode: "serial" });
   const testURL = 'https://author-p133911-e1313554.adobeaemcloud.com/ui#/@formsinternal01/aem/universal-editor/canvas/author-p133911-e1313554.adobeaemcloud.com/content/forms/af/forms-x-walk-collateral/datasource.html';
   let frame, editorFrame, propertiesPanel, componentPathUE, componentPathTree, adaptiveFormPath;
 
@@ -56,8 +55,7 @@ test.describe('Validating datasource in UE', () => {
     await universalEditorBase.expandContentTreeField(page, frame, fieldPath);
     await frame.locator(universalEditorBase.selectors.adaptiveFormInContentTree).locator('span').click();
     await expect(frame.locator(universalEditorBase.selectors.adaptiveFormInContentTree).locator('..')).toHaveAttribute('aria-selected', 'true');
-    await expect(frame.locator(universalEditorBase.selectors.dataSource)).toBeVisible();
-    await frame.locator(universalEditorBase.selectors.dataSource).click();
+    await componentUtils.verifyAndClickDataSource(frame);
     try {
       await datasourceInner.getByText('Select a Form').waitFor({ state: 'visible', timeout: 3000 });
       const componentPathInUE = frame.locator(universalEditorBase.componentLocatorForUe(componentEmail));
@@ -71,26 +69,21 @@ test.describe('Validating datasource in UE', () => {
     await datasourceInner.getByText('Status').click();
     await expect(addButton).toBeEnabled();
     await addButton.click();
-
     await expect(datasourceInner.getByText('Success!')).toBeVisible({ timeout: 10000 });
-
     await universalEditorBase.expandContentTreeField(page, frame, nestedFieldPath);
-
     const statusNode = frame.locator(`li[data-resource*="${nestedFieldPath}/"] label[title="${componentNameStatus}"]`).first();
     await expect(statusNode).toBeVisible();
     await statusNode.scrollIntoViewIfNeeded();
     await statusNode.click({ force: true });
-
     await frame.locator(universalEditorBase.selectors.propertyPagePath).click();
     await expect(frame.locator(`span:text-is("${componentNameStatus}")`).first()).toBeVisible();
-
     const bindRefFrame = frame.frameLocator(universalEditorBase.datasource.dataSourceFrame);
     await expect(bindRefFrame.locator(universalEditorBase.datasource.bindRef)).toBeVisible();
     const bindRefValue = await bindRefFrame.locator(universalEditorBase.datasource.bindRef).inputValue();
     expect(bindRefValue).toBe('$.Pet.status');
   });
 
-  test.skip('Dynamically update Bind Reference and validate reflected JSON @chromium-only', async ({ page }) => {
+  test('Dynamically update Bind Reference and validate reflected JSON @chromium-only', async ({ page }) => {
     await universalEditorBase.expandContentTreeField(page, frame, fieldPath);
     const componentTreeNode = frame.locator(`li[data-resource$="${fieldPath}/${componentEmail}"][class*="treenode"]`).first();
     await expect(componentTreeNode).toBeVisible();
@@ -103,12 +96,12 @@ test.describe('Validating datasource in UE', () => {
     const currentValue = await bindRefInput.inputValue();
 
     let targetLabel, expectedDataRef;
-    if (currentValue === expectedRefs['Photo Urls']) {
+    if (currentValue === expectedRefs['Tags']) {
       targetLabel = 'Category';
       expectedDataRef = expectedRefs['Category'];
     } else {
-      targetLabel = 'Photo Urls';
-      expectedDataRef = expectedRefs['Photo Urls'];
+      targetLabel = 'Tags';
+      expectedDataRef = expectedRefs['Tags'];
     }
     await bindRefSelectButton.click();
     const dataSourceFrame = frame.frameLocator(universalEditorBase.datasource.dataSourceFrame);
@@ -121,12 +114,26 @@ test.describe('Validating datasource in UE', () => {
     await datasourceIFrame.getByText(targetLabel, { exact: true }).click();
     await expect(selectButton).toBeEnabled();
     await selectButton.click();
-    await expect(datasourceIFrame.getByText('Select a Bind Reference')).toBeHidden();
     await expect(bindRefInput).toBeVisible({ timeout: 7000 });
     await bindRefInput.scrollIntoViewIfNeeded();
     const updatedValue = await bindRefInput.getAttribute('value');
     expect(updatedValue).toBe(expectedDataRef);
-    const actualDataRef = await waitForUpdatedJSON(page, jsonURL, expectedDataRef);
+
+    await componentUtils.verifyAndClickDataSource(frame);
+    try {
+      await datasourceIFrame.getByText('Select a Form').waitFor({ state: 'visible', timeout: 3000 });
+      await componentUtils.verifyAndClickContentTree(frame);
+      await frame.locator(universalEditorBase.selectors.adaptiveFormInContentTree).locator('span').click();
+      await componentUtils.verifyAndClickDataSource(frame);
+      await datasourceIFrame.getByText('Select a Form').waitFor({ state: "visible", timeout: 3000 });
+      await frame.locator(universalEditorBase.componentLocatorForUe(componentEmail)).first().click({ force: true });
+    } catch {}
+    await expect(datasourceIFrame.getByText(petModal)).toBeVisible({timeout: 6000});
+    await datasourceIFrame.locator(universalEditorBase.datasource.expandAllButton).click();
+    const verificationTick = datasourceIFrame.locator(`span:has-text("${targetLabel}")`).locator('..').locator('> svg').last();
+    await verificationTick.scrollIntoViewIfNeeded();
+    await expect(verificationTick).toBeVisible();
+    const actualDataRef = await waitForUpdatedJSON(page.context(), jsonURL, expectedDataRef);
     expect(actualDataRef).toBe(expectedDataRef);
   });
 
@@ -145,14 +152,19 @@ test.describe('Validating datasource in UE', () => {
   });
 });
 
-async function waitForUpdatedJSON(page, jsonURL, expectedValue) {
-  for (let i = 0; i < 5; i++) {
-    const response = await page.goto(jsonURL);
+async function waitForUpdatedJSON(context, jsonURL, expectedValue) {
+  const jsonPage = await context.newPage();
+
+  for (let i = 0; i < 10; i++) {
+    const response = await jsonPage.goto(jsonURL, { timeout: 5000 });
     const json = await response.json();
     const actualRef = json['jcr:content']?.root?.section?.form?.emailinput?.dataRef;
-
-    if (actualRef === expectedValue) return actualRef;
-    await page.waitForTimeout(1000);
+    if (actualRef === expectedValue) {
+      await jsonPage.close();
+      return actualRef;
+    }
+    await jsonPage.waitForTimeout(1000);
   }
+  await jsonPage.close();
   throw new Error(`JSON never updated. Expected: ${expectedValue}`);
 }
