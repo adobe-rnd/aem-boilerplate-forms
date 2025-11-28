@@ -73,11 +73,11 @@ export class UniversalEditorBase {
     await expect(frame.locator(`li[data-resource*="${component}"]`)).toBeVisible({ timeout: 2000 });
   }
 
-  async verifyComponentDelete(page, frame, component) {
+  async verifyComponentDelete(page, frame, component, componentName) {
     let componentPathInUE = frame.locator(this.componentLocatorForUe(component));
     let count = await componentPathInUE.count();
     while (count > 0) {
-      await this.canvasUtils.isComponentPresent(frame, component, 2000);
+      await this.canvasUtils.isComponentPresent(frame, component, componentName, 2000);
       await this.canvasUtils.selectComponent(frame, component);
       await this.canvasUtils.isComponentSelected(frame, component, 2000);
       await this.componentUtils.deleteComponent(frame);
