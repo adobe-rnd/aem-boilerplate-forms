@@ -31,6 +31,7 @@ import {
 import registerCustomFunctions from './functionRegistration.js';
 import { LOG_LEVEL } from '../constant.js';
 import { createOptimizedPicture } from '../../../scripts/aem.js';
+import { FormRendered } from './model/afb-events.js';
 
 const formSubscriptions = {};
 const formModels = {};
@@ -344,6 +345,9 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitError');
   applyRuleEngine(htmlForm, form, captcha);
+  
+  // Dispatch formRendered event after form is fully rendered (non-worker path)
+  form.dispatch(new FormRendered());
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
