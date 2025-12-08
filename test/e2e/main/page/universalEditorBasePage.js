@@ -74,6 +74,7 @@ export class UniversalEditorBase {
   }
 
   async verifyComponentDelete(page, frame, component, componentName) {
+    await this.componentUtils.verifyAndClickContentTree(frame);
     let componentPathInUE = frame.locator(this.componentLocatorForUe(component));
     let count = await componentPathInUE.count();
     while (count > 0) {
@@ -86,6 +87,7 @@ export class UniversalEditorBase {
       count = await componentPathInUE.count();
     }
     await expect(componentPathInUE).toHaveCount(0);
+    await expect(frame.locator(`div.StructuredTree li[data-resource*="/${component}"] div[role="treeitem"]`)).not.toBeVisible();
   }
 
   // This function expands the tree nodes in the content tree to reach a specific field.
