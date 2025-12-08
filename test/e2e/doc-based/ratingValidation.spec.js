@@ -11,7 +11,7 @@ const selector = {
   emoji: '.rating.hover span.emoji',
 };
 
-const partialUrl = '/L3JhdGluZy5qc29u';
+const partialUrl = '/L3JhdGluZ3ZhbGlkYXRpb24uanNvbg==';
 const starsSelected = 'star hover selected';
 
 test.describe('rating component validation in Doc-based forms', () => {
