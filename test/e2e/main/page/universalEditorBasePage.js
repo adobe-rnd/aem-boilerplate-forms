@@ -108,4 +108,23 @@ export class UniversalEditorBase {
       }
     }
   }
+
+  // This function expands the tree nodes in the content tree to reach a specific field.
+  // Do not include leaf nodes (fields) in the path that do not have an expand/collapse button.
+  // Only intermediate nodes with expandable behavior should be part of the path.
+  async expandContentTreeField(page, frame,  path) {
+    await this.componentUtils.verifyAndClickContentTree(frame);
+    const nodeNames = path.split('/').filter(Boolean);
+    for (const nodeName of nodeNames) {
+      const expandButtonSelector = `li[data-resource$="${nodeName}"][class*="treenode"] button`;
+      const expandButton = frame.locator(expandButtonSelector).first();
+      await expect(expandButton).toBeVisible({ timeout: 5000 });
+
+      const ariaLabel = await expandButton.getAttribute('aria-label');
+      if (ariaLabel.includes('Expand Node')) {
+        await expandButton.click();
+        await expect(expandButton).toHaveAttribute('aria-label', 'Collapse Node');
+      }
+    }
+  }
 }

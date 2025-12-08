@@ -5,7 +5,7 @@ export class ComponentUtils {
     contentTreeLabel: '[aria-label="Content tree"]',
     deleteButton: 'button[aria-label="Delete"]',
     componentList: 'div[class*="menu"]',
-    dataSource: 'button[aria-label="Data Sources"]',
+    dataSource: 'button[aria-label="Data Sources"]'
   };
 
   async addComponent(frame, componentName) {
