@@ -118,7 +118,7 @@ test.describe('Validating datasource in UE', () => {
     await bindRefInput.scrollIntoViewIfNeeded();
     const updatedValue = await bindRefInput.getAttribute('value');
     expect(updatedValue).toBe(expectedDataRef);
-
+    await page.waitForTimeout(1000);
     await componentUtils.verifyAndClickDataSource(frame);
     try {
       await datasourceIFrame.getByText('Select a Form').waitFor({ state: 'visible', timeout: 3000 });
@@ -130,7 +130,8 @@ test.describe('Validating datasource in UE', () => {
     } catch {}
     await expect(datasourceIFrame.getByText(petModal)).toBeVisible({timeout: 6000});
     await datasourceIFrame.locator(universalEditorBase.datasource.expandAllButton).click();
-    const verificationTick = datasourceIFrame.locator(`span:has-text("${targetLabel}")`).locator('..').locator('> svg').last();
+    //
+    const verificationTick = datasourceIFrame.locator(`span:has-text("${targetLabel}")`).locator('+ svg > path').last();
     await verificationTick.scrollIntoViewIfNeeded();
     await expect(verificationTick).toBeVisible();
     const actualDataRef = await waitForUpdatedJSON(page.context(), jsonURL, expectedDataRef);
