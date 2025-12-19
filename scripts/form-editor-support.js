@@ -260,7 +260,7 @@ async function renderFormBlock(form, editMode) {
       // eslint-disable-next-line no-console
       console.warn('Failed to fetch form model json:', error);
       try {
-        const formDef = await fetchForm(document.location.href);
+        const formDef = await fetchForm(document.location.pathname);
         div.replaceChildren();
         div.appendChild(createPreCodeElement(formDef));
         await decorate(block);
