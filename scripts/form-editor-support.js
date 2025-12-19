@@ -233,14 +233,6 @@ export function handleEditorSelect(event) {
   }
 }
 
-function createPreCodeElement(formDef) {
-  const pre = document.createElement('pre');
-  const code = document.createElement('code');
-  code.textContent = JSON.stringify(formDef);
-  pre.appendChild(code);
-  return pre;
-}
-
 async function renderFormBlock(form, editMode) {
   const block = form.closest('.block[data-aue-resource]');
   if ((editMode && !block.classList.contains('edit-mode')) || !editMode) {
@@ -267,7 +259,11 @@ async function renderFormBlock(form, editMode) {
     }
 
     div.replaceChildren();
-    div.appendChild(createPreCodeElement(formDef));
+    const pre = document.createElement('pre');
+    const code = document.createElement('code');
+    code.textContent = JSON.stringify(formDef);
+    pre.appendChild(code);
+    div.appendChild(pre);
     await decorate(block);
     return {
       formEl: block.querySelector('form'),
