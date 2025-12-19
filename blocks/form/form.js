@@ -417,7 +417,7 @@ function decode(rawContent) {
   return JSON.parse(cleanUp(content));
 }
 
-export function extractFormDefinition(block) {
+function extractFormDefinition(block) {
   let formDef;
   const container = block.querySelector('pre');
   const codeEl = container?.querySelector('code');
