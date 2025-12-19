@@ -246,34 +246,33 @@ async function renderFormBlock(form, editMode) {
   if ((editMode && !block.classList.contains('edit-mode')) || !editMode) {
     block.classList.toggle('edit-mode', editMode);
     const div = form.parentElement;
+    let formDef;
     try {
       const formDefResp = await fetch(`${form.dataset.formpath}.model.json`);
-      const formDef = await formDefResp.json();
-      div.replaceChildren();
-      div.appendChild(createPreCodeElement(formDef));
-      await decorate(block);
-      return {
-        formEl: block.querySelector('form'),
-        formDef,
-      };
+      formDef = await formDefResp.json();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.warn('Failed to fetch form model json:', error);
       try {
-        const formDef = await fetchForm(document.location.pathname);
-        div.replaceChildren();
-        div.appendChild(createPreCodeElement(formDef));
-        await decorate(block);
-        return {
-          formEl: block.querySelector('form'),
-          formDef,
-        };
+        formDef = await fetchForm(document.location.pathname);
       } catch (fallbackError) {
         // eslint-disable-next-line no-console
         console.error('Failed to fetch fallback form definition:', fallbackError);
         return null;
       }
     }
+
+    if (!formDef) {
+      return null;
+    }
+
+    div.replaceChildren();
+    div.appendChild(createPreCodeElement(formDef));
+    await decorate(block);
+    return {
+      formEl: block.querySelector('form'),
+      formDef,
+    };
   }
   return null;
 }
