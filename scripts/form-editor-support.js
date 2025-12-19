@@ -17,7 +17,7 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import decorate, { generateFormRendition } from '../blocks/form/form.js';
+import decorate, { generateFormRendition, extractFormDefinition } from '../blocks/form/form.js';
 import { loadCSS } from './aem.js';
 import { handleAccordionNavigation } from '../blocks/form/components/accordion/accordion.js';
 import { createButton as createRepeatButton } from '../blocks/form/components/repeat/repeat.js';
@@ -237,20 +237,42 @@ async function renderFormBlock(form, editMode) {
   const block = form.closest('.block[data-aue-resource]');
   if ((editMode && !block.classList.contains('edit-mode')) || !editMode) {
     block.classList.toggle('edit-mode', editMode);
-    const formDefResp = await fetch(`${form.dataset.formpath}.model.json`);
-    const formDef = await formDefResp.json();
     const div = form.parentElement;
-    div.replaceChildren();
-    const pre = document.createElement('pre');
-    const code = document.createElement('code');
-    code.textContent = JSON.stringify(formDef);
-    pre.appendChild(code);
-    div.appendChild(pre);
-    await decorate(block);
-    return {
-      formEl: block.querySelector('form'),
-      formDef,
-    };
+    try {
+      const formDefResp = await fetch(`${form.dataset.formpath}.model.json`);
+      const formDef = await formDefResp.json();
+      div.replaceChildren();
+      const pre = document.createElement('pre');
+      const code = document.createElement('code');
+      code.textContent = JSON.stringify(formDef);
+      pre.appendChild(code);
+      div.appendChild(pre);
+      await decorate(block);
+      return {
+        formEl: block.querySelector('form'),
+        formDef,
+      };
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to fetch form model json:', error);
+      try {
+        const pageResp = await fetch(document.location.href);
+        const pageHtml = await pageResp.text();
+        const parsedPage = new DOMParser().parseFromString(pageHtml, 'text/html');
+        const { container, formDef } = extractFormDefinition(parsedPage.querySelector('.form'));
+        div.replaceChildren();
+        div.appendChild(container);
+        await decorate(block);
+        return {
+          formEl: block.querySelector('form'),
+          formDef,
+        };
+      } catch (fallbackError) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to fetch fallback form definition:', fallbackError);
+        return null;
+      }
+    }
   }
   return null;
 }
