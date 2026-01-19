@@ -9,7 +9,7 @@ export class UniversalEditorBase {
     contentTree: 'button[aria-label="Content tree"]',
     dataSource: 'button[aria-label="Data Sources"]',
     mainInContentTree: 'li > [class*="content expandable collapsed"]',
-    adaptiveFormPathInUE: 'main[class="Canvas"] button[data-resource$="content/root/section/form"]',
+    adaptiveFormPathInUE: 'main button[data-resource$="content/root/section/form"]',
     adaptiveFormDropdown: 'li[data-resource*="content/root/section/form"] button[aria-label]',
     adaptiveFormInContentTree: 'li[data-resource*="content/root/section/form"] label[title="Adaptive Form"]',
     componentPath: 'div[class="form block edit-mode"] [data-aue-resource*="/',
