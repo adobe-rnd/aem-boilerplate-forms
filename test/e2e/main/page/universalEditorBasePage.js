@@ -53,7 +53,7 @@ export class UniversalEditorBase {
   }
 
   componentLocatorForUe(component) {
-    return `main[class="Canvas"] [data-resource*="/${component}"]`;
+    return `main [data-resource*="/${component}"]`;
   }
 
   async waitForCountToDecreaseByOne(adaptiveFormPath, initialCount) {
