@@ -233,7 +233,7 @@ export function handleEditorSelect(event) {
   }
 }
 
-async function renderFormBlock(form, editMode) {
+export async function renderFormBlock(form, editMode) {
   const block = form.closest('.block[data-aue-resource]');
   if ((editMode && !block.classList.contains('edit-mode')) || !editMode) {
     block.classList.toggle('edit-mode', editMode);
