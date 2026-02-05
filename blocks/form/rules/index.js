@@ -46,11 +46,11 @@ const renderPromises = {};
 function restoreAndRegisterHandler(fieldModel, handler, changeEvent = null) {
   // eslint-disable-next-line no-underscore-dangle
   const oldSubscribe = fieldModel._originalSubscribe;
-  
+
   if (!oldSubscribe) {
     return;
   }
-  
+
   // Invoke handler with changes if provided
   if (changeEvent) {
     try {
@@ -60,11 +60,11 @@ function restoreAndRegisterHandler(fieldModel, handler, changeEvent = null) {
       console.error('Error notifying component subscription:', ex);
     }
   }
-  
+
   // Restore subscribe method and register handler for future changes
   fieldModel.subscribe = oldSubscribe;
   fieldModel.subscribe(handler, 'change');
-  
+
   // Clean up
   // eslint-disable-next-line no-underscore-dangle
   delete fieldModel._originalSubscribe;
@@ -464,7 +464,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
           if (mainThreadFieldModel && mainThreadFieldModel._componentChangeHandler) {
             // eslint-disable-next-line no-underscore-dangle
             const handler = mainThreadFieldModel._componentChangeHandler;
-            
+
             // Create change event for handler invocation
             const changeAction = new Change({
               changes: e.data.payload.changes,
@@ -477,7 +477,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
               target: mainThreadFieldModel,
               currentTarget: mainThreadFieldModel,
             };
-            
+
             // Restore and register handler (with invocation)
             restoreAndRegisterHandler(mainThreadFieldModel, handler, changeEvent);
           }
@@ -486,7 +486,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
 
       if (e.data.name === 'sync-complete') {
         form?.classList.remove('loading');
-        
+
         // Restore any remaining intercepted handlers that didn't receive fieldChanged events
         const formModel = formModels[form.dataset?.id];
         if (formModel) {
@@ -498,7 +498,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
               if (mainThreadFieldModel && mainThreadFieldModel._componentChangeHandler) {
                 // eslint-disable-next-line no-underscore-dangle
                 const handler = mainThreadFieldModel._componentChangeHandler;
-                
+
                 // Restore and register handler (without invocation since field wasn't changed)
                 restoreAndRegisterHandler(mainThreadFieldModel, handler);
               }
