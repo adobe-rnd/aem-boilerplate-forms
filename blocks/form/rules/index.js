@@ -44,13 +44,6 @@ const renderPromises = {};
  * @param {Object} changeEvent - Optional change event to invoke handler with
  */
 function restoreAndRegisterHandler(fieldModel, handler, changeEvent = null) {
-  // eslint-disable-next-line no-underscore-dangle
-  const oldSubscribe = fieldModel._originalSubscribe;
-
-  if (!oldSubscribe) {
-    return;
-  }
-
   // Invoke handler with changes if provided
   if (changeEvent) {
     try {
@@ -61,13 +54,10 @@ function restoreAndRegisterHandler(fieldModel, handler, changeEvent = null) {
     }
   }
 
-  // Restore subscribe method and register handler for future changes
-  fieldModel.subscribe = oldSubscribe;
+  // Register handler for future changes (subscribe was already restored in loadRuleEngine)
   fieldModel.subscribe(handler, 'change');
 
   // Clean up
-  // eslint-disable-next-line no-underscore-dangle
-  delete fieldModel._originalSubscribe;
   // eslint-disable-next-line no-underscore-dangle
   delete fieldModel._componentChangeHandler;
 }
@@ -381,6 +371,15 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
 
         // Call the component's callback which will call fieldModel.subscribe
         callback(fieldDiv, fieldModel, 'register');
+
+        // Restore the original subscribe method and clean up the reference
+        // eslint-disable-next-line no-underscore-dangle
+        fieldModel.subscribe = fieldModel._originalSubscribe;
+        // eslint-disable-next-line no-underscore-dangle
+        delete fieldModel._originalSubscribe;
+
+        // NOTE: The 'change' handler (if any) stays stored in _componentChangeHandler
+        // and will be invoked when fieldChanged messages arrive from the worker, then registered.
       }
     });
   }
