@@ -37,6 +37,41 @@ const formSubscriptions = {};
 const formModels = {};
 const renderPromises = {};
 
+/**
+ * Restores the original subscribe method and registers the component handler
+ * @param {Object} fieldModel - The field model to restore
+ * @param {Function} handler - The handler to register
+ * @param {Object} changeEvent - Optional change event to invoke handler with
+ */
+function restoreAndRegisterHandler(fieldModel, handler, changeEvent = null) {
+  // eslint-disable-next-line no-underscore-dangle
+  const oldSubscribe = fieldModel._originalSubscribe;
+  
+  if (!oldSubscribe) {
+    return;
+  }
+  
+  // Invoke handler with changes if provided
+  if (changeEvent) {
+    try {
+      handler(changeEvent);
+    } catch (ex) {
+      // eslint-disable-next-line no-console
+      console.error('Error notifying component subscription:', ex);
+    }
+  }
+  
+  // Restore subscribe method and register handler for future changes
+  fieldModel.subscribe = oldSubscribe;
+  fieldModel.subscribe(handler, 'change');
+  
+  // Clean up
+  // eslint-disable-next-line no-underscore-dangle
+  delete fieldModel._originalSubscribe;
+  // eslint-disable-next-line no-underscore-dangle
+  delete fieldModel._componentChangeHandler;
+}
+
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
   el.toggleAttribute('aria-readonly', value === true);
@@ -429,46 +464,47 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
           if (mainThreadFieldModel && mainThreadFieldModel._componentChangeHandler) {
             // eslint-disable-next-line no-underscore-dangle
             const handler = mainThreadFieldModel._componentChangeHandler;
-            // eslint-disable-next-line no-underscore-dangle
-            const oldSubscribe = mainThreadFieldModel._originalSubscribe;
-
-            // Invoke stored handler with changes
-            try {
-              const changeAction = new Change({
-                changes: e.data.payload.changes,
-                field: fieldModel,
-              });
-
-              // Create action with target directly
-              handler({
-                type: changeAction.type,
-                payload: changeAction.payload,
-                metadata: changeAction.metadata,
-                target: mainThreadFieldModel,
-                currentTarget: mainThreadFieldModel,
-              });
-            } catch (ex) {
-              // eslint-disable-next-line no-console
-              console.error('Error notifying component subscription:', ex);
-            }
-
-            // Restore subscribe method
-            if (oldSubscribe) {
-              mainThreadFieldModel.subscribe = oldSubscribe;
-              mainThreadFieldModel.subscribe(handler, 'change');
-
-              // Clean up
-              // eslint-disable-next-line no-underscore-dangle
-              delete mainThreadFieldModel._originalSubscribe;
-              // eslint-disable-next-line no-underscore-dangle
-              delete mainThreadFieldModel._componentChangeHandler;
-            }
+            
+            // Create change event for handler invocation
+            const changeAction = new Change({
+              changes: e.data.payload.changes,
+              field: fieldModel,
+            });
+            const changeEvent = {
+              type: changeAction.type,
+              payload: changeAction.payload,
+              metadata: changeAction.metadata,
+              target: mainThreadFieldModel,
+              currentTarget: mainThreadFieldModel,
+            };
+            
+            // Restore and register handler (with invocation)
+            restoreAndRegisterHandler(mainThreadFieldModel, handler, changeEvent);
           }
         }
       }
 
       if (e.data.name === 'sync-complete') {
         form?.classList.remove('loading');
+        
+        // Restore any remaining intercepted handlers that didn't receive fieldChanged events
+        const formModel = formModels[form.dataset?.id];
+        if (formModel) {
+          const subscriptions = formSubscriptions[form.dataset?.id];
+          if (subscriptions) {
+            subscriptions.forEach((subscription, id) => {
+              const mainThreadFieldModel = formModel.getElement(id);
+              // eslint-disable-next-line no-underscore-dangle
+              if (mainThreadFieldModel && mainThreadFieldModel._componentChangeHandler) {
+                // eslint-disable-next-line no-underscore-dangle
+                const handler = mainThreadFieldModel._componentChangeHandler;
+                
+                // Restore and register handler (without invocation since field wasn't changed)
+                restoreAndRegisterHandler(mainThreadFieldModel, handler);
+              }
+            });
+          }
+        }
       }
     });
   });
