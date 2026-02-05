@@ -31,6 +31,7 @@ import {
 import registerCustomFunctions from './functionRegistration.js';
 import { LOG_LEVEL } from '../constant.js';
 import { createOptimizedPicture } from '../../../scripts/aem.js';
+import { Change, CustomEvent } from './model/afb-events.js';
 
 const formSubscriptions = {};
 const formModels = {};
@@ -318,11 +319,33 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];
-  subscriptions?.forEach((subscription, id) => {
-    const { callback, fieldDiv } = subscription;
-    const model = form.getElement(id);
-    callback(fieldDiv, model, 'register');
-  });
+  
+  // Intercept subscribe method for components that registered during decoration
+  if (subscriptions) {
+    subscriptions.forEach((subscription, id) => {
+      const { callback, fieldDiv } = subscription;
+      const fieldModel = form.getElement(id);
+      
+      if (fieldModel) {
+        // Store the original subscribe method on the fieldModel itself
+        fieldModel._originalSubscribe = fieldModel.subscribe.bind(fieldModel);
+        
+        // Intercept fieldModel.subscribe to capture 'change' handlers
+        fieldModel.subscribe = (fn, eventName) => {
+          if (eventName === 'change') {
+            // Store the handler on the fieldModel itself instead of registering it
+            fieldModel._componentChangeHandler = fn;
+          } else {
+            // For other event types, use the original subscribe
+            fieldModel._originalSubscribe(fn, eventName);
+          }
+        };
+        
+        // Call the component's callback which will call fieldModel.subscribe
+        callback(fieldDiv, fieldModel, 'register');
+      }
+    });
+  }
 
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
@@ -388,9 +411,51 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       if (e.data.name === 'restore') {
         loadRuleEngine(e.data.payload, form, captcha, generateFormRendition, data);
       }
-
       if (e.data.name === 'fieldChanged') {
+        const { field: fieldModel } = e.data.payload;
+        const fieldId = fieldModel.id;
+        
+        // First, update the DOM via fieldChanged
         await fieldChanged(e.data.payload, form, generateFormRendition);
+        
+        // Then, notify component subscriptions and restore subscribe method
+        const formModel = formModels[form.dataset?.id];
+        if (formModel) {
+          const mainThreadFieldModel = formModel.getElement(fieldId);
+          if (mainThreadFieldModel && mainThreadFieldModel._componentChangeHandler) {
+            const handler = mainThreadFieldModel._componentChangeHandler;
+            const oldSubscribe = mainThreadFieldModel._originalSubscribe;
+            
+            // Invoke stored handler with changes
+            try {
+              const changeAction = new Change({
+                changes: e.data.payload.changes,
+                field: fieldModel,
+              });
+              
+              // Create action with target directly
+              handler({
+                type: changeAction.type,
+                payload: changeAction.payload,
+                metadata: changeAction.metadata,
+                target: mainThreadFieldModel,
+                currentTarget: mainThreadFieldModel,
+              });
+            } catch (ex) {
+              console.error('Error notifying component subscription:', ex);
+            }
+            
+            // Restore subscribe method
+            if (oldSubscribe) {
+              mainThreadFieldModel.subscribe = oldSubscribe;
+              mainThreadFieldModel.subscribe(handler, 'change');
+              
+              // Clean up
+              delete mainThreadFieldModel._originalSubscribe;
+              delete mainThreadFieldModel._componentChangeHandler;
+            }
+          }
+        }
       }
 
       if (e.data.name === 'sync-complete') {
