@@ -352,7 +352,8 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
     const needsPrefill = formDef?.properties?.['fd:formDataEnabled'] === true;
     const data = needsPrefill ? await fetchData(formDef?.id, window.location.search || '') : null;
     const ruleEngine = await import('./model/afb-runtime.js');
-    const form = ruleEngine.createFormInstance({ ...formDef, ...(data != null && { data }) }, undefined, LOG_LEVEL);
+    const formDefWithData = { ...formDef, ...(data != null && { data }) };
+    const form = ruleEngine.createFormInstance(formDefWithData, undefined, LOG_LEVEL);
     return renderHTMLForm(form.getState(true), data);
   }
   const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`, { type: 'module' });

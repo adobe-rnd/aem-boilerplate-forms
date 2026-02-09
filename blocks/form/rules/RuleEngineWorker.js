@@ -75,9 +75,8 @@ onmessage = async (e) => {
         break;
     }
   }
-  // prefills form data, waits for all async operations
-  // to complete, then restores state and syncs field changes to main thread.
-  // In this codebase fetchData is only called here (inside the worker), and only when prefill is enabled.
+  // prefills form data, waits for all async operations to complete, then restores state and
+  // syncs field changes to main thread. fetchData is only called here (worker), when prefill enabled.
   if (e.data.name === 'decorated') {
     const { search, ...formDef } = initPayload;
     const needsPrefill = formDef?.properties?.['fd:formDataEnabled'] === true;
