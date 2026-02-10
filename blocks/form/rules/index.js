@@ -312,17 +312,11 @@ function applyRuleEngine(htmlForm, form, captcha) {
   });
 }
 
-export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
+export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data, fieldChanges) {
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
-  const subscriptions = formSubscriptions[htmlForm.dataset?.id];
-  subscriptions?.forEach((subscription, id) => {
-    const { callback, fieldDiv } = subscription;
-    const model = form.getElement(id);
-    callback(fieldDiv, model, 'register');
-  });
 
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
@@ -344,6 +338,29 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitError');
   applyRuleEngine(htmlForm, form, captcha);
+  if (Array.isArray(fieldChanges)) {
+    for (const payload of fieldChanges) {
+      await fieldChanged(payload, form, generateFormRendition);
+      const { changes } = payload;
+      const fieldId = payload.field?.id;
+      if (form && fieldId) {
+        changes?.forEach((change) => {
+          const { propertyName, currentValue } = change;
+          if (propertyName.includes('properties.')) {
+            form.getElement(fieldId).properties[propertyName.split('properties.')[1]] = currentValue;
+          } else if (propertyName === 'enum' || propertyName === 'enumNames') {
+            form.getElement(fieldId)[propertyName] = currentValue;
+          }
+        });
+      }
+    }
+  }
+  const subscriptions = formSubscriptions[htmlForm.dataset?.id];
+  subscriptions?.forEach((subscription, id) => {
+    const { callback, fieldDiv } = subscription;
+    const model = form.getElement(id);
+    callback(fieldDiv, model, 'register');
+  });
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
@@ -392,11 +409,8 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       }
 
       if (e.data.name === 'restore') {
-        loadRuleEngine(e.data.payload, form, captcha, generateFormRendition, data);
-      }
-
-      if (e.data.name === 'fieldChanged') {
-        await fieldChanged(e.data.payload, form, generateFormRendition);
+        const { state, fieldChanges } = e.data.payload;
+        loadRuleEngine(state, form, captcha, generateFormRendition, data, fieldChanges);
       }
 
       if (e.data.name === 'sync-complete') {
