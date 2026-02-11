@@ -87,10 +87,13 @@ onmessage = async (e) => {
     await ruleEngine.form.waitForPromises();
     postMessage({
       name: 'restore',
-      payload: {
-        state: ruleEngine.getState(),
-        fieldChanges: ruleEngine.getFieldChanges(),
-      },
+      payload: ruleEngine.getState(),
+    });
+    ruleEngine.getFieldChanges().forEach((changes) => {
+      postMessage({
+        name: 'fieldChanged',
+        payload: changes,
+      });
     });
     // informing the main thread that form is ready
     postMessage({
