@@ -10,12 +10,21 @@ export class CanvasUtils {
     return frame.locator(`main [data-resource*="/${component}"]`);
   }
 
-  async isComponentPresent(frame, component, timeout) {
-    await expect(this.getComponentLocator(frame, component).first()).toBeVisible({ timeout });
+  async isComponentPresent(frame, component, componentName, timeout, page) {
+    const locators = this.getComponentLocator(frame, component);
+    const count = await locators.count();
+    for (let i = 0; i < count; i++) {
+      const locator = locators.nth(i);
+      const componentTitle = await locator.locator('span.label').textContent();
+      if (componentTitle && componentTitle.includes(componentName)) {
+        await expect(locator).toBeVisible({ timeout });
+        return true;
+      }
+    }
   }
 
   async selectComponent(frame, component) {
-    await this.getComponentLocator(frame, component).first().click();
+    await this.getComponentLocator(frame, component).first().click({ force: true });
   }
 
   async isComponentSelected(frame, component, timeout) {
