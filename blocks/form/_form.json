@@ -35,6 +35,9 @@
     },
     { 
       "...": "./components/wizard/_wizard.json#/definitions" 
+    },
+    {
+      "...": "./components/scribble/_scribble.json#/definitions"
     }
   ],
   "models": [
@@ -86,7 +89,8 @@
         "text-input",
         "tnc",
         "wizard",
-        "range"
+        "range",
+        "scribble"
       ]
     }
   ]

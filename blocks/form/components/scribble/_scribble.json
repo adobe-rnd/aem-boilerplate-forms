@@ -1,0 +1,64 @@
+{
+  "definitions": [
+    {
+      "title": "Scribble Signature",
+      "id": "scribble",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/fileinput/v2/fileinput",
+            "template": {
+              "jcr:title": "Scribble Signature",
+              "fieldType": "file-input",
+              "accept": [
+                "audio/*",
+                "video/*",
+                "image/*",
+                "text/*",
+                "application/pdf"
+              ],
+              "buttonText": "Attach",
+              "dragDropText": "Drag and Drop To Upload",
+              "type": "file",
+              "fd:viewType": "scribble"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "scribble",
+      "fields": [
+        {
+          "component": "container",
+          "name": "basic",
+          "label": "Basic",
+          "collapsible": false,
+          "...": "../../models/form-common/_basic-input-fields.json"
+        },
+        {
+          "component": "text",
+          "name": "buttonText",
+          "label": "Button Title",
+          "valueType": "string"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json"
+        },
+        {
+          "component": "container",
+          "name": "validation",
+          "label": "Validation",
+          "collapsible": true,
+          "fields": [
+            {
+              "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
