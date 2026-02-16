@@ -86,7 +86,8 @@
         "text-input",
         "tnc",
         "wizard",
-        "range"
+        "range",
+        "review"
       ]
     }
   ]

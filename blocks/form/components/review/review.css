@@ -1,0 +1,41 @@
+:root {
+  --color-action-border-primary-disabled: #a3baf9;
+}
+
+main .form form .review-container {
+  display: block;
+}
+
+main .form .review-container label {
+  margin:0;
+  position: relative;
+}
+
+main .form form:not(.edit-mode) .review-container .field-wrapper:not(.panel-wrapper, .plain-text-wrapper, .file-wrapper) {
+  border-left: 3px solid var(--color-action-border-primary-disabled);
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+}
+
+main .form .review-panel-wrapper {
+  display: grid;
+}
+
+main .form .review-panel-wrapper .checkbox-wrapper {
+  margin: 5px;
+}
+
+main .form form.edit-mode .review-container .field-wrapper {
+  display: none;
+}
+
+main .form form.edit-mode .review-container::after {
+  content: 'Review of selected panels will appear here';
+  font-size: 20px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
