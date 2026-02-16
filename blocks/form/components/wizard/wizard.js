@@ -70,6 +70,7 @@ export class WizardLayout {
       navigateTo.classList.add('current-wizard-step');
       // add/remove active class from menu item
       const navigateToMenuItem = panel.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
+      currentMenuItem.classList.add('wizard-menu-item--complete');
       currentMenuItem.classList.remove('wizard-menu-active-item');
       navigateToMenuItem.classList.add('wizard-menu-active-item');
       const event = new CustomEvent('wizard:navigate', {
