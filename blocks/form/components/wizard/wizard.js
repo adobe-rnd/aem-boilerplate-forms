@@ -72,7 +72,9 @@ export class WizardLayout {
       const navigateToMenuItem = panel.querySelector(`li[data-index="${navigateTo.dataset.index}"]`);
       currentMenuItem.classList.add('wizard-menu-item--complete');
       currentMenuItem.classList.remove('wizard-menu-active-item');
+      currentMenuItem.removeAttribute('aria-current');
       navigateToMenuItem.classList.add('wizard-menu-active-item');
+      navigateToMenuItem.setAttribute('aria-current', 'true');
       const event = new CustomEvent('wizard:navigate', {
         detail: {
           prevStep: { id: current.id, index: +current.dataset.index },
@@ -149,6 +151,7 @@ export class WizardLayout {
       // create wizard menu
       const wizardMenu = WizardLayout.createMenu(Array.from(children));
       wizardMenu.querySelector('li').classList.add('wizard-menu-active-item');
+      wizardMenu.querySelector('li').setAttribute('aria-current', 'true');
       // Insert the menu before the first child of the wizard
       panel.insertBefore(wizardMenu, children[0]);
       WizardLayout.attachMutationObserver(panel);
