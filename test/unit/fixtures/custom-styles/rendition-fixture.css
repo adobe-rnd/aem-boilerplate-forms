@@ -1,0 +1,6 @@
+/* Fixture for custom form styles rendition tests. */
+form[data-source="aem"],
+form[data-source="sheet"] {
+  outline-width: 5px;
+  outline-style: solid;
+}

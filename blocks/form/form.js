@@ -1,4 +1,4 @@
-import { createOptimizedPicture } from '../../scripts/aem.js';
+import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
@@ -494,6 +494,19 @@ function addRequestContextToForm(formDef) {
   }
 }
 
+function loadFormCustomStyles(formDef) {
+  const { style } = formDef?.properties || {};
+  if (style) {
+    try {
+      const base = (window.hlx?.codeBasePath || '').replace(/\/$/, '');
+      const stylePath = style.startsWith('/') ? style : `/${style}`;
+      loadCSS(`${base}${stylePath}`);
+    } catch (error) {
+      console.error('Failed to load form CSS:', error);
+    }
+  }
+}
+
 export default async function decorate(block) {
   let container = block.querySelector('a[href]');
   let formDef;
@@ -523,14 +536,16 @@ export default async function decorate(block) {
     }
     if (isDocumentBasedForm(formDef)) {
       const transform = new DocBasedFormToAF();
-      formDef = transform.transform(formDef);
+      formDef = transform.transform(formDef, { block });
       source = 'sheet';
+      loadFormCustomStyles(formDef);
       const response = await createForm(formDef, null, source);
       form = response?.form;
       const docRuleEngine = await import('./rules-doc/index.js');
       docRuleEngine.default(formDef, form);
       rules = false;
     } else {
+      loadFormCustomStyles(formDef);
       afModule = await import('./rules/index.js');
       addRequestContextToForm(formDef);
       if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
