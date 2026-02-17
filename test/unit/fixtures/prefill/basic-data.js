@@ -7,6 +7,7 @@ const data = {
 export const sample = {
   action: 'http://localhost:3000/submit',
   id: 'someid',
+  properties: { 'fd:formDataEnabled': true },
   items: [{
     fieldType: 'text-input',
     id: 'text-input',
