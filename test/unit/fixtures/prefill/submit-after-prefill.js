@@ -27,6 +27,7 @@ const scope = nock('http://localhost:3000')
 export const sample = {
   action: 'http://localhost:3000/submit-success',
   id: 'someid3',
+  properties: { 'fd:formDataEnabled': true },
   items: [{
     fieldType: 'text-input',
     id: 'text-input',
