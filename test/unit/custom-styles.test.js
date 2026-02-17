@@ -15,7 +15,7 @@ describe('Custom form styles', () => {
     it('returns CSS path and removes the row when block has "css: path"', () => {
       const block = document.createElement('div');
       const row = document.createElement('div');
-      row.textContent = 'css: blocks/form/form-1.css';
+      row.textContent = 'style: blocks/form/form-1.css';
       block.appendChild(row);
 
       const result = DocBasedFormToAF.parseStyleFromBlock(block);
@@ -50,7 +50,7 @@ describe('Custom form styles', () => {
     it('handles "CSS:" key case-insensitively', () => {
       const block = document.createElement('div');
       const row = document.createElement('div');
-      row.textContent = 'CSS: styles/custom.css';
+      row.textContent = 'STYLE: styles/custom.css';
       block.appendChild(row);
 
       const result = DocBasedFormToAF.parseStyleFromBlock(block);
@@ -97,7 +97,7 @@ describe('Custom form styles', () => {
       };
       const block = document.createElement('div');
       const cssRow = document.createElement('div');
-      cssRow.textContent = 'css: blocks/form/form-1.css';
+      cssRow.textContent = 'style: blocks/form/form-1.css';
       block.appendChild(cssRow);
       const pre = document.createElement('pre');
       const code = document.createElement('code');
@@ -109,7 +109,7 @@ describe('Custom form styles', () => {
 
       const link = document.head.querySelector('link[rel="stylesheet"][href*="blocks/form/form-1.css"]');
       assert.ok(link, 'stylesheet link should be added for document-based form with css row');
-      const configRow = [...block.children].find((el) => el.textContent?.trim().toLowerCase().startsWith('css:'));
+      const configRow = [...block.children].find((el) => el.textContent?.trim().toLowerCase().startsWith('style:'));
       assert.strictEqual(configRow, undefined, 'css config row should be removed from block');
     });
 
@@ -196,7 +196,7 @@ describe('Custom form styles', () => {
       };
       const block = document.createElement('div');
       const cssRow = document.createElement('div');
-      cssRow.textContent = 'css: test/unit/fixtures/custom-styles/rendition-fixture.css';
+      cssRow.textContent = 'style: test/unit/fixtures/custom-styles/rendition-fixture.css';
       block.appendChild(cssRow);
       const pre = document.createElement('pre');
       const code = document.createElement('code');

@@ -184,7 +184,7 @@ export default class DocBasedFormToAF {
       const text = row?.textContent?.trim() || '';
       if (text.includes(':')) {
         const [key, ...rest] = text.split(':');
-        if (key.trim().toLowerCase() === 'css') {
+        if (key.trim().toLowerCase() === 'style') {
           style = rest.join(':').trim();
           row.remove();
         }
