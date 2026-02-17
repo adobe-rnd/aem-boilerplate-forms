@@ -498,7 +498,9 @@ function loadFormCustomStyles(formDef) {
   const { style } = formDef?.properties || {};
   if (style) {
     try {
-      loadCSS(`${window.hlx.codeBasePath}/${style}`);
+      const base = (window.hlx?.codeBasePath || '').replace(/\/$/, '');
+      const stylePath = style.startsWith('/') ? style : `/${style}`;
+      loadCSS(`${base}${stylePath}`);
     } catch (error) {
       console.error('Failed to load form CSS:', error);
     }

@@ -129,6 +129,24 @@ describe('Custom form styles', () => {
       const formStyleLinks = [...links].filter((l) => l.href.includes('form-1') || l.href.includes('form-2'));
       assert.strictEqual(formStyleLinks.length, 0, 'no custom form stylesheet should be added');
     });
+
+    it('builds href without double slash when style already starts with "/"', async () => {
+      const formDef = {
+        adaptiveform: '0.10.0',
+        metadata: {},
+        properties: { style: '/blocks/form/form-2.css' },
+        items: [],
+        id: 'test-form',
+      };
+      const block = createBlock(formDef);
+
+      await decorate(block);
+
+      const link = document.head.querySelector('link[rel="stylesheet"][href*="blocks/form/form-2.css"]');
+      assert.ok(link, 'stylesheet link should be added');
+      assert.ok(!link.href.includes('/base//'), 'href should not contain double slash between base and style path');
+      assert.ok(link.href.includes('/base/blocks/form/form-2.css'), 'href should be base + style path');
+    });
   });
 
   describe('Custom form styles rendition', () => {
