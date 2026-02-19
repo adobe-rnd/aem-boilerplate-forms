@@ -326,6 +326,18 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
 
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
+    const fieldId = e.payload?.field?.id;
+    if (fieldId) {
+      const subs = formSubscriptions[htmlForm.dataset?.id];
+      const sub = subs?.get(fieldId);
+      if (sub) {
+        try {
+          sub.callback(sub.fieldDiv, e.payload.field, 'change', e.payload);
+        } catch (err) {
+          console.error(`Error in subscription callback for field "${fieldId}":`, err);
+        }
+      }
+    }
   }, 'fieldChanged');
 
   form.subscribe((e) => {
