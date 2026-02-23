@@ -23,6 +23,30 @@ import {
   createInput,
 } from './util.js';
 
+/**
+ * Parses the form block DOM for the style row (two cells: "style" + path/link).
+ * Removes the style row from the block. Used so the first link in the block is the form JSON link.
+ * @param {HTMLElement} [block] - The form block element
+ * @returns {string|undefined} The CSS path if found
+ */
+export function parseStyleFromBlock(block) {
+  if (!block?.children?.length) return undefined;
+  let style;
+  [...block.children].forEach((row) => {
+    const cells = row?.children;
+    if (cells?.length >= 2) {
+      const key = cells[0]?.textContent?.trim()?.toLowerCase();
+      if (key === 'style') {
+        const second = cells[1];
+        const link = second?.querySelector?.('a');
+        style = link ? (link.getAttribute('href') || link.textContent?.trim()) : second?.textContent?.trim();
+        if (style) row.remove();
+      }
+    }
+  });
+  return style;
+}
+
 export const DELAY_MS = 0;
 let captchaField;
 let afModule;
@@ -508,7 +532,10 @@ function loadFormCustomStyles(formDef) {
 }
 
 export default async function decorate(block) {
-  let container = block.querySelector('a[href]');
+  // Parse and remove style row first so the first link in the block is the form JSON link
+  const styleFromBlock = parseStyleFromBlock(block);
+
+  let container = block?.querySelector?.('a[href]');
   let formDef;
   let pathname;
   if (container) {
@@ -536,7 +563,7 @@ export default async function decorate(block) {
     }
     if (isDocumentBasedForm(formDef)) {
       const transform = new DocBasedFormToAF();
-      formDef = transform.transform(formDef, { block });
+      formDef = transform.transform(formDef, {style: styleFromBlock });
       source = 'sheet';
       loadFormCustomStyles(formDef);
       const response = await createForm(formDef, null, source);
