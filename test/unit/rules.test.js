@@ -1,14 +1,13 @@
 /* eslint-env mocha */
 /**
- * Unit tests for new/changed code in blocks/form/rules/index.js (uncommitted changes).
- * Covers: loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data, fieldChanges),
- * fieldChanges application, formViewInitialized dispatch.
+ * Unit tests for loadRuleEngine in blocks/form/rules/index.js.
+ * Covers restoring form state and applying batched field changes (worker restore flow).
  */
 import assert from 'assert';
 import Sinon from 'sinon';
 import { loadRuleEngine } from '../../blocks/form/rules/index.js';
 
-describe('Rule engine (index.js) – new lines', () => {
+describe('Rule engine', () => {
   const formId = 'test-form-id';
 
   beforeEach(() => {
@@ -16,7 +15,7 @@ describe('Rule engine (index.js) – new lines', () => {
     global.window.myForm = null;
   });
 
-  describe('loadRuleEngine with fieldChanges (new param and logic)', () => {
+  describe('loadRuleEngine', () => {
     const minimalFormState = {
       id: formId,
       action: '/submit',
@@ -25,7 +24,7 @@ describe('Rule engine (index.js) – new lines', () => {
       adaptiveform: '0.10.0',
     };
 
-    it('completes and sets window.myForm when fieldChanges is an array', async () => {
+    it('restores form state and sets window.myForm when given an empty field changes list', async () => {
       const htmlForm = document.createElement('form');
       htmlForm.dataset.id = formId;
       const genFormRendition = Sinon.stub();
@@ -35,7 +34,7 @@ describe('Rule engine (index.js) – new lines', () => {
       assert.ok(global.window.myForm, 'window.myForm should be set after loadRuleEngine');
     });
 
-    it('completes when fieldChanges is undefined (new optional param)', async () => {
+    it('restores form state when field changes param is omitted', async () => {
       const htmlForm = document.createElement('form');
       htmlForm.dataset.id = formId;
 
@@ -44,7 +43,7 @@ describe('Rule engine (index.js) – new lines', () => {
       assert.ok(global.window.myForm);
     });
 
-    it('completes when fieldChanges is non-empty (exercises reduce + applyFieldChangeToFormModel path)', async () => {
+    it('restores form state and applies batched field changes when field changes are provided', async () => {
       const htmlForm = document.createElement('form');
       htmlForm.dataset.id = formId;
       const fieldChanges = [
