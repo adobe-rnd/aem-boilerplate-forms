@@ -96,7 +96,7 @@ let customComponents = ['range', '<name>'];
 const OOTBComponentDecorators = ['accordion', ..., '<name>'];
 ```
 
-The runtime loads components by matching `fd[':type']` (set via `fd:viewType` in the JSON schema) against these arrays. The component name in `customComponents` must exactly match the `fd:viewType` value in `_<name>.json`.
+The runtime loads components by matching `fd[':type']` (set via `fd:viewType` in the JSON schema) against these arrays. Components can also be loaded via `properties.variant` (set in authoring), which is checked against `customComponents` only. The component name must exactly match the `fd:viewType` value in `_<name>.json` or the `variant` value set in authoring.
 
 #### 5b. Update `_form.json` (if needed)
 

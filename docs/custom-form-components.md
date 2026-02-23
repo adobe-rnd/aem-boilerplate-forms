@@ -43,9 +43,10 @@ This guide explains how to create custom components for the Form block, which fo
 
 ## Extending OOTB Components
 - Custom components **must extend** from a predefined set of OOTB components.
-- The system identifies which OOTB component to extend based on the `variant` property in the field's JSON (`fd.properties.variant`) or the `:type` property (which can be set as `fd:viewType`).
-- The system maintains a registry of allowed custom component variants. Only variants listed in this registry can be used.
-- When rendering a form, the system checks the `variant` property or `:type`/`fd:viewType`, and if it matches a registered custom component, loads the corresponding JS and CSS files from the `blocks/form/components` folder.
+- The system identifies which custom component to load using two mechanisms:
+  1. **`:type`** (set via `fd:viewType` in the JSON schema) — checked against both `customComponents` and `OOTBComponentDecorators` in `mappings.js`.
+  2. **`properties.variant`** (set in authoring) — checked against `customComponents` only.
+- When either matches a registered name, the system loads the corresponding JS and CSS files from `blocks/form/components/<name>/`.
 - The custom component is then applied to the base HTML structure of the OOTB component, allowing you to enhance or override its behavior and appearance.
 
 ---
@@ -68,32 +69,36 @@ This guide explains how to create custom components for the Form block, which fo
 ---
 
 ## Listening to Field Changes: How `subscribe` Works
-- The `subscribe` function allows your component to react to changes in the field's value or other custom events.
-- When you call `subscribe(element, formId, callback)`, the system registers your callback to be notified when the field changes.
+- The `subscribe` function (from `blocks/form/rules/index.js`) connects your component to its field model. Always use `{ listenChanges: true }` for new components.
 - **Callback Signature:**
-  - The callback receives two arguments:
-    1. `element`: The HTML element for the field.
-    2. `fieldModel`: An object representing the field's state and events.
-- To listen to value changes or custom events, use `fieldModel.subscribe((event) => { ... }, 'eventName')` inside your callback. The `event` object contains details about what changed.
+  - `callback(element, fieldModel, 'register')` — called once when the model is ready
+  - `callback(element, fieldModel, 'change', payload)` — called on every property change (when `listenChanges` is true)
+  - `payload.changes` is an array of `{ propertyName, currentValue, prevValue }`
+- For the full API reference, callback patterns, and child subscription examples, see [subscribe-api.md](./subscribe-api.md).
 - **Example: Countdown Timer**
   ```js
   import { subscribe } from '../../rules/index.js';
 
   export default function decorate(fieldDiv, fieldJson, container, formId) {
-    // Access custom properties defined in the JSON
     const { initialText, finalText, time } = fieldJson?.properties;
 
-    // ... setup logic ...
+    let model = null;
 
-    subscribe(fieldDiv, formId, (_fieldDiv, fieldModel) => {
-      fieldModel.subscribe(() => {
-        // React to custom event (e.g., resetOtpCounter)
-        // ... countdown logic ...
-      }, 'resetOtpCounter');
-    });
+    subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
+      if (eventType === 'register') {
+        model = fieldModel;
+        // one-time setup...
+      } else if (eventType === 'change') {
+        payload?.changes?.forEach((change) => {
+          if (change?.propertyName === 'value') {
+            // react to value changes
+          }
+        });
+      }
+    }, { listenChanges: true });
   }
   ```
-- This allows your component to update its UI or perform logic whenever the field value or properties change, or when a custom event is triggered.
+- **Panel/container components** that watch child items should call `subscribe()` on each child's DOM wrapper inside the parent's `'register'` callback. Find child wrappers with `element.querySelector('[data-id="${child.id}"]')` and find child models by `fieldType` or `':type'`. See [subscribe-api.md](./subscribe-api.md) for the full child pattern.
 
 ---
 
@@ -143,7 +148,7 @@ When defining fields in your custom component's JSON (for any field group—basi
    - Use the `element` parameter to modify the base HTML structure.
    - Use the `fd` parameter if needed for standard field data.
    - Use `subscribe` to listen to field changes or custom events if needed.
-7. **Register your component as a variant** in the form builder and set the `variant` property or `fd:viewType`/`:type` in the JSON to your component's name (e.g., `countdown-timer`).
+7. **Register your component** by setting `fd:viewType` in your component's JSON schema to your component's name (e.g., `countdown-timer`). The runtime uses this as the `:type` property to load the component. Alternatively, components can be identified via `properties.variant` set in authoring (checked against `customComponents` only).
 8. **Update `mappings.js`:** Add your component's name to the `OOTBComponentDecorators` (for OOTB-style components) or `customComponents` list so it is recognized and loaded by the system.
 9. **Update `_form.json`:** Add your component's name to the `filters.components` array so it can be dropped in the authoring UI.
 10. **Run the build:json script:** Execute `npm run build:json` to compile and merge all component JSON definitions into a single file to be served from the server. This ensures your new component's schema is included in the merged output.
@@ -153,18 +158,24 @@ When defining fields in your custom component's JSON (for any field group—basi
 import { subscribe } from '../../rules/index.js';
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
-  // Access custom properties defined in your JSON
   const { initialText, finalText, time } = fieldJson?.properties;
 
-  // ... setup logic ...
+  let model = null;
 
-  subscribe(fieldDiv, formId, (_fieldDiv, fieldModel) => {
-    fieldModel.subscribe((e) => {
-      const customProperty = fieldModel.properties.initialText;
-      const changes = e.payload.changes;
-      console.log('field changed')
-    }, 'change');
-  });
+  subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
+    if (eventType === 'register') {
+      model = fieldModel;
+      // one-time setup with model...
+    } else if (eventType === 'change') {
+      payload?.changes?.forEach((change) => {
+        if (change?.propertyName === 'value') {
+          // react to value changes
+        } else if (change?.propertyName === 'properties') {
+          // react to custom property changes (e.g., initialText)
+        }
+      });
+    }
+  }, { listenChanges: true });
 }
 ```
 

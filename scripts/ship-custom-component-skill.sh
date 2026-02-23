@@ -15,9 +15,8 @@ mkdir -p "$DEST/tools" "$DEST/knowledge"
 # Copy skill files
 cp "$SKILLS_DIR/create-custom-component/skill.md" "$DEST/SKILL.md"
 cp "$SKILLS_DIR/create-custom-component/tools/"* "$DEST/tools/"
-cp "$SKILLS_DIR/create-custom-component/knowledge/subscribe-api.md" "$DEST/knowledge/subscribe-api.md"
-
 # Bundle knowledge from local docs/
+cp "$DOCS_DIR/subscribe-api.md" "$DEST/knowledge/subscribe-api.md"
 cp "$DOCS_DIR/custom-form-components.md" "$DEST/knowledge/custom-form-components.md"
 cp "$DOCS_DIR/form-field-types.md" "$DEST/knowledge/form-field-types.md"
 
