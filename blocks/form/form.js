@@ -563,7 +563,7 @@ export default async function decorate(block) {
     }
     if (isDocumentBasedForm(formDef)) {
       const transform = new DocBasedFormToAF();
-      formDef = transform.transform(formDef, {style: styleFromBlock });
+      formDef = transform.transform(formDef, { style: styleFromBlock });
       source = 'sheet';
       loadFormCustomStyles(formDef);
       const response = await createForm(formDef, null, source);
