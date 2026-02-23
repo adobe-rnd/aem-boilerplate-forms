@@ -62,14 +62,10 @@ async function loadComponent(componentName, element, fd, container, formId) {
  *
  * */
 export default async function componentDecorator(element, fd, container, formId) {
-  const { ':type': type = '', fieldType, properties } = fd;
+  const { ':type': type = '', fieldType } = fd;
 
   if (type.endsWith('wizard')) {
     await loadComponent('wizard', element, fd, container, formId);
-  }
-
-  if (getCustomComponents().includes(properties?.variant)) {
-    await loadComponent(properties?.variant, element, fd, container, formId);
   }
 
   if (getCustomComponents().includes(type) || getOOTBComponents().includes(type)) {

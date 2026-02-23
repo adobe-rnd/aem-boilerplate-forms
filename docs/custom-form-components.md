@@ -43,10 +43,8 @@ This guide explains how to create custom components for the Form block, which fo
 
 ## Extending OOTB Components
 - Custom components **must extend** from a predefined set of OOTB components.
-- The system identifies which custom component to load using two mechanisms:
-  1. **`:type`** (set via `fd:viewType` in the JSON schema) — checked against both `customComponents` and `OOTBComponentDecorators` in `mappings.js`.
-  2. **`properties.variant`** (set in authoring) — checked against `customComponents` only.
-- When either matches a registered name, the system loads the corresponding JS and CSS files from `blocks/form/components/<name>/`.
+- The system identifies which custom component to load based on the **`:type`** property (set via `fd:viewType` in the JSON schema). The runtime checks `fd[':type']` against the `customComponents` and `OOTBComponentDecorators` arrays in `mappings.js`.
+- When the name matches, the system loads the corresponding JS and CSS files from `blocks/form/components/<name>/`.
 - The custom component is then applied to the base HTML structure of the OOTB component, allowing you to enhance or override its behavior and appearance.
 
 ---
@@ -148,7 +146,7 @@ When defining fields in your custom component's JSON (for any field group—basi
    - Use the `element` parameter to modify the base HTML structure.
    - Use the `fd` parameter if needed for standard field data.
    - Use `subscribe` to listen to field changes or custom events if needed.
-7. **Register your component** by setting `fd:viewType` in your component's JSON schema to your component's name (e.g., `countdown-timer`). The runtime uses this as the `:type` property to load the component. Alternatively, components can be identified via `properties.variant` set in authoring (checked against `customComponents` only).
+7. **Register your component** by setting `fd:viewType` in your component's JSON schema to your component's name (e.g., `countdown-timer`). The runtime uses this as the `:type` property to load the component.
 8. **Update `mappings.js`:** Add your component's name to the `OOTBComponentDecorators` (for OOTB-style components) or `customComponents` list so it is recognized and loaded by the system.
 9. **Update `_form.json`:** Add your component's name to the `filters.components` array so it can be dropped in the authoring UI.
 10. **Run the build:json script:** Execute `npm run build:json` to compile and merge all component JSON definitions into a single file to be served from the server. This ensures your new component's schema is included in the merged output.

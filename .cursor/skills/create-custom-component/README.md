@@ -79,7 +79,7 @@ on a running form. When prompted, provide a form URL where the component is in u
 The skill will navigate to that URL using browser MCP, inject `tools/validate-registration.js`,
 and check three things:
 1. **Form model loaded** -- is there a form on the page?
-2. **Field using component** -- does any field's `:type` or `variant` match the component name?
+2. **Field using component** -- does any field's `:type` match the component name?
 3. **DOM component loaded** -- does the field's DOM element have `componentStatus=loaded`?
 
 This step requires Cursor with browser MCP (`cursor-ide-browser` or `cursor-browser-extension`).
