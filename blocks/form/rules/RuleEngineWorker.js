@@ -24,18 +24,64 @@ import { getLogLevelFromURL } from '../constant.js';
 
 let customFunctionRegistered = false;
 
+/**
+ * Worker → main thread messages (restore flow):
+ *
+ * - restoreState: Sent after 'decorated'. Payload: { state, fieldChanges }.
+ *   Main thread runs loadRuleEngine(state, ..., fieldChanges).
+ *
+ * - applyRestoreBatchedFieldChanges: Sent after restoreState. Payload: { fieldChanges }.
+ *   Main thread applies each after formViewInitialized.
+ *
+ * - applyLiveFieldChange:     Sent per field change (live phase). Payload: single field change.
+ *                             Main thread runs fieldChanged + applyFieldChangeToFormModel.
+ *
+ * - applyLiveFormChange:      Sent per form-level 'change' (live phase). Payload: form change.
+ *                             Main thread updates form properties (e.g. polling success).
+ */
 export default class RuleEngine {
   rulesOrder = {};
 
   fieldChanges = [];
+
+  postRestoreFieldChanges = [];
+
+  /** True after we send applyRestoreBatchedFieldChanges; then post each field/form change. */
+  postRestoreCompleteSent = false;
+
+  /** True after restoreState until applyRestoreBatchedFieldChanges; collect field changes. */
+  restoreSent = false;
 
   constructor(formDef, url) {
     const logLevel = getLogLevelFromURL(url);
     this.form = createFormInstance(formDef, undefined, logLevel);
     this.form.subscribe((e) => {
       const { payload } = e;
-      this.fieldChanges.push(payload);
+      this.handleFieldChanged(payload);
     }, 'fieldChanged');
+
+    this.form.subscribe((e) => {
+      const { payload } = e;
+      if (this.postRestoreCompleteSent) {
+        postMessage({
+          name: 'applyLiveFormChange',
+          payload,
+        });
+      }
+    }, 'change');
+  }
+
+  handleFieldChanged(payload) {
+    if (this.postRestoreCompleteSent) {
+      postMessage({
+        name: 'applyLiveFieldChange',
+        payload,
+      });
+    } else if (this.restoreSent) {
+      this.postRestoreFieldChanges.push(payload);
+    } else {
+      this.fieldChanges.push(payload);
+    }
   }
 
   getState() {
@@ -51,7 +97,8 @@ export default class RuleEngine {
   }
 }
 
-let ruleEngine; let initPayload;
+let ruleEngine;
+let initPayload;
 onmessage = async (e) => {
   async function handleMessageEvent(event) {
     switch (event.data.name) {
@@ -59,9 +106,7 @@ onmessage = async (e) => {
         const { search, ...formDef } = event.data.payload;
         initPayload = event.data.payload;
         ruleEngine = new RuleEngine(formDef, event.data.url);
-        // eslint-disable-next-line no-case-declarations
         const state = ruleEngine.getState();
-        // Informing the main thread that the form is initialized
         postMessage({
           name: 'init',
           payload: state,
@@ -75,8 +120,8 @@ onmessage = async (e) => {
         break;
     }
   }
-  // prefills form data, waits for all async operations to complete, then restores state and
-  // syncs field changes to main thread. fetchData only called here (worker) when prefill enabled.
+
+  // Prefill form data, wait for async ops, then restore state and sync field changes to main.
   if (e.data.name === 'decorated') {
     const { search, ...formDef } = initPayload;
     const needsPrefill = formDef?.properties?.['fd:formDataEnabled'] === true;
@@ -86,16 +131,23 @@ onmessage = async (e) => {
     }
     await ruleEngine.form.waitForPromises();
     postMessage({
-      name: 'restore',
-      payload: ruleEngine.getState(),
+      name: 'restoreState',
+      payload: {
+        state: ruleEngine.getState(),
+        fieldChanges: ruleEngine.getFieldChanges(),
+      },
     });
-    ruleEngine.getFieldChanges().forEach((changes) => {
-      postMessage({
-        name: 'fieldChanged',
-        payload: changes,
-      });
+    ruleEngine.restoreSent = true;
+    await new Promise((r) => {
+      setTimeout(r, 0);
     });
-    // informing the main thread that form is ready
+    postMessage({
+      name: 'applyRestoreBatchedFieldChanges',
+      payload: { fieldChanges: ruleEngine.postRestoreFieldChanges },
+    });
+    ruleEngine.postRestoreCompleteSent = true;
+    ruleEngine.restoreSent = false;
+    ruleEngine.postRestoreFieldChanges = [];
     postMessage({
       name: 'sync-complete',
     });

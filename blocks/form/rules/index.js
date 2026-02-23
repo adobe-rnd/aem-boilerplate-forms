@@ -312,38 +312,96 @@ function applyRuleEngine(htmlForm, form, captcha) {
   });
 }
 
-export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
+// Field property names in fieldChanged payload (af2-web-runtime)
+const FIELD_CHANGE_PROPERTIES = new Set([
+  'value', 'valid', 'errorMessage', 'validationMessage', 'validity', 'checked',
+  'visible', 'label', 'enabled', 'readOnly', 'enum', 'enumNames',
+  'required', 'description', 'minimum', 'maximum', 'items', 'activeChild',
+]);
+
+// eslint-disable-next-line max-len
+function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false, onlySyncProperties = false) {
+  const { changes } = payload;
+  const fieldId = payload.field?.id;
+  if (form && fieldId) {
+    const element = form.getElement(fieldId);
+    if (!element) return;
+    try {
+      if (onlyNotifyView) {
+        /* eslint-disable-next-line no-underscore-dangle */
+        element._onlyViewNotify = true;
+      }
+      changes?.forEach((change) => {
+        const { propertyName, currentValue } = change;
+        if (propertyName.startsWith('properties.')) {
+          element.properties[propertyName.split('properties.')[1]] = currentValue;
+        } else if (FIELD_CHANGE_PROPERTIES.has(propertyName) && !onlySyncProperties) {
+          try {
+            element[propertyName] = currentValue;
+          } catch (err) {
+            // Fallback for read-only properties; update model via _setProperty
+            /* eslint-disable-next-line no-underscore-dangle */
+            if (typeof element._setProperty === 'function') {
+              /* eslint-disable-next-line no-underscore-dangle */
+              element._setProperty(propertyName, currentValue);
+            }
+          }
+        }
+      });
+    } finally {
+      if (onlyNotifyView) {
+        /* eslint-disable-next-line no-underscore-dangle */
+        element._onlyViewNotify = false;
+      }
+    }
+  }
+}
+
+// eslint-disable-next-line max-len
+export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data, fieldChanges) {
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];
-  subscriptions?.forEach((subscription, id) => {
-    const { callback, fieldDiv } = subscription;
-    const model = form.getElement(id);
-    callback(fieldDiv, model, 'register');
-  });
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'fieldChanged');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'change');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitSuccess');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitFailure');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitError');
   applyRuleEngine(htmlForm, form, captcha);
+
+  if (Array.isArray(fieldChanges)) {
+    await fieldChanges.reduce(
+      (promise, payload) => promise.then(async () => {
+        await fieldChanged(payload, htmlForm, genFormRendition);
+      }),
+      Promise.resolve(),
+    );
+  }
+  if (subscriptions) {
+    subscriptions.forEach((subscription, id) => {
+      const { callback, fieldDiv } = subscription;
+      const model = form.getElement(id);
+      callback(fieldDiv, model, 'register');
+    });
+  }
+  if (Array.isArray(fieldChanges)) {
+    fieldChanges.forEach((payload) => {
+      applyFieldChangeToFormModel(form, payload, false, true);
+    });
+  }
+  form.dispatch(new CustomEvent('formViewInitialized'));
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
@@ -391,12 +449,44 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
         resolve(response);
       }
 
-      if (e.data.name === 'restore') {
-        loadRuleEngine(e.data.payload, form, captcha, generateFormRendition, data);
+      if (e.data.name === 'restoreState') {
+        const { state, fieldChanges } = e.data.payload;
+        loadRuleEngine(state, form, captcha, generateFormRendition, data, fieldChanges);
       }
 
-      if (e.data.name === 'fieldChanged') {
+      if (e.data.name === 'applyRestoreBatchedFieldChanges') {
+        const { fieldChanges: batchedFieldChanges } = e.data.payload;
+        const formModel = formModels[form?.dataset?.id];
+        if (Array.isArray(batchedFieldChanges) && form && formModel) {
+          await batchedFieldChanges.reduce(
+            (promise, payload) => promise.then(async () => {
+              await fieldChanged(payload, form, generateFormRendition);
+              applyFieldChangeToFormModel(formModel, payload, true);
+            }),
+            Promise.resolve(),
+          );
+        }
+      }
+
+      if (e.data.name === 'applyLiveFieldChange') {
         await fieldChanged(e.data.payload, form, generateFormRendition);
+        const formModel = formModels[form?.dataset?.id];
+        if (formModel) applyFieldChangeToFormModel(formModel, e.data.payload, true);
+      }
+
+      if (e.data.name === 'applyLiveFormChange') {
+        const { payload } = e.data;
+        const { changes } = payload;
+        const formModel = formModels[form?.dataset?.id];
+        if (formModel) {
+          changes?.forEach((change) => {
+            const { propertyName, currentValue } = change;
+            if (propertyName.includes('properties.')) {
+              const key = propertyName.split('properties.')[1];
+              formModel.getPropertiesManager().updateSimpleProperty(key, currentValue);
+            }
+          });
+        }
       }
 
       if (e.data.name === 'sync-complete') {
