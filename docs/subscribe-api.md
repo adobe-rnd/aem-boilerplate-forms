@@ -167,7 +167,7 @@ const childEl = element.querySelector(`#${child.id}`);
 When `fd:viewType` is set in a component's JSON schema, the runtime stores it as the field's `:type` property. The `componentDecorator` function in `mappings.js` extracts `fd[':type']` and checks it against `customComponents` and `OOTBComponentDecorators` arrays to decide which component JS to load.
 
 This means:
-- **Parent finding children by `:type`**: `model.items?.find(item => item[':type'] === 'modal')` -- used when a child is itself a custom component (like consent-popup's modal sub-panel)
+- **Parent finding children by `:type`**: `model.items?.find(item => item[':type'] === 'modal')` -- used when a child is itself a custom component (e.g. a panel that contains a modal sub-panel)
 - **Parent finding children by `fieldType`**: `model.items?.find(item => item.fieldType === 'checkbox')` -- used when a child is a standard OOTB field
 
 Both patterns are valid for finding children to subscribe to.
@@ -226,7 +226,9 @@ subscribe(fieldDiv, formId, (_fieldDiv, fieldModel) => {
 
 ---
 
-## Concrete example: dynamic-dropdown migration
+## Concrete example: migrating from legacy to the new pattern
+
+The new pattern receives the same `payload` as the form's `fieldChanged` event; that payload has the same `{ changes, field }` shape as the legacy `fieldModel.subscribe(..., 'change')` event's `e.payload`. So `payload.changes` in the new callback is identical to `e.payload.changes` in the legacy callback — migration is a direct replacement.
 
 ### Before (legacy):
 
