@@ -24,18 +24,72 @@ import { getLogLevelFromURL } from '../constant.js';
 
 let customFunctionRegistered = false;
 
+/**
+ * Main thread ↔ Worker message protocol:
+ *
+ * Main → Worker:
+ * - createFormInstance: Initialize worker with form definition. Payload: formDef + search params.
+ *                       Worker creates form instance and returns initial state.
+ * - decorated:          Main thread HTML rendering complete. Worker applies prefill data and
+ *                       sends restore state + batched field changes.
+ *
+ * Worker → Main:
+ * - renderForm:         Sent after createFormInstance. Payload: form state.
+ *                       Main thread renders HTML form.
+ * - restoreState:       Sent after 'decorated'. Payload: { state }.
+ *                       Main thread runs loadRuleEngine(state, ...).
+ * - applyFieldChanges:  Unified field change message. Payload: { fieldChanges }.
+ *                       fieldChanges is an array (batched during restore) or
+ *                       a single object (live phase).
+ *                       Main thread runs fieldChanged + applyFieldChangeToFormModel.
+ * - applyLiveFormChange: Sent per form-level 'change' (live phase). Payload: form change.
+ *                       Main thread updates form properties (e.g. polling success).
+ * - sync-complete:      Sent after all restore field changes applied. Main thread removes
+ *                       'loading' class from form.
+ */
 export default class RuleEngine {
   rulesOrder = {};
 
   fieldChanges = [];
+
+  postRestoreFieldChanges = [];
+
+  /** True after all restore field changes are sent; then post each field/form change live. */
+  postRestoreCompleteSent = false;
+
+  /** True after restoreState until batched applyFieldChanges; collect field changes. */
+  restoreSent = false;
 
   constructor(formDef, url) {
     const logLevel = getLogLevelFromURL(url);
     this.form = createFormInstance(formDef, undefined, logLevel);
     this.form.subscribe((e) => {
       const { payload } = e;
-      this.fieldChanges.push(payload);
+      this.handleFieldChanged(payload);
     }, 'fieldChanged');
+
+    this.form.subscribe((e) => {
+      const { payload } = e;
+      if (this.postRestoreCompleteSent) {
+        postMessage({
+          name: 'applyLiveFormChange',
+          payload,
+        });
+      }
+    }, 'change');
+  }
+
+  handleFieldChanged(payload) {
+    if (this.postRestoreCompleteSent) {
+      postMessage({
+        name: 'applyFieldChanges',
+        payload: { fieldChanges: payload },
+      });
+    } else if (this.restoreSent) {
+      this.postRestoreFieldChanges.push(payload);
+    } else {
+      this.fieldChanges.push(payload);
+    }
   }
 
   getState() {
@@ -51,19 +105,18 @@ export default class RuleEngine {
   }
 }
 
-let ruleEngine; let initPayload;
+let ruleEngine;
+let initPayload;
 onmessage = async (e) => {
   async function handleMessageEvent(event) {
     switch (event.data.name) {
-      case 'init': {
+      case 'createFormInstance': {
         const { search, ...formDef } = event.data.payload;
         initPayload = event.data.payload;
         ruleEngine = new RuleEngine(formDef, event.data.url);
-        // eslint-disable-next-line no-case-declarations
         const state = ruleEngine.getState();
-        // Informing the main thread that the form is initialized
         postMessage({
-          name: 'init',
+          name: 'renderForm',
           payload: state,
         });
         ruleEngine.dispatch = (msg) => {
@@ -75,8 +128,8 @@ onmessage = async (e) => {
         break;
     }
   }
-  // prefills form data, waits for all async operations to complete, then restores state and
-  // syncs field changes to main thread. fetchData only called here (worker) when prefill enabled.
+
+  // Prefill form data, wait for async ops, then restore state and sync field changes to main.
   if (e.data.name === 'decorated') {
     const { search, ...formDef } = initPayload;
     const needsPrefill = formDef?.properties?.['fd:formDataEnabled'] === true;
@@ -86,16 +139,28 @@ onmessage = async (e) => {
     }
     await ruleEngine.form.waitForPromises();
     postMessage({
-      name: 'restore',
-      payload: ruleEngine.getState(),
+      name: 'restoreState',
+      payload: {
+        state: ruleEngine.getState(),
+      },
     });
-    ruleEngine.getFieldChanges().forEach((changes) => {
+    ruleEngine.restoreSent = true;
+    await new Promise((r) => {
+      setTimeout(r, 0);
+    });
+    const allFieldChanges = [
+      ...ruleEngine.getFieldChanges(),
+      ...ruleEngine.postRestoreFieldChanges,
+    ];
+    if (allFieldChanges.length > 0) {
       postMessage({
-        name: 'fieldChanged',
-        payload: changes,
+        name: 'applyFieldChanges',
+        payload: { fieldChanges: allFieldChanges },
       });
-    });
-    // informing the main thread that form is ready
+    }
+    ruleEngine.postRestoreCompleteSent = true;
+    ruleEngine.restoreSent = false;
+    ruleEngine.postRestoreFieldChanges = [];
     postMessage({
       name: 'sync-complete',
     });
