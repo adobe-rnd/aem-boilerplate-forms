@@ -312,18 +312,56 @@ function applyRuleEngine(htmlForm, form, captcha) {
   });
 }
 
+// Field property names in fieldChanged payload (af2-web-runtime)
+const FIELD_CHANGE_PROPERTIES = new Set([
+  'activeChild', 'checked', 'description', 'enabled', 'enum', 'enumNames',
+  'errorMessage', 'items', 'label', 'maximum', 'minimum', 'readOnly',
+  'required', 'valid', 'validationMessage', 'validity', 'value', 'visible',
+]);
+
+function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false) {
+  const { changes } = payload;
+  const fieldId = payload.field?.id;
+  if (form && fieldId) {
+    const element = form.getElement(fieldId);
+    if (!element) return;
+    try {
+      if (onlyNotifyView) {
+        /* eslint-disable-next-line no-underscore-dangle */
+        element._onlyViewNotify = true;
+      }
+      changes?.forEach((change) => {
+        const { propertyName, currentValue } = change;
+        if (propertyName.startsWith('properties.')) {
+          element.properties[propertyName.split('properties.')[1]] = currentValue;
+        } else if (FIELD_CHANGE_PROPERTIES.has(propertyName)) {
+          try {
+            element[propertyName] = currentValue;
+          } catch (err) {
+            // Fallback for read-only properties; update model via _setProperty
+            /* eslint-disable-next-line no-underscore-dangle */
+            if (typeof element._setProperty === 'function') {
+              /* eslint-disable-next-line no-underscore-dangle */
+              element._setProperty(propertyName, currentValue);
+            }
+          }
+        }
+      });
+    } finally {
+      if (onlyNotifyView) {
+        /* eslint-disable-next-line no-underscore-dangle */
+        element._onlyViewNotify = false;
+      }
+    }
+  }
+}
+
 export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];
-  subscriptions?.forEach((subscription, id) => {
-    const { callback, fieldDiv } = subscription;
-    const model = form.getElement(id);
-    callback(fieldDiv, model, 'register');
-  });
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
     const fieldId = e.payload?.field?.id;
@@ -339,23 +377,27 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
       }
     }
   }, 'fieldChanged');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'change');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitSuccess');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitFailure');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitError');
   applyRuleEngine(htmlForm, form, captcha);
+  if (subscriptions) {
+    subscriptions.forEach((subscription, id) => {
+      const { callback, fieldDiv } = subscription;
+      const model = form.getElement(id);
+      callback(fieldDiv, model, 'register');
+    });
+  }
+  form.dispatch(new CustomEvent('formViewInitialized'));
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
@@ -373,7 +415,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
   const currentUrl = window.location.href;
   // Trigger the worker to start form initialization
   myWorker.postMessage({
-    name: 'init',
+    name: 'createFormInstance',
     payload: {
       ...formDef,
       search: window.location.search || '',
@@ -389,7 +431,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       generateFormRendition;
     myWorker.addEventListener('message', async (e) => {
       // main thread starts html rendering
-      if (e.data.name === 'init') {
+      if (e.data.name === 'renderForm') {
         const response = await renderHTMLForm(e.data.payload);
         form = response.form;
         captcha = response.captcha;
@@ -403,12 +445,43 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
         resolve(response);
       }
 
-      if (e.data.name === 'restore') {
-        loadRuleEngine(e.data.payload, form, captcha, generateFormRendition, data);
+      if (e.data.name === 'restoreState') {
+        const { state } = e.data.payload;
+        loadRuleEngine(state, form, captcha, generateFormRendition, data);
       }
 
-      if (e.data.name === 'fieldChanged') {
-        await fieldChanged(e.data.payload, form, generateFormRendition);
+      if (e.data.name === 'applyFieldChanges') {
+        const { fieldChanges: changes } = e.data.payload;
+        const formModel = formModels[form?.dataset?.id];
+        if (Array.isArray(changes)) {
+          if (form && formModel) {
+            await changes.reduce(
+              (promise, payload) => promise.then(async () => {
+                await fieldChanged(payload, form, generateFormRendition);
+                applyFieldChangeToFormModel(formModel, payload, true);
+              }),
+              Promise.resolve(),
+            );
+          }
+        } else if (changes) {
+          await fieldChanged(changes, form, generateFormRendition);
+          if (formModel) applyFieldChangeToFormModel(formModel, changes, true);
+        }
+      }
+
+      if (e.data.name === 'applyLiveFormChange') {
+        const { payload } = e.data;
+        const { changes } = payload;
+        const formModel = formModels[form?.dataset?.id];
+        if (formModel) {
+          changes?.forEach((change) => {
+            const { propertyName, currentValue } = change;
+            if (propertyName.includes('properties.')) {
+              const key = propertyName.split('properties.')[1];
+              formModel.getPropertiesManager().updateSimpleProperty(key, currentValue);
+            }
+          });
+        }
       }
 
       if (e.data.name === 'sync-complete') {
