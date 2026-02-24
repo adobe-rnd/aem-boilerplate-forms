@@ -121,7 +121,7 @@ If the developer provides a form URL:
 3. Read `tools/validate-registration.js` and inject it via `evaluate_script`, passing the component name as argument:
    ```js
    // In evaluate_script, call the function with the component name:
-   const validate = <contents of validate-registration.js>;
+   const validate = <contents of tools/validate-registration.js>;
    validate('<component-name>');
    ```
 4. Interpret results:
