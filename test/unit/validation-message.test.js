@@ -2,7 +2,11 @@
 /**
  * Unit tests for validation message condition logic.
  * Tests the bug: validationMessage only checked for expressionMismatch/customConstraint,
- * but should check for any validation error (valid === false).
+ * but should check for standard HTML5 constraint validation types (valueMissing,
+ * typeMismatch, patternMismatch, etc.) that can be set via Universal Editor.
+ *
+ * Note: file-input fields are excluded as they manage their own validation
+ * via the file.js component decorator.
  */
 import assert from 'assert';
 
@@ -138,7 +142,8 @@ describe('Validation Message Condition Logic', () => {
         },
       };
 
-      // Correct condition: check if field is invalid
+      // Correct condition: check specific validity flags
+      // Implementation checks: valueMissing || typeMismatch || patternMismatch || expressionMismatch || customConstraint
       const showsError = payload.field.valid === false && !!payload.field.validationMessage;
 
       assert.strictEqual(

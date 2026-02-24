@@ -98,10 +98,19 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'validationMessage':
         {
-          const { valid } = payload.field;
-          // Show error message when field is invalid, regardless of which validity flag is set
-          // (valueMissing, typeMismatch, expressionMismatch, customConstraint, etc.)
-          if (field.setCustomValidity && valid === false && currentValue) {
+          const { validity } = payload.field;
+          // File inputs manage their own validation via file.js decorator
+          if (payload.field.fieldType === 'file-input') {
+            break;
+          }
+          // Show error for constraint validation types that can be set via UE
+          if (field.setCustomValidity && validity && currentValue && (
+            validity.valueMissing           // required field empty
+            || validity.typeMismatch         // wrong type (email, url, etc.)
+            || validity.patternMismatch      // regex pattern failed
+            || validity.expressionMismatch   // validation expression failed
+            || validity.customConstraint     // custom validation failed
+          )) {
             field.setCustomValidity(currentValue);
             updateOrCreateInvalidMsg(field, currentValue);
           }
