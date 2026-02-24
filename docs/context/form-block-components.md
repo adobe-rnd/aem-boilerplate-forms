@@ -9,36 +9,36 @@ This document describes the rendering pipeline, component decorator system, and 
 
 The decorate function initializes the form, createForm orchestrates form creation, generateFormRendition walks the form definition, renderField creates DOM elements, inputDecorator applies attributes, and componentDecorator lazy-loads custom components.
 
-## Section 2: generateFormRendition (form.js:279-307)
+## Section 2: generateFormRendition
 
 **Step-by-step execution:**
 
-1. Walks the items array from the form definition (280)
-2. Captcha fields get placeholder element with "CAPTCHA" text (284-288)
-3. renderField creates the DOM element for each field (290)
-4. appliedCssClassNames are added to the element (291-293)
-5. colSpanDecorator applies column span classes (294)
-6. Panel fields recurse into generateFormRendition (295-297)
-7. componentDecorator lazy-loads custom component scripts (299)
-8. Returns Promise — all field rendering happens in parallel via Promise.all (303)
-9. Appends all rendered children to container (304)
-10. Decorates panel container and applies componentDecorator to container itself (305-306)
+1. Walks the items array from the form definition
+2. Captcha fields get placeholder element with "CAPTCHA" text
+3. renderField creates the DOM element for each field
+4. appliedCssClassNames are added to the element
+5. colSpanDecorator applies column span classes
+6. Panel fields recurse into generateFormRendition
+7. componentDecorator lazy-loads custom component scripts
+8. Returns Promise — all field rendering happens in parallel via Promise.all
+9. Appends all rendered children to container
+10. Decorates panel container and applies componentDecorator to container itself
 
-## Section 3: renderField (form.js:259-277)
+## Section 3: renderField
 
 **Rendering logic:**
 
-1. Strips `-input` suffix from fieldType (260)
-2. Looks up renderer in fieldRenderers registry (261)
-3. If renderer found, calls it to create field (263-264)
-4. Falls through to createFieldWrapper + createInput for unlisted types (266-267)
-5. Appends help text if description exists (269-272)
-6. Calls inputDecorator for non-group non-captcha fields (273-275)
-7. Returns the field wrapper element (276)
+1. Strips `-input` suffix from fieldType
+2. Looks up renderer in fieldRenderers registry
+3. If renderer found, calls it to create field
+4. Falls through to createFieldWrapper + createInput for unlisted types
+5. Appends help text if description exists
+6. Calls inputDecorator for non-group non-captcha fields
+7. Returns the field wrapper element
 
 Unlisted types (text-input, number-input, email, date-input, telephone-input) use default createInput() from util.js.
 
-## Section 4: fieldRenderers Registry (form.js:131-143)
+## Section 4: fieldRenderers Registry
 
 All 11 registered field renderers:
 
@@ -58,45 +58,45 @@ All 11 registered field renderers:
 
 **Note:** Unlisted types (text-input, number-input, email, date-input, telephone-input) use default createInput() from util.js.
 
-## Section 5: inputDecorator (form.js:164-240)
+## Section 5: inputDecorator
 
 **Key behaviors:**
 
-1. **Basic attributes:** id, name, tooltip (167-170)
-2. **State attributes:** readOnly, autocomplete, disabled (172-177)
-3. **Display format handling** for number/date/text/email (179-206):
+1. **Basic attributes:** id, name, tooltip
+2. **State attributes:** readOnly, autocomplete, disabled
+3. **Display format handling** for number/date/text/email:
    - Sets `edit-value` and `display-value` attributes
    - Switches input type on focus/blur
    - Handles mobile touch events for native pickers
 4. **Value by type:**
-   - File inputs: multiple attribute (214)
-   - Checkbox/radio: checked state and value from enum (209-211)
-   - Other inputs: direct value assignment (208)
+   - File inputs: multiple attribute
+   - Checkbox/radio: checked state and value from enum
+   - Other inputs: direct value assignment
 5. **Validation attributes:**
-   - Required attribute (216-218)
-   - aria-describedby for description (219-221)
-   - Email pattern validation (234-236)
-6. **File constraints:** minItems, maxItems, maxFileSize (222-230)
-7. **Constraint messages:** setConstraintsMessage stores custom error messages (237-238)
+   - Required attribute
+   - aria-describedby for description
+   - Email pattern validation
+6. **File constraints:** minItems, maxItems, maxFileSize
+7. **Constraint messages:** setConstraintsMessage stores custom error messages
 
 ## Section 6: Component Decorator System
 
 **mappings.js overview:**
 
-- **OOTBComponentDecorators** (line 4): accordion, file, modal, password, rating, repeat, tnc, toggleable-link, wizard
-- **customComponents** (line 3, default: ['range'])
-- **loadComponent** (27-58):
+- **OOTBComponentDecorators**: accordion, file, modal, password, rating, repeat, tnc, toggleable-link, wizard
+- **customComponents** (default: ['range'])
+- **loadComponent**:
   - Status tracking via dataset.componentStatus (loading/loaded)
   - CSS load from components directory
   - Dynamic JS import with mod.default() call
   - Error handling for failed component loads
-- **componentDecorator** (64-79):
+- **componentDecorator**:
   - Dispatch logic:
     - file-input → file component
     - :type ends with 'wizard' → wizard component
     - :type in OOTB or custom list → that component
 
-## Section 7: Subscription System (rules/index.js:512-529)
+## Section 7: Subscription System
 
 **subscribe(fieldDiv, formId, callback)**
 
@@ -115,10 +115,10 @@ export default async function(element, fd, container, formId) {
 ```
 
 **Timing:**
-- If formModels[formId] exists, callback fires immediately (522-525)
-- Otherwise stored in formSubscriptions, fired when loadRuleEngine() completes (392-398)
+- If formModels[formId] exists, callback fires immediately
+- Otherwise stored in formSubscriptions, fired when loadRuleEngine() completes
 
-## Section 8: View Updates — fieldChanged (rules/index.js:67-242)
+## Section 8: View Updates — fieldChanged
 
 **Property handler table:**
 
@@ -137,7 +137,7 @@ export default async function(element, fd, container, formId) {
 | required | Sets or removes data-required attribute |
 | activeChild | Focuses and scrolls to active field |
 
-**Note:** Render promises for repeatable panels tracked via renderPromises (line 217), awaited at lines 76-84 to ensure DOM exists before updates.
+**Note:** Render promises for repeatable panels tracked via renderPromises, awaited to ensure DOM exists before updates.
 
 ## Section 9: Adding a New Component
 
@@ -155,8 +155,8 @@ export default async function(element, fd, container, formId) {
    ```
 
 3. **Register in mappings.js:**
-   - Add to OOTBComponentDecorators array (line 4) for built-in components
-   - Or add to customComponents array (line 3) for custom components
+   - Add to OOTBComponentDecorators array for built-in components
+   - Or add to customComponents array for custom components
 
 4. **Use subscribe() if model access needed:**
    ```javascript

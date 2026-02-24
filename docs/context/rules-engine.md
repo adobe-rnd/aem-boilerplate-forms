@@ -38,14 +38,14 @@ Scriptable
 
 Creates a new form model from a form definition.
 
-- **Used in:** RuleEngineWorker.js:57 (worker thread), rules/index.js:414 (no-worker fallback)
+- **Used in:** RuleEngineWorker.js (worker thread), rules/index.js (no-worker fallback)
 - **Returns:** Form instance with full rule evaluation capabilities
 
 ### restoreFormInstance(formDef, data, options)
 
 Recreates a form instance from serialized state.
 
-- **Used in:** rules/index.js:363 (main thread restoration)
+- **Used in:** rules/index.js (main thread restoration via `loadRuleEngine`)
 - **Purpose:** Cheaper than re-evaluating. Call `getState(true)` to serialize full model for later restore.
 
 ## Event System
@@ -78,8 +78,8 @@ form.subscribe((event) => {
 ```
 
 **Used in:**
-- RuleEngineWorker.js:58-71 (worker thread subscriptions)
-- rules/index.js:367-381 (main thread subscriptions)
+- RuleEngineWorker.js (worker thread subscriptions)
+- rules/index.js (main thread subscriptions in `loadRuleEngine`)
 
 ## Rule Evaluation
 
@@ -93,19 +93,19 @@ When field A changes, dependent rules automatically re-evaluate.
 Rules execute in a worker thread (if available), isolating expensive calculations from the main UI thread.
 
 ### Result Propagation
-Changed properties → fieldChanged events → relayed to main thread → DOM updates.
+Changed properties → fieldChanged events → relayed to main thread via `applyFieldChanges` → DOM updates.
 
 ## Custom Functions
 
-### Registration Flow (functionRegistration.js:56-84)
+### Registration Flow (functionRegistration.js)
 
-1. Import OOTB functions from `rules/functions.js` (line 73)
-2. Import custom functions from path if set (75-78)
+1. Import OOTB functions from `rules/functions.js`
+2. Import custom functions from path if set
 3. Call `registerFunctions()` from afb-runtime
 
-### Preloading (functionRegistration.js:31-54)
+### Preloading (functionRegistration.js)
 
-Modulepreload links are inserted early in `initAdaptiveForm` (index.js:500) to ensure scripts are cached before both main and worker threads import them.
+Modulepreload links are inserted early in `initAdaptiveForm` to ensure scripts are cached before both main and worker threads import them.
 
 ### How to Add Custom Functions
 
@@ -119,19 +119,19 @@ Modulepreload links are inserted early in `initAdaptiveForm` (index.js:500) to e
 `rules-doc/` provides a separate code path for document-based forms (e.g., from spreadsheets).
 
 - **No worker thread:** All evaluation happens on the main thread
-- **Loaded from:** form.js:544
+- **Loaded from:** form.js `decorate()` document path
 - **Isolated:** Changes to `rules/` do not affect `rules-doc/` and vice versa
 
 ## Key Files Reference
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| rules/model/afb-runtime.js | ~5730 | **DO NOT EDIT.** Core form model, rule evaluation, factory functions. |
-| rules/model/afb-events.js | ~220 | **DO NOT EDIT.** Event queue, cycle detection. |
-| rules/RuleEngineWorker.js | 165 | Worker thread entry point. Creates form, subscribes to events, posts messages to main. |
-| rules/index.js | 530 | Main thread controller. Spawns worker, handles restore flow, applies field changes to DOM. |
-| rules/functionRegistration.js | 85 | Preloads and registers OOTB + custom functions in both threads. |
-| rules/functions.js | 257 | **DO NOT EDIT.** OOTB custom functions from @aemforms/af-custom-functions. |
+| File | Purpose |
+|------|---------|
+| rules/model/afb-runtime.js | **DO NOT EDIT.** Core form model, rule evaluation, factory functions. |
+| rules/model/afb-events.js | **DO NOT EDIT.** Event queue, cycle detection. |
+| rules/RuleEngineWorker.js | Worker thread entry point. Creates form, subscribes to events, posts messages to main. |
+| rules/index.js | Main thread controller. Spawns worker, handles restore flow, applies field changes to DOM. |
+| rules/functionRegistration.js | Preloads and registers OOTB + custom functions in both threads. |
+| rules/functions.js | **DO NOT EDIT.** OOTB custom functions from @aemforms/af-custom-functions. |
 
 ## Related Documentation
 

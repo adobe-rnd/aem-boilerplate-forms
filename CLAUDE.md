@@ -12,7 +12,7 @@ A lightweight, high-performance boilerplate for rendering Adobe Adaptive Forms o
 
 ## Architecture at a Glance
 
-This is an **MVC** architecture: the **Model** (form state, validation, rules) runs in a Web Worker (`RuleEngineWorker.js` + `afb-runtime.js`), the **View** (DOM rendering) runs on the main thread (`form.js`), and the **Controller** (`rules/index.js`) orchestrates message passing and synchronization between them. The worker handles all business logic and state mutations, posting `fieldChanged` events back to the main thread, which applies them to the DOM.
+This is an **MVC** architecture: the **Model** (form state, validation, rules) runs in a Web Worker (`RuleEngineWorker.js` + `afb-runtime.js`), the **View** (DOM rendering) runs on the main thread (`form.js`), and the **Controller** (`rules/index.js`) orchestrates message passing and synchronization between them. The worker handles all business logic and state mutations, posting `applyFieldChanges` events back to the main thread, which applies them to the DOM.
 
 For detailed architecture, see [`docs/context/architecture.md`](./docs/context/architecture.md).
 
@@ -22,13 +22,13 @@ For detailed architecture, see [`docs/context/architecture.md`](./docs/context/a
 blocks/form/
 ├── form.js                           — Main block entry, renders form DOM
 ├── form.css                          — Base form styling
-├── mappings.js                       — Component decorator registry (line 4: OOTBComponentDecorators)
+├── mappings.js                       — Component decorator registry (OOTBComponentDecorators)
 ├── util.js                           — DOM creation helpers (createLabel, createInput, etc.)
 ├── constant.js                       — Shared constants (LOG_LEVEL, emailPattern, etc.)
 ├── submit.js                         — Form submission handlers
 ├── transform.js                      — Document-based form transformer
 ├── rules/
-│   ├── index.js                      — Controller: worker init (line 407-497), sync logic
+│   ├── index.js                      — Controller: worker init, sync logic
 │   ├── RuleEngineWorker.js           — Web Worker entry point
 │   ├── functionRegistration.js      — Custom function loader
 │   ├── functions.js                  — Default custom functions
@@ -74,6 +74,7 @@ blocks/form/
 - **Indentation**: 2 spaces for JavaScript, 4 spaces for CSS
 - **Linebreaks**: Unix (`\n`), not Windows (`\r\n`)
 - **Pre-commit Hook**: Runs lint + unit tests automatically
+- **Keep docs in sync**: When changing architecture, message protocols, rendering pipeline, or component systems in `blocks/form/`, update the corresponding files in `docs/context/` and this file. Do not use line numbers in documentation — they go stale.
 
 ## Common Commands
 
@@ -95,7 +96,7 @@ npm run create:custom-component       # Scaffold new custom component
 **Example**: Add a "slider" component for numeric input
 
 1. Run `npm run create:custom-component` (or manually create `blocks/form/components/slider/`)
-2. Add component to `customComponents` array in `mappings.js:3`
+2. Add component to `customComponents` array in `mappings.js`
 3. Implement `slider.js` default export: `async function(element, fd, container, formId)`
 4. Test by setting `:type: slider` in a form definition
 
@@ -103,17 +104,17 @@ npm run create:custom-component       # Scaffold new custom component
 
 **Example**: Change how `drop-down` fields render
 
-1. Read `form.js:131-143` to see `fieldRenderers` registry
-2. Locate current renderer function (e.g., `createSelect` at `form.js:42`)
+1. Read `form.js` to see `fieldRenderers` registry
+2. Locate current renderer function (e.g., `createSelect`)
 3. Modify renderer or add new one to registry
-4. Ensure `inputDecorator` (`form.js:164-240`) still applies correctly
+4. Ensure `inputDecorator` still applies correctly
 
 ### 3. Change Worker-Main Thread Sync Behavior
 
 **Example**: Debounce `fieldChanged` events to reduce DOM thrashing
 
 1. Read [`docs/context/worker-sync-protocol.md`](docs/context/worker-sync-protocol.md) for message protocol
-2. Modify `handleRuleEngineEvent` in `rules/index.js:257-268`
+2. Modify `handleRuleEngineEvent` in `rules/index.js`
 3. If changing worker side, edit `RuleEngineWorker.js` message handlers
 4. Test with complex forms (e.g., repeatable panels + rules)
 
@@ -128,5 +129,5 @@ npm run create:custom-component       # Scaffold new custom component
 
 ---
 
-**Entry point for human devs**: `form.js:510` (`decorate()` function)
-**Entry point for rule engine**: `rules/index.js:407` (`initializeRuleEngineWorker()` function)
+**Entry point for human devs**: `form.js` `decorate()` function
+**Entry point for rule engine**: `rules/index.js` `initializeRuleEngineWorker()` function
