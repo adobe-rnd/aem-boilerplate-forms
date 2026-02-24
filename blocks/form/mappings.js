@@ -62,6 +62,8 @@ async function loadComponent(componentName, element, fd, container, formId) {
  *
  * */
 export default async function componentDecorator(element, fd, container, formId) {
+  // Default mappings (e.g., file-input) should always run AFTER custom/OOTB component
+  // decorators to ensure custom component logic executes first.
   const { ':type': type = '', fieldType } = fd;
 
   if (type.endsWith('wizard')) {
