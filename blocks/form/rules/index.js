@@ -98,9 +98,10 @@ async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'validationMessage':
         {
-          const { validity } = payload.field;
-          if (field.setCustomValidity
-            && (validity?.expressionMismatch || validity?.customConstraint)) {
+          const { valid } = payload.field;
+          // Show error message when field is invalid, regardless of which validity flag is set
+          // (valueMissing, typeMismatch, expressionMismatch, customConstraint, etc.)
+          if (field.setCustomValidity && valid === false && currentValue) {
             field.setCustomValidity(currentValue);
             updateOrCreateInvalidMsg(field, currentValue);
           }
