@@ -314,13 +314,12 @@ function applyRuleEngine(htmlForm, form, captcha) {
 
 // Field property names in fieldChanged payload (af2-web-runtime)
 const FIELD_CHANGE_PROPERTIES = new Set([
-  'value', 'valid', 'errorMessage', 'validationMessage', 'validity', 'checked',
-  'visible', 'label', 'enabled', 'readOnly', 'enum', 'enumNames',
-  'required', 'description', 'minimum', 'maximum', 'items', 'activeChild',
+  'activeChild', 'checked', 'description', 'enabled', 'enum', 'enumNames',
+  'errorMessage', 'items', 'label', 'maximum', 'minimum', 'readOnly',
+  'required', 'valid', 'validationMessage', 'validity', 'value', 'visible',
 ]);
 
-// eslint-disable-next-line max-len
-function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false, onlySyncProperties = false) {
+function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false) {
   const { changes } = payload;
   const fieldId = payload.field?.id;
   if (form && fieldId) {
@@ -335,7 +334,7 @@ function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false, only
         const { propertyName, currentValue } = change;
         if (propertyName.startsWith('properties.')) {
           element.properties[propertyName.split('properties.')[1]] = currentValue;
-        } else if (FIELD_CHANGE_PROPERTIES.has(propertyName) && !onlySyncProperties) {
+        } else if (FIELD_CHANGE_PROPERTIES.has(propertyName)) {
           try {
             element[propertyName] = currentValue;
           } catch (err) {
@@ -357,8 +356,7 @@ function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false, only
   }
 }
 
-// eslint-disable-next-line max-len
-export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data, fieldChanges) {
+export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
@@ -380,25 +378,11 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitError');
   applyRuleEngine(htmlForm, form, captcha);
-
-  if (Array.isArray(fieldChanges)) {
-    await fieldChanges.reduce(
-      (promise, payload) => promise.then(async () => {
-        await fieldChanged(payload, htmlForm, genFormRendition);
-      }),
-      Promise.resolve(),
-    );
-  }
   if (subscriptions) {
     subscriptions.forEach((subscription, id) => {
       const { callback, fieldDiv } = subscription;
       const model = form.getElement(id);
       callback(fieldDiv, model, 'register');
-    });
-  }
-  if (Array.isArray(fieldChanges)) {
-    fieldChanges.forEach((payload) => {
-      applyFieldChangeToFormModel(form, payload, false, true);
     });
   }
   form.dispatch(new CustomEvent('formViewInitialized'));
@@ -450,28 +434,27 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       }
 
       if (e.data.name === 'restoreState') {
-        const { state, fieldChanges } = e.data.payload;
-        loadRuleEngine(state, form, captcha, generateFormRendition, data, fieldChanges);
+        const { state } = e.data.payload;
+        loadRuleEngine(state, form, captcha, generateFormRendition, data);
       }
 
-      if (e.data.name === 'applyRestoreBatchedFieldChanges') {
-        const { fieldChanges: batchedFieldChanges } = e.data.payload;
+      if (e.data.name === 'applyFieldChanges') {
+        const { fieldChanges: changes } = e.data.payload;
         const formModel = formModels[form?.dataset?.id];
-        if (Array.isArray(batchedFieldChanges) && form && formModel) {
-          await batchedFieldChanges.reduce(
-            (promise, payload) => promise.then(async () => {
-              await fieldChanged(payload, form, generateFormRendition);
-              applyFieldChangeToFormModel(formModel, payload, true);
-            }),
-            Promise.resolve(),
-          );
+        if (Array.isArray(changes)) {
+          if (form && formModel) {
+            await changes.reduce(
+              (promise, payload) => promise.then(async () => {
+                await fieldChanged(payload, form, generateFormRendition);
+                applyFieldChangeToFormModel(formModel, payload, true);
+              }),
+              Promise.resolve(),
+            );
+          }
+        } else if (changes) {
+          await fieldChanged(changes, form, generateFormRendition);
+          if (formModel) applyFieldChangeToFormModel(formModel, changes, true);
         }
-      }
-
-      if (e.data.name === 'applyLiveFieldChange') {
-        await fieldChanged(e.data.payload, form, generateFormRendition);
-        const formModel = formModels[form?.dataset?.id];
-        if (formModel) applyFieldChangeToFormModel(formModel, e.data.payload, true);
       }
 
       if (e.data.name === 'applyLiveFormChange') {

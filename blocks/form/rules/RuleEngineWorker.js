@@ -25,15 +25,14 @@ import { getLogLevelFromURL } from '../constant.js';
 let customFunctionRegistered = false;
 
 /**
- * Worker → main thread messages (restore flow):
+ * Worker → main thread messages:
  *
- * - restoreState: Sent after 'decorated'. Payload: { state, fieldChanges }.
- *   Main thread runs loadRuleEngine(state, ..., fieldChanges).
+ * - restoreState: Sent after 'decorated'. Payload: { state }.
+ *   Main thread runs loadRuleEngine(state, ...).
  *
- * - applyRestoreBatchedFieldChanges: Sent after restoreState. Payload: { fieldChanges }.
- *   Main thread applies each after formViewInitialized.
- *
- * - applyLiveFieldChange:     Sent per field change (live phase). Payload: single field change.
+ * - applyFieldChanges:        Unified field change message. Payload: { fieldChanges }.
+ *                             fieldChanges is an array (batched during restore) or
+ *                             a single object (live phase).
  *                             Main thread runs fieldChanged + applyFieldChangeToFormModel.
  *
  * - applyLiveFormChange:      Sent per form-level 'change' (live phase). Payload: form change.
@@ -46,10 +45,10 @@ export default class RuleEngine {
 
   postRestoreFieldChanges = [];
 
-  /** True after we send applyRestoreBatchedFieldChanges; then post each field/form change. */
+  /** True after all restore field changes are sent; then post each field/form change live. */
   postRestoreCompleteSent = false;
 
-  /** True after restoreState until applyRestoreBatchedFieldChanges; collect field changes. */
+  /** True after restoreState until batched applyFieldChanges; collect field changes. */
   restoreSent = false;
 
   constructor(formDef, url) {
@@ -74,8 +73,8 @@ export default class RuleEngine {
   handleFieldChanged(payload) {
     if (this.postRestoreCompleteSent) {
       postMessage({
-        name: 'applyLiveFieldChange',
-        payload,
+        name: 'applyFieldChanges',
+        payload: { fieldChanges: payload },
       });
     } else if (this.restoreSent) {
       this.postRestoreFieldChanges.push(payload);
@@ -134,17 +133,22 @@ onmessage = async (e) => {
       name: 'restoreState',
       payload: {
         state: ruleEngine.getState(),
-        fieldChanges: ruleEngine.getFieldChanges(),
       },
     });
     ruleEngine.restoreSent = true;
     await new Promise((r) => {
       setTimeout(r, 0);
     });
-    postMessage({
-      name: 'applyRestoreBatchedFieldChanges',
-      payload: { fieldChanges: ruleEngine.postRestoreFieldChanges },
-    });
+    const allFieldChanges = [
+      ...ruleEngine.getFieldChanges(),
+      ...ruleEngine.postRestoreFieldChanges,
+    ];
+    if (allFieldChanges.length > 0) {
+      postMessage({
+        name: 'applyFieldChanges',
+        payload: { fieldChanges: allFieldChanges },
+      });
+    }
     ruleEngine.postRestoreCompleteSent = true;
     ruleEngine.restoreSent = false;
     ruleEngine.postRestoreFieldChanges = [];
