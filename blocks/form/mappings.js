@@ -72,8 +72,6 @@ export default async function componentDecorator(element, fd, container, formId)
     await loadComponent(type, element, fd, container, formId);
   }
 
-  // Default mappings (e.g., file-input) should always run AFTER custom/OOTB component
-  // decorators to ensure custom component logic executes first.
   if (fieldType === 'file-input') {
     await loadComponent('file', element, fd, container, formId);
   }

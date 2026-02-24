@@ -31,16 +31,16 @@ Move the folder to:
 
 ```
 create-custom-component/
-├── skill.md
+├── SKILL.md
 ├── README.md
 ├── tools/
 │   ├── scaffold-component.sh
 │   └── validate-registration.js
 └── knowledge/
-    └── (knowledge files are not included in cloned repos)
+    ├── custom-form-components.md
+    ├── form-field-types.md
+    └── subscribe-api.md
 ```
-
-**Note**: The `knowledge/` folder exists for potential future documentation but currently does not contain files when you clone this repository. The skill is self-contained and does not require external knowledge files to function.
 
 ## Usage
 
@@ -56,7 +56,7 @@ Ask your coding assistant to create a custom component. Example queries:
 Add to your `.cursorrules`:
 
 ```
-Read .cursor/skills/create-custom-component/skill.md when the user asks to
+Read .cursor/skills/create-custom-component/SKILL.md when the user asks to
 create, scaffold, or build a custom form component.
 ```
 

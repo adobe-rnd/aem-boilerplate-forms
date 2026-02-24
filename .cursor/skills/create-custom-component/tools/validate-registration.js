@@ -66,6 +66,10 @@
     }
   }
 
+  // 4. Registration hint
+  check('Registration hint', true,
+    'Ensure "' + componentName + '" is listed in customComponents or OOTBComponentDecorators in blocks/form/mappings.js');
+
   results.message = results.status === 'pass'
     ? 'Component "' + componentName + '" is registered and loaded.'
     : 'Component "' + componentName + '" has issues. See checks above.';
