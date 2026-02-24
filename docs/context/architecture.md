@@ -40,16 +40,16 @@ Main Thread (rules/index.js)          Web Worker (RuleEngineWorker.js)
         |    - Register custom functions           |
         |    - initializeRuleEngineWorker()        |
         |                                          |
-        |----------- postMessage('init') --------->|
+        |----- postMessage('createFormInstance') ->|
         |                                          |
-        |                           2. init handler
+        |              2. createFormInstance handler
         |                              - new RuleEngine(formDef)
         |                              - createFormInstance()
         |                              - Subscribe to events
         |                                          |
-        |<------- postMessage('init', state) ------|
+        |<------ postMessage('renderForm') --------|
         |                                          |
-  3. init handler                                  |
+  3. renderForm handler                            |
      - createForm() (form.js)                      |
      - generateFormRendition() (form.js)           |
      - Add .loading class to form                  |

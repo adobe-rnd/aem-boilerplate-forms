@@ -25,18 +25,27 @@ import { getLogLevelFromURL } from '../constant.js';
 let customFunctionRegistered = false;
 
 /**
- * Worker → main thread messages:
+ * Main thread ↔ Worker message protocol:
  *
- * - restoreState: Sent after 'decorated'. Payload: { state }.
- *   Main thread runs loadRuleEngine(state, ...).
+ * Main → Worker:
+ * - createFormInstance: Initialize worker with form definition. Payload: formDef + search params.
+ *                       Worker creates form instance and returns initial state.
+ * - decorated:          Main thread HTML rendering complete. Worker applies prefill data and
+ *                       sends restore state + batched field changes.
  *
- * - applyFieldChanges:        Unified field change message. Payload: { fieldChanges }.
- *                             fieldChanges is an array (batched during restore) or
- *                             a single object (live phase).
- *                             Main thread runs fieldChanged + applyFieldChangeToFormModel.
- *
- * - applyLiveFormChange:      Sent per form-level 'change' (live phase). Payload: form change.
- *                             Main thread updates form properties (e.g. polling success).
+ * Worker → Main:
+ * - renderForm:         Sent after createFormInstance. Payload: form state.
+ *                       Main thread renders HTML form.
+ * - restoreState:       Sent after 'decorated'. Payload: { state }.
+ *                       Main thread runs loadRuleEngine(state, ...).
+ * - applyFieldChanges:  Unified field change message. Payload: { fieldChanges }.
+ *                       fieldChanges is an array (batched during restore) or
+ *                       a single object (live phase).
+ *                       Main thread runs fieldChanged + applyFieldChangeToFormModel.
+ * - applyLiveFormChange: Sent per form-level 'change' (live phase). Payload: form change.
+ *                       Main thread updates form properties (e.g. polling success).
+ * - sync-complete:      Sent after all restore field changes applied. Main thread removes
+ *                       'loading' class from form.
  */
 export default class RuleEngine {
   rulesOrder = {};
@@ -101,13 +110,13 @@ let initPayload;
 onmessage = async (e) => {
   async function handleMessageEvent(event) {
     switch (event.data.name) {
-      case 'init': {
+      case 'createFormInstance': {
         const { search, ...formDef } = event.data.payload;
         initPayload = event.data.payload;
         ruleEngine = new RuleEngine(formDef, event.data.url);
         const state = ruleEngine.getState();
         postMessage({
-          name: 'init',
+          name: 'renderForm',
           payload: state,
         });
         ruleEngine.dispatch = (msg) => {

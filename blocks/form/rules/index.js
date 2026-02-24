@@ -403,7 +403,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
   const currentUrl = window.location.href;
   // Trigger the worker to start form initialization
   myWorker.postMessage({
-    name: 'init',
+    name: 'createFormInstance',
     payload: {
       ...formDef,
       search: window.location.search || '',
@@ -419,7 +419,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       generateFormRendition;
     myWorker.addEventListener('message', async (e) => {
       // main thread starts html rendering
-      if (e.data.name === 'init') {
+      if (e.data.name === 'renderForm') {
         const response = await renderHTMLForm(e.data.payload);
         form = response.form;
         captcha = response.captcha;

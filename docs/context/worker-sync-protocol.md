@@ -8,14 +8,14 @@ Communication protocol between main thread and RuleEngine web worker.
 
 | Message | When Sent | Payload | Handler |
 |---------|-----------|---------|---------|
-| `init` | Worker created | `{ ...formDef, search, codeBasePath, url }` | RuleEngineWorker.js `handleMessageEvent` |
+| `createFormInstance` | Worker created | `{ ...formDef, search, codeBasePath, url }` | RuleEngineWorker.js `handleMessageEvent` |
 | `decorated` | HTML rendered | (none) | RuleEngineWorker.js `decorated` handler |
 
 ### Worker → Main Messages
 
 | Message | When Sent | Payload | Handler |
 |---------|-----------|---------|---------|
-| `init` | Model created | `{ state }` (serialized form model) | `initializeRuleEngineWorker` in index.js |
+| `renderForm` | Model created | `{ state }` (serialized form model) | `initializeRuleEngineWorker` in index.js |
 | `restoreState` | Prefill complete | `{ state }` | `initializeRuleEngineWorker` in index.js |
 | `applyFieldChanges` | Restore batch or live field change | `{ fieldChanges }` — array (batched) or single object (live) | `initializeRuleEngineWorker` in index.js |
 | `applyLiveFormChange` | Runtime form-level change | Form change payload with `changes[]` | `initializeRuleEngineWorker` in index.js |

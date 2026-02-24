@@ -12,7 +12,7 @@ A lightweight, high-performance boilerplate for rendering Adobe Adaptive Forms o
 
 ## Architecture at a Glance
 
-This is an **MVC** architecture: the **Model** (form state, validation, rules) runs in a Web Worker (`RuleEngineWorker.js` + `afb-runtime.js`), the **View** (DOM rendering) runs on the main thread (`form.js`), and the **Controller** (`rules/index.js`) orchestrates message passing and synchronization between them. The worker handles all business logic and state mutations, posting `applyFieldChanges` events back to the main thread, which applies them to the DOM.
+This is an **MVC** architecture with a **dual-model pattern**: the **Model** runs in two places—an authoritative instance in a Web Worker (`RuleEngineWorker.js` + `afb-runtime.js`) handles all business logic, validation, and rule evaluation, while a synchronized copy in the main thread enables direct property access for DOM updates. The **View** (`form.js`) renders the form DOM, and the **Controller** (`rules/index.js`) orchestrates message passing and keeps both models in sync. The worker posts `applyFieldChanges` events to update both the DOM and the main thread model copy.
 
 For detailed architecture, see [`docs/context/architecture.md`](./docs/context/architecture.md).
 
