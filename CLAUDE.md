@@ -76,6 +76,44 @@ blocks/form/
 - **Pre-commit Hook**: Runs lint + unit tests automatically
 - **Keep docs in sync**: When changing architecture, message protocols, rendering pipeline, or component systems in `blocks/form/`, update the corresponding files in `docs/context/` and this file. Do not use line numbers in documentation — they go stale.
 
+### Pre-Commit Checklist
+
+**ALWAYS run before committing:**
+
+1. `npm run lint` — Fix all errors before committing
+2. `npm run test:unit` — Ensure all tests pass
+3. Review changes with `git diff` — Verify no unintended modifications
+
+### Test-Driven Development (TDD) Practices
+
+When following TDD workflow:
+
+1. **RED Phase**: Write failing tests that demonstrate the bug or missing feature
+2. **GREEN Phase**: Write minimal code to make tests pass
+3. **REFACTOR Phase**: Clean up implementation
+4. **CLEANUP Phase**: Remove "demonstrates bug" tests, keep only correct behavior tests
+
+**After implementation is complete:**
+- Test files should ONLY contain tests for correct behavior
+- Remove tests that "demonstrate the bug" or show "current buggy condition"
+- Test descriptions should describe what the code SHOULD do, not what it used to do wrong
+- Keep regression tests to ensure existing behavior is preserved
+
+**Example of correct test organization:**
+```javascript
+describe('Feature Name', () => {
+  describe('Standard behavior', () => {
+    it('should handle valid input correctly', () => { ... });
+    it('should show error for invalid input', () => { ... });
+  });
+
+  describe('Edge cases', () => {
+    it('should handle empty values', () => { ... });
+    it('should handle undefined values', () => { ... });
+  });
+});
+```
+
 ## Common Commands
 
 ```bash

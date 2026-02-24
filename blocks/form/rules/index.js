@@ -105,11 +105,11 @@ async function fieldChanged(payload, form, generateFormRendition) {
           }
           // Show error for constraint validation types that can be set via UE
           if (field.setCustomValidity && validity && currentValue && (
-            validity.valueMissing           // required field empty
-            || validity.typeMismatch         // wrong type (email, url, etc.)
-            || validity.patternMismatch      // regex pattern failed
-            || validity.expressionMismatch   // validation expression failed
-            || validity.customConstraint     // custom validation failed
+            validity.valueMissing // required field empty
+            || validity.typeMismatch // wrong type (email, url, etc.)
+            || validity.patternMismatch // regex pattern failed
+            || validity.expressionMismatch // validation expression failed
+            || validity.customConstraint // custom validation failed
           )) {
             field.setCustomValidity(currentValue);
             updateOrCreateInvalidMsg(field, currentValue);
