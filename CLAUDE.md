@@ -75,6 +75,7 @@ blocks/form/
 - **Linebreaks**: Unix (`\n`), not Windows (`\r\n`)
 - **Pre-commit Hook**: Runs lint + unit tests automatically
 - **Keep docs in sync**: When changing architecture, message protocols, rendering pipeline, or component systems in `blocks/form/`, update the corresponding files in `docs/context/` and this file. Do not use line numbers in documentation — they go stale.
+- **CLAUDE.md length limit**: This file MUST NOT exceed 200 lines. If it reaches 200 lines, split content into topic-specific files in `docs/` and reference them from CLAUDE.md.
 
 ### Pre-Commit Checklist
 
@@ -83,6 +84,7 @@ blocks/form/
 1. `npm run lint` — Fix all errors before committing
 2. `npm run test:unit` — Ensure all tests pass
 3. Review changes with `git diff` — Verify no unintended modifications
+4. Check `wc -l CLAUDE.md` — If over 200 lines, split content into `docs/` before committing
 
 ### Test-Driven Development (TDD) Practices
 
