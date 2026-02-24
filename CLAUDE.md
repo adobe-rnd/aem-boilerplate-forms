@@ -1,0 +1,132 @@
+# AEM Edge Delivery Services - Adaptive Forms Boilerplate
+
+A lightweight, high-performance boilerplate for rendering Adobe Adaptive Forms on Edge Delivery Services without runtime bundling.
+
+## Tech Stack
+
+- **ES6 Modules**: Native browser modules, no webpack/rollup/vite
+- **No Runtime Bundler**: Direct script imports via `<script type="module">`
+- **Web Workers**: Model layer runs in separate thread for non-blocking UI
+- **Pure CSS**: 4-space indents, unix linebreaks, no preprocessors
+- **Testing**: Mocha (unit) + Playwright (e2e)
+
+## Architecture at a Glance
+
+This is an **MVC** architecture: the **Model** (form state, validation, rules) runs in a Web Worker (`RuleEngineWorker.js` + `afb-runtime.js`), the **View** (DOM rendering) runs on the main thread (`form.js`), and the **Controller** (`rules/index.js`) orchestrates message passing and synchronization between them. The worker handles all business logic and state mutations, posting `fieldChanged` events back to the main thread, which applies them to the DOM.
+
+For detailed architecture, see [`docs/context/architecture.md`](./docs/context/architecture.md).
+
+## File Map
+
+```
+blocks/form/
+├── form.js                           — Main block entry, renders form DOM
+├── form.css                          — Base form styling
+├── mappings.js                       — Component decorator registry (line 4: OOTBComponentDecorators)
+├── util.js                           — DOM creation helpers (createLabel, createInput, etc.)
+├── constant.js                       — Shared constants (LOG_LEVEL, emailPattern, etc.)
+├── submit.js                         — Form submission handlers
+├── transform.js                      — Document-based form transformer
+├── rules/
+│   ├── index.js                      — Controller: worker init (line 407-497), sync logic
+│   ├── RuleEngineWorker.js           — Web Worker entry point
+│   ├── functionRegistration.js      — Custom function loader
+│   ├── functions.js                  — Default custom functions
+│   ├── model/
+│   │   ├── afb-runtime.js            — [DO NOT EDIT] Core runtime from Adobe
+│   │   ├── afb-runtime.min.js        — Minified runtime
+│   │   ├── afb-events.js             — Event system
+│   │   ├── afb-formatters.js         — Display formatters (date, number, etc.)
+│   │   └── afb-formatters.min.js     — Minified formatters
+│   └── formula/
+│       ├── index.js                  — [DO NOT EDIT] Formula engine from Adobe
+│       └── index.min.js              — Minified formula engine
+├── rules-doc/                        — Legacy document-based rule engine (non-worker)
+├── components/                       — Custom component decorators
+│   ├── accordion/
+│   ├── file/
+│   ├── modal/
+│   ├── password/
+│   ├── rating/
+│   ├── range/
+│   ├── repeat/                       — Repeatable panel logic
+│   ├── tnc/
+│   ├── toggleable-link/
+│   └── wizard/
+├── integrations/
+│   └── recaptcha.js                  — Google reCAPTCHA integration
+└── models/                           — JSON schema fragments for authoring
+```
+
+## Detailed Context Files
+
+| File | Purpose | When to Read |
+|------|---------|--------------|
+| [`architecture.md`](docs/context/architecture.md) | MVC pattern, initialization flow, dual-model pattern | Understanding init flow, MVC roles, or form source types |
+| [`worker-sync-protocol.md`](docs/context/worker-sync-protocol.md) | Message types, field change phases, sync mechanism | Debugging sync issues, adding message types, field change phases |
+| [`form-block-components.md`](docs/context/form-block-components.md) | Renderers, component decorator, subscription system | Adding or modifying components, rendering pipeline |
+| [`rules-engine.md`](docs/context/rules-engine.md) | Model internals, afb-runtime, event system, custom functions | Debugging rule evaluation, model state, custom functions |
+
+## Coding Conventions
+
+- **Linter**: Airbnb ESLint config
+- **Imports**: Always use `.js` extensions in import paths
+- **Indentation**: 2 spaces for JavaScript, 4 spaces for CSS
+- **Linebreaks**: Unix (`\n`), not Windows (`\r\n`)
+- **Pre-commit Hook**: Runs lint + unit tests automatically
+
+## Common Commands
+
+```bash
+npm run lint                          # Run ESLint
+npm run lint:fix                      # Auto-fix lint errors
+npm run test:unit                     # Run Mocha unit tests
+npm run test:e2e                      # Run Playwright e2e tests
+npm run update:core                   # Update afb-runtime.js from upstream
+npm run update:formatters             # Update afb-formatters.js from upstream
+npm run update:formula                # Update formula engine from upstream
+npm run create:custom-component       # Scaffold new custom component
+```
+
+## Common Agent Tasks
+
+### 1. Add a New Custom Component
+
+**Example**: Add a "slider" component for numeric input
+
+1. Run `npm run create:custom-component` (or manually create `blocks/form/components/slider/`)
+2. Add component to `customComponents` array in `mappings.js:3`
+3. Implement `slider.js` default export: `async function(element, fd, container, formId)`
+4. Test by setting `:type: slider` in a form definition
+
+### 2. Modify How a Field Type Renders
+
+**Example**: Change how `drop-down` fields render
+
+1. Read `form.js:131-143` to see `fieldRenderers` registry
+2. Locate current renderer function (e.g., `createSelect` at `form.js:42`)
+3. Modify renderer or add new one to registry
+4. Ensure `inputDecorator` (`form.js:164-240`) still applies correctly
+
+### 3. Change Worker-Main Thread Sync Behavior
+
+**Example**: Debounce `fieldChanged` events to reduce DOM thrashing
+
+1. Read [`docs/context/worker-sync-protocol.md`](docs/context/worker-sync-protocol.md) for message protocol
+2. Modify `handleRuleEngineEvent` in `rules/index.js:257-268`
+3. If changing worker side, edit `RuleEngineWorker.js` message handlers
+4. Test with complex forms (e.g., repeatable panels + rules)
+
+### 4. Update Core Runtime (afb-runtime.js)
+
+**Example**: Pull latest Adobe runtime changes
+
+1. Run `npm run update:core` to fetch from upstream
+2. Review diff in `blocks/form/rules/model/afb-runtime.js`
+3. Run full test suite: `npm run test:unit && npm run test:e2e`
+4. Commit with message: `"chore: update afb-runtime to vX.Y.Z"`
+
+---
+
+**Entry point for human devs**: `form.js:510` (`decorate()` function)
+**Entry point for rule engine**: `rules/index.js:407` (`initializeRuleEngineWorker()` function)
