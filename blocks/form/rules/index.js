@@ -364,6 +364,18 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
+    const fieldId = e.payload?.field?.id;
+    if (fieldId) {
+      const subs = formSubscriptions[htmlForm.dataset?.id];
+      const sub = subs?.get(fieldId);
+      if (sub?.listenChanges) {
+        try {
+          sub.callback(sub.fieldDiv, e.payload.field, 'change', e.payload);
+        } catch (err) {
+          console.error(`Error in subscription callback for field "${fieldId}":`, err);
+        }
+      }
+    }
   }, 'fieldChanged');
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
@@ -487,12 +499,54 @@ export async function initAdaptiveForm(formDef, createForm) {
 }
 
 /**
- * Subscribes to changes in the specified field element and triggers a callback
- * with access to formModel when the component is initialised
- * @param {HTMLElement} fieldDiv - The field element to observe for changes.
- * @param {Function} callback - The callback function to which returns fieldModel
+ * Registers a custom component callback for a form field.
+ *
+ * Always use `{ listenChanges: true }` for new components. The callback is invoked:
+ * - Once with eventType='register' when the form model is ready
+ * - On every fieldChanged event with eventType='change' (when listenChanges is true)
+ *
+ * For panel/container components that watch child items, call `subscribe()` on each
+ * child's DOM wrapper element inside the parent's 'register' callback. Use the
+ * `[data-id="..."]` selector to find child wrappers (not `#id` which targets inputs).
+ *
+ * @param {HTMLElement} fieldDiv - The field's DOM wrapper. Must have `dataset.id`
+ *   matching the field model's id (set automatically by createFieldWrapper).
+ * @param {string} formId - The form's identifier (`htmlForm.dataset.id`).
+ * @param {Function} callback - Invoked as:
+ *   - Register: `callback(fieldDiv, fieldModel, 'register')`
+ *   - Change:   `callback(fieldDiv, fieldModel, 'change', payload)`
+ *     where `payload.changes` is an array of `{propertyName, currentValue, prevValue}`.
+ * @param {Object} [options]
+ * @param {boolean} [options.listenChanges=false] - When true, forward fieldChanged
+ *   events to this callback. Always set to true for new components.
+ *
+ * @example
+ * // Recommended: register + change forwarding
+ * subscribe(fieldDiv, formId, (el, model, eventType, payload) => {
+ *   if (eventType === 'register') {
+ *     // one-time setup
+ *   } else if (eventType === 'change') {
+ *     payload?.changes?.forEach((change) => {
+ *       // handle property changes (value, enum, visible, etc.)
+ *     });
+ *   }
+ * }, { listenChanges: true });
+ *
+ * @example
+ * // Panel with child subscriptions (no model.subscribe needed):
+ * subscribe(panelEl, formId, (el, model, eventType) => {
+ *   if (eventType === 'register') {
+ *     const checkbox = model.items?.find(i => i.fieldType === 'checkbox');
+ *     if (checkbox) {
+ *       const childWrapper = el.querySelector(`[data-id="${checkbox.id}"]`);
+ *       subscribe(childWrapper, formId, (_el, _m, childEvt, childPayload) => {
+ *         if (childEvt === 'change') { handleChildChanges(childPayload); }
+ *       }, { listenChanges: true });
+ *     }
+ *   }
+ * }, { listenChanges: true });
  */
-export function subscribe(fieldDiv, formId, callback) {
+export function subscribe(fieldDiv, formId, callback, options) {
   if (callback) {
     // Check if a subscription map already exists for this form
     let subscriptions = formSubscriptions[formId];
@@ -506,7 +560,8 @@ export function subscribe(fieldDiv, formId, callback) {
       const form = formModels[formId];
       callback(fieldDiv, form.getElement(fieldDiv?.dataset?.id), 'register');
     }
+    const listenChanges = options?.listenChanges === true;
     // Add the new subscription to the existing map
-    subscriptions.set(fieldDiv?.dataset?.id, { callback, fieldDiv });
+    subscriptions.set(fieldDiv?.dataset?.id, { callback, fieldDiv, listenChanges });
   }
 }
