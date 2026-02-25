@@ -3,7 +3,11 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import decorate, { parseStyleFromBlock } from '../../blocks/form/form.js';
+import { readBlockConfig } from '../../scripts/aem.js';
+import decorate, {
+  removeStyleConfigRow,
+  normalizeStylePath,
+} from '../../blocks/form/form.js';
 import { createBlock } from './testUtils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,36 +33,40 @@ function createStyleRow(path, useLink = true) {
 }
 
 describe('Custom form styles', () => {
-  describe('parseStyleFromBlock', () => {
-    it('returns CSS path from link href and removes the row when block has style row with link', () => {
+  describe('readBlockConfig + style row', () => {
+    it('readBlockConfig returns style from link href; removeStyleConfigRow removes the row', () => {
       const block = document.createElement('div');
       block.appendChild(createStyleRow('blocks/form/form-1.css'));
 
-      const result = parseStyleFromBlock(block);
+      const config = readBlockConfig(block);
+      const stylePath = normalizeStylePath(config.style);
+      removeStyleConfigRow(block);
 
-      assert.strictEqual(result, 'blocks/form/form-1.css');
+      assert.strictEqual(stylePath, 'blocks/form/form-1.css');
       assert.strictEqual(block.children.length, 0, 'style row should be removed');
     });
 
-    it('returns CSS path from second cell text when no link', () => {
+    it('readBlockConfig returns style from second cell text when no link', () => {
       const block = document.createElement('div');
       block.appendChild(createStyleRow('styles/custom.css', false));
 
-      const result = parseStyleFromBlock(block);
+      const config = readBlockConfig(block);
+      const stylePath = normalizeStylePath(config.style);
+      removeStyleConfigRow(block);
 
-      assert.strictEqual(result, 'styles/custom.css');
+      assert.strictEqual(stylePath, 'styles/custom.css');
       assert.strictEqual(block.children.length, 0);
     });
 
-    it('returns undefined when block has no children', () => {
+    it('readBlockConfig returns empty config when block has no children', () => {
       const block = document.createElement('div');
-      const result = parseStyleFromBlock(block);
-      assert.strictEqual(result, undefined);
+      const config = readBlockConfig(block);
+      assert.strictEqual(normalizeStylePath(config.style), undefined);
     });
 
-    it('returns undefined when block is null or undefined', () => {
-      assert.strictEqual(parseStyleFromBlock(null), undefined);
-      assert.strictEqual(parseStyleFromBlock(undefined), undefined);
+    it('removeStyleConfigRow does not throw when block is null or undefined', () => {
+      assert.doesNotThrow(() => removeStyleConfigRow(null));
+      assert.doesNotThrow(() => removeStyleConfigRow(undefined));
     });
 
     it('ignores rows that do not have first cell "style"', () => {
@@ -72,13 +80,14 @@ describe('Custom form styles', () => {
       otherRow.appendChild(valueCell);
       block.appendChild(otherRow);
 
-      const result = parseStyleFromBlock(block);
+      const config = readBlockConfig(block);
+      removeStyleConfigRow(block);
 
-      assert.strictEqual(result, undefined);
+      assert.strictEqual(config.style, undefined);
       assert.strictEqual(block.children.length, 1, 'other row should remain');
     });
 
-    it('handles "style" key case-insensitively', () => {
+    it('handles "style" key case-insensitively (readBlockConfig uses toClassName)', () => {
       const block = document.createElement('div');
       const row = document.createElement('div');
       const keyCell = document.createElement('div');
@@ -89,10 +98,31 @@ describe('Custom form styles', () => {
       row.appendChild(valueCell);
       block.appendChild(row);
 
-      const result = parseStyleFromBlock(block);
+      const config = readBlockConfig(block);
+      const stylePath = normalizeStylePath(config.style);
+      removeStyleConfigRow(block);
 
-      assert.strictEqual(result, 'styles/custom.css');
+      assert.strictEqual(stylePath, 'styles/custom.css');
       assert.strictEqual(block.children.length, 0);
+    });
+  });
+
+  describe('normalizeStylePath', () => {
+    it('returns path unchanged when relative', () => {
+      assert.strictEqual(normalizeStylePath('styles/custom.css'), 'styles/custom.css');
+    });
+
+    it('strips leading slash from absolute URL pathname', () => {
+      assert.strictEqual(
+        normalizeStylePath('http://localhost/blocks/form/form-1.css'),
+        'blocks/form/form-1.css',
+      );
+    });
+
+    it('returns undefined for null, undefined, empty string', () => {
+      assert.strictEqual(normalizeStylePath(null), undefined);
+      assert.strictEqual(normalizeStylePath(undefined), undefined);
+      assert.strictEqual(normalizeStylePath(''), undefined);
     });
   });
 

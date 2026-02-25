@@ -1,4 +1,4 @@
-import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
+import { createOptimizedPicture, loadCSS, readBlockConfig } from '../../scripts/aem.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
@@ -24,27 +24,34 @@ import {
 } from './util.js';
 
 /**
- * Parses the form block DOM for the style row (two cells: "style" + path/link).
- * Removes the style row from the block. Used so the first link in the block is the form JSON link.
+ * Removes the style config row from the block so the first link is the form JSON link.
  * @param {HTMLElement} [block] - The form block element
- * @returns {string|undefined} The CSS path if found
  */
-export function parseStyleFromBlock(block) {
-  if (!block?.children?.length) return undefined;
-  let style;
+export function removeStyleConfigRow(block) {
+  if (!block?.children?.length) return;
   [...block.children].forEach((row) => {
     const cells = row?.children;
-    if (cells?.length >= 2) {
-      const key = cells[0]?.textContent?.trim()?.toLowerCase();
-      if (key === 'style') {
-        const second = cells[1];
-        const link = second?.querySelector?.('a');
-        style = link ? (link.getAttribute('href') || link.textContent?.trim()) : second?.textContent?.trim();
-        if (style) row.remove();
-      }
+    if (cells?.length >= 2 && cells[0]?.textContent?.trim()?.toLowerCase() === 'style') {
+      row.remove();
     }
   });
-  return style;
+}
+
+/**
+ * Returns the style path from block config (readBlockConfig), normalized to a relative path.
+ * @param {string} [style] - Value from readBlockConfig(block).style (full URL or path)
+ * @returns {string|undefined} Relative path for loadCSS, or undefined
+ */
+export function normalizeStylePath(style) {
+  if (!style || typeof style !== 'string') return undefined;
+  try {
+    if (style.startsWith('http://') || style.startsWith('https://')) {
+      return new URL(style).pathname.replace(/^\//, '');
+    }
+    return style.trim() || undefined;
+  } catch {
+    return style.trim() || undefined;
+  }
 }
 
 export const DELAY_MS = 0;
@@ -532,8 +539,10 @@ function loadFormCustomStyles(formDef) {
 }
 
 export default async function decorate(block) {
-  // Parse and remove style row first so the first link in the block is the form JSON link
-  const styleFromBlock = parseStyleFromBlock(block);
+  // Use block config (same as other blocks); remove style row so first link is form JSON
+  const config = readBlockConfig(block);
+  const styleFromBlock = normalizeStylePath(config?.style);
+  removeStyleConfigRow(block);
 
   let container = block?.querySelector?.('a[href]');
   let formDef;
