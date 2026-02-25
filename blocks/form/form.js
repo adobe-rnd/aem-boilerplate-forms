@@ -1,4 +1,4 @@
-import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
+import { createOptimizedPicture, loadCSS, readBlockConfig } from '../../scripts/aem.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
@@ -22,6 +22,37 @@ import {
   createRadioOrCheckbox,
   createInput,
 } from './util.js';
+
+/**
+ * Removes the style config row from the block so the first link is the form JSON link.
+ * @param {HTMLElement} [block] - The form block element
+ */
+export function removeStyleConfigRow(block) {
+  if (!block?.children?.length) return;
+  [...block.children].forEach((row) => {
+    const cells = row?.children;
+    if (cells?.length >= 2 && cells[0]?.textContent?.trim()?.toLowerCase() === 'style') {
+      row.remove();
+    }
+  });
+}
+
+/**
+ * Returns the style path from block config (readBlockConfig), normalized to a relative path.
+ * @param {string} [style] - Value from readBlockConfig(block).style (full URL or path)
+ * @returns {string|undefined} Relative path for loadCSS, or undefined
+ */
+export function normalizeStylePath(style) {
+  if (!style || typeof style !== 'string') return undefined;
+  try {
+    if (style.startsWith('http://') || style.startsWith('https://')) {
+      return new URL(style).pathname.replace(/^\//, '');
+    }
+    return style.trim() || undefined;
+  } catch {
+    return style.trim() || undefined;
+  }
+}
 
 export const DELAY_MS = 0;
 let captchaField;
@@ -508,7 +539,12 @@ function loadFormCustomStyles(formDef) {
 }
 
 export default async function decorate(block) {
-  let container = block.querySelector('a[href]');
+  // Use block config (same as other blocks); remove style row so first link is form JSON
+  const config = readBlockConfig(block);
+  const styleFromBlock = normalizeStylePath(config?.style);
+  removeStyleConfigRow(block);
+
+  let container = block?.querySelector?.('a[href]');
   let formDef;
   let pathname;
   if (container) {
@@ -536,7 +572,7 @@ export default async function decorate(block) {
     }
     if (isDocumentBasedForm(formDef)) {
       const transform = new DocBasedFormToAF();
-      formDef = transform.transform(formDef, { block });
+      formDef = transform.transform(formDef, { style: styleFromBlock });
       source = 'sheet';
       loadFormCustomStyles(formDef);
       const response = await createForm(formDef, null, source);
