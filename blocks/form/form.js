@@ -360,7 +360,10 @@ export async function createForm(formDef, data, source = 'aem') {
     captcha.loadCaptcha(form);
   }
 
-  enableValidation(form);
+  // Only enable DOM validation for doc-based forms; edge forms use the model.
+  if (source === 'sheet') {
+    enableValidation(form);
+  }
   transferRepeatableDOM(form, formDef, form, formId);
 
   if (afModule && typeof Worker === 'undefined') {
@@ -370,7 +373,8 @@ export async function createForm(formDef, data, source = 'aem') {
   }
 
   form.addEventListener('reset', async () => {
-    const response = await createForm(formDef);
+    const currentSource = form.dataset.source || 'aem';
+    const response = await createForm(formDef, undefined, currentSource);
     if (response?.form) {
       document.querySelector(`[data-action="${form?.dataset?.action}"]`)?.replaceWith(response?.form);
     }

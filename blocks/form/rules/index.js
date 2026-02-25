@@ -64,7 +64,7 @@ function handleActiveChild(id, form) {
   }
 }
 
-async function fieldChanged(payload, form, generateFormRendition) {
+export async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
     id, name, fieldType, ':type': componentType, readOnly, type, displayValue, displayFormat, displayValueExpression,
@@ -99,24 +99,15 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'validationMessage':
         {
           const { validity } = payload.field;
-          // Show error for constraint validation types that can be set via UE
-          if (field.setCustomValidity && validity && currentValue && (
-            validity.valueMissing // required field empty
-            || validity.typeMismatch // wrong type (email, url, etc.)
-            || validity.patternMismatch // regex pattern failed
-            || validity.tooShort // value.length < minlength
-            || validity.tooLong // value.length > maxlength
-            || validity.rangeOverflow // value > max
-            || validity.rangeUnderflow // value < min
-            || validity.acceptMismatch // file type not accepted
-            || validity.fileSizeMismatch // file size exceeds limit
-            || validity.minItemsMismatch // too few files
-            || validity.maxItemsMismatch // too many files
-            || validity.expressionMismatch // validation expression failed
-            || validity.customConstraint // custom validation failed
-          )) {
-            field.setCustomValidity(currentValue);
-            updateOrCreateInvalidMsg(field, currentValue);
+          if (field.setCustomValidity) {
+            if (currentValue && validity && validity.valid === false) {
+              field.setCustomValidity(currentValue);
+              updateOrCreateInvalidMsg(field, currentValue);
+            } else if (!currentValue) {
+              // Model says field is valid; clear DOM validation state
+              field.setCustomValidity('');
+              updateOrCreateInvalidMsg(field, '');
+            }
           }
         }
         break;
