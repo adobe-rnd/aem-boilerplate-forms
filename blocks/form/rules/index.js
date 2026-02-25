@@ -99,10 +99,6 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'validationMessage':
         {
           const { validity } = payload.field;
-          // File inputs manage their own validation via file.js decorator
-          if (payload.field.fieldType === 'file-input') {
-            break;
-          }
           // Show error for constraint validation types that can be set via UE
           if (field.setCustomValidity && validity && currentValue && (
             validity.valueMissing // required field empty
@@ -113,6 +109,10 @@ async function fieldChanged(payload, form, generateFormRendition) {
             || validity.rangeOverflow // value > max
             || validity.rangeUnderflow // value < min
             || validity.stepMismatch // value doesn't match step
+            || validity.acceptMismatch // file type not accepted
+            || validity.fileSizeMismatch // file size exceeds limit
+            || validity.minItemsMismatch // too few files
+            || validity.maxItemsMismatch // too many files
             || validity.expressionMismatch // validation expression failed
             || validity.customConstraint // custom validation failed
           )) {

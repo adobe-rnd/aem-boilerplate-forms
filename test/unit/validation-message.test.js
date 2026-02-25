@@ -1,12 +1,12 @@
 /* eslint-env mocha */
 /**
  * Unit tests for validation message display logic.
- * Verifies that validation errors are shown for all standard HTML5 constraint
- * validation types (valueMissing, typeMismatch, patternMismatch, etc.) that
- * can be set via Universal Editor.
+ * Verifies that validation errors are shown for all constraint validation types
+ * (standard HTML5 and file-specific) that can be set via Universal Editor.
  *
- * Note: file-input fields are excluded as they manage their own validation
- * via the file.js component decorator.
+ * Both view (file.js decorator) and model (worker) validation are honored.
+ * The worker handles validation messages for all constraint types including
+ * file-specific constraints (acceptMismatch, fileSizeMismatch, minItems, maxItems).
  */
 import assert from 'assert';
 
@@ -221,6 +221,110 @@ describe('Validation Message Display', () => {
       );
     });
 
+    it('should show error for acceptMismatch (file type not accepted)', () => {
+      const payload = {
+        field: {
+          id: 'upload',
+          fieldType: 'file-input',
+          valid: false,
+          validity: {
+            valid: false,
+            acceptMismatch: true,
+          },
+          validationMessage: 'Please upload a valid file type',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.acceptMismatch
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for acceptMismatch constraint',
+      );
+    });
+
+    it('should show error for fileSizeMismatch (file too large)', () => {
+      const payload = {
+        field: {
+          id: 'upload',
+          fieldType: 'file-input',
+          valid: false,
+          validity: {
+            valid: false,
+            fileSizeMismatch: true,
+          },
+          validationMessage: 'File size exceeds 2MB limit',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.fileSizeMismatch
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for fileSizeMismatch constraint',
+      );
+    });
+
+    it('should show error for minItemsMismatch (too few files)', () => {
+      const payload = {
+        field: {
+          id: 'upload',
+          fieldType: 'file-input',
+          valid: false,
+          validity: {
+            valid: false,
+            minItemsMismatch: true,
+          },
+          validationMessage: 'Please upload at least 2 files',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.minItemsMismatch
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for minItemsMismatch constraint',
+      );
+    });
+
+    it('should show error for maxItemsMismatch (too many files)', () => {
+      const payload = {
+        field: {
+          id: 'upload',
+          fieldType: 'file-input',
+          valid: false,
+          validity: {
+            valid: false,
+            maxItemsMismatch: true,
+          },
+          validationMessage: 'Maximum 5 files allowed',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.maxItemsMismatch
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for maxItemsMismatch constraint',
+      );
+    });
+
     it('should show error for expressionMismatch (validation expressions)', () => {
       const payload = {
         field: {
@@ -297,6 +401,10 @@ describe('Validation Message Display', () => {
           || payload.field.validity?.rangeOverflow
           || payload.field.validity?.rangeUnderflow
           || payload.field.validity?.stepMismatch
+          || payload.field.validity?.acceptMismatch
+          || payload.field.validity?.fileSizeMismatch
+          || payload.field.validity?.minItemsMismatch
+          || payload.field.validity?.maxItemsMismatch
           || payload.field.validity?.expressionMismatch
           || payload.field.validity?.customConstraint)
         && payload.field.validationMessage
@@ -359,31 +467,4 @@ describe('Validation Message Display', () => {
     });
   });
 
-  describe('File input exclusion', () => {
-    it('should NOT handle file-input fields (managed by file.js decorator)', () => {
-      // File inputs manage their own validation via fileValidation() in file.js
-      // The validationMessage handler explicitly excludes fieldType === 'file-input'
-      const payload = {
-        field: {
-          id: 'upload',
-          fieldType: 'file-input',
-          valid: false,
-          validity: {
-            valid: false,
-            acceptMismatch: true, // Custom validity flag used by file.js
-          },
-          validationMessage: 'Invalid file type',
-        },
-      };
-
-      // The handler breaks early for file-input fields
-      const isFileInput = payload.field.fieldType === 'file-input';
-
-      assert.strictEqual(
-        isFileInput,
-        true,
-        'File inputs should be excluded from worker validation message handler',
-      );
-    });
-  });
 });
