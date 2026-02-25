@@ -91,6 +91,58 @@ describe('Validation Message Display', () => {
       );
     });
 
+    it('should show error for tooShort (value.length < minlength)', () => {
+      const payload = {
+        field: {
+          id: 'username',
+          fieldType: 'text-input',
+          valid: false,
+          validity: {
+            valid: false,
+            tooShort: true,
+          },
+          validationMessage: 'Please use at least 3 characters',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.tooShort
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for tooShort constraint',
+      );
+    });
+
+    it('should show error for tooLong (value.length > maxlength)', () => {
+      const payload = {
+        field: {
+          id: 'bio',
+          fieldType: 'text-input',
+          valid: false,
+          validity: {
+            valid: false,
+            tooLong: true,
+          },
+          validationMessage: 'Please use no more than 100 characters',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.tooLong
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for tooLong constraint',
+      );
+    });
+
     it('should show error for rangeOverflow (value > max)', () => {
       const payload = {
         field: {
@@ -140,6 +192,32 @@ describe('Validation Message Display', () => {
         showsError,
         true,
         'Should show error for rangeUnderflow constraint',
+      );
+    });
+
+    it('should show error for stepMismatch (value does not match step)', () => {
+      const payload = {
+        field: {
+          id: 'quantity',
+          fieldType: 'number',
+          valid: false,
+          validity: {
+            valid: false,
+            stepMismatch: true,
+          },
+          validationMessage: 'Please enter a valid value',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.stepMismatch
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for stepMismatch constraint',
       );
     });
 
@@ -214,8 +292,11 @@ describe('Validation Message Display', () => {
         (payload.field.validity?.valueMissing
           || payload.field.validity?.typeMismatch
           || payload.field.validity?.patternMismatch
+          || payload.field.validity?.tooShort
+          || payload.field.validity?.tooLong
           || payload.field.validity?.rangeOverflow
           || payload.field.validity?.rangeUnderflow
+          || payload.field.validity?.stepMismatch
           || payload.field.validity?.expressionMismatch
           || payload.field.validity?.customConstraint)
         && payload.field.validationMessage

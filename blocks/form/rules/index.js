@@ -108,8 +108,11 @@ async function fieldChanged(payload, form, generateFormRendition) {
             validity.valueMissing // required field empty
             || validity.typeMismatch // wrong type (email, url, etc.)
             || validity.patternMismatch // regex pattern failed
+            || validity.tooShort // value.length < minlength
+            || validity.tooLong // value.length > maxlength
             || validity.rangeOverflow // value > max
             || validity.rangeUnderflow // value < min
+            || validity.stepMismatch // value doesn't match step
             || validity.expressionMismatch // validation expression failed
             || validity.customConstraint // custom validation failed
           )) {
