@@ -91,6 +91,58 @@ describe('Validation Message Display', () => {
       );
     });
 
+    it('should show error for rangeOverflow (value > max)', () => {
+      const payload = {
+        field: {
+          id: 'age',
+          fieldType: 'number',
+          valid: false,
+          validity: {
+            valid: false,
+            rangeOverflow: true,
+          },
+          validationMessage: 'Value must be less than or equal to 100',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.rangeOverflow
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for rangeOverflow constraint',
+      );
+    });
+
+    it('should show error for rangeUnderflow (value < min)', () => {
+      const payload = {
+        field: {
+          id: 'age',
+          fieldType: 'number',
+          valid: false,
+          validity: {
+            valid: false,
+            rangeUnderflow: true,
+          },
+          validationMessage: 'Value must be greater than or equal to 0',
+        },
+      };
+
+      const showsError = !!(
+        payload.field.validity?.rangeUnderflow
+        && payload.field.validationMessage
+      );
+
+      assert.strictEqual(
+        showsError,
+        true,
+        'Should show error for rangeUnderflow constraint',
+      );
+    });
+
     it('should show error for expressionMismatch (validation expressions)', () => {
       const payload = {
         field: {
@@ -162,6 +214,8 @@ describe('Validation Message Display', () => {
         (payload.field.validity?.valueMissing
           || payload.field.validity?.typeMismatch
           || payload.field.validity?.patternMismatch
+          || payload.field.validity?.rangeOverflow
+          || payload.field.validity?.rangeUnderflow
           || payload.field.validity?.expressionMismatch
           || payload.field.validity?.customConstraint)
         && payload.field.validationMessage
