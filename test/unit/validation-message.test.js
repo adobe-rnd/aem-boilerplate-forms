@@ -195,32 +195,6 @@ describe('Validation Message Display', () => {
       );
     });
 
-    it('should show error for stepMismatch (value does not match step)', () => {
-      const payload = {
-        field: {
-          id: 'quantity',
-          fieldType: 'number',
-          valid: false,
-          validity: {
-            valid: false,
-            stepMismatch: true,
-          },
-          validationMessage: 'Please enter a valid value',
-        },
-      };
-
-      const showsError = !!(
-        payload.field.validity?.stepMismatch
-        && payload.field.validationMessage
-      );
-
-      assert.strictEqual(
-        showsError,
-        true,
-        'Should show error for stepMismatch constraint',
-      );
-    });
-
     it('should show error for acceptMismatch (file type not accepted)', () => {
       const payload = {
         field: {
@@ -400,7 +374,6 @@ describe('Validation Message Display', () => {
           || payload.field.validity?.tooLong
           || payload.field.validity?.rangeOverflow
           || payload.field.validity?.rangeUnderflow
-          || payload.field.validity?.stepMismatch
           || payload.field.validity?.acceptMismatch
           || payload.field.validity?.fileSizeMismatch
           || payload.field.validity?.minItemsMismatch

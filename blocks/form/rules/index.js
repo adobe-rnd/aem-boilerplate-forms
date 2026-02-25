@@ -108,7 +108,6 @@ async function fieldChanged(payload, form, generateFormRendition) {
             || validity.tooLong // value.length > maxlength
             || validity.rangeOverflow // value > max
             || validity.rangeUnderflow // value < min
-            || validity.stepMismatch // value doesn't match step
             || validity.acceptMismatch // file type not accepted
             || validity.fileSizeMismatch // file size exceeds limit
             || validity.minItemsMismatch // too few files
