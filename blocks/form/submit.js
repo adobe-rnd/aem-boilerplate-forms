@@ -11,6 +11,7 @@ export function submitSuccess(e, form) {
     if (!thankYouMessage) {
       thankYouMessage = document.createElement('div');
       thankYouMessage.className = 'form-message success-message';
+      thankYouMessage.setAttribute('aria-live', 'assertive');
     }
     thankYouMessage.innerHTML = thankYouMsg || DEFAULT_THANK_YOU_MESSAGE;
     form.parentNode.insertBefore(thankYouMessage, form);
@@ -28,6 +29,7 @@ export function submitFailure(e, form) {
   if (!errorMessage) {
     errorMessage = document.createElement('div');
     errorMessage.className = 'form-message error-message';
+    errorMessage.setAttribute('role', 'alert');
   }
   errorMessage.innerHTML = 'Some error occured while submitting the form'; // TODO: translation
   form.prepend(errorMessage);
