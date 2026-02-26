@@ -61,6 +61,7 @@ export const defaultErrorMessages = {
   maximum: 'Value must be less than or equal to $0.',
   minimum: 'Value must be greater than or equal to $0.',
   required: 'Please fill in this field.',
+  step: 'Constraints not satisfied',
 };
 
 // eslint-disable-next-line no-useless-escape

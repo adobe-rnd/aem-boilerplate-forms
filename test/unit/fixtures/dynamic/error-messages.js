@@ -81,7 +81,8 @@ export const sample = {
       id: 'f8',
       fieldType: 'number-input',
       name: 'f8_number',
-      type: 'integer',
+      type: 'number',
+      step: 1, // Only integers allowed
     },
     {
       fieldType: 'button',
@@ -103,12 +104,26 @@ export function op(block) {
   form.dispatchEvent(new Event('submit'));
 }
 
-export function expect(block) {
+// Helper to wait for model validation to complete
+// Waits for next microtask to allow fieldChanged subscription callback to run
+function waitForValidation() {
+  return new Promise((resolve) => {
+    // Use queueMicrotask to wait for the current event loop to complete
+    // This ensures fieldChanged() async function has completed
+    queueMicrotask(() => {
+      // Add one more microtask to ensure DOM updates have propagated
+      queueMicrotask(resolve);
+    });
+  });
+}
+
+export async function expect(block) {
   // text input error message
   const f1 = block.querySelector('#f1').parentElement;
   const f1Message = f1.querySelector('.field-invalid .field-description');
   assert.equal(f1Message.textContent, 'Please fill in this field.', 'Required error message for text input');
   setValue(block, '#f1', 'abc');
+  await waitForValidation();
   assert.equal(f1.classList.contains('.field-invalid'), false, 'field-invalid class not getting removed once field is valid');
   assert.equal(f1.querySelector('.field-invalid .field-description'), undefined, 'Not Required error message for text input');
 
@@ -117,11 +132,15 @@ export function expect(block) {
   const f2Message = f2.querySelector('.field-invalid .field-description');
   assert.equal(f2Message.textContent, 'Please fill in this field.', 'Required error message for number input');
   setValue(block, '#f2', 5);
-  assert.equal(f2.querySelector('.field-invalid .field-description'), undefined, 'Not Required error message for number input');
+  await waitForValidation();
+  const f2ErrorAfter5 = f2.querySelector('.field-invalid .field-description');
+  assert.equal(f2ErrorAfter5, undefined, 'Not Required error message for number input');
   setValue(block, '#f2', 1);
+  await waitForValidation();
   const minMessage = f2.querySelector('.field-invalid .field-description').textContent;
   assert.equal(minMessage, 'Value must be greater than or equal to 2.', 'minimum error message for number input');
   setValue(block, '#f2', 11);
+  await waitForValidation();
   const maxMessage = f2.querySelector('.field-invalid .field-description').textContent;
   assert.equal(maxMessage, 'Value must be less than or equal to 10.', 'maximum error message for number input');
 
@@ -132,6 +151,7 @@ export function expect(block) {
   const radio = f3.querySelectorAll('input')[0];
   radio.click();
   radio.dispatchEvent(new Event('change', { bubbles: true }));
+  await waitForValidation();
   assert.equal(f3.querySelector('.field-invalid .field-description'), undefined, 'Not required error message for radio buttons');
 
   // checkbox group error message
@@ -141,6 +161,7 @@ export function expect(block) {
   const checkbox = f4.querySelectorAll('input')[0];
   checkbox.click();
   checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+  await waitForValidation();
   assert.equal(f4.querySelector('.field-invalid .field-description'), undefined, 'Not required error message for checkbox group');
 
   // file input error message
@@ -150,18 +171,18 @@ export function expect(block) {
   assert.equal(f5Message.textContent, 'Please fill in this field.', 'Required error message for file input');
   const input = block.querySelector('#f5');
   const file = new File([new ArrayBuffer(1024)], 'file1.png', { type: 'image/png' });
-  const event = new Event('change', {
-    bubbles: true,
-    cancelable: true,
-  });
-  event.files = [file];
-  input.dispatchEvent(event);
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  input.files = dataTransfer.files;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+  await waitForValidation();
 
   // email input error message
   const f6 = block.querySelector('#f6').closest('.field-wrapper');
   const f6Message = f6.querySelector('.field-invalid .field-description');
   assert.equal(f6Message.textContent, 'Please fill in this field.', 'Required error message for file input');
   setValue(block, '#f6', 'abc');
+  await waitForValidation();
   assert.equal(f6.querySelector('.field-invalid .field-description').textContent, 'Specify the value in allowed format : email.', 'Invalid email error message');
 
   //number input with type number(decimal) shouldn't display stepMismatch error message
@@ -173,7 +194,6 @@ export function expect(block) {
   const f8 = block.querySelector('#f8').closest('.field-wrapper');
   const f8Message = f8.querySelector('.field-invalid .field-description');
   assert.equal(f8Message.textContent, "Constraints not satisfied", 'Error message should trigger for decimal values');
-
 }
 
 export const opDelay = 100;
