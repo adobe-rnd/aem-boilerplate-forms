@@ -122,8 +122,13 @@ export async function expect(block) {
   const f1 = block.querySelector('#f1').parentElement;
   const f1Message = f1.querySelector('.field-invalid .field-description');
   assert.equal(f1Message.textContent, 'Please fill in this field.', 'Required error message for text input');
+  const f1Input = block.querySelector('#f1');
+  // Verify customError is set when invalid
+  assert.equal(f1Input.validity.customError, true, 'Custom error should be set when field is invalid');
   setValue(block, '#f1', 'abc');
   await waitForValidation();
+  // Verify customError is cleared when valid
+  assert.equal(f1Input.validity.customError, false, 'Custom error should be cleared when field is valid');
   assert.equal(f1.classList.contains('.field-invalid'), false, 'field-invalid class not getting removed once field is valid');
   assert.equal(f1.querySelector('.field-invalid .field-description'), undefined, 'Not Required error message for text input');
 
