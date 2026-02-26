@@ -135,39 +135,51 @@ export async function expect(block) {
   // number input error message
   const f2 = block.querySelector('#f2').parentElement;
   const f2Message = f2.querySelector('.field-invalid .field-description');
+  const f2Input = block.querySelector('#f2');
   assert.equal(f2Message.textContent, 'Please fill in this field.', 'Required error message for number input');
+  assert.equal(f2Input.validity.customError, true, 'Custom error should be set for required field');
   setValue(block, '#f2', 5);
   await waitForValidation();
   const f2ErrorAfter5 = f2.querySelector('.field-invalid .field-description');
   assert.equal(f2ErrorAfter5, undefined, 'Not Required error message for number input');
+  assert.equal(f2Input.validity.customError, false, 'Custom error should be cleared when valid');
   setValue(block, '#f2', 1);
   await waitForValidation();
   const minMessage = f2.querySelector('.field-invalid .field-description').textContent;
   assert.equal(minMessage, 'Value must be greater than or equal to 2.', 'minimum error message for number input');
+  assert.equal(f2Input.validity.customError, true, 'Custom error should be set for minimum violation');
+  setValue(block, '#f2', 5);
+  await waitForValidation();
+  assert.equal(f2Input.validity.customError, false, 'Custom error should be cleared after fixing minimum violation');
   setValue(block, '#f2', 11);
   await waitForValidation();
   const maxMessage = f2.querySelector('.field-invalid .field-description').textContent;
   assert.equal(maxMessage, 'Value must be less than or equal to 10.', 'maximum error message for number input');
+  assert.equal(f2Input.validity.customError, true, 'Custom error should be set for maximum violation');
 
   // radio buttons error message
   const f3 = block.querySelector('#f3');
   const f3Message = f3.querySelector('.field-invalid .field-description');
   assert.equal(f3Message.textContent, 'Please fill in this field.', 'Required error message for radio buttons');
   const radio = f3.querySelectorAll('input')[0];
+  assert.equal(radio.validity.customError, true, 'Custom error should be set for required radio');
   radio.click();
   radio.dispatchEvent(new Event('change', { bubbles: true }));
   await waitForValidation();
   assert.equal(f3.querySelector('.field-invalid .field-description'), undefined, 'Not required error message for radio buttons');
+  assert.equal(radio.validity.customError, false, 'Custom error should be cleared for selected radio');
 
   // checkbox group error message
   const f4 = block.querySelector('#f4');
   const f4Message = f4.querySelector('.field-invalid .field-description');
   assert.equal(f4Message.textContent, 'Please fill in this field.', 'Required error message for checkbox group');
   const checkbox = f4.querySelectorAll('input')[0];
+  assert.equal(checkbox.validity.customError, true, 'Custom error should be set for required checkbox');
   checkbox.click();
   checkbox.dispatchEvent(new Event('change', { bubbles: true }));
   await waitForValidation();
   assert.equal(f4.querySelector('.field-invalid .field-description'), undefined, 'Not required error message for checkbox group');
+  assert.equal(checkbox.validity.customError, false, 'Custom error should be cleared for selected checkbox');
 
   // file input error message
   const f5 = block.querySelector('#f5').closest('.field-wrapper');
@@ -181,14 +193,23 @@ export async function expect(block) {
   input.files = dataTransfer.files;
   input.dispatchEvent(new Event('change', { bubbles: true }));
   await waitForValidation();
+  // Verify file input error is cleared after adding file
+  assert.equal(f5.querySelector('.field-invalid .field-description'), undefined, 'File input error should be cleared after adding file');
 
   // email input error message
   const f6 = block.querySelector('#f6').closest('.field-wrapper');
   const f6Message = f6.querySelector('.field-invalid .field-description');
   assert.equal(f6Message.textContent, 'Please fill in this field.', 'Required error message for file input');
+  const f6Input = block.querySelector('#f6');
   setValue(block, '#f6', 'abc');
   await waitForValidation();
   assert.equal(f6.querySelector('.field-invalid .field-description').textContent, 'Specify the value in allowed format : email.', 'Invalid email error message');
+  assert.equal(f6Input.validity.customError, true, 'Custom error should be set for invalid email');
+  // Make email valid
+  setValue(block, '#f6', 'test@example.com');
+  await waitForValidation();
+  assert.equal(f6.querySelector('.field-invalid .field-description'), undefined, 'Email error should be cleared for valid email');
+  assert.equal(f6Input.validity.customError, false, 'Custom error should be cleared for valid email');
 
   //number input with type number(decimal) shouldn't display stepMismatch error message
   const f7 = block.querySelector('#f7').closest('.field-wrapper');
@@ -198,7 +219,14 @@ export async function expect(block) {
   // number input with integer type should trigger stepMismatch error
   const f8 = block.querySelector('#f8').closest('.field-wrapper');
   const f8Message = f8.querySelector('.field-invalid .field-description');
+  const f8Input = block.querySelector('#f8');
   assert.equal(f8Message.textContent, 'Please enter a valid value.', 'Error message should trigger for decimal values');
+  assert.equal(f8Input.validity.customError, true, 'Custom error should be set for step mismatch');
+  // Fix step mismatch by entering integer
+  setValue(block, '#f8', 123);
+  await waitForValidation();
+  assert.equal(f8.querySelector('.field-invalid .field-description'), undefined, 'Step mismatch error should be cleared for integer value');
+  assert.equal(f8Input.validity.customError, false, 'Custom error should be cleared after fixing step mismatch');
 }
 
 export const opDelay = 100;
