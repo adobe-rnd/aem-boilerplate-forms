@@ -193,7 +193,7 @@ export async function expect(block) {
   // number input with integer type should trigger stepMismatch error
   const f8 = block.querySelector('#f8').closest('.field-wrapper');
   const f8Message = f8.querySelector('.field-invalid .field-description');
-  assert.equal(f8Message.textContent, "Constraints not satisfied", 'Error message should trigger for decimal values');
+  assert.equal(f8Message.textContent, 'Please enter a valid value.', 'Error message should trigger for decimal values');
 }
 
 export const opDelay = 100;

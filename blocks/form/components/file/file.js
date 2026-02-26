@@ -69,12 +69,14 @@ function checkAccept(acceptedMediaTypes, files) {
 /**
  * triggers file Validation for the given input element and updates the error message
  *
- * File validation is currently DOM-based for BOTH Sheet and AEM forms (exception to standard architecture).
+ * File validation is currently DOM-based for BOTH Sheet and AEM forms
+ * (exception to standard architecture).
  * This component validates: required, accept, maxFileSize, minItems, maxItems.
  *
- * TODO: Remove this DOM-based validation for AEM forms and use afb-runtime's built-in file validation.
- * afb-runtime already supports: ACCEPT_MISMATCH, FILE_SIZE_MISMATCH, MIN_ITEMS_MISMATCH, MAX_ITEMS_MISMATCH.
- * After this change, this component would only be needed for Sheet forms (DOM-based validation).
+ * TODO: Remove this DOM-based validation for AEM forms and use afb-runtime's
+ * built-in file validation. afb-runtime already supports: ACCEPT_MISMATCH,
+ * FILE_SIZE_MISMATCH, MIN_ITEMS_MISMATCH, MAX_ITEMS_MISMATCH.
+ * After this change, this component would only be needed for Sheet forms.
  * Remove the bypass logic in rules/index.js fieldChanged() when implementing this.
  *
  * @param {HTMLInputElement} input
