@@ -108,7 +108,9 @@ Main Thread (rules/index.js)          Web Worker (RuleEngineWorker.js)
 
 **AEM-Based Forms** (Model-based validation):
 - NO DOM validation listeners attached (`enableValidation()` not called)
-- User input → event dispatched to worker/model → model validates
+- User input → event dispatched to model → model validates
+  - In browser: model runs in Web Worker
+  - In tests: model runs synchronously in main thread (no worker)
 - Model sends field changes including `valid` and `validationMessage` properties
 - `fieldChanged()` in rules/index.js handles `valid` case:
   - When `valid: true` → clears error message and custom validity
@@ -183,10 +185,10 @@ When a field value changes in an AEM form:
 ```
 
 **Key points:**
-- Steps 1-6 are synchronous (EventQueue processes immediately)
-- Steps 7-11 are asynchronous (fieldChanged is async)
-- DOM updates in step 10 happen in microtask queue
-- Tests must wait for async completion before assertions
+- All steps are synchronous (EventQueue processes immediately)
+- Exception: When field is not present in DOM and is being rendered because its parent is being decorated via `generateFormRendition`, `fieldChanged()` waits for render completion
+- `fieldChanged()` is declared async but typically executes synchronously
+- Tests must use `await waitForValidation()` to ensure `fieldChanged()` completes before assertions
 
 ## Dual-Model Pattern (AEM-based forms only)
 

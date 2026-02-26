@@ -83,8 +83,9 @@ blocks/form/
 
 1. `npm run lint` — Fix all errors before committing
 2. `npm run test:unit` — Ensure all tests pass
-3. Review changes with `git diff` — Verify no unintended modifications
-4. Check `wc -l CLAUDE.md` — If over 200 lines, split content into `docs/` before committing
+3. `npm run coverage:unit` — Verify coverage is above 85% threshold
+4. Review changes with `git diff` — Verify no unintended modifications
+5. Check `wc -l CLAUDE.md` — If over 200 lines, split content into `docs/` before committing
 
 ### Test-Driven Development (TDD) Practices
 
@@ -93,13 +94,11 @@ When following TDD workflow:
 1. **RED Phase**: Write failing tests that demonstrate the bug or missing feature
 2. **GREEN Phase**: Write minimal code to make tests pass
 3. **REFACTOR Phase**: Clean up implementation
-4. **CLEANUP Phase**: Remove "demonstrates bug" tests, keep only correct behavior tests
 
-**After implementation is complete:**
-- Test files should ONLY contain tests for correct behavior
-- Remove tests that "demonstrate the bug" or show "current buggy condition"
-- Test descriptions should describe what the code SHOULD do, not what it used to do wrong
-- Keep regression tests to ensure existing behavior is preserved
+**Test organization principles:**
+- Test descriptions should describe what the code SHOULD do
+- Keep all tests that verify correct behavior, including regression tests
+- Tests serve as documentation and prevent future regressions
 
 **Example of correct test organization:**
 ```javascript
