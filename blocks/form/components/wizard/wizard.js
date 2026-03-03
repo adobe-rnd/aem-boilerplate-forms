@@ -85,6 +85,21 @@ export class WizardLayout {
     }
   }
 
+  static focusNewStep(container) {
+    const legend = container.querySelector('legend');
+    if (legend) {
+      legend.setAttribute('tabindex', '-1');
+      legend.focus();
+      return;
+    }
+    const firstFocusable = container.querySelector(
+      'input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex="0"]',
+    );
+    if (firstFocusable) {
+      firstFocusable.focus();
+    }
+  }
+
   static handleMutation(panel, mutationsList) {
     mutationsList.forEach((mutation) => {
       const { type, target, attributeName } = mutation;
@@ -104,6 +119,7 @@ export class WizardLayout {
         menuItems.querySelector(`[data-index="${activePanel.dataset.index}"]`)?.classList.add('wizard-menu-active-item');
         target.querySelector('[data-active="true"]')?.focus();
       }
+      WizardLayout.focusNewStep(target);
     });
   }
 
