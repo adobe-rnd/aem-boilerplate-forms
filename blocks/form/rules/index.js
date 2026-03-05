@@ -64,7 +64,7 @@ function handleActiveChild(id, form) {
   }
 }
 
-async function fieldChanged(payload, form, generateFormRendition) {
+export async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
     id, name, fieldType, ':type': componentType, readOnly, type, displayValue, displayFormat, displayValueExpression,
@@ -99,10 +99,36 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'validationMessage':
         {
           const { validity } = payload.field;
-          if (field.setCustomValidity
-            && (validity?.expressionMismatch || validity?.customConstraint)) {
-            field.setCustomValidity(currentValue);
-            updateOrCreateInvalidMsg(field, currentValue);
+
+          // TODO: File inputs use DOM-based validation for file-specific constraints
+          // (accept, maxFileSize, minItems, maxItems) in file.js fileValidation().
+          // Worker still handles standard constraints like 'required' for file inputs.
+          // Skip worker validation ONLY if it's a file-specific validity state.
+          if (field.type === 'file' && validity && (
+            validity.acceptMismatch
+            || validity.fileSizeMismatch
+            || validity.minItemsMismatch
+            || validity.maxItemsMismatch
+          )) {
+            // File component handles file-specific validation, skip worker message
+            break;
+          }
+
+          if (field.setCustomValidity) {
+            if (currentValue && validity && validity.valid === false) {
+              field.setCustomValidity(currentValue);
+              updateOrCreateInvalidMsg(field, currentValue);
+            } else if (!currentValue) {
+              // Model says field is valid; clear DOM validation state
+              // For file inputs, only clear if there's no custom validity already set
+              // (file component may have set file-specific validation errors)
+              if (field.type === 'file' && field.validationMessage) {
+                // File component has validation error, don't override
+                break;
+              }
+              field.setCustomValidity('');
+              updateOrCreateInvalidMsg(field, '');
+            }
           }
         }
         break;
@@ -225,6 +251,13 @@ async function fieldChanged(payload, form, generateFormRendition) {
           if (field.validity?.customError) {
             field?.setCustomValidity('');
           }
+        } else if (currentValue === false) {
+          // Field is invalid, display the model's validation message
+          const validationMessage = fieldModel.validationMessage || fieldModel.errorMessage;
+          if (validationMessage) {
+            field?.setCustomValidity(validationMessage);
+            updateOrCreateInvalidMsg(field, validationMessage);
+          }
         }
         break;
       case 'enum':
@@ -282,7 +315,7 @@ function applyRuleEngine(htmlForm, form, captcha) {
     } else if (field.type === 'checkbox') {
       form.getElement(id).value = checked ? value : field.dataset.uncheckedValue;
     } else if (field.type === 'file') {
-      form.getElement(id).value = Array.from(e?.detail?.files || field.files);
+      form.getElement(id).value = Array.from(e?.detail?.files || field.files || []);
     } else {
       form.getElement(id).value = value;
     }
