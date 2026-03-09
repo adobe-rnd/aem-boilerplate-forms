@@ -10,6 +10,12 @@ export function op(block) {
 }
 
 export function expect(block) {
+  const tabs = block.querySelectorAll('.wizard > ul');
+  const tab1 = instances?.[0];
+  assert.equal(tab1?.classList.contains('wizard-menu-item--complete'), true);
+  const tab2 = instances?.[1];
+  assert.equal(tab2?.classList.contains('wizard-menu-item--complete'), false);
+
   const instances = block.querySelectorAll('.wizard > fieldset');
   const step1 = instances?.[0];
   assert.equal(step1?.dataset.index, 0);
