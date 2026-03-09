@@ -17,3 +17,6 @@ helix-importer-ui
 /playwright/.cache/
 test/e2e/reports/
 LoginAuth.json
+
+# Skill distribution zip
+create-custom-component.zip

@@ -1,4 +1,4 @@
-import { createOptimizedPicture } from '../../scripts/aem.js';
+import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
@@ -360,7 +360,10 @@ export async function createForm(formDef, data, source = 'aem') {
     captcha.loadCaptcha(form);
   }
 
-  enableValidation(form);
+  // Only enable DOM validation for doc-based forms; edge forms use the model.
+  if (source === 'sheet') {
+    enableValidation(form);
+  }
   transferRepeatableDOM(form, formDef, form, formId);
 
   if (afModule && typeof Worker === 'undefined') {
@@ -370,7 +373,8 @@ export async function createForm(formDef, data, source = 'aem') {
   }
 
   form.addEventListener('reset', async () => {
-    const response = await createForm(formDef);
+    const currentSource = form.dataset.source || 'aem';
+    const response = await createForm(formDef, undefined, currentSource);
     if (response?.form) {
       document.querySelector(`[data-action="${form?.dataset?.action}"]`)?.replaceWith(response?.form);
     }
@@ -494,6 +498,19 @@ function addRequestContextToForm(formDef) {
   }
 }
 
+function loadFormCustomStyles(formDef) {
+  const { style } = formDef?.properties || {};
+  if (style) {
+    try {
+      const base = (window.hlx?.codeBasePath || '').replace(/\/$/, '');
+      const stylePath = style.startsWith('/') ? style : `/${style}`;
+      loadCSS(`${base}${stylePath}`);
+    } catch (error) {
+      console.error('Failed to load form CSS:', error);
+    }
+  }
+}
+
 export default async function decorate(block) {
   let container = block.querySelector('a[href]');
   let formDef;
@@ -523,14 +540,16 @@ export default async function decorate(block) {
     }
     if (isDocumentBasedForm(formDef)) {
       const transform = new DocBasedFormToAF();
-      formDef = transform.transform(formDef);
+      formDef = transform.transform(formDef, { block });
       source = 'sheet';
+      loadFormCustomStyles(formDef);
       const response = await createForm(formDef, null, source);
       form = response?.form;
       const docRuleEngine = await import('./rules-doc/index.js');
       docRuleEngine.default(formDef, form);
       rules = false;
     } else {
+      loadFormCustomStyles(formDef);
       afModule = await import('./rules/index.js');
       addRequestContextToForm(formDef);
       if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
