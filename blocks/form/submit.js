@@ -121,6 +121,7 @@ async function submitDocBasedForm(form, captcha) {
 
 export async function handleSubmit(e, form, captcha) {
   e.preventDefault();
+
   const valid = form.checkValidity();
   if (valid) {
     e.submitter?.setAttribute('disabled', '');

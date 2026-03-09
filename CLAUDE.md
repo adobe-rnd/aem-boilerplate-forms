@@ -75,6 +75,45 @@ blocks/form/
 - **Linebreaks**: Unix (`\n`), not Windows (`\r\n`)
 - **Pre-commit Hook**: Runs lint + unit tests automatically
 - **Keep docs in sync**: When changing architecture, message protocols, rendering pipeline, or component systems in `blocks/form/`, update the corresponding files in `docs/context/` and this file. Do not use line numbers in documentation — they go stale.
+- **CLAUDE.md length limit**: This file MUST NOT exceed 200 lines. If it reaches 200 lines, split content into topic-specific files in `docs/` and reference them from CLAUDE.md.
+
+### Pre-Commit Checklist
+
+**ALWAYS run before committing:**
+
+1. `npm run lint` — Fix all errors before committing
+2. `npm run test:unit` — Ensure all tests pass
+3. `npm run coverage:unit` — Verify coverage is above 85% threshold
+4. Review changes with `git diff` — Verify no unintended modifications
+5. Check `wc -l CLAUDE.md` — If over 200 lines, split content into `docs/` before committing
+
+### Test-Driven Development (TDD) Practices
+
+When following TDD workflow:
+
+1. **RED Phase**: Write failing tests that demonstrate the bug or missing feature
+2. **GREEN Phase**: Write minimal code to make tests pass
+3. **REFACTOR Phase**: Clean up implementation
+
+**Test organization principles:**
+- Test descriptions should describe what the code SHOULD do
+- Keep all tests that verify correct behavior, including regression tests
+- Tests serve as documentation and prevent future regressions
+
+**Example of correct test organization:**
+```javascript
+describe('Feature Name', () => {
+  describe('Standard behavior', () => {
+    it('should handle valid input correctly', () => { ... });
+    it('should show error for invalid input', () => { ... });
+  });
+
+  describe('Edge cases', () => {
+    it('should handle empty values', () => { ... });
+    it('should handle undefined values', () => { ... });
+  });
+});
+```
 
 ## Common Commands
 
