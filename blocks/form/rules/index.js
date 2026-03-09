@@ -64,7 +64,7 @@ function handleActiveChild(id, form) {
   }
 }
 
-async function fieldChanged(payload, form, generateFormRendition) {
+export async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
     id, name, fieldType, ':type': componentType, readOnly, type, displayValue, displayFormat, displayValueExpression,
@@ -99,10 +99,36 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'validationMessage':
         {
           const { validity } = payload.field;
-          if (field.setCustomValidity
-            && (validity?.expressionMismatch || validity?.customConstraint)) {
-            field.setCustomValidity(currentValue);
-            updateOrCreateInvalidMsg(field, currentValue);
+
+          // TODO: File inputs use DOM-based validation for file-specific constraints
+          // (accept, maxFileSize, minItems, maxItems) in file.js fileValidation().
+          // Worker still handles standard constraints like 'required' for file inputs.
+          // Skip worker validation ONLY if it's a file-specific validity state.
+          if (field.type === 'file' && validity && (
+            validity.acceptMismatch
+            || validity.fileSizeMismatch
+            || validity.minItemsMismatch
+            || validity.maxItemsMismatch
+          )) {
+            // File component handles file-specific validation, skip worker message
+            break;
+          }
+
+          if (field.setCustomValidity) {
+            if (currentValue && validity && validity.valid === false) {
+              field.setCustomValidity(currentValue);
+              updateOrCreateInvalidMsg(field, currentValue);
+            } else if (!currentValue) {
+              // Model says field is valid; clear DOM validation state
+              // For file inputs, only clear if there's no custom validity already set
+              // (file component may have set file-specific validation errors)
+              if (field.type === 'file' && field.validationMessage) {
+                // File component has validation error, don't override
+                break;
+              }
+              field.setCustomValidity('');
+              updateOrCreateInvalidMsg(field, '');
+            }
           }
         }
         break;
@@ -225,6 +251,13 @@ async function fieldChanged(payload, form, generateFormRendition) {
           if (field.validity?.customError) {
             field?.setCustomValidity('');
           }
+        } else if (currentValue === false) {
+          // Field is invalid, display the model's validation message
+          const validationMessage = fieldModel.validationMessage || fieldModel.errorMessage;
+          if (validationMessage) {
+            field?.setCustomValidity(validationMessage);
+            updateOrCreateInvalidMsg(field, validationMessage);
+          }
         }
         break;
       case 'enum':
@@ -282,7 +315,7 @@ function applyRuleEngine(htmlForm, form, captcha) {
     } else if (field.type === 'checkbox') {
       form.getElement(id).value = checked ? value : field.dataset.uncheckedValue;
     } else if (field.type === 'file') {
-      form.getElement(id).value = Array.from(e?.detail?.files || field.files);
+      form.getElement(id).value = Array.from(e?.detail?.files || field.files || []);
     } else {
       form.getElement(id).value = value;
     }
@@ -312,38 +345,92 @@ function applyRuleEngine(htmlForm, form, captcha) {
   });
 }
 
+// Field property names in fieldChanged payload (af2-web-runtime)
+const FIELD_CHANGE_PROPERTIES = new Set([
+  'activeChild', 'checked', 'description', 'enabled', 'enum', 'enumNames',
+  'errorMessage', 'items', 'label', 'maximum', 'minimum', 'readOnly',
+  'required', 'valid', 'validationMessage', 'validity', 'value', 'visible',
+]);
+
+function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false) {
+  const { changes } = payload;
+  const fieldId = payload.field?.id;
+  if (form && fieldId) {
+    const element = form.getElement(fieldId);
+    if (!element) return;
+    try {
+      if (onlyNotifyView) {
+        /* eslint-disable-next-line no-underscore-dangle */
+        element._onlyViewNotify = true;
+      }
+      changes?.forEach((change) => {
+        const { propertyName, currentValue } = change;
+        if (propertyName.startsWith('properties.')) {
+          element.properties[propertyName.split('properties.')[1]] = currentValue;
+        } else if (FIELD_CHANGE_PROPERTIES.has(propertyName)) {
+          try {
+            element[propertyName] = currentValue;
+          } catch (err) {
+            // Fallback for read-only properties; update model via _setProperty
+            /* eslint-disable-next-line no-underscore-dangle */
+            if (typeof element._setProperty === 'function') {
+              /* eslint-disable-next-line no-underscore-dangle */
+              element._setProperty(propertyName, currentValue);
+            }
+          }
+        }
+      });
+    } finally {
+      if (onlyNotifyView) {
+        /* eslint-disable-next-line no-underscore-dangle */
+        element._onlyViewNotify = false;
+      }
+    }
+  }
+}
+
 export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
   const ruleEngine = await import('./model/afb-runtime.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];
-  subscriptions?.forEach((subscription, id) => {
-    const { callback, fieldDiv } = subscription;
-    const model = form.getElement(id);
-    callback(fieldDiv, model, 'register');
-  });
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
+    const fieldId = e.payload?.field?.id;
+    if (fieldId) {
+      const subs = formSubscriptions[htmlForm.dataset?.id];
+      const sub = subs?.get(fieldId);
+      if (sub?.listenChanges) {
+        try {
+          sub.callback(sub.fieldDiv, e.payload.field, 'change', e.payload);
+        } catch (err) {
+          console.error(`Error in subscription callback for field "${fieldId}":`, err);
+        }
+      }
+    }
   }, 'fieldChanged');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
   }, 'change');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitSuccess');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitFailure');
-
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitError');
   applyRuleEngine(htmlForm, form, captcha);
+  if (subscriptions) {
+    subscriptions.forEach((subscription, id) => {
+      const { callback, fieldDiv } = subscription;
+      const model = form.getElement(id);
+      callback(fieldDiv, model, 'register');
+    });
+  }
+  form.dispatch(new CustomEvent('formViewInitialized'));
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
@@ -361,7 +448,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
   const currentUrl = window.location.href;
   // Trigger the worker to start form initialization
   myWorker.postMessage({
-    name: 'init',
+    name: 'createFormInstance',
     payload: {
       ...formDef,
       search: window.location.search || '',
@@ -377,7 +464,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       generateFormRendition;
     myWorker.addEventListener('message', async (e) => {
       // main thread starts html rendering
-      if (e.data.name === 'init') {
+      if (e.data.name === 'renderForm') {
         const response = await renderHTMLForm(e.data.payload);
         form = response.form;
         captcha = response.captcha;
@@ -391,12 +478,43 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
         resolve(response);
       }
 
-      if (e.data.name === 'restore') {
-        loadRuleEngine(e.data.payload, form, captcha, generateFormRendition, data);
+      if (e.data.name === 'restoreState') {
+        const { state } = e.data.payload;
+        loadRuleEngine(state, form, captcha, generateFormRendition, data);
       }
 
-      if (e.data.name === 'fieldChanged') {
-        await fieldChanged(e.data.payload, form, generateFormRendition);
+      if (e.data.name === 'applyFieldChanges') {
+        const { fieldChanges: changes } = e.data.payload;
+        const formModel = formModels[form?.dataset?.id];
+        if (Array.isArray(changes)) {
+          if (form && formModel) {
+            await changes.reduce(
+              (promise, payload) => promise.then(async () => {
+                await fieldChanged(payload, form, generateFormRendition);
+                applyFieldChangeToFormModel(formModel, payload, true);
+              }),
+              Promise.resolve(),
+            );
+          }
+        } else if (changes) {
+          await fieldChanged(changes, form, generateFormRendition);
+          if (formModel) applyFieldChangeToFormModel(formModel, changes, true);
+        }
+      }
+
+      if (e.data.name === 'applyLiveFormChange') {
+        const { payload } = e.data;
+        const { changes } = payload;
+        const formModel = formModels[form?.dataset?.id];
+        if (formModel) {
+          changes?.forEach((change) => {
+            const { propertyName, currentValue } = change;
+            if (propertyName.includes('properties.')) {
+              const key = propertyName.split('properties.')[1];
+              formModel.getPropertiesManager().updateSimpleProperty(key, currentValue);
+            }
+          });
+        }
       }
 
       if (e.data.name === 'sync-complete') {
@@ -414,12 +532,54 @@ export async function initAdaptiveForm(formDef, createForm) {
 }
 
 /**
- * Subscribes to changes in the specified field element and triggers a callback
- * with access to formModel when the component is initialised
- * @param {HTMLElement} fieldDiv - The field element to observe for changes.
- * @param {Function} callback - The callback function to which returns fieldModel
+ * Registers a custom component callback for a form field.
+ *
+ * Always use `{ listenChanges: true }` for new components. The callback is invoked:
+ * - Once with eventType='register' when the form model is ready
+ * - On every fieldChanged event with eventType='change' (when listenChanges is true)
+ *
+ * For panel/container components that watch child items, call `subscribe()` on each
+ * child's DOM wrapper element inside the parent's 'register' callback. Use the
+ * `[data-id="..."]` selector to find child wrappers (not `#id` which targets inputs).
+ *
+ * @param {HTMLElement} fieldDiv - The field's DOM wrapper. Must have `dataset.id`
+ *   matching the field model's id (set automatically by createFieldWrapper).
+ * @param {string} formId - The form's identifier (`htmlForm.dataset.id`).
+ * @param {Function} callback - Invoked as:
+ *   - Register: `callback(fieldDiv, fieldModel, 'register')`
+ *   - Change:   `callback(fieldDiv, fieldModel, 'change', payload)`
+ *     where `payload.changes` is an array of `{propertyName, currentValue, prevValue}`.
+ * @param {Object} [options]
+ * @param {boolean} [options.listenChanges=false] - When true, forward fieldChanged
+ *   events to this callback. Always set to true for new components.
+ *
+ * @example
+ * // Recommended: register + change forwarding
+ * subscribe(fieldDiv, formId, (el, model, eventType, payload) => {
+ *   if (eventType === 'register') {
+ *     // one-time setup
+ *   } else if (eventType === 'change') {
+ *     payload?.changes?.forEach((change) => {
+ *       // handle property changes (value, enum, visible, etc.)
+ *     });
+ *   }
+ * }, { listenChanges: true });
+ *
+ * @example
+ * // Panel with child subscriptions (no model.subscribe needed):
+ * subscribe(panelEl, formId, (el, model, eventType) => {
+ *   if (eventType === 'register') {
+ *     const checkbox = model.items?.find(i => i.fieldType === 'checkbox');
+ *     if (checkbox) {
+ *       const childWrapper = el.querySelector(`[data-id="${checkbox.id}"]`);
+ *       subscribe(childWrapper, formId, (_el, _m, childEvt, childPayload) => {
+ *         if (childEvt === 'change') { handleChildChanges(childPayload); }
+ *       }, { listenChanges: true });
+ *     }
+ *   }
+ * }, { listenChanges: true });
  */
-export function subscribe(fieldDiv, formId, callback) {
+export function subscribe(fieldDiv, formId, callback, options) {
   if (callback) {
     // Check if a subscription map already exists for this form
     let subscriptions = formSubscriptions[formId];
@@ -433,7 +593,8 @@ export function subscribe(fieldDiv, formId, callback) {
       const form = formModels[formId];
       callback(fieldDiv, form.getElement(fieldDiv?.dataset?.id), 'register');
     }
+    const listenChanges = options?.listenChanges === true;
     // Add the new subscription to the existing map
-    subscriptions.set(fieldDiv?.dataset?.id, { callback, fieldDiv });
+    subscriptions.set(fieldDiv?.dataset?.id, { callback, fieldDiv, listenChanges });
   }
 }
