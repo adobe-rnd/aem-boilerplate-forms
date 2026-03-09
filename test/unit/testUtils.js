@@ -151,9 +151,9 @@ async function test(
     block = bUrlMode ? createBlockWithUrl(sample, formPath) : createBlock(sample);
     await decorate(block);
   }
-  await runAfterdelay(() => {
+  await runAfterdelay(async () => {
     // console.log('before expect');
-    expect(block);
+    await expect(block);
   }, opDelay);
   // console.log('expect');
   after(block);
