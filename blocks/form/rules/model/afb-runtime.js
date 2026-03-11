@@ -2743,7 +2743,15 @@ class EventNode {
         return that !== null && that !== undefined && this._node == that._node && this._event.type == that._event.type;
     }
     toString() {
-        return this._node.id + '__' + this.event.type;
+        const base = this._node.id + '__' + this._event.type;
+        if (this._event.type === 'change' && this._event.payload?.changes) {
+            const sig = this._event.payload.changes
+                .map((c) => c.propertyName)
+                .sort()
+                .join(',');
+            return base + '__' + sig;
+        }
+        return base;
     }
     valueOf() {
         return this.toString();
