@@ -22,7 +22,7 @@
  *  Package: @aemforms/af-core
  *  Version: 0.22.167
  */
-import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, RequestSuccess, RequestFailure, SubmitError, Submit, Save, Reset, SubmitFailure, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
+import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, ScriptError, Valid, Invalid, SubmitSuccess, CustomEvent, RequestSuccess, RequestFailure, SubmitError, Submit, Save, Reset, SubmitFailure, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
@@ -80,7 +80,7 @@ const defaultConstraintTypeMessages = Object.freeze({
     [ConstraintType.RANGE_UNDERFLOW]: 'Value must be greater than or equal to ${0}.',
     [ConstraintType.TYPE_MISMATCH]: 'Please enter a valid value.',
     [ConstraintType.VALUE_MISSING]: 'Please fill in this field.',
-    [ConstraintType.STEP_MISMATCH]: 'Please enter a valid value.',
+    [ConstraintType.STEP_MISMATCH]: 'Please enter a valid value. The two nearest valid values are ${0} and ${1}.',
     [ConstraintType.FORMAT_MISMATCH]: 'Specify the value in allowed format : ${0}.',
     [ConstraintType.ACCEPT_MISMATCH]: 'The specified file type not supported.',
     [ConstraintType.FILE_SIZE_MISMATCH]: 'File too large. Reduce size and try again.',
@@ -560,7 +560,7 @@ const isAlphaNum = function (ch) {
     return (ch >= 'a' && ch <= 'z')
         || (ch >= 'A' && ch <= 'Z')
         || (ch >= '0' && ch <= '9')
-        || ch === '_';
+        || ch === '_' || ch === '-';
 };
 const isGlobal = (prev, stream, pos) => {
     return prev === null && stream[pos] === globalStartToken;
@@ -575,7 +575,7 @@ const isIdentifier = (stream, pos) => {
     }
     return (ch >= 'a' && ch <= 'z')
         || (ch >= 'A' && ch <= 'Z')
-        || ch === '_';
+        || ch === '_' || ch === '-';
 };
 const isNum = (ch) => {
     return (ch >= '0' && ch <= '9');
@@ -1377,7 +1377,8 @@ const editableProperties = [
     'maxItems',
     'minimum',
     'minItems',
-    'checked'
+    'checked',
+    'placeholder'
 ];
 const dynamicProps = [
     ...editableProperties,
@@ -1467,6 +1468,7 @@ class BaseNode {
     _ruleNode;
     _lang = '';
     _callbacks = {};
+    _onlyViewNotify;
     _dependents = [];
     _jsonModel;
     _tokens = [];
@@ -1657,12 +1659,13 @@ class BaseNode {
             };
         });
     }
-    subscribe(callback, eventName = 'change') {
+    subscribe(callback, eventName = 'change', dependentType = 'view') {
         this._callbacks[eventName] = this._callbacks[eventName] || [];
-        this._callbacks[eventName].push(callback);
+        const entry = { callback, dependentType };
+        this._callbacks[eventName].push(entry);
         return {
             unsubscribe: () => {
-                this._callbacks[eventName] = this._callbacks[eventName].filter(x => x !== callback);
+                this._callbacks[eventName] = this._callbacks[eventName].filter(x => x.callback !== callback);
             }
         };
     }
@@ -1690,7 +1693,7 @@ class BaseNode {
                         dependent.dispatch(new ExecuteRule());
                     }
                 }
-            });
+            }, 'change', 'model');
             this._dependents.push({ node: dependent, propertyName, subscription });
         }
     }
@@ -1702,10 +1705,17 @@ class BaseNode {
         }
     }
     queueEvent(action) {
+        if (this._onlyViewNotify) {
+            return;
+        }
         const actionWithTarget = new ActionImplWithTarget(action, this);
         this.form.getEventQueue().queue(this, actionWithTarget, ['valid', 'invalid'].indexOf(actionWithTarget.type) > -1);
     }
     dispatch(action) {
+        if (this._onlyViewNotify) {
+            this.notifyDependents(new ActionImplWithTarget(action, this));
+            return;
+        }
         this.queueEvent(action);
         this.form.getEventQueue().runPendingQueue();
     }
@@ -1734,10 +1744,14 @@ class BaseNode {
             });
             this._jsonModel._dependents = undefined;
         }
-        const handlers = this._callbacks[action.type] || [];
-        handlers.forEach(x => {
+        const onlyView = this._onlyViewNotify;
+        const entries = this._callbacks[action.type] || [];
+        const toRun = onlyView
+            ? entries.filter(e => e.dependentType === 'view' || e.dependentType === undefined)
+            : entries;
+        toRun.forEach(({ callback }) => {
             this.withDependencyTrackingControl(true, () => {
-                x(new ActionImplWithTarget(action, this));
+                callback(new ActionImplWithTarget(action, this));
             });
         });
     }
@@ -1837,6 +1851,12 @@ class BaseNode {
         }
         if (_data) {
             if (!this.isContainer && _parent !== NullDataValue && _data !== NullDataValue) {
+                if (_data.$isDataGroup && _data.$_fields.length > 0) {
+                    console.error(`Data binding conflict: non-container field "${this._jsonModel.name || this.id}" ` +
+                        `with dataRef "${dataRef}" points to a DataGroup already bound by a container. ` +
+                        'This would destroy existing child data. The data of this field will not be exported.');
+                    return this._data;
+                }
                 _data = _data?.$convertToDataValue();
                 _parent.$addDataNode(_key, _data, true);
             }
@@ -1971,8 +1991,8 @@ class Scriptable extends BaseNode {
         if (!(eName in this._rules)) {
             const eString = rule || this.getRules()[eName];
             if (typeof eString === 'string' && eString.length > 0) {
+                let updatedRule = eString;
                 try {
-                    let updatedRule = eString;
                     if (this.fragment !== '$form') {
                         const sanitizedFragment = sanitizeName(this.fragment);
                         updatedRule = eString.replaceAll('$form', sanitizedFragment);
@@ -1980,7 +2000,16 @@ class Scriptable extends BaseNode {
                     this._rules[eName] = this.ruleEngine.compileRule(updatedRule, this.lang);
                 }
                 catch (e) {
-                    this.form.logger.error(`Unable to compile rule \`"${eName}" : "${eString}"\` Exception : ${e}`);
+                    const errorMsg = `Unable to compile rule \`"${eName}" : "${updatedRule}"\` Exception : ${e}`;
+                    this.form.logger.error(errorMsg);
+                    const errorPayload = {
+                        name: this.name,
+                        error: errorMsg,
+                        event: eName,
+                        rule: updatedRule,
+                        stack: e instanceof Error ? e.stack : undefined
+                    };
+                    this.form.dispatch(new ScriptError(errorPayload, false));
                 }
             }
             else {
@@ -1992,13 +2021,16 @@ class Scriptable extends BaseNode {
     getCompiledEvent(eName) {
         if (!(eName in this._events)) {
             let eString = this._jsonModel.events?.[eName];
+            if (eName === 'custom:setProperty' && typeof eString === 'undefined') {
+                eString = ['$event.payload'];
+            }
             if (typeof eString === 'string' && eString.length > 0) {
                 eString = [eString];
             }
             if (typeof eString !== 'undefined' && eString.length > 0) {
                 this._events[eName] = eString.map(x => {
+                    let updatedExpr = x;
                     try {
-                        let updatedExpr = x;
                         if (this.fragment !== '$form') {
                             const sanitizedFragment = sanitizeName(this.fragment);
                             updatedExpr = x.replaceAll('$form', sanitizedFragment);
@@ -2006,7 +2038,16 @@ class Scriptable extends BaseNode {
                         return this.ruleEngine.compileRule(updatedExpr, this.lang);
                     }
                     catch (e) {
-                        this.form.logger.error(`Unable to compile expression \`"${eName}" : "${eString}"\` Exception : ${e}`);
+                        const errorMsg = `Unable to compile expression \`"${eName}" : "${updatedExpr}"\` Exception : ${e}`;
+                        this.form.logger.error(errorMsg);
+                        const errorPayload = {
+                            name: this.name,
+                            error: errorMsg,
+                            event: eName,
+                            rule: updatedExpr,
+                            stack: e instanceof Error ? e.stack : undefined
+                        };
+                        this.form.dispatch(new ScriptError(errorPayload, false));
                     }
                     return null;
                 }).filter(x => x !== null);
@@ -2520,6 +2561,9 @@ class Container extends Scriptable {
             x.reset();
         });
     }
+    get valid() {
+        return this.items.every((item) => item.valid);
+    }
     validate() {
         return this.items.flatMap(x => {
             return x.validate();
@@ -2529,25 +2573,26 @@ class Container extends Scriptable {
         super.dispatch(action);
     }
     importData(dataModel) {
-        if (typeof this._data !== 'undefined' && this.type === 'array' && Array.isArray(dataModel)) {
-            const dataGroup = new DataGroup(this._data.$name, dataModel, this._data.$type, this._data.parent);
-            try {
-                this._data.parent?.$addDataNode(dataGroup.$name, dataGroup, true);
-            }
-            catch (e) {
-                this.form.logger.error(`unable to setItems for ${this.qualifiedName} : ${e}`);
-                return;
-            }
-            this._data = dataGroup;
-            this.syncDataAndFormModel(dataGroup);
-            const newLength = this.items.length;
-            for (let i = 0; i < newLength; i += 1) {
-                this._children[i].dispatch(new ExecuteRule());
-            }
-        }
-        else if (typeof this._data === 'undefined') {
+        if (typeof this._data === 'undefined') {
             console.warn(`Data node is null, hence importData did not work for panel "${this.name}". Check if parent has a dataRef set to null.`);
+            return;
         }
+        const isArrayPanel = this.type === 'array' && Array.isArray(dataModel);
+        const isObjectPanel = this.type === 'object' && typeof dataModel === 'object' && dataModel !== null && !Array.isArray(dataModel);
+        if (!isArrayPanel && !isObjectPanel) {
+            return;
+        }
+        const dataGroup = new DataGroup(this._data.$name, dataModel, this._data.$type, this._data.parent);
+        try {
+            this._data.parent?.$addDataNode(dataGroup.$name, dataGroup, true);
+        }
+        catch (e) {
+            this.form.logger.error(`unable to importData for ${this.qualifiedName} : ${e}`);
+            return;
+        }
+        this._data = dataGroup;
+        this.syncDataAndFormModel(dataGroup);
+        this._children.forEach((child) => child.dispatch(new ExecuteRule()));
     }
     syncDataAndFormModel(contextualDataModel) {
         const result = {
@@ -2657,6 +2702,9 @@ __decorate([
 ], Container.prototype, "minItems", null);
 __decorate([
     dependencyTracked()
+], Container.prototype, "valid", null);
+__decorate([
+    dependencyTracked()
 ], Container.prototype, "activeChild", null);
 class Node {
     _jsonModel;
@@ -2743,7 +2791,15 @@ class EventNode {
         return that !== null && that !== undefined && this._node == that._node && this._event.type == that._event.type;
     }
     toString() {
-        return this._node.id + '__' + this.event.type;
+        const base = this._node.id + '__' + this._event.type;
+        if (this._event.type === 'change' && this._event.payload?.changes) {
+            const sig = this._event.payload.changes
+                .map((c) => c.propertyName)
+                .sort()
+                .join(',');
+            return base + '__' + sig;
+        }
+        return base;
     }
     valueOf() {
         return this.toString();
@@ -2918,6 +2974,9 @@ const request = async (context, uri, httpVerb, payload, success, error, headers)
     if (payload.body && payload.headers) {
         encryptOutput = { ...payload };
         headers = { ...payload.headers };
+        if (payload.options && typeof payload.options === 'object') {
+            Object.assign(requestOptions, payload.options);
+        }
         payload = payload.body;
         cryptoMetadata = payload.cryptoMetadata;
         inputPayload = payload;
@@ -3210,6 +3269,47 @@ class FunctionRuntimeImpl {
                                         filesMap[qualifiedName] = field.serialize();
                                     }
                                     return filesMap;
+                                },
+                                setVariable: (variableName, variableValue, target) => {
+                                    const args = [variableName, variableValue, target];
+                                    return FunctionRuntimeImpl.getInstance().getFunctions().setVariable._func.call(undefined, args, data, interpreter);
+                                },
+                                getVariable: (variableName, target) => {
+                                    const args = [variableName, target];
+                                    return FunctionRuntimeImpl.getInstance().getFunctions().getVariable._func.call(undefined, args, data, interpreter);
+                                },
+                                request: async (options) => {
+                                    const { url, method = 'GET', body: requestBody = {}, headers = { 'Content-Type': 'application/json' }, options: fetchOptions } = options;
+                                    const funcs = FunctionRuntimeImpl.getInstance().getFunctions();
+                                    const externalizedUrl = funcs.externalize._func.call(undefined, [url], data, interpreter);
+                                    const random = Math.floor(Math.random() * 1000000);
+                                    const now = Date.now();
+                                    const internalSuccess = `custom:__internalSuccess_${random}_${now}`;
+                                    const internalError = `custom:__internalError_${random}_${now}`;
+                                    const encryptPayload = { body: requestBody, headers };
+                                    if (fetchOptions) {
+                                        encryptPayload.options = fetchOptions;
+                                    }
+                                    const payload = await funcs.encrypt._func.call(undefined, [encryptPayload], data, interpreter);
+                                    const requestArgs = [externalizedUrl, method, payload, internalSuccess, internalError];
+                                    const requestFn = funcs.requestWithRetry._func.call(undefined, requestArgs, data, interpreter);
+                                    const response = await funcs.retryHandler._func.call(undefined, [requestFn], data, interpreter);
+                                    const isSuccess = response?.status >= 200 && response?.status <= 299;
+                                    if (isSuccess && response?.body) {
+                                        const decryptedBody = await funcs.decrypt._func.call(undefined, [response.body, response.originalRequest], data, interpreter);
+                                        return {
+                                            ok: true,
+                                            status: response.status,
+                                            body: decryptedBody,
+                                            headers: response.headers
+                                        };
+                                    }
+                                    return {
+                                        ok: isSuccess,
+                                        status: response?.status,
+                                        body: response?.body,
+                                        headers: response?.headers
+                                    };
                                 }
                             }
                         };
@@ -3530,6 +3630,13 @@ class FunctionRuntimeImpl {
                 _func: (args, data, interpreter) => {
                     const requestFn = valueOf(args[0]);
                     return requestFn();
+                },
+                _signature: []
+            },
+            externalize: {
+                _func: (args, data, interpreter) => {
+                    const url = toString(args[0]);
+                    return url;
                 },
                 _signature: []
             },
@@ -4130,13 +4237,13 @@ class Form extends Container {
             if (this._invalidFields.indexOf(action.target.id) === -1) {
                 this._invalidFields.push(action.target.id);
             }
-        }, 'invalid');
+        }, 'invalid', 'model');
         field.subscribe((action) => {
             const index = this._invalidFields.indexOf(action.target.id);
             if (index > -1) {
                 this._invalidFields.splice(index, 1);
             }
-        }, 'valid');
+        }, 'valid', 'model');
         field.subscribe((action) => {
             const field = action.target.getState();
             if (action.payload.changes.length > 0 && field) {
@@ -4161,7 +4268,7 @@ class Form extends Container {
                 const fieldChangedAction = new FieldChanged(changes, field, action.payload.eventSource);
                 this.notifyDependents(fieldChangedAction);
             }
-        });
+        }, 'change', 'model');
     }
     visit(callBack) {
         this.traverseChild(this, callBack);
@@ -4306,10 +4413,33 @@ class RuleEngine {
         this._context = globals;
         let res = undefined;
         try {
+            this._context?.form?.logger?.info({
+                message: 'Executing rule',
+                expression: eString,
+                fieldName: this._context.field?.name,
+                fieldId: this._context.field?.id,
+                eventType: this._context?.$event?.type
+            });
             res = formula.run(ast, data, 'en-US', globals);
         }
         catch (err) {
             this._context?.form?.logger?.error(err);
+            if (this._context?.form) {
+                const field = this._context?.field;
+                const fieldName = field?.name;
+                const errorMsg = err instanceof Error ? err.message : String(err);
+                const fullError = fieldName
+                    ? `Script execution error in field "${fieldName}": ${errorMsg}. Expression: ${eString}`
+                    : `Script execution error: ${errorMsg}. Expression: ${eString}`;
+                const errorPayload = {
+                    name: fieldName,
+                    error: fullError,
+                    event: this._context?.$event?.type,
+                    rule: eString,
+                    stack: err instanceof Error ? err.stack : undefined
+                };
+                this._context.form.dispatch(new ScriptError(errorPayload, false));
+            }
         }
         if (this.debugInfo.length) {
             this._context?.form?.logger?.warn(`Form rule expression string: ${eString}`);
@@ -4588,6 +4718,9 @@ class Field extends Scriptable {
     get placeholder() {
         return this._jsonModel.placeholder;
     }
+    set placeholder(value) {
+        this._setProperty('placeholder', value);
+    }
     get readOnly() {
         if (this.parent.readOnly !== undefined) {
             return this.parent.readOnly === true ? true : this._jsonModel.readOnly;
@@ -4689,7 +4822,7 @@ class Field extends Scriptable {
     }
     get editValue() {
         const df = this.editFormat;
-        if (df && this.isNotEmpty(this.value) && this.valid !== false) {
+        if (df && this.isNotEmpty(this.value) && this?.validity?.typeMismatch !== true) {
             try {
                 return format(this.value, this.lang, df);
             }
@@ -4780,7 +4913,12 @@ class Field extends Scriptable {
             if (updates.valid) {
                 this.triggerValidationEvent(updates);
             }
-            const changeAction = new Change({ changes: changes.concat(Object.values(updates)), eventSource: this._eventSource });
+            const allChanges = changes.concat(Object.values(updates));
+            const changesWithCurrentState = allChanges.map((change) => {
+                const valueToUse = change.propertyName === 'value' ? this._jsonModel.value : change.currentValue;
+                return { ...change, currentValue: valueToUse };
+            });
+            const changeAction = new Change({ changes: changesWithCurrentState, eventSource: this._eventSource });
             this.dispatch(changeAction);
         }
     }
@@ -4846,10 +4984,32 @@ class Field extends Scriptable {
         const afConstraintKey = constraint;
         const html5ConstraintType = constraintKeys[afConstraintKey];
         const constraintTypeMessages = getConstraintTypeMessages();
-        return this._jsonModel.constraintMessages?.[afConstraintKey === 'exclusiveMaximum' ? 'maximum' :
+        const customMessage = this._jsonModel.constraintMessages?.[afConstraintKey === 'exclusiveMaximum' ? 'maximum' :
             afConstraintKey === 'exclusiveMinimum' ? 'minimum' :
-                afConstraintKey]
-            || replaceTemplatePlaceholders(constraintTypeMessages[html5ConstraintType], [this._jsonModel[afConstraintKey]]);
+                afConstraintKey];
+        if (customMessage) {
+            const stepValues = constraint === 'step' ? this._getStepMessageValues() : [this._jsonModel[afConstraintKey]];
+            return replaceTemplatePlaceholders(customMessage, stepValues.length === 2 ? stepValues : [this._jsonModel.step]);
+        }
+        if (constraint === 'step') {
+            const stepValues = this._getStepMessageValues();
+            if (stepValues.length === 2) {
+                return replaceTemplatePlaceholders(constraintTypeMessages[html5ConstraintType], stepValues);
+            }
+            return 'Please enter a valid value.';
+        }
+        return replaceTemplatePlaceholders(constraintTypeMessages[html5ConstraintType], [this._jsonModel[afConstraintKey]]);
+    }
+    _getStepMessageValues() {
+        const result = this.checkStep();
+        if (!result.valid
+            && result.prev != null
+            && result.next != null
+            && Number.isFinite(result.prev)
+            && Number.isFinite(result.next)) {
+            return [result.prev, result.next];
+        }
+        return [];
     }
     get errorMessage() {
         return this._jsonModel.errorMessage;
@@ -4909,7 +5069,7 @@ class Field extends Scriptable {
             let next, prev;
             if (!valid) {
                 next = (Math.ceil(qt) * fStep + fIVal) / factor;
-                prev = (next - fStep) / factor;
+                prev = next - step;
             }
             return {
                 valid,
@@ -5060,7 +5220,7 @@ class Field extends Scriptable {
             else {
                 valid = this.checkEnum(value, Constraints);
                 constraint = 'enum';
-                if (valid && this.type === 'number') {
+                if (valid && (this.type === 'number' || this.type === 'integer')) {
                     valid = this.checkStep().valid;
                     constraint = 'step';
                 }
@@ -5395,6 +5555,20 @@ class CheckboxGroup extends Field {
         };
     }
 }
+const warnedPatterns = new Set();
+function normalizeDatePattern(pattern) {
+    if (!pattern || typeof pattern !== 'string') {
+        return pattern;
+    }
+    const normalized = pattern
+        .replace(/DD/g, 'dd')
+        .replace(/YYYY/g, 'yyyy');
+    if (normalized !== pattern && !warnedPatterns.has(pattern)) {
+        warnedPatterns.add(pattern);
+        console.warn(`[AEM Forms] Date field pattern "${pattern}" uses deprecated format. Auto-corrected to "${normalized}". Please update to use lowercase 'y' for year and 'd' for day.`);
+    }
+    return normalized;
+}
 class DateField extends Field {
     locale;
     _dataFormat = 'yyyy-MM-dd';
@@ -5404,8 +5578,12 @@ class DateField extends Field {
         if (!this._jsonModel.editFormat) {
             this._jsonModel.editFormat = 'short';
         }
+        this._jsonModel.editFormat = normalizeDatePattern(this._jsonModel.editFormat);
         if (!this._jsonModel.displayFormat) {
             this._jsonModel.displayFormat = this._jsonModel.editFormat;
+        }
+        else {
+            this._jsonModel.displayFormat = normalizeDatePattern(this._jsonModel.displayFormat);
         }
         if (!this._jsonModel.placeholder) {
             this._jsonModel.placeholder = parseDateSkeleton(this._jsonModel.editFormat, this.locale);
