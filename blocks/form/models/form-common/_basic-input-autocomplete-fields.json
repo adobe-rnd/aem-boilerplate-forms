@@ -1,0 +1,133 @@
+{
+  "fields": [
+    {
+        "component": "select",
+        "name": "autocomplete",
+        "label": "Autofill attribute",
+        "valueType": "string",
+        "value": "",
+        "options": [
+            {
+                "name": "",
+                "value": ""
+            },
+            {
+                "name": "off",
+                "value": "off"
+            },
+            {
+                "name": "on",
+                "value": "on"
+            },
+            {
+                "name": "name",
+                "value": "name"
+            },
+            {
+                "name": "given-name",
+                "value": "given-name"
+            },
+            {
+                "name": "street-address",
+                "value": "street-address"
+            },
+            {
+                "name": "postal-code",
+                "value": "postal-code"
+            },
+            {
+                "name": "cc-name",
+                "value": "cc-name"
+            },
+            {
+                "name": "additional-name",
+                "value": "additional-name"
+            },
+            {
+                "name": "family-name",
+                "value": "family-name"
+            },
+            {
+                "name": "organization",
+                "value": "organization"
+            },
+            {
+                "name": "organization-title",
+                "value": "organization-title"
+            },
+            {
+                "name": "address-line1",
+                "value": "address-line1"
+            },
+            {
+                "name": "address-line2",
+                "value": "address-line2"
+            },
+            {
+                "name": "address-line3",
+                "value": "address-line3"
+            },
+            {
+                "name": "address-level1",
+                "value": "address-level1"
+            },
+            {
+                "name": "address-level2",
+                "value": "address-level2"
+            },
+            {
+                "name": "address-level3",
+                "value": "address-level3"
+            },
+            {
+                "name": "address-level4",
+                "value": "address-level4"
+            },
+            {
+                "name": "country",
+                "value": "country"
+            },
+            {
+                "name": "country-name",
+                "value": "country-name"
+            },
+            {
+                "name": "cc-given-name",
+                "value": "cc-given-name"
+            },
+            {
+                "name": "cc-additional-name",
+                "value": "cc-additional-name"
+            },
+            {
+                "name": "cc-family-name",
+                "value": "cc-family-name"
+            },
+            {
+                "name": "cc-number",
+                "value": "cc-number"
+            },
+            {
+                "name": "cc-csc",
+                "value": "cc-csc"
+            },
+            {
+                "name": "cc-exp-month",
+                "value": "cc-exp-month"
+            },
+            {
+                "name": "cc-exp-year",
+                "value": "cc-exp-year"
+            },
+            {
+                "name": "cc-exp",
+                "value": "cc-exp"
+            },
+            {
+                "name": "cc-type",
+                "value": "cc-type"
+            }
+        ]
+    }
+  ]
+}
