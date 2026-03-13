@@ -783,6 +783,12 @@ main div.form-wrapper {
     box-shadow: 0 4px 24px rgb(0 0 0 / 8%);
 }
 
+ /* Stack all form fields in a single column. [class*="col-"] overrides .col-1..col-12 (same specificity). */
+ main .form form .field-wrapper,
+ main .form form .field-wrapper[class*="col-"] {
+     grid-column: span 12;
+ }
+
 /* Responsive adjustments for mobile */
 @media (width <= 599px) {
     :root {
