@@ -684,6 +684,22 @@
               }
             }
           }
+        },
+        {
+          "title": "Review",
+          "id": "review",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+                "template": {
+                  "jcr:title": "Review",
+                  "fieldType": "panel",
+                  "fd:viewType": "review"
+                }
+              }
+            }
+          }
         }
       ]
     }
