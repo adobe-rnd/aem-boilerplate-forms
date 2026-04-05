@@ -168,6 +168,8 @@ function createDragAndDropArea(wrapper, field) {
   const input = wrapper.querySelector('input');
   const customButtonText = field?.properties?.['fd:buttonText'] || fileAttachmentText;
   const customDragDropText = field?.properties?.dragDropText || dragDropText;
+  const fieldLabel = field?.label?.value ? stripTags(field.label.value, '') : '';
+  const ariaLabel = fieldLabel ? `${customButtonText} ${fieldLabel}`.trim() : null;
   const dragArea = `
     <div class="file-dragIcon"></div>
     <div class="file-dragText">${customDragDropText}</div>
@@ -179,6 +181,9 @@ function createDragAndDropArea(wrapper, field) {
   }
   dragContainer.className = 'file-drag-area';
   dragContainer.innerHTML = dragArea;
+  if (ariaLabel) {
+    dragContainer.querySelector('.file-attachButton').setAttribute('aria-label', ariaLabel);
+  }
   dragContainer.appendChild(input.cloneNode(true));
   input.parentNode.replaceChild(dragContainer, input);
   return dragContainer;
