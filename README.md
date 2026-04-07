@@ -43,14 +43,40 @@ npm run lint
 
 ## Custom Form Components
 
-Create custom form components using the interactive scaffolder:
+Create custom form components using the scaffolder:
+
+### Interactive Mode
 
 ```sh
 npm run create:custom-component
 ```
 
-This will guide you through creating a new custom component with:
-- Interactive prompts for component name and base type
+This will guide you through creating a new custom component with interactive prompts for component name and base type.
+
+### Command Line Arguments
+
+You can also pass arguments directly to skip prompts:
+
+```sh
+npm run create:custom-component -- --name <component-name> --base "<base-component>"
+```
+
+For example:
+
+```sh
+npm run create:custom-component -- --name icon-radio --base "Radio Group"
+```
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | Component name in kebab-case (e.g., `icon-radio`) |
+| `--base <base>` | Base component to extend (e.g., `"Text Input"`, `"Button"`) |
+| `-h, --help` | Show help with all available base components |
+
+When both `--name` and `--base` are provided, the scaffolder runs non-interactively. When only one is provided, it prompts for the missing value.
+
+### What It Does
+
 - Automatic file generation (JS, CSS, JSON)
 - Automatic integration in form block with mappings
 
