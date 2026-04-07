@@ -46,6 +46,7 @@ export function expect(block) {
   assert.equal(scope.isDone(), true, 'submit call was not made');
   const el = block.querySelector('.form-message.error-message');
   assert.equal(el.textContent, 'Some error occured while submitting the form');
+  assert.equal(el.hasAttribute('role') && el.getAttribute('role') === 'alert', true);
 }
 
 export const opDelay = 200;
