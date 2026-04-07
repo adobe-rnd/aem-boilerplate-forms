@@ -76,6 +76,7 @@ function getBaseComponents() {
     'Email',
     'File Input',
     'Image',
+    'Multiline Input',
     'Number Input',
     'Panel',
     'Radio Group',
@@ -112,13 +113,13 @@ function printUsage() {
   log('\nUsage: node tools/forms-scaffolder.js [options]\n', colors.bright);
   log('Options:', colors.cyan);
   log('  --name <name>    Component name (kebab-case, e.g. icon-radio)', colors.white);
-  log('  --base <base>    Base component to extend (e.g. "Text Input")', colors.white);
+  log('  --base <base>    Base component to extend (e.g. "Text Input" or "text-input")', colors.white);
   log('  -h, --help       Show this help message\n', colors.white);
   log('When options are omitted, interactive prompts are used.', colors.dim);
   log('When both --name and --base are provided, runs non-interactively.\n', colors.dim);
   log('Available base components:', colors.cyan);
   getBaseComponents().forEach((comp) => {
-    log(`  - ${comp.name}`, colors.white);
+    log(`  - ${comp.name} (${comp.value})`, colors.white);
   });
   console.log('');
 }
