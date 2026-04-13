@@ -1,0 +1,63 @@
+{
+  "definitions": [
+    {
+      "title": "PAN Input",
+      "id": "pan-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/textinput/v1/textinput",
+            "template": {
+              "jcr:title": "PAN Input",
+              "fieldType": "text-input",
+              "fd:viewType": "pan-input"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "pan-input",
+      "fields": [
+        {
+          "component": "container",
+          "name": "basic",
+          "label": "Basic",
+          "collapsible": false,
+          "fields": [
+            {
+              "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
+            },
+            {
+              "component": "text",
+              "name": "fourthChar",
+              "label": "Fourth Character",
+              "valueType": "string",
+              "description": "The allowed fourth character in the PAN (e.g., P, H, or any letter)",
+              "default": "P",
+              "maxLength": 1,
+              "pattern": "^[A-Z]$",
+              "patternErrorMessage": "Please enter a single uppercase letter"
+            }
+          ]
+        },
+        {
+          "component": "container",
+          "name": "validation",
+          "label": "Validation",
+          "collapsible": true,
+          "fields": [
+            {
+              "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+            }
+          ]
+        },
+        {
+          "...": "../../models/form-common/_help-container.json"
+        }
+      ]
+    }
+  ]
+}

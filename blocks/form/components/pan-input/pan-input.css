@@ -1,0 +1,11 @@
+.pan-input-wrapper input {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: monospace;
+}
+
+.pan-input-wrapper input::placeholder {
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: inherit;
+}

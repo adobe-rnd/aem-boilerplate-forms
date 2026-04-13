@@ -1,0 +1,76 @@
+{
+  "definitions": [
+    {
+      "title": "Mobile Input",
+      "id": "mobile-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/panelcontainer/v1/panelcontainer",
+            "template": {
+              "jcr:title": "Mobile Number",
+              "fieldType": "panel",
+              "fd:viewType": "mobile-input",
+              "minOccur": 1,
+              "countryCode": {
+                "jcr:title": "countryCode",
+                "fieldType": "drop-down",
+                "sling:resourceType": "core/fd/components/form/dropdown/v1/dropdown"
+              },
+              "countryCodeSearch": {
+                "jcr:title": "countryCodeSearch",
+                "fieldType": "text-input",
+                "sling:resourceType": "core/fd/components/form/textinput/v1/textinput"
+              },
+              "mobileInput": {
+                "jcr:title": "Mobile Number",
+                "fieldType": "number-input",
+                "sling:resourceType": "core/fd/components/form/numberinput/v1/numberinput"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "mobile-input",
+      "fields": [
+        {
+          "component": "container",
+          "name": "basic",
+          "label": "Basic",
+          "collapsible": false,
+          "...": "../../models/form-common/_basic-input-fields.json"
+        },
+        {
+          "component": "text",
+          "name": "countryCodesUrl",
+          "label": "Country Codes API URL",
+          "valueType": "string",
+          "description": "URL returning a JSON array of country objects with ISDCODE and DESCRIPTION/COUNTRYNAME fields."
+        },
+        {
+          "component": "number",
+          "name": "phoneMinLength",
+          "label": "Phone Min Length",
+          "valueType": "number",
+          "default": 7,
+          "description": "Minimum number of digits for the phone number (informational — enforce via form-level validation)."
+        },
+        {
+          "component": "number",
+          "name": "phoneMaxLength",
+          "label": "Phone Max Length",
+          "valueType": "number",
+          "default": 15,
+          "description": "Maximum number of digits for the phone number."
+        },
+        {
+          "...": "../../models/form-common/_help-container.json"
+        }
+      ]
+    }
+  ]
+}
