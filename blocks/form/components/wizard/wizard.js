@@ -54,6 +54,7 @@ export class WizardLayout {
       // Trigger model-level validation so invalid events fire and error messages render.
       // _fieldModel is set by the subscribe callback in wizardLayout; undefined for doc-based
       // forms where the rule engine is not loaded (safe no-op via optional chaining).
+      // eslint-disable-next-line no-underscore-dangle
       container._fieldModel?.validate?.();
       container.querySelector(':invalid')?.focus();
     }
@@ -193,6 +194,7 @@ export default function wizardLayout(panel, fd, container, formId) {
   // subscribe() is a no-op for doc-based forms (formModels[formId] never populated).
   layout.getSteps(panel).forEach((step) => {
     subscribe(step, formId, (_, stepModel) => {
+      // eslint-disable-next-line no-underscore-dangle
       step._fieldModel = stepModel;
     });
   });
