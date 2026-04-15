@@ -1,4 +1,5 @@
 import { createButton } from '../../util.js';
+import { subscribe } from '../../rules/index.js';
 
 export class WizardLayout {
   inputFields = 'input,textarea,select';
@@ -50,6 +51,10 @@ export class WizardLayout {
     }, true);
 
     if (!isValid) {
+      // Trigger model-level validation so invalid events fire and error messages render.
+      // _fieldModel is set by the subscribe callback in wizardLayout; undefined for doc-based
+      // forms where the rule engine is not loaded (safe no-op via optional chaining).
+      container._fieldModel?.validate?.();
       container.querySelector(':invalid')?.focus();
     }
     return isValid;
@@ -180,8 +185,17 @@ export class WizardLayout {
 
 const layout = new WizardLayout();
 
-export default function wizardLayout(panel) {
+// eslint-disable-next-line no-unused-vars
+export default function wizardLayout(panel, fd, container, formId) {
   layout.applyLayout(panel);
+  // Cache each step panel's model on the DOM element so validateContainer can call
+  // model.validate(), which dispatches invalid events and triggers error message rendering.
+  // subscribe() is a no-op for doc-based forms (formModels[formId] never populated).
+  layout.getSteps(panel).forEach((step) => {
+    subscribe(step, formId, (_, stepModel) => {
+      step._fieldModel = stepModel;
+    });
+  });
   return panel;
 }
 
