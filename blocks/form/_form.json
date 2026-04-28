@@ -50,6 +50,12 @@
           "fields": [
             {
               "component": "text",
+              "name": "customFunctionsPath",
+              "label": "Form Specific Custom Functions Path",
+              "valueType": "string"
+            },
+            {
+              "component": "text",
               "name": "style",
               "label": "Form Specific styles path",
               "valueType": "string"
