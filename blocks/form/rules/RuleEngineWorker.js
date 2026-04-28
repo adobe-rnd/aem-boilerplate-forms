@@ -168,7 +168,7 @@ onmessage = async (e) => {
 
   if (!customFunctionRegistered) {
     const codeBasePath = e?.data?.codeBasePath;
-    const customFunctionPath = e?.data?.payload?.properties?.customFunctionsPath;
+    const customFunctionPath = e?.data?.payload?.properties?.customFunctionsPath || '/blocks/form/functions.js';
     registerCustomFunctions(customFunctionPath, codeBasePath).then(() => {
       customFunctionRegistered = true;
       handleMessageEvent(e);
