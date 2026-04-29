@@ -570,3 +570,17 @@ export default async function decorate(block) {
     container.replaceWith(form);
   }
 }
+
+export async function exportForm(formUrl, element) {
+  const url = new URL(formUrl).origin;
+  const a = document.createElement('a');
+  [a.href] = formUrl.split('/jcr:content');
+  a.style.all = 'unset';
+  a.innerHTML = 'Loading Form...';
+  element.appendChild(a);
+  const style = document.createElement('link');
+  style.rel = 'stylesheet';
+  style.href = `${url}/blocks/form/form.css`;
+  document.head.appendChild(style);
+  await decorate(element);
+}
