@@ -1,0 +1,133 @@
+{
+  "adaptiveform": "0.15.2",
+  "items": [
+    {
+      "name": "first_name",
+      "fieldType": "text-input",
+      "type": "string",
+      "required": true,
+      "label": { "value": "First Name" }
+    },
+    {
+      "name": "last_name",
+      "fieldType": "text-input",
+      "type": "string",
+      "required": true,
+      "label": { "value": "Last Name" }
+    },
+    {
+      "name": "email",
+      "fieldType": "email",
+      "type": "string",
+      "required": true,
+      "label": { "value": "Business Email" }
+    },
+    {
+      "name": "phone",
+      "fieldType": "text-input",
+      "type": "string",
+      "required": true,
+      "label": { "value": "Phone" }
+    },
+    {
+      "name": "job_title",
+      "fieldType": "drop-down",
+      "type": "string",
+      "required": false,
+      "enforceEnum": true,
+      "label": { "value": "Job Title" },
+      "enum": ["Analyst", "Consultant", "CXO/EVP", "Educator", "Individual Contributor", "Senior Director/Director", "Senior Manager/Manager", "Student", "SVP/VP", "Other"],
+      "enumNames": ["Analyst", "Consultant", "CXO/EVP", "Educator", "Individual Contributor", "Senior Director/Director", "Senior Manager/Manager", "Student", "SVP/VP", "Other"]
+    },
+    {
+      "name": "department",
+      "fieldType": "drop-down",
+      "type": "string",
+      "required": true,
+      "enforceEnum": true,
+      "label": { "value": "Department" },
+      "enum": ["Creative: General", "Digital Commerce", "Engineering/Development", "Executive/General Administration", "Finance", "Human Resources", "IT: Operations/General", "Legal", "Marketing: General", "Procurement", "Public Relations/Affairs/Communications", "Public/Social Services", "Sales", "Other"],
+      "enumNames": ["Creative: General", "Digital Commerce", "Engineering/Development", "Executive/General Administration", "Finance", "Human Resources", "IT: Operations/General", "Legal", "Marketing: General", "Procurement", "Public Relations/Affairs/Communications", "Public/Social Services", "Sales", "Other"]
+    },
+    {
+      "name": "product_interest",
+      "fieldType": "drop-down",
+      "type": "string",
+      "required": true,
+      "enforceEnum": true,
+      "label": { "value": "Product Interest" },
+      "enum": ["primary_product_of_interest", "Adobe Acrobat", "Adobe Acrobat Sign", "adobe_advertising_cloud", "adobe_analytics", "Brand Concierge", "adobe_commerce", "adobe_creative_cloud", "adobe_experience_manager_assets", "adobe_experience_manager_sites", "adobe_experience_platform", "adobe_express", "adobe_firefly", "adobe_frame_io", "adobe_genstudio_for_performance_marketing", "adobe_journey_optimizer", "adobe_journey_optimizer_b2b_edition", "adobe_learning_manager", "adobe_llm_optimizer", "adobe_marketo_engage", "adobe_mix_modeler", "adobe_real_time_cdp_collaboration", "adobe_stock", "adobe_substance", "adobe_target", "adobe_workfront"],
+      "enumNames": ["Primary product of interest*", "Adobe Acrobat", "Adobe Acrobat Sign", "Adobe Advertising Cloud", "Adobe Analytics", "Adobe Brand Concierge", "Adobe Commerce", "Adobe Creative Cloud", "Adobe Experience Manager Assets", "Adobe Experience Manager Sites", "Adobe Experience Platform", "Adobe Express", "Adobe Firefly", "Adobe Frame.io", "Adobe GenStudio for Performance Marketing", "Adobe Journey Optimizer", "Adobe Journey Optimizer B2B Edition", "Adobe Learning Manager", "Adobe LLM Optimizer", "Adobe Marketo Engage", "Adobe Mix Modeler", "Adobe Real-Time CDP Collaboration", "Adobe Stock", "Adobe Substance", "Adobe Target", "Adobe Workfront"]
+    },
+    {
+      "name": "country",
+      "fieldType": "drop-down",
+      "type": "string",
+      "required": true,
+      "enforceEnum": true,
+      "label": { "value": "Country" },
+      "enum": ["United States", "cn", "ru", "in", "gb", "fr", "jp", "de", "kr", "it"],
+      "enumNames": ["United States", "China", "Russia", "India", "United Kingdom", "France", "Japan", "Germany", "South Korea", "Italy"]
+    },
+    {
+      "name": "zipcode",
+      "fieldType": "number-input",
+      "type": "number",
+      "required": true,
+      "label": { "value": "Zipcode" },
+      "events": {
+        "custom:zipLookupSuccess": [
+          "dispatchEvent(city, 'custom:setProperty', {value : toObject($event.payload.body).places[0][\"place name\"]})",
+          "dispatchEvent(state, 'custom:setProperty', {value : toObject($event.payload.body).places[0].state})"
+        ],
+        "change": [
+          "if(contains($event.payload.changes[].propertyName, 'value'), awaitFn(retryHandler(requestWithRetry(externalize('https://api.zippopotam.us/' & country.$value & '/' & $field.$value), 'GET', {}, {\"Content-Type\": 'application/json'}, 'custom:zipLookupSuccess', 'custom:zipLookupError'))), {})"
+        ],
+        "custom:setProperty": ["$event.payload"]
+      }
+    },
+    {
+      "name": "state",
+      "fieldType": "text-input",
+      "type": "string",
+      "required": true,
+      "label": { "value": "State" },
+      "events": { "custom:setProperty": ["$event.payload"] }
+    },
+    {
+      "name": "city",
+      "fieldType": "text-input",
+      "type": "string",
+      "required": true,
+      "label": { "value": "City" },
+      "events": { "custom:setProperty": ["$event.payload"] },
+      "rules": {
+        "visible": "$form.zipcode == 560048"
+      }
+    },
+    {
+      "name": "additional_information",
+      "fieldType": "text-input",
+      "type": "string",
+      "required": false,
+      "label": { "value": "Additional Information" }
+    },
+    {
+      "fieldType": "button",
+      "buttonType": "submit",
+      "label": { "value": "Submit" },
+      "events": { "click": "submitForm()" }
+    }
+  ],
+  "metadata": {
+    "grammar": "json-formula-1.0.0",
+    "version": "1.0.0",
+    "description": "Contact sales form for Synopsis",
+    "name": "contact sales",
+    "tags": ["contact", "sales", "synopsis"]
+  },
+  "action": "/adobe/forms/af/submit/L2NvbnRlbnQvZm9ybXMvYWYvc2VjdXJlYmFuay9jb250YWN0",
+  "thankYouMessage": "Thank you for contacting us. We'll be in touch shortly.",
+  "actionType": "POST",
+  "id": "/content/forms/af/securebank/contact"
+}
