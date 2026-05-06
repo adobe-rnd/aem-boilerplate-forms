@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>Form Embed</title>
+  <link rel="stylesheet" href="https://main--aem-boilerplate-forms--adobe-rnd.aem.live/styles/styles.css">
   <link rel="stylesheet" href="https://main--aem-boilerplate-forms--adobe-rnd.aem.live/blocks/form/form.css">
 </head>
 <body>
@@ -9,7 +10,7 @@
 <div class="form"></div>
   <script type="module">
     const module = await import('https://embed--aem-boilerplate-forms--adobe-rnd.aem.live/blocks/form/form.js');
-    module.exportForm('https://www.securbankdemo.com/content/forms/af/securebank/contact', document.querySelector('.form'))
+    module.exportForm('contact.form.json', document.querySelector('.form'))
   </script>
 
 </body>
