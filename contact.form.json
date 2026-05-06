@@ -66,7 +66,7 @@
       "required": true,
       "enforceEnum": true,
       "label": { "value": "Country" },
-      "enum": ["United States", "cn", "ru", "in", "gb", "fr", "jp", "de", "kr", "it"],
+      "enum": ["US", "cn", "ru", "in", "gb", "fr", "jp", "de", "kr", "it"],
       "enumNames": ["United States", "China", "Russia", "India", "United Kingdom", "France", "Japan", "Germany", "South Korea", "Italy"]
     },
     {
@@ -92,7 +92,10 @@
       "type": "string",
       "required": true,
       "label": { "value": "State" },
-      "events": { "custom:setProperty": ["$event.payload"] }
+      "events": { "custom:setProperty": ["$event.payload"] },
+      "rules": {
+        "visible": "$form.country == 'US'"
+      }
     },
     {
       "name": "city",
@@ -100,10 +103,7 @@
       "type": "string",
       "required": true,
       "label": { "value": "City" },
-      "events": { "custom:setProperty": ["$event.payload"] },
-      "rules": {
-        "visible": "$form.zipcode == 560048"
-      }
+      "events": { "custom:setProperty": ["$event.payload"] }
     },
     {
       "name": "additional_information",
