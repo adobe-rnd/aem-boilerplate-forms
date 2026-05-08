@@ -31,7 +31,6 @@ test.describe('resetButton validation test', () => {
   test('resetButton validation on repeatable wizard', async ({ page }) => {
     await openPage(page, testURL);
     const count = await page.locator(wizardPanelCount).count();
-    await page.pause();
     for (let i = 0; i < count - 1; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await page.getByRole('button', { name: 'Next' }).click({ force: true });
