@@ -40,18 +40,16 @@ export function getCustomComponents() {
 export default async function componentDecorator(element, fd, container, formId) {
   const { ':type': type = '', fieldType } = fd;
 
-  const toLoad = [];
-  if (type.endsWith('wizard')) toLoad.push('wizard');
-  if (registry[type] && !toLoad.includes(type)) toLoad.push(type);
-  if (fieldType === 'file-input' && !toLoad.includes('file')) toLoad.push('file');
+  const toLoad = [
+    type.endsWith('wizard') ? 'wizard' : null,
+    registry[type] ? type : null,
+    fieldType === 'file-input' ? 'file' : null,
+  ].filter((key, idx, arr) => key && arr.indexOf(key) === idx);
 
-  for (const key of toLoad) {
+  await toLoad.reduce((promise, key) => promise.then(async () => {
     const mod = registry[key];
-    if (mod?.default) {
-      // eslint-disable-next-line no-await-in-loop
-      await mod.default(element, fd, container, formId);
-    }
-  }
+    if (mod?.default) await mod.default(element, fd, container, formId);
+  }), Promise.resolve());
 
   return null;
 }
