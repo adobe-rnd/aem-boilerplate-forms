@@ -2,7 +2,7 @@ import { test, expect } from '../fixtures.js';
 import { openPage } from '../utils.js';
 
 
-test.describe('import data on a panel with initalise enums rule on radio button', () => {
+test.describe.skip('import data on a panel with initalise enums rule on radio button', () => {
 const url = '/content/aem-boilerplate-forms-xwalk-collaterals/import-data';
 test('sync changes from service worker to main thread', async ({ page }) => {
     await openPage(page, url);

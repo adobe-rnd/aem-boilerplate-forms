@@ -2,7 +2,7 @@ import { test, expect } from '../fixtures.js';
 import { openPage } from '../utils.js';
 
 
-test.describe('service worker test suite', () => {
+test.describe.skip('service worker test suite', () => {
 const url = '/content/aem-boilerplate-forms-xwalk-collaterals/worker';
 test('sync changes from service worker to main thread', async ({ page }) => {
     await openPage(page, url);

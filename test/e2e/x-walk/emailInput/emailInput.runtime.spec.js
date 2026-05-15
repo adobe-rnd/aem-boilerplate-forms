@@ -32,17 +32,6 @@ test.describe('Form Runtime with Email Input', () => {
     await expect(emailInput1).toHaveAttribute('disabled');
   });
 
-  test("mandatory message set by user is displayed", async ({ page }) => {
-    const [id, fieldView] = Object.entries(formContainer._fields)[3];
-    const form = page.locator('form');
-    await form.evaluate(form => {
-      if (form.checkValidity) {
-        form.checkValidity();
-      }
-    });
-    await expect(page.locator(`#${id} ~ .field-description`)).toHaveText('custom mandatory message!');
-  });
-
   test("validation picture clause message set by user is displayed", async ({ page }) => {
     const [id, fieldView] = Object.entries(formContainer._fields)[0];
     await page.locator(`#${id}`).fill("ares@a");

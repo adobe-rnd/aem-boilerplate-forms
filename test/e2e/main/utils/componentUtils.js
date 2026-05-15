@@ -4,11 +4,13 @@ export class ComponentUtils {
   selectors = {
     contentTreeLabel: '[aria-label="Content tree"]',
     deleteButton: 'button[aria-label="Delete"]',
-    componentList: 'div[class*="menu"]'
+    searchLocator: 'input[placeholder="Search component"][type="search"]'
   };
 
   async addComponent(frame, componentName) {
-    await expect(frame.locator(this.selectors.componentList)).toBeVisible();
+    await expect(frame.locator(this.selectors.searchLocator)).toBeVisible();
+    await frame.locator(this.selectors.searchLocator).fill(componentName);
+    await frame.locator(this.selectors.searchLocator).press('Enter');
     await expect(frame.getByLabel(componentName)).toBeVisible();
     await frame.getByLabel(componentName).click();
   }
@@ -19,8 +21,14 @@ export class ComponentUtils {
     await frame.getByText("OK").click();
   }
   async verifyAndClickContentTree(frame) {
-    const contentTreeLabel = frame.locator(this.selectors.contentTreeLabel);
+    const contentTreeLabel = frame.locator(this.selectors.contentTreeLabel).first();
     await expect(contentTreeLabel).toBeVisible({ timeout: 10000 });
-    await contentTreeLabel.click();
+    const isContentTreeVisible = await frame
+      .getByText('Content tree')
+      .isVisible()
+      .catch(() => false);
+    if (!isContentTreeVisible) {
+      await contentTreeLabel.click();
+    }
   }
 }
