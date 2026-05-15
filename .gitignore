@@ -20,3 +20,6 @@ LoginAuth.json
 
 # Skill distribution zip
 create-custom-component.zip
+
+# Form bundle sourcemaps (dev mode only, not committed)
+blocks/form/*.js.map
