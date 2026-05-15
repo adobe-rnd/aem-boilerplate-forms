@@ -498,17 +498,53 @@ function addRequestContextToForm(formDef) {
   }
 }
 
+/**
+ * CSS loading convention for EDS form pages:
+ *
+ * properties.style points to the full form CSS (e.g. styles/my-form.css).
+ * To enable the critical/non-critical CSS split, ship a companion file named
+ * <name>-critical.css alongside (e.g. styles/my-form-critical.css) containing only
+ * the above-the-fold styles needed for LCP.
+ *
+ * When the companion file exists: critical CSS loads immediately; full CSS is deferred
+ * to window.load via deferLoadCSS, ensuring it never competes with LCP paint.
+ * When no companion file exists: full CSS loads immediately (old behaviour, no FOUC).
+ */
+function deferLoadCSS(href) {
+  const load = () => loadCSS(href).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error('Failed to load deferred CSS:', error);
+  });
+  if (document.readyState === 'complete') {
+    window.setTimeout(load, 0);
+    return;
+  }
+  window.addEventListener('load', () => {
+    window.setTimeout(load, 0);
+  }, { once: true });
+}
+
 function loadFormCustomStyles(formDef) {
   const { style } = formDef?.properties || {};
-  if (style) {
-    try {
-      const base = (window.hlx?.codeBasePath || '').replace(/\/$/, '');
-      const stylePath = style.startsWith('/') ? style : `/${style}`;
-      loadCSS(`${base}${stylePath}`);
-    } catch (error) {
-      console.error('Failed to load form CSS:', error);
-    }
-  }
+  if (!style) return;
+
+  const base = (window.hlx?.codeBasePath || '').replace(/\/$/, '');
+  const stylePath = style.startsWith('/') ? style : `/${style}`;
+  const fullHref = `${base}${stylePath}`;
+  const criticalHref = fullHref.replace(/\.css$/, '-critical.css');
+
+  fetch(criticalHref, { method: 'HEAD' })
+    .then((res) => {
+      if (res.ok) {
+        loadCSS(criticalHref);
+        deferLoadCSS(fullHref);
+      } else {
+        loadCSS(fullHref).catch(() => {});
+      }
+    })
+    .catch(() => {
+      loadCSS(fullHref).catch(() => {});
+    });
 }
 
 export default async function decorate(block) {
