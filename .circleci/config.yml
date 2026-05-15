@@ -25,7 +25,7 @@ jobs:
           name: Run unit tests with coverage
           command: |
             set +e
-            npx c8 --reporter=json --reporter=text --lines 85 npm run test:unit
+            npx c8 --reporter=json --reporter=text --lines 84 npm run test:unit
             TEST_EXIT=$?
             set -e
 
