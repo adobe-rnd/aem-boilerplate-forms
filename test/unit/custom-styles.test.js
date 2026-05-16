@@ -3,60 +3,126 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import DocBasedFormToAF from '../../blocks/form/transform.js';
-import decorate from '../../blocks/form/form.js';
+import { readBlockConfig } from '../../scripts/aem.js';
+import decorate, {
+  removeStyleConfigRow,
+  normalizeStylePath,
+} from '../../blocks/form/form.js';
 import { createBlock } from './testUtils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(__dirname, '../..');
 
+/** Creates a two-cell style row: first cell "style", second cell link with href (or plain text). */
+function createStyleRow(path, useLink = true) {
+  const row = document.createElement('div');
+  const keyCell = document.createElement('div');
+  keyCell.textContent = 'style';
+  const valueCell = document.createElement('div');
+  if (useLink) {
+    const link = document.createElement('a');
+    link.href = path;
+    link.textContent = path;
+    valueCell.appendChild(link);
+  } else {
+    valueCell.textContent = path;
+  }
+  row.appendChild(keyCell);
+  row.appendChild(valueCell);
+  return row;
+}
+
 describe('Custom form styles', () => {
-  describe('DocBasedFormToAF.parseStyleFromBlock', () => {
-    it('returns CSS path and removes the row when block has "css: path"', () => {
+  describe('readBlockConfig + style row', () => {
+    it('readBlockConfig returns style from link href; removeStyleConfigRow removes the row', () => {
       const block = document.createElement('div');
-      const row = document.createElement('div');
-      row.textContent = 'style: blocks/form/form-1.css';
-      block.appendChild(row);
+      block.appendChild(createStyleRow('blocks/form/form-1.css'));
 
-      const result = DocBasedFormToAF.parseStyleFromBlock(block);
+      const config = readBlockConfig(block);
+      const stylePath = normalizeStylePath(config.style);
+      removeStyleConfigRow(block);
 
-      assert.strictEqual(result, 'blocks/form/form-1.css');
-      assert.strictEqual(block.children.length, 0, 'css row should be removed');
+      assert.strictEqual(stylePath, 'blocks/form/form-1.css');
+      assert.strictEqual(block.children.length, 0, 'style row should be removed');
     });
 
-    it('returns undefined when block has no children', () => {
+    it('readBlockConfig returns style from second cell text when no link', () => {
       const block = document.createElement('div');
-      const result = DocBasedFormToAF.parseStyleFromBlock(block);
-      assert.strictEqual(result, undefined);
+      block.appendChild(createStyleRow('styles/custom.css', false));
+
+      const config = readBlockConfig(block);
+      const stylePath = normalizeStylePath(config.style);
+      removeStyleConfigRow(block);
+
+      assert.strictEqual(stylePath, 'styles/custom.css');
+      assert.strictEqual(block.children.length, 0);
     });
 
-    it('returns undefined when block is null or undefined', () => {
-      assert.strictEqual(DocBasedFormToAF.parseStyleFromBlock(null), undefined);
-      assert.strictEqual(DocBasedFormToAF.parseStyleFromBlock(undefined), undefined);
+    it('readBlockConfig returns empty config when block has no children', () => {
+      const block = document.createElement('div');
+      const config = readBlockConfig(block);
+      assert.strictEqual(normalizeStylePath(config.style), undefined);
     });
 
-    it('ignores rows that do not contain "css:"', () => {
+    it('removeStyleConfigRow does not throw when block is null or undefined', () => {
+      assert.doesNotThrow(() => removeStyleConfigRow(null));
+      assert.doesNotThrow(() => removeStyleConfigRow(undefined));
+    });
+
+    it('ignores rows that do not have first cell "style"', () => {
       const block = document.createElement('div');
       const otherRow = document.createElement('div');
-      otherRow.textContent = 'other: value';
+      const keyCell = document.createElement('div');
+      keyCell.textContent = 'other';
+      const valueCell = document.createElement('div');
+      valueCell.textContent = 'value';
+      otherRow.appendChild(keyCell);
+      otherRow.appendChild(valueCell);
       block.appendChild(otherRow);
 
-      const result = DocBasedFormToAF.parseStyleFromBlock(block);
+      const config = readBlockConfig(block);
+      removeStyleConfigRow(block);
 
-      assert.strictEqual(result, undefined);
+      assert.strictEqual(config.style, undefined);
       assert.strictEqual(block.children.length, 1, 'other row should remain');
     });
 
-    it('handles "CSS:" key case-insensitively', () => {
+    it('handles "style" key case-insensitively (readBlockConfig uses toClassName)', () => {
       const block = document.createElement('div');
       const row = document.createElement('div');
-      row.textContent = 'STYLE: styles/custom.css';
+      const keyCell = document.createElement('div');
+      keyCell.textContent = 'STYLE';
+      const valueCell = document.createElement('div');
+      valueCell.textContent = 'styles/custom.css';
+      row.appendChild(keyCell);
+      row.appendChild(valueCell);
       block.appendChild(row);
 
-      const result = DocBasedFormToAF.parseStyleFromBlock(block);
+      const config = readBlockConfig(block);
+      const stylePath = normalizeStylePath(config.style);
+      removeStyleConfigRow(block);
 
-      assert.strictEqual(result, 'styles/custom.css');
+      assert.strictEqual(stylePath, 'styles/custom.css');
       assert.strictEqual(block.children.length, 0);
+    });
+  });
+
+  describe('normalizeStylePath', () => {
+    it('returns path unchanged when relative', () => {
+      assert.strictEqual(normalizeStylePath('styles/custom.css'), 'styles/custom.css');
+    });
+
+    it('strips leading slash from absolute URL pathname', () => {
+      assert.strictEqual(
+        normalizeStylePath('http://localhost/blocks/form/form-1.css'),
+        'blocks/form/form-1.css',
+      );
+    });
+
+    it('returns undefined for null, undefined, empty string', () => {
+      assert.strictEqual(normalizeStylePath(null), undefined);
+      assert.strictEqual(normalizeStylePath(undefined), undefined);
+      assert.strictEqual(normalizeStylePath(''), undefined);
     });
   });
 
@@ -87,7 +153,7 @@ describe('Custom form styles', () => {
       assert.ok(link.href.includes('/base/blocks/form/form-2.css') || link.href.endsWith('blocks/form/form-2.css'), 'href should include style path');
     });
 
-    it('loads stylesheet when document-based block has "css: path" row', async () => {
+    it('loads stylesheet when document-based block has style row (two-cell with link)', async () => {
       const sheetDef = {
         total: 1,
         offset: 0,
@@ -96,21 +162,21 @@ describe('Custom form styles', () => {
         ':type': 'sheet',
       };
       const block = document.createElement('div');
-      const cssRow = document.createElement('div');
-      cssRow.textContent = 'style: blocks/form/form-1.css';
-      block.appendChild(cssRow);
       const pre = document.createElement('pre');
       const code = document.createElement('code');
       code.textContent = JSON.stringify(JSON.stringify(sheetDef));
       pre.appendChild(code);
       block.appendChild(pre);
+      block.appendChild(createStyleRow('blocks/form/form-1.css'));
 
       await decorate(block);
 
       const link = document.head.querySelector('link[rel="stylesheet"][href*="blocks/form/form-1.css"]');
-      assert.ok(link, 'stylesheet link should be added for document-based form with css row');
-      const configRow = [...block.children].find((el) => el.textContent?.trim().toLowerCase().startsWith('style:'));
-      assert.strictEqual(configRow, undefined, 'css config row should be removed from block');
+      assert.ok(link, 'stylesheet link should be added for document-based form with style row');
+      const styleConfigRow = [...block.children].find(
+        (el) => el.children?.[0]?.textContent?.trim()?.toLowerCase() === 'style',
+      );
+      assert.strictEqual(styleConfigRow, undefined, 'style config row should be removed from block');
     });
 
     it('does not add stylesheet when formDef has no properties.style', async () => {
@@ -204,7 +270,7 @@ describe('Custom form styles', () => {
       assert.strictEqual(computed.outlineStyle, 'solid', 'custom style outline-style should be applied');
     });
 
-    it('applies custom styles to the form when stylesheet is loaded (document-based with css row)', async () => {
+    it('applies custom styles to the form when stylesheet is loaded (document-based with style row)', async () => {
       const sheetDef = {
         total: 1,
         offset: 0,
@@ -213,14 +279,12 @@ describe('Custom form styles', () => {
         ':type': 'sheet',
       };
       const block = document.createElement('div');
-      const cssRow = document.createElement('div');
-      cssRow.textContent = 'style: test/unit/fixtures/custom-styles/rendition-fixture.css';
-      block.appendChild(cssRow);
       const pre = document.createElement('pre');
       const code = document.createElement('code');
       code.textContent = JSON.stringify(JSON.stringify(sheetDef));
       pre.appendChild(code);
       block.appendChild(pre);
+      block.appendChild(createStyleRow('test/unit/fixtures/custom-styles/rendition-fixture.css'));
 
       await decorate(block);
 
