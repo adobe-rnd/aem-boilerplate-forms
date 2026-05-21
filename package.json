@@ -28,6 +28,7 @@
     "update": "npm run update:core && npm run update:formula && npm run update:formatters",
     "update:mappings": "node tools/update-mappings.js",
     "create:custom-component": "node tools/forms-scaffolder.js",
+    "server": "node server/server.js",
     "postinstall": "npx playwright install chromium"
   },
   "c8": {
@@ -56,11 +57,16 @@
     "url": "https://github.com/adobe/aem-boilerplate/issues"
   },
   "homepage": "https://github.com/adobe/aem-boilerplate#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.1",
+    "cors": "^2.8.6",
+    "express": "^4.22.2"
+  },
   "devDependencies": {
     "@adobe/json-formula": "0.1.50",
     "@aemforms/af-core": "0.22.167",
-    "@aemforms/af-formatters": "0.22.167",
     "@aemforms/af-custom-functions": "1.0.14",
+    "@aemforms/af-formatters": "0.22.167",
     "@babel/eslint-parser": "7.28.0",
     "@playwright/test": "^1.43.1",
     "@testing-library/dom": "9.3.4",

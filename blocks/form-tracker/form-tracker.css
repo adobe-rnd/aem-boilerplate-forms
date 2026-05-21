@@ -1,0 +1,35 @@
+.fis-continue-banner {
+    background: #f0f7ff;
+    border: 1px solid #b3d4f5;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.fis-continue-banner p {
+    margin: 0;
+    flex: 1;
+}
+
+.fis-btn-yes,
+.fis-btn-no {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.fis-btn-yes {
+    background: #0070f3;
+    color: #fff;
+}
+
+.fis-btn-no {
+    background: #e0e0e0;
+    color: #333;
+}

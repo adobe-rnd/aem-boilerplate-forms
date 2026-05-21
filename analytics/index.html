@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Form Intelligence — Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="analytics.css" />
+</head>
+<body>
+  <header class="fis-header">
+    <h1>Form Intelligence Dashboard</h1>
+    <div class="fis-controls">
+      <input type="text" id="formIdInput" placeholder="Enter form ID or path" />
+      <button id="loadBtn">Load Analytics</button>
+    </div>
+  </header>
+
+  <main id="dashboard" class="fis-dashboard hidden">
+
+    <!-- Overview -->
+    <section class="fis-section">
+      <h2>Overview</h2>
+      <div class="fis-cards">
+        <div class="fis-card">
+          <span class="fis-card-label">Total Sessions</span>
+          <span class="fis-card-value" id="totalSessions">—</span>
+        </div>
+        <div class="fis-card">
+          <span class="fis-card-label">Completion Rate</span>
+          <span class="fis-card-value" id="completionRate">—</span>
+        </div>
+        <div class="fis-card">
+          <span class="fis-card-label">Drop-off Rate</span>
+          <span class="fis-card-value" id="dropOffRate">—</span>
+        </div>
+        <div class="fis-card">
+          <span class="fis-card-label">Return Rate</span>
+          <span class="fis-card-value" id="returnRate">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Field Breakdown -->
+    <section class="fis-section">
+      <h2>Field Breakdown</h2>
+      <div class="fis-charts">
+        <div class="fis-chart-box">
+          <h3>Drop-off Rate per Field</h3>
+          <canvas id="dropOffChart"></canvas>
+        </div>
+        <div class="fis-chart-box">
+          <h3>Avg Time Spent per Field (seconds)</h3>
+          <canvas id="timeChart"></canvas>
+        </div>
+        <div class="fis-chart-box">
+          <h3>Avg Errors per Field</h3>
+          <canvas id="errorChart"></canvas>
+        </div>
+      </div>
+      <div id="fieldTable" class="fis-field-table"></div>
+    </section>
+
+    <!-- AI Insights -->
+    <section class="fis-section">
+      <h2>AI Insights & Fix Suggestions</h2>
+      <button id="generateInsightsBtn" class="fis-btn-primary">Generate Insights</button>
+      <div id="insightsContainer" class="fis-insights"></div>
+    </section>
+
+  </main>
+
+  <div id="notReady" class="fis-not-ready hidden">
+    <p id="notReadyMsg"></p>
+  </div>
+
+  <script type="module" src="analytics.js"></script>
+</body>
+</html>
