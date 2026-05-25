@@ -16,6 +16,16 @@
       "label": { "value": "Last Name" }
     },
     {
+      "name": "full_name",
+      "fieldType": "text-input",
+      "type": "string",
+      "label": { "value": "Full Name" },
+      "visible": false,
+      "rules": {
+        "value": "$form.first_name & ' ' & $form.last_name"
+      }
+    },
+    {
       "name": "email",
       "fieldType": "email",
       "type": "string",
