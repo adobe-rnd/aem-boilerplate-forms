@@ -440,8 +440,9 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
     const data = needsPrefill ? await fetchData(formDef?.id, window.location.search || '') : null;
     const ruleEngine = await import('./model/afb-runtime.js');
     const formDefWithData = { ...formDef, ...(data != null && { data }) };
-    const form = ruleEngine.createFormInstance(formDefWithData, undefined, LOG_LEVEL);
-    return renderHTMLForm(form.getState(true), data);
+    const afbForm = ruleEngine.createFormInstance(formDefWithData, undefined, LOG_LEVEL);
+    const response = await renderHTMLForm(afbForm.getState(true), data);
+    return { ...response, afbForm };
   }
   const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`, { type: 'module' });
   // Pass the current URL to the worker for log level determination
@@ -475,7 +476,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
         myWorker.postMessage({
           name: 'decorated',
         });
-        resolve(response);
+        resolve({ ...response, afbForm: null });
       }
 
       if (e.data.name === 'restoreState') {
@@ -528,7 +529,7 @@ export async function initAdaptiveForm(formDef, createForm) {
   preloadFunctionScripts(formDef?.properties?.customFunctionsPath, window.hlx?.codeBasePath);
   await registerCustomFunctions(formDef?.properties?.customFunctionsPath || '/blocks/form/functions.js', window.hlx?.codeBasePath);
   const response = await initializeRuleEngineWorker(formDef, createForm);
-  return response?.form;
+  return { form: response?.form, afbForm: response?.afbForm };
 }
 
 /**

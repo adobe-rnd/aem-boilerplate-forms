@@ -524,6 +524,7 @@ export default async function decorate(block) {
   let source = 'aem';
   let rules = true;
   let form;
+  let afbForm;
   if (formDef) {
     const submitProps = formDef?.properties?.['fd:submit'];
     const actionType = submitProps?.actionName || formDef?.properties?.actionType;
@@ -553,7 +554,7 @@ export default async function decorate(block) {
       afModule = await import('./rules/index.js');
       addRequestContextToForm(formDef);
       if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
-        form = await afModule.initAdaptiveForm(formDef, createForm);
+        ({ form, afbForm } = await afModule.initAdaptiveForm(formDef, createForm));
       } else {
         form = await createFormForAuthoring(formDef);
       }
@@ -569,4 +570,5 @@ export default async function decorate(block) {
     }
     container.replaceWith(form);
   }
+  return { form, afbForm };
 }
