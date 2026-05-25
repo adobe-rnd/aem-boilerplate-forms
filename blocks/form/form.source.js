@@ -282,7 +282,15 @@ function renderField(fd) {
   return field;
 }
 
-export async function generateFormRendition(panel, container, formId, getItems = (p) => p?.items) {
+export async function generateFormRendition(
+  panel,
+  container,
+  formId,
+  getItems = (p) => p?.items,
+  options = {},
+) {
+  const { lazyPanels, lazyComponents } = options;
+  const activeChildId = panel.activeChild?.id ?? panel.activeChild;
   const items = getItems(panel) || [];
   const promises = items.map(async (field) => {
     field.value = field.value ?? '';
@@ -299,10 +307,27 @@ export async function generateFormRendition(panel, container, formId, getItems =
     }
     colSpanDecorator(field, element);
     if (field?.fieldType === 'panel') {
-      await generateFormRendition(field, element, formId, getItems);
+      // Defer non-active wizard panels and initially-hidden panels — render wrapper only.
+      if (lazyPanels && (
+        (activeChildId != null && field.id !== activeChildId)
+        || field.visible === false
+      )) {
+        lazyPanels.set(field.id, { fieldData: field, formId, getItems });
+        return element;
+      }
+      await generateFormRendition(field, element, formId, getItems, options);
       return element;
     }
-    await componentDecorator(element, field, container, formId);
+    // Defer component JS/CSS for initially-hidden fields — DOM wrapper is still appended so
+    // fieldChanged events can find the element; decorator runs when the field becomes visible.
+    if (field.visible === false && lazyComponents && field[':type'] !== 'analytics') {
+      lazyComponents.set(field.id, {
+        thunk: () => componentDecorator(element, field, container, formId),
+        qualifiedName: field.qualifiedName,
+      });
+    } else {
+      await componentDecorator(element, field, container, formId);
+    }
     return element;
   });
 
@@ -349,7 +374,26 @@ export async function createForm(formDef, data, source = 'aem') {
     form.className = formDef.appliedCssClassNames;
   }
   const formId = extractIdFromUrl(formPath); // formDef.id returns $form after getState()
-  await generateFormRendition(formDef, form, formId);
+  // Lazy rendering is opt-in via formDef.properties.lazyRendering = true. When enabled,
+  // non-active wizard panels and visible=false fields are deferred — wrappers are still
+  // appended (so fieldChanged events can find them) but decorators/children run only when
+  // the field/panel becomes active or visible.
+  const lazyEnabled = formDef?.properties?.lazyRendering === true;
+  const lazyPanels = lazyEnabled ? new Map() : undefined;
+  const lazyComponents = lazyEnabled ? new Map() : undefined;
+  await generateFormRendition(
+    formDef,
+    form,
+    formId,
+    undefined,
+    lazyEnabled ? { lazyPanels, lazyComponents } : {},
+  );
+  if (lazyEnabled) {
+    /* eslint-disable no-underscore-dangle */
+    form._lazyPanels = lazyPanels;
+    form._lazyComponents = lazyComponents;
+    /* eslint-enable no-underscore-dangle */
+  }
 
   let captcha;
   if (captchaField) {
