@@ -441,8 +441,15 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
     const ruleEngine = await import('./model/afb-runtime.js');
     const formDefWithData = { ...formDef, ...(data != null && { data }) };
     const afbForm = ruleEngine.createFormInstance(formDefWithData, undefined, LOG_LEVEL);
-    const response = await renderHTMLForm(afbForm.getState(true), data);
-    return { ...response, afbForm };
+    const formState = afbForm.getState(true);
+    const response = await renderHTMLForm(formState, data);
+    if (response?.form) {
+      // Wire DOM events to the model, same as the worker path does after restoreState.
+      // dataset.id must be set before loadRuleEngine keys into formModels.
+      response.form.dataset.id = formDef.id;
+      await loadRuleEngine(formState, response.form, response.captcha, response.generateFormRendition, data);
+    }
+    return { ...response, afbForm: formModels[formDef.id] ?? afbForm };
   }
   const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`, { type: 'module' });
   // Pass the current URL to the worker for log level determination
