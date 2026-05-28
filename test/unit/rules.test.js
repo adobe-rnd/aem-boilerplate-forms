@@ -5,7 +5,7 @@
  */
 import assert from 'assert';
 import Sinon from 'sinon';
-import { loadRuleEngine } from '../../blocks/form/rules/index.js';
+import { loadRuleEngine } from '../../blocks/form/rules/index.source.js';
 
 describe('Rule engine', () => {
   const formId = 'test-form-id';

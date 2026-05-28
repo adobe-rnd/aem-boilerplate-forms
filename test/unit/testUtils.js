@@ -5,7 +5,7 @@ import fs from 'fs';
 import jsdom from 'jsdom';
 import path from 'path';
 import Sinon from 'sinon';
-import decorate, { DELAY_MS, generateFormRendition } from '../../blocks/form/form.js';
+import decorate, { DELAY_MS, generateFormRendition } from '../../blocks/form/form.source.js';
 import { getCustomComponents, setCustomComponents } from '../../blocks/form/mappings.js';
 import { resetIds } from '../../blocks/form/util.js';
 import { annotateFormForEditing, getItems } from '../../scripts/form-editor-support.js';

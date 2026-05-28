@@ -4,7 +4,7 @@
  * Tests the actual fieldChanged implementation with a real form DOM.
  */
 import assert from 'assert';
-import { fieldChanged } from '../../blocks/form/rules/index.js';
+import { fieldChanged } from '../../blocks/form/rules/index.source.js';
 
 function makeFormWithField(fieldId = 'email') {
   const form = document.createElement('form');

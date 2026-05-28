@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import DocBasedFormToAF from '../../blocks/form/transform.js';
-import decorate from '../../blocks/form/form.js';
+import decorate from '../../blocks/form/form.source.js';
 import { createBlock } from './testUtils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
