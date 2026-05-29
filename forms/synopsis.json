@@ -591,7 +591,7 @@
         "colspan": 6
       },
       "rules": {
-        "visible": "$form.Country == 'United States'"
+        "visible": "$form.country == 'United States'"
       },
       "enum": [
         "Alabama",
@@ -713,7 +713,7 @@
         "colspan": 6
       },
       "rules": {
-        "visible": "$form.Country == 'Canada'"
+        "visible": "$form.country == 'Canada'"
       },
       "enum": [
         "Alberta",
@@ -755,7 +755,7 @@
         "colspan": 6
       },
       "rules": {
-        "visible": "$form.Country == 'India'"
+        "visible": "$form.country == 'India'"
       },
       "enum": [
         "Andaman and Nicobar Islands",
@@ -841,7 +841,7 @@
         "value": "State"
       },
       "rules": {
-        "value": "if($form.Country == 'United States', $form.State_US, if($form.Country == 'Canada', $form.Province, if($form.Country == 'India', $form.State_IN, '')))"
+        "value": "if($form.country == 'United States', $form.State_US, if($form.country == 'Canada', $form.Province, if($form.country == 'India', $form.State_IN, '')))"
       }
     },
     {
@@ -922,7 +922,7 @@
         "colspan": 12
       },
       "rules": {
-        "visible": "$form.Country != 'United States' && $form.Country != ''"
+        "visible": "$form.country != 'United States' && $form.country != ''"
       }
     },
     {
