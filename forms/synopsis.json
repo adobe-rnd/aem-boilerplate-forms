@@ -2,7 +2,7 @@
   "adaptiveform": "0.15.2",
   "items": [
     {
-      "name": "Email",
+      "name": "email",
       "fieldType": "email",
       "type": "string",
       "required": true,
@@ -15,7 +15,7 @@
       }
     },
     {
-      "name": "FirstName",
+      "name": "firstName",
       "fieldType": "text-input",
       "type": "string",
       "required": true,
@@ -27,7 +27,7 @@
       }
     },
     {
-      "name": "LastName",
+      "name": "lastName",
       "fieldType": "text-input",
       "type": "string",
       "required": true,
@@ -39,7 +39,7 @@
       }
     },
     {
-      "name": "Phone",
+      "name": "phone",
       "fieldType": "text-input",
       "type": "string",
       "required": true,
@@ -51,7 +51,7 @@
       }
     },
     {
-      "name": "Title",
+      "name": "title",
       "fieldType": "text-input",
       "type": "string",
       "required": true,
@@ -63,7 +63,7 @@
       }
     },
     {
-      "name": "Company",
+      "name": "company",
       "fieldType": "text-input",
       "type": "string",
       "required": true,
@@ -75,7 +75,7 @@
       }
     },
     {
-      "name": "Country",
+      "name": "country",
       "fieldType": "drop-down",
       "type": "string",
       "required": true,
@@ -833,7 +833,7 @@
       ]
     },
     {
-      "name": "State",
+      "name": "state",
       "fieldType": "text-input",
       "type": "string",
       "visible": false,
@@ -845,7 +845,7 @@
       }
     },
     {
-      "name": "City",
+      "name": "city",
       "fieldType": "text-input",
       "type": "string",
       "required": true,
