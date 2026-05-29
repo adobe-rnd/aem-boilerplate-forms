@@ -1050,34 +1050,6 @@ const replaceTemplatePlaceholders = (str, values = []) => {
         return typeof replacement !== 'undefined' ? replacement : match;
     });
 };
-const sanitizeName = (name) => {
-    const nameRegex = /^[A-Za-z0-9_$][A-Za-z0-9_.[\]]*$/;
-    if (name.includes('.')) {
-        const parts = name.split('.');
-        const sanitizedParts = parts.map((part) => {
-            if (part.includes('[')) {
-                const bracketIndex = part.indexOf('[');
-                const namePart = part.substring(0, bracketIndex);
-                const bracketPart = part.substring(bracketIndex);
-                if (!nameRegex.test(namePart)) {
-                    return `"${namePart}"${bracketPart}`;
-                }
-                return part;
-            }
-            else {
-                if (!nameRegex.test(part)) {
-                    return `"${part}"`;
-                }
-                return part;
-            }
-        });
-        return sanitizedParts.join('.');
-    }
-    if (!nameRegex.test(name)) {
-        return `"${name}"`;
-    }
-    return name;
-};
 const dateRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
 const emailRegex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -1468,6 +1440,7 @@ class BaseNode {
     _ruleNode;
     _lang = '';
     _callbacks = {};
+    _pendingViewEvents = {};
     _onlyViewNotify;
     _dependents = [];
     _jsonModel;
@@ -1500,6 +1473,13 @@ class BaseNode {
     }
     get fragment() {
         return this._fragment;
+    }
+    getFragmentRuleNode() {
+        if (this.fragment === '$form') {
+            return this.form.getRuleNode();
+        }
+        const fragmentContainer = this.form.resolveQualifiedName(this.fragment);
+        return fragmentContainer?.getRuleNode() ?? this.form.getRuleNode();
     }
     setupRuleNode() {
         const self = this;
@@ -1650,7 +1630,7 @@ class BaseNode {
                 } : {}),
                 ':type': this[':type'],
                 ...(forRestore ? {
-                    _dependents: this._dependents.length ? this.getDependents() : undefined,
+                    _dependents: this._dependents.length ? this.getDependents() : this._jsonModel._dependents,
                     allowedComponents: undefined,
                     columnClassNames: undefined,
                     columnCount: undefined,
@@ -1661,8 +1641,21 @@ class BaseNode {
     }
     subscribe(callback, eventName = 'change', dependentType = 'view') {
         this._callbacks[eventName] = this._callbacks[eventName] || [];
+        const isViewSubscriber = dependentType === 'view';
+        const hasExistingViewSubscriber = this._callbacks[eventName].some((x) => x.dependentType === 'view' || x.dependentType == null);
         const entry = { callback, dependentType };
         this._callbacks[eventName].push(entry);
+        if (isViewSubscriber && !hasExistingViewSubscriber) {
+            const pending = this._pendingViewEvents[eventName];
+            if (pending?.length) {
+                delete this._pendingViewEvents[eventName];
+                pending.forEach((action) => {
+                    this.withDependencyTrackingControl(true, () => {
+                        callback(new ActionImplWithTarget(action, this));
+                    });
+                });
+            }
+        }
         return {
             unsubscribe: () => {
                 this._callbacks[eventName] = this._callbacks[eventName].filter(x => x.callback !== callback);
@@ -1671,11 +1664,16 @@ class BaseNode {
     }
     _addDependent(dependent, propertyName) {
         const existingDependency = this._dependents.find(({ node, propertyName: existingProp }) => {
-            let isExistingDependent = node === dependent;
-            if (isExistingDependent && propertyName && propertyName.startsWith('properties.')) {
-                isExistingDependent = existingProp === propertyName;
+            if (node !== dependent) {
+                return false;
             }
-            return isExistingDependent;
+            if (propertyName && this.form.propDependencyBehaviour === 'strict') {
+                return existingProp === propertyName;
+            }
+            if (propertyName && propertyName.startsWith('properties.')) {
+                return existingProp === propertyName;
+            }
+            return true;
         });
         if (existingDependency === undefined) {
             const subscription = this.subscribe((change) => {
@@ -1683,6 +1681,9 @@ class BaseNode {
                 const propsToLook = [...dynamicProps, 'items'];
                 const isPropChanged = changes.findIndex(x => {
                     const changedPropertyName = x.propertyName;
+                    if (propertyName && this.form.propDependencyBehaviour === 'strict') {
+                        return changedPropertyName === propertyName;
+                    }
                     return propsToLook.includes(changedPropertyName) || (changedPropertyName.startsWith('properties.') && propertyName === changedPropertyName);
                 }) > -1;
                 if (isPropChanged) {
@@ -1698,11 +1699,9 @@ class BaseNode {
         }
     }
     removeDependent(dependent) {
-        const index = this._dependents.findIndex(({ node }) => node === dependent);
-        if (index > -1) {
-            this._dependents[index].subscription.unsubscribe();
-            this._dependents.splice(index, 1);
-        }
+        const toRemove = this._dependents.filter(({ node }) => node === dependent);
+        toRemove.forEach(dep => dep.subscription.unsubscribe());
+        this._dependents = this._dependents.filter(({ node }) => node !== dependent);
     }
     queueEvent(action) {
         if (this._onlyViewNotify) {
@@ -1749,6 +1748,10 @@ class BaseNode {
         const toRun = onlyView
             ? entries.filter(e => e.dependentType === 'view' || e.dependentType === undefined)
             : entries;
+        if (entries.length === 0 && !onlyView && action.isCustomEvent) {
+            this._pendingViewEvents[action.type] = this._pendingViewEvents[action.type] || [];
+            this._pendingViewEvents[action.type].push(action);
+        }
         toRun.forEach(({ callback }) => {
             this.withDependencyTrackingControl(true, () => {
                 callback(new ActionImplWithTarget(action, this));
@@ -1994,8 +1997,7 @@ class Scriptable extends BaseNode {
                 let updatedRule = eString;
                 try {
                     if (this.fragment !== '$form') {
-                        const sanitizedFragment = sanitizeName(this.fragment);
-                        updatedRule = eString.replaceAll('$form', sanitizedFragment);
+                        updatedRule = eString.replaceAll('$form', '$fragment');
                     }
                     this._rules[eName] = this.ruleEngine.compileRule(updatedRule, this.lang);
                 }
@@ -2032,8 +2034,7 @@ class Scriptable extends BaseNode {
                     let updatedExpr = x;
                     try {
                         if (this.fragment !== '$form') {
-                            const sanitizedFragment = sanitizeName(this.fragment);
-                            updatedExpr = x.replaceAll('$form', sanitizedFragment);
+                            updatedExpr = x.replaceAll('$form', '$fragment');
                         }
                         return this.ruleEngine.compileRule(updatedExpr, this.lang);
                     }
@@ -2054,6 +2055,11 @@ class Scriptable extends BaseNode {
             }
         }
         return this._events[eName] || [];
+    }
+    getState(forRestore = false) {
+        const state = super.getState(forRestore);
+        state.events = state.events || {};
+        return state;
     }
     applyUpdates(updates) {
         if (typeof updates === 'object') {
@@ -2158,7 +2164,8 @@ class Scriptable extends BaseNode {
             'form': this.form,
             '$form': this.form.getRuleNode(),
             '$field': this.getRuleNode(),
-            'field': this
+            'field': this,
+            '$fragment': this.getFragmentRuleNode()
         };
         const node = this.ruleEngine.compileRule(expr, this.lang);
         return this.ruleEngine.execute(node, this.getExpressionScope(), ruleContext, false, expr);
@@ -2174,6 +2181,7 @@ class Scriptable extends BaseNode {
             '$form': this.form.getRuleNode(),
             '$field': this.getRuleNode(),
             'field': this,
+            '$fragment': this.getFragmentRuleNode(),
             '$event': {
                 type: action.type,
                 payload: action.payload,
@@ -2666,8 +2674,9 @@ class Container extends Scriptable {
         this._setProperty('enabled', e, true, this.notifyChildren);
     }
     get readOnly() {
-        if (this.parent?.readOnly !== undefined) {
-            return this.parent.readOnly ? true : this._jsonModel.readOnly;
+        const parentReadOnly = this.parent?.readOnly;
+        if (parentReadOnly !== undefined) {
+            return parentReadOnly ? true : this._jsonModel.readOnly;
         }
         else {
             return this._jsonModel.readOnly;
@@ -3203,6 +3212,7 @@ class FunctionRuntimeImpl {
                             form: interpreter.globals.$form,
                             field: interpreter.globals.$field,
                             event: interpreter.globals.$event,
+                            fragment: interpreter.globals.$fragment,
                             functions: {
                                 setProperty: (target, payload) => {
                                     const eventName = 'custom:setProperty';
@@ -3310,6 +3320,18 @@ class FunctionRuntimeImpl {
                                         body: response?.body,
                                         headers: response?.headers
                                     };
+                                },
+                                addInstance: (element, index) => {
+                                    const args = index !== undefined ? [element, index] : [element];
+                                    return FunctionRuntimeImpl.getInstance().getFunctions().addInstance._func.call(undefined, args, data, interpreter);
+                                },
+                                removeInstance: (element, index) => {
+                                    const args = index !== undefined ? [element, index] : [element];
+                                    return FunctionRuntimeImpl.getInstance().getFunctions().removeInstance._func.call(undefined, args, data, interpreter);
+                                },
+                                getQueryParameter: (param) => {
+                                    const args = [param];
+                                    return FunctionRuntimeImpl.getInstance().getFunctions().getQueryParameter._func.call(undefined, args, data, interpreter);
                                 }
                             }
                         };
@@ -3691,8 +3713,8 @@ class FunctionRuntimeImpl {
             dispatchEvent: {
                 _func: (args, data, interpreter) => {
                     const element = args[0];
-                    if (element === null && typeof interpreter !== 'string') {
-                        interpreter.debug.push('Invalid argument passed in dispatchEvent. An element is expected');
+                    if (element == null && typeof interpreter !== 'string') {
+                        interpreter.globals.form.logger.error(`dispatchEvent: target element is null or undefined. Event "${valueOf(args[1])}" was skipped.`);
                         return {};
                     }
                     let eventName = valueOf(args[1]);
@@ -4024,6 +4046,9 @@ class Form extends Container {
     }
     get changeEventBehaviour() {
         return this.properties['fd:changeEventBehaviour'] === 'deps' ? 'deps' : 'self';
+    }
+    get propDependencyBehaviour() {
+        return this.properties['fd:propDependencyBehaviour'] === 'strict' ? 'strict' : 'any';
     }
     dataRefRegex = /("[^"]+?"|[^.]+?)(?:\.|$)/g;
     get metaData() {
@@ -4395,7 +4420,8 @@ class RuleEngine {
     _globalNames = [
         '$form',
         '$field',
-        '$event'
+        '$event',
+        '$fragment'
     ];
     customFunctions;
     debugInfo = [];
@@ -4722,8 +4748,9 @@ class Field extends Scriptable {
         this._setProperty('placeholder', value);
     }
     get readOnly() {
-        if (this.parent.readOnly !== undefined) {
-            return this.parent.readOnly === true ? true : this._jsonModel.readOnly;
+        const parentReadOnly = this.parent.readOnly;
+        if (parentReadOnly !== undefined) {
+            return parentReadOnly === true ? true : this._jsonModel.readOnly;
         }
         else {
             return this._jsonModel.readOnly;
@@ -5278,6 +5305,7 @@ class Field extends Scriptable {
             const changeAction = propertyChange('value', dataNode.$value, this._jsonModel.value);
             this._jsonModel.value = dataNode.$value;
             this.queueEvent(changeAction);
+            this.evaluateConstraints();
         }
     }
     defaultDataModel(name) {
