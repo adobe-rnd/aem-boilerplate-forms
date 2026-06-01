@@ -31,6 +31,7 @@ import {
 import registerCustomFunctions, { preloadFunctionScripts } from './functionRegistration.js';
 import { LOG_LEVEL } from '../constant.js';
 import { createOptimizedPicture } from '../../../scripts/aem.js';
+import { CustomEvent as RuntimeCustomEvent } from './model/afb-events.js';
 
 const formSubscriptions = {};
 const formModels = {};
@@ -430,7 +431,7 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
       callback(fieldDiv, model, 'register');
     });
   }
-  form.dispatch(new CustomEvent('formViewInitialized'));
+  form.dispatch(new RuntimeCustomEvent('formViewInitialized'));
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
