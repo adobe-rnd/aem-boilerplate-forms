@@ -19,6 +19,7 @@
     "build:json:filters": "merge-json-cli -i \"models/_component-filters.json\" -o \"component-filters.json\"",
     "prepare": "husky",
     "test:unit": "npm run build:json --silent && mocha",
+    "setup:e2e": "playwright install chromium",
     "test:e2e": "playwright test",
     "debug:e2e": "playwright test --project='chromium' --debug",
     "update:formula": "rollup -c rollup/jsonformula.rollup.config.js",
@@ -27,8 +28,8 @@
     "update:functions": "cp node_modules/@aemforms/af-custom-functions/src/index.js blocks/form/rules/functions.js",
     "update": "npm run update:core && npm run update:formula && npm run update:formatters",
     "update:mappings": "node tools/update-mappings.js",
-    "create:custom-component": "node tools/forms-scaffolder.js",
-    "postinstall": "npx playwright install chromium"
+    "create:custom-component": "node tools/forms-scaffolder.js"
+
   },
   "c8": {
     "exclude": [
