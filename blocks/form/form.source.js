@@ -2,7 +2,7 @@ import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
-import componentDecorator from './mappings.js';
+import componentDecorator, { getCustomComponents } from './mappings.js';
 import { handleSubmit } from './submit.js';
 import DocBasedFormToAF from './transform.js';
 import {
@@ -307,6 +307,24 @@ export async function generateFormRendition(
     }
     colSpanDecorator(field, element);
     if (field?.fieldType === 'panel') {
+      // Custom component panels that contain nested child panels must have those child panels
+      // rendered eagerly (not deferred via _lazyPanels). Their subscribe callbacks run once
+      // at decoration time and query for child elements via querySelector — those elements
+      // must already be in DOM when subscribe fires.
+      //
+      // The check is limited to custom components WITH nested child panels:
+      //   - Custom components without child panels: no _lazyPanels issue (non-panel children
+      //     are always rendered regardless of the lazyPanels option).
+      //   - Custom components that are themselves visible=false (lazy): already safe — the
+      //     lazy render path calls generateFormRendition without lazyPanels, so their children
+      //     render eagerly automatically when the component surfaces.
+      //   - OOTB panels (modal, accordion, wizard): fixed in their own component code.
+      const isCustomWithChildPanels = getCustomComponents().includes(field[':type'])
+        && field.items?.some((item) => item.fieldType === 'panel');
+      // For custom components with child panels, disable _lazyPanels for their children
+      // so nested panels render immediately instead of being deferred.
+      const childOptions = isCustomWithChildPanels ? { ...options, lazyPanels: null } : options;
+
       // Defer non-active wizard panels and initially-hidden panels — render wrapper only.
       if (lazyPanels && (
         (activeChildId != null && field.id !== activeChildId)
@@ -315,7 +333,7 @@ export async function generateFormRendition(
         lazyPanels.set(field.id, { fieldData: field, formId, getItems });
         return element;
       }
-      await generateFormRendition(field, element, formId, getItems, options);
+      await generateFormRendition(field, element, formId, getItems, childOptions);
       return element;
     }
     // Defer component JS/CSS for initially-hidden fields — DOM wrapper is still appended so
