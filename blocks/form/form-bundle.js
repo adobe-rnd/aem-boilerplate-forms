@@ -1,6 +1,6 @@
 import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import { getSubmitBaseUrl, defaultErrorMessages, DEFAULT_THANK_YOU_MESSAGE, LOG_LEVEL, SUBMISSION_SERVICE, emailPattern } from './constant.js';
-import { registerFunctions as registerFunctions$1 } from './rules/model/afb-runtime.js';
+import { registerFunctions as registerFunctions$1 } from './rules/model/afb-runtime.min.js';
 
 function externalize(url) {
   const submitBaseUrl = getSubmitBaseUrl();
@@ -9,158 +9,6 @@ function externalize(url) {
   }
   return url;
 }
-function validateURL(url) {
-  try {
-    const validatedUrl = new URL(url, window.location.href);
-    return (validatedUrl.protocol === 'http:' || validatedUrl.protocol === 'https:');
-  } catch (err) {
-    return false;
-  }
-}
-function toObject(str) {
-  if (typeof str === 'string') {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return {};
-    }
-  }
-  return str;
-}
-function navigateTo(destinationURL, destinationType) {
-  let param = null;
-  const windowParam = window;
-  let arg = null;
-  switch (destinationType) {
-    case '_newwindow':
-      param = '_blank';
-      arg = 'width=1000,height=800';
-      break;
-  }
-  if (!param) {
-    if (destinationType) {
-      param = destinationType;
-    } else {
-      param = '_blank';
-    }
-  }
-  if (validateURL(destinationURL)) {
-    windowParam.open(destinationURL, param, arg);
-  }
-}
-function defaultErrorHandler(response, headers, globals) {
-  if (response && response.validationErrors) {
-    response.validationErrors?.forEach((violation) => {
-      if (violation.details) {
-        if (violation.fieldName) {
-          globals.functions.markFieldAsInvalid(violation.fieldName, violation.details.join('\n'), { useQualifiedName: true });
-        } else if (violation.dataRef) {
-          globals.functions.markFieldAsInvalid(violation.dataRef, violation.details.join('\n'), { useDataRef: true });
-        }
-      }
-    });
-  }
-}
-function defaultSubmitSuccessHandler(globals) {
-  const { event } = globals;
-  const submitSuccessResponse = event?.payload?.body;
-  const { form } = globals;
-  if (submitSuccessResponse) {
-    if (submitSuccessResponse.redirectUrl) {
-      window.location.href = encodeURI(submitSuccessResponse.redirectUrl);
-    } else if (submitSuccessResponse.thankYouMessage) {
-      const formContainerElement = document.getElementById(`${form.$id}`);
-      const thankYouMessage = document.createElement('div');
-      thankYouMessage.setAttribute('class', 'tyMessage');
-      thankYouMessage.setAttribute('tabindex', '-1');
-      thankYouMessage.setAttribute('role', 'alertdialog');
-      thankYouMessage.innerHTML = submitSuccessResponse.thankYouMessage;
-      formContainerElement.replaceWith(thankYouMessage);
-      thankYouMessage.focus();
-    }
-  }
-}
-function defaultSubmitErrorHandler(defaultSubmitErrorMessage, globals) {
-  window.alert(defaultSubmitErrorMessage);
-}
-async function fetchCaptchaToken(globals) {
-  return new Promise((resolve, reject) => {
-    const successCallback = function (token) {
-      resolve(token);
-    };
-    const errorCallback = function (error) {
-      reject(error);
-    };
-    try {
-      const captcha = globals.form.$captcha;
-      if (captcha.$captchaProvider === 'turnstile') {
-        const turnstileContainer = document.getElementsByClassName('cmp-adaptiveform-turnstile__widget')[0];
-        const turnstileParameters = {
-          sitekey: captcha.$captchaSiteKey,
-          callback: successCallback,
-          'error-callback': errorCallback,
-        };
-        if (turnstile != undefined) {
-          const widgetId = turnstile.render(turnstileContainer, turnstileParameters);
-          if (widgetId) {
-            turnstile.execute(widgetId);
-          } else {
-            reject({ error: 'Failed to render turnstile captcha' });
-          }
-        } else {
-          reject({ error: 'Turnstile captcha not loaded' });
-        }
-      } else {
-        const siteKey = captcha?.$properties['fd:captcha']?.config?.siteKey;
-        const captchaElementName = captcha.$name.replaceAll('-', '_');
-        let captchaPath = captcha?.$properties['fd:path'];
-        const index = captchaPath.indexOf('/jcr:content');
-        let formName = '';
-        if (index > 0) {
-          captchaPath = captchaPath.substring(0, index);
-          formName = captchaPath.substring(captchaPath.lastIndexOf('/') + 1).replaceAll('-', '_');
-        }
-        const actionName = `submit_${formName}_${captchaElementName}`;
-        grecaptcha.enterprise.ready(() => {
-          grecaptcha.enterprise.execute(siteKey, { action: actionName })
-            .then((token) => resolve(token))
-            .catch((error) => reject(error));
-        });
-      }
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-function dateToDaysSinceEpoch(date) {
-  let dateObj;
-  if (typeof date === 'string') {
-    dateObj = new Date(date);
-  } else if (typeof date === 'number') {
-    return Math.floor(date);
-  } else if (date instanceof Date) {
-    dateObj = date;
-  } else {
-    throw new Error('Invalid date input');
-  }
-  if (isNaN(dateObj.getTime())) {
-    throw new Error('Invalid date input');
-  }
-  return Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24));
-}
-
-var functions$1 = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  externalize: externalize,
-  validateURL: validateURL,
-  navigateTo: navigateTo,
-  toObject: toObject,
-  defaultErrorHandler: defaultErrorHandler,
-  defaultSubmitSuccessHandler: defaultSubmitSuccessHandler,
-  defaultSubmitErrorHandler: defaultSubmitErrorHandler,
-  fetchCaptchaToken: fetchCaptchaToken,
-  dateToDaysSinceEpoch: dateToDaysSinceEpoch
-});
 
 const headings = Array.from({ length: 6 }, (_, i) => `<h${i + 1}>`).join('');
 const allowedTags = `${headings}<a><b><p><i><em><strong><ul><li><ol><br><hr><u><sup><sub><s>`;
@@ -679,9 +527,32 @@ function preloadFunctionScripts(customFunctionsPath, codeBasePath) {
     ? codeBasePath.replace(/\/$/, '')
     : '';
   const prefix = base ? `${base}/` : '/';
-  const paths = [`${prefix}blocks/form/rules/functions.js`];
+  const paths = [
+    `${prefix}blocks/form/rules/functions.min.js`,
+    `${prefix}blocks/form/functions.min.js`,
+  ];
   if (typeof customFunctionsPath === 'string' && customFunctionsPath.trim() !== '') {
-    paths.push(`${prefix}${customFunctionsPath.replace(/^\//, '').trim()}`);
+    const normalised = customFunctionsPath.replace(/^\//, '').trim();
+    const dir = normalised.replace(/[^/]+$/, '');
+    const filename = normalised.split('/').pop();
+    const basename = filename.replace(/\.js$/, '');
+    paths.push(`${prefix}${normalised}`);
+    paths.push(`${prefix}${dir}${basename}-bundle-eager.min.js`);
+    try {
+      const lazyHref = `${prefix}${dir}${basename}-bundle-lazy.min.js`;
+      const lazyUrl = lazyHref.startsWith('http')
+        ? lazyHref
+        : new URL(lazyHref, window.location.origin).href;
+      if (!preloadedUrls.has(lazyUrl)) {
+        preloadedUrls.add(lazyUrl);
+        const lazyLink = document.createElement('link');
+        lazyLink.rel = 'prefetch';
+        lazyLink.as = 'script';
+        lazyLink.href = lazyUrl;
+        document.head.appendChild(lazyLink);
+      }
+    } catch {
+    }
   }
   paths.forEach((href) => {
     try {
@@ -701,21 +572,40 @@ async function registerCustomFunctions(customFunctionsPath, codeBasePath) {
     function registerFunctionsInRuntime(module) {
       const keys = Object.keys(module);
       for (let i = 0; i < keys.length; i++) {
-        const name = keys[i];
-        const funcDef = module[keys[i]];
+        const key = keys[i];
+        const funcDef = module[key];
         if (typeof funcDef === 'function') {
           const functions = [];
-          functions[name] = funcDef;
+          functions[key] = funcDef;
           registerFunctions$1(functions);
         }
       }
     }
-    const ootbFunctionModule = await Promise.resolve().then(function () { return functions$1; });
-    registerFunctionsInRuntime(ootbFunctionModule);
-    if (codeBasePath != null && codeBasePath !== undefined && customFunctionsPath
-      && customFunctionsPath !== undefined) {
-      const customFunctionModule = await import(`${codeBasePath}${customFunctionsPath}`);
-      registerFunctionsInRuntime(customFunctionModule);
+    const base = (codeBasePath != null && codeBasePath !== undefined)
+      ? codeBasePath.replace(/\/$/, '')
+      : '';
+    const ootbFunctionsPath = base + '/blocks/form/rules/functions.min.js';
+    const imports = [import( ootbFunctionsPath)];
+    if (codeBasePath != null && codeBasePath !== undefined
+      && customFunctionsPath != null && customFunctionsPath !== undefined) {
+      imports.push(import(`${codeBasePath}${customFunctionsPath}`));
+    }
+    const results = await Promise.allSettled(imports);
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        registerFunctionsInRuntime(result.value);
+      } else {
+        console.warn(`failed to load functions module: ${result.reason?.message}`);
+      }
+    });
+    if (typeof window !== 'undefined') {
+      const eagerModule = results.find(
+        (r) => r.status === 'fulfilled' && typeof r.value?.loadLazyBundle === 'function',
+      );
+      if (eagerModule) {
+        window.hlx = window.hlx || {};
+        window.hlx.loadLazyBundle = eagerModule.value.loadLazyBundle;
+      }
     }
   } catch (e) {
     console.log(`error occured while registering custom functions in web worker ${e.message}`);
@@ -738,7 +628,14 @@ function compare(fieldVal, htmlVal, type) {
   }
   return fieldVal === htmlVal;
 }
-function handleActiveChild(id, form) {
+function getLivePanelState(panelId, form) {
+  const liveModel = formModels[form.dataset?.id];
+  if (!liveModel) return null;
+  let livePanel = null;
+  liveModel.visit((f) => { if (f.id === panelId) livePanel = f; });
+  return livePanel ? livePanel.getState(true) : null;
+}
+function handleActiveChild(id, form, generateFormRendition) {
   form.querySelectorAll('[data-active="true"]').forEach((ele) => ele.removeAttribute('data-active'));
   const field = form.querySelector(`#${id}`);
   if (field) {
@@ -746,6 +643,26 @@ function handleActiveChild(id, form) {
     field.focus();
     if (document.activeElement !== field && !field.contains(document.activeElement)) {
       field.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+  if (generateFormRendition && form._lazyPanels?.has(id)) {
+    const { fieldData, formId, getItems } = form._lazyPanels.get(id);
+    form._lazyPanels.delete(id);
+    const panelEl = form.querySelector(`#${id}`);
+    if (panelEl) {
+      const renderData = getLivePanelState(id, form) || fieldData;
+      const promise = generateFormRendition(
+        renderData,
+        panelEl,
+        formId,
+        getItems,
+        { lazyComponents: form._lazyComponents },
+      );
+      if (fieldData.qualifiedName) {
+        renderPromises[fieldData.qualifiedName] = promise;
+        promise.then(() => { delete renderPromises[fieldData.qualifiedName]; });
+      }
+      promise.then(() => handleActiveChild(id, form, null));
     }
   }
 }
@@ -829,15 +746,64 @@ async function fieldChanged(payload, form, generateFormRendition) {
           field.value = valueToSet;
         }
         break;
-      case 'visible':
+      case 'visible': {
+        if (String(fieldWrapper.dataset.visible) === String(currentValue)) break;
+        if (currentValue === true && fieldType !== 'panel' && form._lazyComponents?.has(id)) {
+          if (!formModels[form.dataset?.id]) {
+            form._pendingLazyComponents = form._pendingLazyComponents || new Set();
+            form._pendingLazyComponents.add(id);
+          } else {
+            const { thunk, qualifiedName: qn } = form._lazyComponents.get(id);
+            form._lazyComponents.delete(id);
+            const promise = thunk();
+            const setVisible = () => { fieldWrapper.dataset.visible = 'true'; };
+            if (qn) {
+              renderPromises[qn] = promise;
+              promise.then(() => { delete renderPromises[qn]; setVisible(); });
+            } else {
+              promise.then(setVisible);
+            }
+          }
+          break;
+        }
+        if (currentValue === true && fieldType === 'panel' && form._preRenderPromises?.has(id)) {
+          form._preRenderPromises.get(id).then(() => { fieldWrapper.dataset.visible = 'true'; });
+          break;
+        }
         fieldWrapper.dataset.visible = currentValue;
         if (fieldType === 'panel' && fieldWrapper.querySelector('dialog')) {
           const dialog = fieldWrapper.querySelector('dialog');
           if (currentValue === false && dialog.open) {
             dialog.close();
           }
+          if (currentValue === true && !dialog.open) {
+            dialog.showModal();
+            document.body.classList.add('modal-open');
+          }
+        }
+        if (currentValue === true && fieldType === 'panel' && generateFormRendition && form._lazyPanels?.has(id)) {
+          const liveState = getLivePanelState(id, form);
+          if (!liveState) {
+            form._pendingLazyRenders = form._pendingLazyRenders || new Set();
+            form._pendingLazyRenders.add(id);
+          } else {
+            const { fieldData, formId: storedFormId, getItems } = form._lazyPanels.get(id);
+            form._lazyPanels.delete(id);
+            const promise = generateFormRendition(
+              liveState,
+              field,
+              storedFormId,
+              getItems,
+              { lazyComponents: form._lazyComponents },
+            );
+            if (fieldData.qualifiedName) {
+              renderPromises[fieldData.qualifiedName] = promise;
+              promise.then(() => { delete renderPromises[fieldData.qualifiedName]; });
+            }
+          }
         }
         break;
+      }
       case 'enabled':
         if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
           if (readOnly === false) {
@@ -910,7 +876,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
           renderPromises[currentValue?.qualifiedName] = promise;
         }
         break;
-      case 'activeChild': handleActiveChild(activeChild, form);
+      case 'activeChild': handleActiveChild(activeChild, form, generateFormRendition);
         break;
       case 'valid':
         if (currentValue === true) {
@@ -937,12 +903,12 @@ async function fieldChanged(payload, form, generateFormRendition) {
     }
   });
 }
-function formChanged(payload, form) {
+function formChanged(payload, form, generateFormRendition) {
   const { changes } = payload;
   changes.forEach((change) => {
     const { propertyName, currentValue } = change;
     switch (propertyName) {
-      case 'activeChild': handleActiveChild(currentValue?.id, form);
+      case 'activeChild': handleActiveChild(currentValue?.id, form, generateFormRendition);
         break;
     }
   });
@@ -952,7 +918,7 @@ function handleRuleEngineEvent(e, form, generateFormRendition) {
   if (type === 'fieldChanged') {
     fieldChanged(payload, form, generateFormRendition);
   } else if (type === 'change') {
-    formChanged(payload, form);
+    formChanged(payload, form, generateFormRendition);
   } else if (type === 'submitSuccess') {
     submitSuccess(e, form);
   } else if (type === 'submitFailure') {
@@ -1041,6 +1007,84 @@ async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
+  if (htmlForm._lazyPanels?.size) {
+    htmlForm._preRenderPromises = new Map();
+    htmlForm._lazyPanels.forEach(({ fieldData, formId, getItems }, id) => {
+      const liveState = getLivePanelState(id, htmlForm);
+      if (liveState && liveState.visible === true) {
+        const panelEl = htmlForm.querySelector(`#${id}`);
+        if (panelEl) {
+          htmlForm._lazyPanels.delete(id);
+          const promise = genFormRendition(
+            liveState,
+            panelEl,
+            formId,
+            getItems,
+            { lazyComponents: htmlForm._lazyComponents },
+          );
+          htmlForm._preRenderPromises.set(id, promise);
+          promise.then(() => htmlForm._preRenderPromises?.delete(id));
+          if (fieldData.qualifiedName) {
+            renderPromises[fieldData.qualifiedName] = promise;
+            promise.then(() => { delete renderPromises[fieldData.qualifiedName]; });
+          }
+        }
+      }
+    });
+  }
+  if (htmlForm._pendingLazyRenders?.size) {
+    htmlForm._pendingLazyRenders.forEach((id) => {
+      if (!htmlForm._lazyPanels?.has(id)) return;
+      const { fieldData, formId, getItems } = htmlForm._lazyPanels.get(id);
+      const panelEl = htmlForm.querySelector(`#${id}`);
+      if (!panelEl) return;
+      const liveState = getLivePanelState(id, htmlForm);
+      htmlForm._lazyPanels.delete(id);
+      const promise = genFormRendition(
+        liveState || fieldData,
+        panelEl,
+        formId,
+        getItems,
+        { lazyComponents: htmlForm._lazyComponents },
+      );
+      if (fieldData.qualifiedName) {
+        renderPromises[fieldData.qualifiedName] = promise;
+        promise.then(() => { delete renderPromises[fieldData.qualifiedName]; });
+      }
+    });
+    htmlForm._pendingLazyRenders.clear();
+  }
+  if (htmlForm._lazyComponents?.size) {
+    htmlForm._lazyComponents.forEach(({ thunk, qualifiedName: qn }, id) => {
+      const liveField = formModels[htmlForm.dataset?.id]?.getElement(id);
+      if (liveField && liveField.visible === true) {
+        htmlForm._lazyComponents.delete(id);
+        const promise = thunk();
+        if (qn) {
+          renderPromises[qn] = promise;
+          promise.then(() => { delete renderPromises[qn]; });
+        }
+      }
+    });
+  }
+  if (htmlForm._pendingLazyComponents?.size) {
+    htmlForm._pendingLazyComponents.forEach((id) => {
+      if (!htmlForm._lazyComponents?.has(id)) return;
+      const liveField = formModels[htmlForm.dataset?.id]?.getElement(id);
+      const fieldWrapper = htmlForm.querySelector(`#${id}`)?.closest('.field-wrapper');
+      const { thunk, qualifiedName: qn } = htmlForm._lazyComponents.get(id);
+      htmlForm._lazyComponents.delete(id);
+      const promise = thunk();
+      const setVisible = () => { if (fieldWrapper) fieldWrapper.dataset.visible = 'true'; };
+      if (qn) {
+        renderPromises[qn] = promise;
+        promise.then(() => { delete renderPromises[qn]; if (liveField?.visible) setVisible(); });
+      } else {
+        promise.then(() => { if (liveField?.visible) setVisible(); });
+      }
+    });
+    htmlForm._pendingLazyComponents.clear();
+  }
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
@@ -2031,7 +2075,15 @@ function renderField(fd) {
   }
   return field;
 }
-async function generateFormRendition(panel, container, formId, getItems = (p) => p?.items) {
+async function generateFormRendition(
+  panel,
+  container,
+  formId,
+  getItems = (p) => p?.items,
+  options = {},
+) {
+  const { lazyPanels, lazyComponents } = options;
+  const activeChildId = panel.activeChild?.id ?? panel.activeChild;
   const items = getItems(panel) || [];
   const promises = items.map(async (field) => {
     field.value = field.value ?? '';
@@ -2048,10 +2100,27 @@ async function generateFormRendition(panel, container, formId, getItems = (p) =>
     }
     colSpanDecorator(field, element);
     if (field?.fieldType === 'panel') {
-      await generateFormRendition(field, element, formId, getItems);
+      const isCustomWithChildPanels = getCustomComponents().includes(field[':type'])
+        && field.items?.some((item) => item.fieldType === 'panel');
+      const childOptions = isCustomWithChildPanels ? { ...options, lazyPanels: null } : options;
+      if (lazyPanels && (
+        (activeChildId != null && field.id !== activeChildId)
+        || field.visible === false
+      )) {
+        lazyPanels.set(field.id, { fieldData: field, formId, getItems });
+        return element;
+      }
+      await generateFormRendition(field, element, formId, getItems, childOptions);
       return element;
     }
-    await componentDecorator(element, field, container, formId);
+    if (field.visible === false && lazyComponents && field[':type'] !== 'analytics') {
+      lazyComponents.set(field.id, {
+        thunk: () => componentDecorator(element, field, container, formId),
+        qualifiedName: field.qualifiedName,
+      });
+    } else {
+      await componentDecorator(element, field, container, formId);
+    }
     return element;
   });
   const children = await Promise.all(promises);
@@ -2092,7 +2161,20 @@ async function createForm(formDef, data, source = 'aem') {
     form.className = formDef.appliedCssClassNames;
   }
   const formId = extractIdFromUrl(formPath);
-  await generateFormRendition(formDef, form, formId);
+  const lazyEnabled = formDef?.properties?.lazyRendering === true;
+  const lazyPanels = lazyEnabled ? new Map() : undefined;
+  const lazyComponents = lazyEnabled ? new Map() : undefined;
+  await generateFormRendition(
+    formDef,
+    form,
+    formId,
+    undefined,
+    lazyEnabled ? { lazyPanels, lazyComponents } : {},
+  );
+  if (lazyEnabled) {
+    form._lazyPanels = lazyPanels;
+    form._lazyComponents = lazyComponents;
+  }
   let captcha;
   if (captchaField) {
     let config = captchaField?.properties?.['fd:captcha']?.config;
@@ -2211,17 +2293,37 @@ function addRequestContextToForm(formDef) {
     }
   }
 }
+function deferLoadCSS(href) {
+  const load = () => loadCSS(href).catch((error) => {
+    console.error('Failed to load deferred CSS:', error);
+  });
+  if (document.readyState === 'complete') {
+    window.setTimeout(load, 0);
+    return;
+  }
+  window.addEventListener('load', () => {
+    window.setTimeout(load, 0);
+  }, { once: true });
+}
 function loadFormCustomStyles(formDef) {
   const { style } = formDef?.properties || {};
-  if (style) {
-    try {
-      const base = (window.hlx?.codeBasePath || '').replace(/\/$/, '');
-      const stylePath = style.startsWith('/') ? style : `/${style}`;
-      loadCSS(`${base}${stylePath}`);
-    } catch (error) {
-      console.error('Failed to load form CSS:', error);
-    }
-  }
+  if (!style) return;
+  const base = (window.hlx?.codeBasePath || '').replace(/\/$/, '');
+  const stylePath = style.startsWith('/') ? style : `/${style}`;
+  const fullHref = `${base}${stylePath}`;
+  const criticalHref = fullHref.replace(/\.css$/, '-critical.css');
+  fetch(criticalHref, { method: 'HEAD' })
+    .then((res) => {
+      if (res.ok) {
+        loadCSS(criticalHref);
+        deferLoadCSS(fullHref);
+      } else {
+        loadCSS(fullHref).catch(() => {});
+      }
+    })
+    .catch(() => {
+      loadCSS(fullHref).catch(() => {});
+    });
 }
 async function decorate(block) {
   let container = block.querySelector('a[href]');
