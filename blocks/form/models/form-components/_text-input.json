@@ -21,6 +21,11 @@
             "id": "text-input",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "text-input"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

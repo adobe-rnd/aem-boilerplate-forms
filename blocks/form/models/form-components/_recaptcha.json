@@ -21,6 +21,11 @@
             "id": "captcha",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "captcha"
+                },
+                {
                     "component": "text",
                     "name": "name",
                     "label": "Name",

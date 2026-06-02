@@ -30,6 +30,11 @@
             "id": "radio-group",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "radio-group"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

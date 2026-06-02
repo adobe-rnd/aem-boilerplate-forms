@@ -30,6 +30,11 @@
       "id": "drop-down",
       "fields": [
         {
+          "component": "hidden",
+          "name": "fieldType",
+          "default": "drop-down"
+        },
+        {
           "component": "tab",
           "label": "Basic",
           "name": "basic"

@@ -31,6 +31,11 @@
             "id": "checkbox-group",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "checkbox-group"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

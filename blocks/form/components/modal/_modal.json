@@ -23,6 +23,16 @@
             "id": "modal",
             "fields": [
               {
+                "component": "hidden",
+                "name": "fieldType",
+                "default": "panel"
+              },
+              {
+                "component": "hidden",
+                "name": "fd:viewType",
+                "default": "modal"
+              },
+              {
                 "component": "tab",
                 "label": "Basic",
                 "name": "basic"

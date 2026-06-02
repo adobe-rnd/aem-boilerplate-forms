@@ -21,6 +21,11 @@
             "id": "form-image",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "image"
+                },
+                {
                     "component": "text",
                     "name": "name",
                     "label": "Name",
