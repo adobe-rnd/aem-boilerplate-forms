@@ -229,6 +229,10 @@ export async function fieldChanged(payload, form, generateFormRendition) {
           if (currentValue === false && dialog.open) {
             dialog.close(); // close triggers the event listener that removes the dialog overlay
           }
+          if (currentValue === true && !dialog.open) {
+            dialog.showModal();
+            document.body.classList.add('modal-open');
+          }
         }
         // Lazy panel not yet pre-rendered: render now, or queue if model not ready yet.
         if (currentValue === true && fieldType === 'panel' && generateFormRendition && form._lazyPanels?.has(id)) {
