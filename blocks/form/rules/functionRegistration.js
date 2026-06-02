@@ -47,12 +47,12 @@ export function preloadFunctionScripts(customFunctionsPath, codeBasePath) {
     const basename = filename.replace(/\.js$/, ''); // e.g. 'myfn'
 
     paths.push(`${prefix}${normalised}`); // shim modulepreload
-    paths.push(`${prefix}${dir}${basename}.min.js`); // eager bundle modulepreload
+    paths.push(`${prefix}${dir}${basename}-bundle-eager.min.js`); // eager bundle modulepreload
 
     // Speculative prefetch for the lazy bundle — silent 404 if no split exists.
     // prefetch ≠ modulepreload: no parse/eval at page load, no LCP bandwidth competition.
     try {
-      const lazyHref = `${prefix}${dir}${basename}-lazy.min.js`;
+      const lazyHref = `${prefix}${dir}${basename}-bundle-lazy.min.js`;
       const lazyUrl = lazyHref.startsWith('http')
         ? lazyHref
         : new URL(lazyHref, window.location.origin).href;

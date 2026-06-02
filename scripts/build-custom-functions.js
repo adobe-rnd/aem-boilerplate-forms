@@ -6,28 +6,26 @@
  *   # Minify-only (no eager/lazy split):
  *   node scripts/build-custom-functions.js --functions blocks/form/mydir/myfn.js
  *
- *   # Full eager/lazy split (fetches form JSON from a live page):
+ *   # Full eager/lazy split — --form accepts any of:
+ *   #   • EDS page URL  (extracts form JSON from <pre><code> block)
+ *   #   • .model.json or .json URL  (fetched and parsed directly)
+ *   #   • local file path  (read from disk)
  *   node scripts/build-custom-functions.js \
  *     --functions blocks/form/mydir/myfn.js \
- *     --page https://your-site.aem.live/path/to/form-page
- *
- *   # Full eager/lazy split (reads a local form JSON file):
- *   node scripts/build-custom-functions.js \
- *     --functions blocks/form/mydir/myfn.js \
- *     --form-json path/to/form.json
+ *     --form https://your-site.aem.live/path/to/form-page
  *
  * What it does:
- *   1. On first run: renames myfn.js → myfn.source.js (authoritative source).
+ *   1. On first run: backs up myfn.js → myfn.source.js (authoritative source).
  *      Subsequent runs use myfn.source.js automatically.
  *   2. Parses @MANUAL_EAGER / @MANUAL_LAZY JSDoc annotations from the source.
- *   3. If --page or --form-json: walks the form JSON, classifies every exported
- *      function as LOAD_TIME (→ eager) or INTERACTION_ONLY (→ lazy), applies
- *      annotations as overrides.
+ *   3. If --form: walks the form JSON, classifies every exported function as
+ *      LOAD_TIME (→ eager) or INTERACTION_ONLY (→ lazy), applies annotations.
  *   4. Updates blocks/form/functions-registry.json (keyed by entry point path).
  *   5. Runs rollup (rollup/custom-functions.rollup.config.js) to produce:
- *        myfn.min.js        — eager bundle (real impls + stubs)
- *        myfn-lazy.min.js   — lazy bundle  (only when --page / --form-json)
- *   6. Writes the shim:  myfn.js → `export * from './myfn.min.js';`
+ *        myfn-bundle.min.js        — single bundle   (no --form)
+ *        myfn-bundle-eager.min.js  — eager bundle     (with --form, real impls + stubs)
+ *        myfn-bundle-lazy.min.js   — lazy bundle      (with --form, all real impls)
+ *   6. Writes the shim:  myfn.js → `export * from './myfn-bundle[-eager].min.js';`
  */
 
 import fs from 'node:fs';
@@ -49,19 +47,20 @@ function getArg(flag) {
 }
 
 const functionsArg = getArg('--functions');
-const pageUrl = getArg('--page');
-const formJsonArg = getArg('--form-json');
+const formArg = getArg('--form');
 
 if (!functionsArg) {
   console.error([
     'Error: --functions is required.',
     '',
     'Usage:',
-    '  node scripts/build-custom-functions.js --functions <path> [--page <url> | --form-json <path>]',
+    '  node scripts/build-custom-functions.js --functions <path> [--form <url-or-path>]',
     '',
     'Examples:',
     '  node scripts/build-custom-functions.js --functions blocks/form/mydir/myfn.js',
-    '  node scripts/build-custom-functions.js --functions blocks/form/mydir/myfn.js --page https://...',
+    '  node scripts/build-custom-functions.js --functions blocks/form/mydir/myfn.js --form https://your-site.aem.live/path/to/form',
+    '  node scripts/build-custom-functions.js --functions blocks/form/mydir/myfn.js --form https://your-site.aem.live/path/to/form.model.json',
+    '  node scripts/build-custom-functions.js --functions blocks/form/mydir/myfn.js --form path/to/form.json',
   ].join('\n'));
   process.exit(1);
 }
@@ -128,26 +127,28 @@ if (manualEager.size || manualLazy.size) {
 }
 
 // ---------------------------------------------------------------------------
-// Step 3 — load form JSON (from --page or --form-json)
+// Step 3 — load form JSON (from --form: URL or local path)
 // ---------------------------------------------------------------------------
 
 async function loadFormJson() {
-  if (formJsonArg) {
-    const p = path.resolve(process.cwd(), formJsonArg);
-    if (!fs.existsSync(p)) { console.error(`Not found: ${p}`); process.exit(1); }
-    return JSON.parse(fs.readFileSync(p, 'utf8'));
-  }
-  if (pageUrl) {
-    console.log(`[build-custom-functions] Fetching form JSON from: ${pageUrl}`);
-    const res = await fetch(pageUrl);
-    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${pageUrl}`);
+  if (!formArg) return null;
+  if (/^https?:\/\//i.test(formArg)) {
+    console.log(`[build-custom-functions] Fetching from: ${formArg}`);
+    const res = await fetch(formArg);
+    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${formArg}`);
+    // .model.json or any .json URL → parse as JSON directly
+    if (/\.json$/i.test(formArg.split('?')[0])) return res.json();
+    // EDS page path → extract JSON from <pre><code> block
     const html = await res.text();
     const preMatch = html.match(/<pre[^>]*>(?:<code[^>]*>)?([\s\S]*?)(?:<\/code>)?<\/pre>/i);
     if (!preMatch) throw new Error('No <pre> tag found — is this an EDS form page?');
     const raw = preMatch[1].trim();
     return raw.startsWith('"') ? JSON.parse(JSON.parse(raw)) : JSON.parse(raw);
   }
-  return null;
+  // Local file path
+  const p = path.resolve(process.cwd(), formArg);
+  if (!fs.existsSync(p)) { console.error(`Not found: ${p}`); process.exit(1); }
+  return JSON.parse(fs.readFileSync(p, 'utf8'));
 }
 
 // ---------------------------------------------------------------------------
@@ -261,7 +262,7 @@ function classifyFunctions(formJson, annotations) {
   }
 
   const eager = [...new Set([...loadTimeFns, ...internalHelpers])].sort();
-  const lazy = [...new Set([...interactionFns, ...dead])].sort();
+  const lazy = [...new Set([...interactionFns])].sort();
 
   return { eager, lazy, dead: dead.sort() };
 }
@@ -288,8 +289,7 @@ async function run() {
     }
     registry[normalised] = {
       generated: new Date().toISOString(),
-      ...(pageUrl ? { page: pageUrl } : {}),
-      ...(formJsonArg ? { formJson: formJsonArg } : {}),
+      ...(formArg ? { form: formArg } : {}),
       eager: split.eager,
       lazy: split.lazy,
       dead: split.dead,
@@ -298,8 +298,24 @@ async function run() {
     fs.writeFileSync(REGISTRY_PATH, JSON.stringify(registry, null, 2), 'utf8');
     console.log(`[build-custom-functions] Registry updated: blocks/form/functions-registry.json`);
   } else {
-    console.log('[build-custom-functions] No form JSON — building single minified bundle (no eager/lazy split).');
-    console.log('  Tip: pass --page <url> or --form-json <path> to enable the eager/lazy split.');
+    // Check whether a previous --form run left split data in the registry.
+    // If so, rollup will still build the split bundles (it reads the registry independently).
+    let registryHasSplit = false;
+    if (fs.existsSync(REGISTRY_PATH)) {
+      try {
+        const reg = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
+        const entry = reg[normalised];
+        registryHasSplit = !!(entry && (entry.eager?.length || entry.lazy?.length));
+      } catch { /* ignore */ }
+    }
+    if (registryHasSplit) {
+      console.log('[build-custom-functions] No form JSON — reusing existing split from registry.');
+    } else {
+      console.log('[build-custom-functions] No form JSON — building single merged bundle (no eager/lazy split).');
+      console.log('  Tip: pass --form <url-or-path> to enable the eager/lazy split.');
+    }
+    // Promote to a truthy marker so shim logic below picks the right target
+    if (registryHasSplit) split = registryHasSplit;
   }
 
   // ---------------------------------------------------------------------------
@@ -326,9 +342,10 @@ async function run() {
   // ---------------------------------------------------------------------------
   // Step 7 — write shim
   // ---------------------------------------------------------------------------
-  const shimContent = `export * from './${name}.min.js';\n`;
+  const shimTarget = split ? `${name}-bundle-eager.min.js` : `${name}-bundle.min.js`;
+  const shimContent = `export * from './${shimTarget}';\n`;
   fs.writeFileSync(absEntry, shimContent, 'utf8');
-  console.log(`[build-custom-functions] Shim written: ${filename} → export * from './${name}.min.js'`);
+  console.log(`[build-custom-functions] Shim written: ${filename} → export * from './${shimTarget}'`);
 
   // ---------------------------------------------------------------------------
   // Summary
@@ -339,17 +356,21 @@ async function run() {
   console.log(HR);
   console.log(`  Entry:  ${normalised}  (shim)`);
   console.log(`  Source: ${path.relative(ROOT, sourceFile)}`);
-  if (split) {
+  if (split && typeof split === 'object') {
     const relDir = path.relative(ROOT, dir);
-    console.log(`  Eager:  ${relDir}/${name}.min.js   (${split.eager.length} fns)`);
-    console.log(`  Lazy:   ${relDir}/${name}-lazy.min.js   (${split.lazy.length} fns, loads at 3s mark)`);
-    const totalFns = split.eager.length + split.lazy.length;
+    console.log(`  Eager:  ${relDir}/${name}-bundle-eager.min.js   (${split.eager.length} fns)`);
+    console.log(`  Lazy:   ${relDir}/${name}-bundle-lazy.min.js    (${split.lazy.length + split.dead.length} fns, loads at 3s mark)`);
+    const totalFns = split.eager.length + split.lazy.length + split.dead.length;
     if (totalFns > 0) {
-      const savePct = Math.round((split.lazy.length / totalFns) * 100);
+      const savePct = Math.round(((split.lazy.length + split.dead.length) / totalFns) * 100);
       console.log(`  Saving: ~${savePct}% of custom-function JS off the critical path`);
     }
+  } else if (split) {
+    const relDir = path.relative(ROOT, dir);
+    console.log(`  Eager:  ${relDir}/${name}-bundle-eager.min.js`);
+    console.log(`  Lazy:   ${relDir}/${name}-bundle-lazy.min.js   (loads at 3s mark)`);
   } else {
-    console.log(`  Bundle: ${path.relative(ROOT, dir)}/${name}.min.js   (single bundle)`);
+    console.log(`  Bundle: ${path.relative(ROOT, dir)}/${name}-bundle.min.js   (single bundle)`);
   }
   if (isFirstRun) {
     console.log(`\n  NOTE: edit ${name}.source.js from now on, then re-run this command.`);

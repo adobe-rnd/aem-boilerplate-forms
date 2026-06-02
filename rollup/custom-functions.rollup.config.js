@@ -12,10 +12,14 @@
  * If no registry entry exists, falls back to a single minified bundle.
  *
  * Outputs (all in same directory as FUNCTIONS_SOURCE):
- *   {name}.min.js        — eager bundle (production, what the shim exports from)
- *   {name}-eager.js      — eager bundle (readable dev artifact)
- *   {name}-lazy.min.js   — lazy bundle  (only when split manifest present)
- *   {name}-lazy.js       — lazy bundle  (readable dev artifact)
+ *   Without --form (single bundle):
+ *     {name}-bundle.js      — full bundle (readable)
+ *     {name}-bundle.min.js  — full bundle (minified, what the shim exports from)
+ *   With --form (eager/lazy split):
+ *     {name}-bundle-eager.js      — eager bundle (readable)
+ *     {name}-bundle-eager.min.js  — eager bundle (minified, what the shim exports from)
+ *     {name}-bundle-lazy.js       — lazy bundle  (readable)
+ *     {name}-bundle-lazy.min.js   — lazy bundle  (minified, loaded at 3s mark)
  */
 
 import fs from 'node:fs';
@@ -42,12 +46,12 @@ const SOURCE_DIR = path.dirname(SOURCE);
 const SOURCE_DIR_ABS = path.resolve(ROOT, SOURCE_DIR);
 const SOURCE_NAME = path.basename(SOURCE, '.source.js');  // e.g. 'myfn'
 
-// The shim file: {name}.js → export * from './{name}.min.js'
+// The shim file: {name}.js → export * from './{name}-eager.min.js'
 // This is external to the eager build (breaks the self-import cycle).
 const SHIM_JS_ABS = path.join(SOURCE_DIR_ABS, `${SOURCE_NAME}.js`);
 
 // OOTB functions.js lives one directory above the source dir (blocks/form/functions.js).
-// Eager bundles may re-export from it; keep it external (no download at build time).
+// Keep it external — it is already loaded via modulepreload and must never be bundled in.
 const OOTB_FN_JS_ABS = path.resolve(SOURCE_DIR_ABS, '../functions.js');
 
 // ---------------------------------------------------------------------------
@@ -76,20 +80,27 @@ if (fs.existsSync(REGISTRY_PATH)) {
   }
 } else {
   console.warn('[custom-functions] blocks/form/functions-registry.json not found — building single bundle.');
-  console.warn('  Run: node scripts/build-custom-functions.js --functions <path> --page <url>');
+  console.warn('  Run: node scripts/build-custom-functions.js --functions <path> --form <url-or-path>');
 }
 
 // ---------------------------------------------------------------------------
 // External predicates
 // ---------------------------------------------------------------------------
 
+// Any file named functions.js or functions.min.js is already loaded via
+// modulepreload — keep it external so it is never bundled in.
+const isFunctionsBundle = (id) => {
+  const base = path.basename(id);
+  return base === 'functions.js' || base === 'functions.min.js';
+};
+
 // Shared: always external (never bundled in)
 const external = (id) => id.includes('afb-runtime')
   || id.includes('scripts/aem.js')
-  || (path.resolve(id) === OOTB_FN_JS_ABS);
+  || isFunctionsBundle(id);
 
 // Eager build also marks the shim external — otherwise rollup follows
-// {name}.js → {name}.min.js → itself, creating an unbounded cycle.
+// {name}.js → {name}-eager.min.js → itself, creating an unbounded cycle.
 const externalForEager = (id) => external(id)
   || (path.isAbsolute(id) && id === SHIM_JS_ABS)
   || (!path.isAbsolute(id) && path.resolve(path.dirname(SOURCE_ABS), id) === SHIM_JS_ABS);
@@ -176,7 +187,7 @@ function eagerEntryPlugin(eagerFns, lazyFns) {
     name: 'custom-functions-eager-entry',
     resolveId(id) {
       if (id === EAGER_VIRTUAL_ID) return id;
-      if (id === `./${SOURCE_NAME}-lazy.min.js`) return { id, external: true };
+      if (id === `./${SOURCE_NAME}-bundle-lazy.min.js`) return { id, external: true };
       if (id === EAGER_OOTB_SENTINEL) return { id: OOTB_FN_JS_ABS, external: true };
       if (id === EAGER_SOURCE_SENTINEL) return SOURCE_ABS;
       return null;
@@ -186,7 +197,7 @@ function eagerEntryPlugin(eagerFns, lazyFns) {
 
       const lines = [
         '// AUTO-GENERATED — do not edit.',
-        '// Regenerate: node scripts/build-custom-functions.js --functions <entry> [--page <url>]',
+        '// Regenerate: node scripts/build-custom-functions.js --functions <entry> [--form <url-or-path>]',
         `// OOTB-EAGER   (${ootbEager.length}): static re-exports from ../functions.js`,
         `// SOURCE-EAGER (${sourceOnlyEager.length}): inlined from ${SOURCE_NAME}.source.js via tree-shaking`,
         `// STUBS        (${stubTargets.length}): async/sync stubs — lazy bundle loads on first call`,
@@ -204,7 +215,7 @@ function eagerEntryPlugin(eagerFns, lazyFns) {
         lines.push('');
         lines.push('let _lazyBundle = null;');
         lines.push('async function _loadLazy() {');
-        lines.push(`  if (!_lazyBundle) _lazyBundle = await import('./${SOURCE_NAME}-lazy.min.js');`);
+        lines.push(`  if (!_lazyBundle) _lazyBundle = await import('./${SOURCE_NAME}-bundle-lazy.min.js');`);
         lines.push('  return _lazyBundle;');
         lines.push('}');
         lines.push('// Exported so scripts.js can warm the bundle at the 3s mark via window.hlx.loadLazyBundle');
@@ -243,9 +254,10 @@ const eagerPaths = {
 };
 
 // ---------------------------------------------------------------------------
-// Dead-code functions — kept in lazy bundle (not removed) for safety
+// Dead-code functions — kept in lazy bundle (not removed) for safety.
+// Deduplicate in case an older registry has dead already merged into lazy.
 // ---------------------------------------------------------------------------
-const allLazy = [...(manifest.lazy || []), ...(manifest.dead || [])];
+const allLazy = [...new Set([...(manifest.lazy || []), ...(manifest.dead || [])])];
 
 // ---------------------------------------------------------------------------
 // Rollup configs
@@ -260,13 +272,13 @@ if (hasSplit) {
     plugins: [remapSelfImportPlugin(), cleanup({ comments: 'none' })],
     output: [
       {
-        file: `${SOURCE_DIR}/${SOURCE_NAME}-lazy.js`,
+        file: `${SOURCE_DIR}/${SOURCE_NAME}-bundle-lazy.js`,
         format: 'es',
         inlineDynamicImports: true,
         sourcemap: isDev,
       },
       {
-        file: `${SOURCE_DIR}/${SOURCE_NAME}-lazy.min.js`,
+        file: `${SOURCE_DIR}/${SOURCE_NAME}-bundle-lazy.min.js`,
         format: 'es',
         inlineDynamicImports: true,
         plugins: [terser()],
@@ -284,13 +296,13 @@ if (hasSplit) {
     ],
     output: [
       {
-        file: `${SOURCE_DIR}/${SOURCE_NAME}-eager.js`,
+        file: `${SOURCE_DIR}/${SOURCE_NAME}-bundle-eager.js`,
         format: 'es',
         sourcemap: isDev,
         paths: eagerPaths,
       },
       {
-        file: `${SOURCE_DIR}/${SOURCE_NAME}.min.js`,
+        file: `${SOURCE_DIR}/${SOURCE_NAME}-bundle-eager.min.js`,
         format: 'es',
         plugins: [terser()],
         paths: eagerPaths,
@@ -298,14 +310,20 @@ if (hasSplit) {
     ],
   });
 } else {
-  // SINGLE BUNDLE fallback (no split manifest / first run without --page)
+  // SINGLE BUNDLE fallback (no split manifest / first run without --form)
   configs.push({
     input: SOURCE,
     external,
     plugins: [remapSelfImportPlugin(), cleanup({ comments: 'none' })],
     output: [
       {
-        file: `${SOURCE_DIR}/${SOURCE_NAME}.min.js`,
+        file: `${SOURCE_DIR}/${SOURCE_NAME}-bundle.js`,
+        format: 'es',
+        inlineDynamicImports: true,
+        sourcemap: isDev,
+      },
+      {
+        file: `${SOURCE_DIR}/${SOURCE_NAME}-bundle.min.js`,
         format: 'es',
         inlineDynamicImports: true,
         plugins: [terser()],

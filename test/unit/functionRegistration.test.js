@@ -82,22 +82,22 @@ describe('functionRegistration', () => {
         preloadFunctionScripts(p, BASE);
         const { modulepreload } = addedSince(snap);
         assert.ok(
-          modulepreload.some((h) => h.includes('eager.min.js')),
-          'should modulepreload {name}.min.js',
+          modulepreload.some((h) => h.includes('eager-bundle-eager.min.js')),
+          'should modulepreload {name}-bundle-eager.min.js',
         );
       });
 
-      it('adds a prefetch for {basename}-lazy.min.js (not modulepreload)', () => {
+      it('adds a prefetch for {basename}-bundle-lazy.min.js (not modulepreload)', () => {
         const p = uniquePath('lazy');
         const snap = snapshotLinks();
         preloadFunctionScripts(p, BASE);
         const { modulepreload, prefetch } = addedSince(snap);
         assert.ok(
-          prefetch.some((h) => h.includes('lazy-lazy.min.js')),
-          'should prefetch {name}-lazy.min.js',
+          prefetch.some((h) => h.includes('lazy-bundle-lazy.min.js')),
+          'should prefetch {name}-bundle-lazy.min.js',
         );
         assert.ok(
-          !modulepreload.some((h) => h.includes('lazy-lazy.min.js')),
+          !modulepreload.some((h) => h.includes('lazy-bundle-lazy.min.js')),
           'lazy bundle must NOT be modulepreload — avoids LCP bandwidth competition',
         );
       });
@@ -108,12 +108,12 @@ describe('functionRegistration', () => {
         preloadFunctionScripts(p, BASE);
         const { modulepreload, prefetch } = addedSince(snap);
         assert.ok(
-          modulepreload.some((h) => h.includes('eds-perf-collateral.min.js')),
-          'should modulepreload eds-perf-collateral.min.js (eager bundle)',
+          modulepreload.some((h) => h.includes('eds-perf-collateral-bundle-eager.min.js')),
+          'should modulepreload eds-perf-collateral-bundle-eager.min.js (eager bundle)',
         );
         assert.ok(
-          prefetch.some((h) => h.includes('eds-perf-collateral-lazy.min.js')),
-          'should prefetch eds-perf-collateral-lazy.min.js',
+          prefetch.some((h) => h.includes('eds-perf-collateral-bundle-lazy.min.js')),
+          'should prefetch eds-perf-collateral-bundle-lazy.min.js',
         );
       });
 
