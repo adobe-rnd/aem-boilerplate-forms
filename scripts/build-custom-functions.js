@@ -104,17 +104,15 @@ function parseAnnotations(code) {
   const manualEager = new Set();
   const manualLazy = new Set();
 
-  // Match a JSDoc block containing @MANUAL_EAGER followed by the export fn name
-  const eagerRe = /@MANUAL_EAGER[\s\S]*?export\s+(?:async\s+)?function\s+(\w+)/g;
-  const lazyRe = /@MANUAL_LAZY[\s\S]*?export\s+(?:async\s+)?function\s+(\w+)/g;
+  // Match JSDoc block + optional export + function name (block export at EOF is supported)
+  const eagerFnRe = /\/\*\*[\s\S]*?@MANUAL_EAGER[\s\S]*?\*\/\s*(?:export\s+)?(?:async\s+)?function\s+(\w+)/g;
+  const lazyFnRe = /\/\*\*[\s\S]*?@MANUAL_LAZY[\s\S]*?\*\/\s*(?:export\s+)?(?:async\s+)?function\s+(\w+)/g;
+  const eagerConstRe = /\/\*\*[\s\S]*?@MANUAL_EAGER[\s\S]*?\*\/\s*export\s+(?:const|let)\s+(\w+)/g;
+  const lazyConstRe = /\/\*\*[\s\S]*?@MANUAL_LAZY[\s\S]*?\*\/\s*export\s+(?:const|let)\s+(\w+)/g;
 
   let m;
-  while ((m = eagerRe.exec(code)) !== null) manualEager.add(m[1]);
-  while ((m = lazyRe.exec(code)) !== null) manualLazy.add(m[1]);
-
-  // Also support export const / export let with annotations
-  const eagerConstRe = /@MANUAL_EAGER[\s\S]*?export\s+(?:const|let)\s+(\w+)/g;
-  const lazyConstRe = /@MANUAL_LAZY[\s\S]*?export\s+(?:const|let)\s+(\w+)/g;
+  while ((m = eagerFnRe.exec(code)) !== null) manualEager.add(m[1]);
+  while ((m = lazyFnRe.exec(code)) !== null) manualLazy.add(m[1]);
   while ((m = eagerConstRe.exec(code)) !== null) manualEager.add(m[1]);
   while ((m = lazyConstRe.exec(code)) !== null) manualLazy.add(m[1]);
 
