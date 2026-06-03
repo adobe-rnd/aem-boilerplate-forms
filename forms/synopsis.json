@@ -1161,5 +1161,15 @@
   "action": "/adobe/forms/af/submit/synopsys-contact-sales",
   "thankYouMessage": "Thank you for contacting us. A Synopsys representative will be in touch with you shortly.",
   "actionType": "POST",
-  "id": "/content/forms/af/synopsys/contact-sales"
+  "id": "/content/forms/af/synopsys/contact-sales",
+  "properties": {
+      "fd:submit": {
+        "actionName": "marketo",
+        "marketo": {
+          "munchkinId": "973-STS-510",
+          "formId": 1298,
+          "marketoApiEndpoint": "https://mkto-lead-stage.adobe.io/rest/v1/leads/submitForm.json"
+        }
+    }
+  },
 }
