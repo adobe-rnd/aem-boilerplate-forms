@@ -699,8 +699,17 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
 
 export async function initAdaptiveForm(formDef, createForm) {
   preloadFunctionScripts(formDef?.properties?.customFunctionsPath, window.hlx?.codeBasePath);
-  await registerCustomFunctions(formDef?.properties?.customFunctionsPath || '/blocks/form/functions.js', window.hlx?.codeBasePath);
-  const response = await initializeRuleEngineWorker(formDef, createForm);
+  const customFunctionsPath = formDef?.properties?.customFunctionsPath || '/blocks/form/functions.js';
+  const { codeBasePath } = window.hlx ?? {};
+  if (typeof Worker === 'undefined') {
+    await registerCustomFunctions(customFunctionsPath, codeBasePath);
+    const response = await initializeRuleEngineWorker(formDef, createForm);
+    return response?.form;
+  }
+  const [response] = await Promise.all([
+    initializeRuleEngineWorker(formDef, createForm),
+    registerCustomFunctions(customFunctionsPath, codeBasePath),
+  ]);
   return response?.form;
 }
 
