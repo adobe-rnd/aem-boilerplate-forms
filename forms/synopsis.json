@@ -1171,5 +1171,5 @@
           "marketoApiEndpoint": "https://mkto-lead-stage.adobe.io/rest/v1/leads/submitForm.json"
         }
     }
-  },
+  }
 }
