@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-formatters
- *  Version: 0.22.167
+ *  Version: 0.22.175
  */
 const DATE_TIME_REGEX =
     /(?:[Eec]{1,6}|G{1,5}|[Qq]{1,5}|(?:[yYur]+|U{1,5})|[ML]{1,5}|d{1,2}|D{1,3}|F{1}|[abB]{1,5}|[hkHK]{1,2}|w{1,2}|W{1}|m{1,2}|s{1,2}|[zZOvV]{1,5}|[zZOvVxX]{1,3}|S{1,3}|'(?:[^']|'')*')|[^a-zA-Z']+/g;
@@ -459,6 +459,12 @@ function parseDate(dateString, language, skeleton, timeZone, bUseUTC = false) {
         const [element, func] = lookups[index];
         dateObj[element] = func(m, dateObj);
     });
+    const isValidDate = (date, expectedDateObj, calendar) => {
+        if (calendar !== 'gregory') return true;
+        return  date.getMonth() === expectedDateObj.month &&
+               date.getDate() === expectedDateObj.day &&
+               date.getFullYear() === expectedDateObj.year;
+    };
     if (hourCycle === 'h24' && dateObj.hour === 24) dateObj.hour = 0;
     if (hourCycle === 'h12' && dateObj.hour === 12) dateObj.hour = 0;
     if (_bUseUTC) {
@@ -487,6 +493,9 @@ function parseDate(dateString, language, skeleton, timeZone, bUseUTC = false) {
     );
     if (_setFullYear) {
         jsDate.setFullYear(dateObj.year);
+    }
+    if (!isValidDate(jsDate, dateObj, calendar)) {
+        return null;
     }
     return timeZone == null ? jsDate : adjustTimeZone(jsDate, timeZone);
 }

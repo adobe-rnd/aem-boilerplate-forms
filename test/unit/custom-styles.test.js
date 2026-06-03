@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import DocBasedFormToAF from '../../blocks/form/transform.js';
-import decorate from '../../blocks/form/form.js';
+import decorate from '../../blocks/form/form.source.js';
 import { createBlock } from './testUtils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -61,13 +61,24 @@ describe('Custom form styles', () => {
   });
 
   describe('loadFormCustomStyles via decorate', () => {
+    let originalFetch;
+
     beforeEach(() => {
       document.head.innerHTML = '';
       window.hlx = { codeBasePath: '/base' };
+      originalFetch = global.fetch;
+      global.fetch = (url, opts) => {
+        if (opts?.method === 'HEAD') {
+          return Promise.resolve({ ok: false, status: 404 });
+        }
+        return originalFetch(url, opts);
+      };
+      global.fetch.mockData = originalFetch.mockData;
     });
 
     afterEach(() => {
       document.head.innerHTML = '';
+      global.fetch = originalFetch;
     });
 
     it('loads stylesheet when AEM form has properties.style', async () => {
@@ -81,6 +92,7 @@ describe('Custom form styles', () => {
       const block = createBlock(formDef);
 
       await decorate(block);
+      await Promise.resolve(); // let HEAD-probe .then() chain settle
 
       const link = document.head.querySelector('link[rel="stylesheet"][href*="blocks/form/form-2.css"]');
       assert.ok(link, 'stylesheet link should be added to head');
@@ -106,6 +118,7 @@ describe('Custom form styles', () => {
       block.appendChild(pre);
 
       await decorate(block);
+      await Promise.resolve(); // let HEAD-probe .then() chain settle
 
       const link = document.head.querySelector('link[rel="stylesheet"][href*="blocks/form/form-1.css"]');
       assert.ok(link, 'stylesheet link should be added for document-based form with css row');
@@ -141,6 +154,7 @@ describe('Custom form styles', () => {
       const block = createBlock(formDef);
 
       await decorate(block);
+      await Promise.resolve(); // let HEAD-probe .then() chain settle
 
       const link = document.head.querySelector('link[rel="stylesheet"][href*="blocks/form/form-2.css"]');
       assert.ok(link, 'stylesheet link should be added');
@@ -150,14 +164,25 @@ describe('Custom form styles', () => {
   });
 
   describe('Custom form styles rendition', () => {
+    let originalFetch;
+
     beforeEach(() => {
       document.head.innerHTML = '';
       document.body.innerHTML = '';
       window.hlx = { codeBasePath: '/base' };
+      originalFetch = global.fetch;
+      global.fetch = (url, opts) => {
+        if (opts?.method === 'HEAD') {
+          return Promise.resolve({ ok: false, status: 404 });
+        }
+        return originalFetch(url, opts);
+      };
+      global.fetch.mockData = originalFetch.mockData;
     });
 
     afterEach(() => {
       document.body.innerHTML = '';
+      global.fetch = originalFetch;
     });
 
     /**
@@ -191,6 +216,7 @@ describe('Custom form styles', () => {
       const block = createBlock(formDef);
 
       await decorate(block);
+      await Promise.resolve(); // let HEAD-probe .then() chain settle
 
       const form = block.querySelector('form');
       assert.ok(form, 'form should be rendered');
@@ -223,6 +249,7 @@ describe('Custom form styles', () => {
       block.appendChild(pre);
 
       await decorate(block);
+      await Promise.resolve(); // let HEAD-probe .then() chain settle
 
       const form = block.querySelector('form');
       assert.ok(form, 'form should be rendered');

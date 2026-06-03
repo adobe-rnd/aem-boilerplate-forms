@@ -135,7 +135,9 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
-  // load anything that can be postponed to the latest here
+  // Warm the lazy custom-functions bundle at 3s — after LCP/FCP/SI, before first interaction.
+  // loadLazyBundle is set on window.hlx by registerCustomFunctions when the split is active.
+  window.setTimeout(() => window.hlx?.loadLazyBundle?.(), 3000);
 }
 
 async function loadPage() {

@@ -7,5 +7,6 @@ scripts/editor-support.js
 scripts/editor-support-rte.js
 tools/forms-scaffolder.js
 tools/update-mappings.js
+scripts/build-custom-functions.js
 /test
 dompurify.min.js

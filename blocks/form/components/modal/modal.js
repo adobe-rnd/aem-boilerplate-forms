@@ -100,6 +100,13 @@ export default async function decorate(panel, panelJson, container, formId) {
   modal.decorate(panel);
   subscribe(panel, formId, async (fieldDiv, fieldModel) => {
     modal.setFieldModel(fieldModel);
+    // When the modal panel itself is lazy (visible=false at load, rendered on first
+    // visible=true event), this subscribe fires AFTER the triggering visible=true has
+    // already been processed — so the fieldModel.subscribe below would only catch
+    // future events. Check fieldModel.visible here to catch the missed open.
+    if (fieldModel.visible) {
+      modal.showModal();
+    }
     fieldModel.subscribe((e) => {
       const { payload } = e;
       payload?.changes?.forEach((change) => {
