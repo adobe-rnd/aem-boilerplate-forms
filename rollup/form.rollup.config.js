@@ -43,7 +43,9 @@ const remapToMin = {
 const external = (id) => id.includes('scripts/aem.js')
   || id.includes('afb-runtime')
   || id.includes('RuleEngineWorker')
-  || id.endsWith('constant.js');
+  || id.endsWith('constant.js')
+  || id.endsWith('functionRegistration.js')
+  || id.endsWith('util.js');
 
 export default {
   input: 'blocks/form/form.source.js',
