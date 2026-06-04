@@ -687,7 +687,7 @@
           "name": "Additional_Information__c",
           "fieldType": "multiline-input",
           "type": "string",
-          "required": true,
+          "required": false,
           "label": {
             "value": "Additional Information"
           },
@@ -699,7 +699,7 @@
           "name": "Email_Consent_Trigger_Optin",
           "fieldType": "checkbox",
           "type": "string",
-          "required": true,
+          "required": false,
           "label": {
             "value": "I want to receive communications from Synopsys about products, services, and events. I may unsubscribe at any time. <a href=\"https://www.synopsys.com/company/legal/privacy-policy.html\" target=\"_blank\">Privacy Policy</a>.",
             "richText": true
