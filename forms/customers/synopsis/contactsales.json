@@ -19,7 +19,7 @@
       "marketo": {
         "munchkinId": "973-STS-510",
         "formId": 1298,
-        "marketoApiEndpoint": "https://mkto-lead-stage.adobe.io/rest/v1/leads/submitForm.json"
+        "marketoEnv": "stage"
       }
     },
     "fd:description": "Synopsys Contact Sales form - converted from Marketo form 7687 (online.synopsys.com, munchkin 367-MRV-360)"
