@@ -433,7 +433,7 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   form.dispatch(new CustomEvent('formViewInitialized'));
 }
 
-async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
+export async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
   if (typeof Worker === 'undefined') {
     // No worker: fetch prefill only when enabled (worker path does the same in RuleEngineWorker.js)
     const needsPrefill = formDef?.properties?.['fd:formDataEnabled'] === true;
@@ -462,6 +462,32 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       captcha,
       data,
       generateFormRendition;
+    // While loadRuleEngine (triggered by restoreState) is still resolving the model
+    // import, formModels is not yet populated. Any applyFieldChanges batch that arrives
+    // in this window is buffered here and drained once restore completes, instead of
+    // being dropped. The live phase is unaffected (changes apply directly).
+    let restoreInProgress = false;
+    let pendingFieldChanges = [];
+
+    // Applies a worker field-change payload (batched array or single object) to both
+    // the DOM (fieldChanged) and the main-thread model copy (applyFieldChangeToFormModel).
+    async function processFieldChanges(changes, formModel) {
+      if (Array.isArray(changes)) {
+        if (form && formModel) {
+          await changes.reduce(
+            (promise, payload) => promise.then(async () => {
+              await fieldChanged(payload, form, generateFormRendition);
+              applyFieldChangeToFormModel(formModel, payload, true);
+            }),
+            Promise.resolve(),
+          );
+        }
+      } else if (changes) {
+        await fieldChanged(changes, form, generateFormRendition);
+        if (formModel) applyFieldChangeToFormModel(formModel, changes, true);
+      }
+    }
+
     myWorker.addEventListener('message', async (e) => {
       // main thread starts html rendering
       if (e.data.name === 'renderForm') {
@@ -480,26 +506,31 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
 
       if (e.data.name === 'restoreState') {
         const { state } = e.data.payload;
-        loadRuleEngine(state, form, captcha, generateFormRendition, data);
+        // Set synchronously before awaiting: restoreState is delivered first, so a
+        // subsequent applyFieldChanges macrotask sees this flag and buffers instead
+        // of dropping its batch while formModels is still unset.
+        restoreInProgress = true;
+        await loadRuleEngine(state, form, captcha, generateFormRendition, data);
+        // formModels is now populated; drain anything buffered during the await.
+        const buffered = pendingFieldChanges;
+        pendingFieldChanges = [];
+        restoreInProgress = false;
+        const formModel = formModels[form?.dataset?.id];
+        await buffered.reduce(
+          (promise, changes) => promise.then(() => processFieldChanges(changes, formModel)),
+          Promise.resolve(),
+        );
       }
 
       if (e.data.name === 'applyFieldChanges') {
         const { fieldChanges: changes } = e.data.payload;
-        const formModel = formModels[form?.dataset?.id];
-        if (Array.isArray(changes)) {
-          if (form && formModel) {
-            await changes.reduce(
-              (promise, payload) => promise.then(async () => {
-                await fieldChanged(payload, form, generateFormRendition);
-                applyFieldChangeToFormModel(formModel, payload, true);
-              }),
-              Promise.resolve(),
-            );
-          }
-        } else if (changes) {
-          await fieldChanged(changes, form, generateFormRendition);
-          if (formModel) applyFieldChangeToFormModel(formModel, changes, true);
+        // During restore, formModels is not ready yet; buffer to avoid dropping.
+        if (restoreInProgress) {
+          pendingFieldChanges.push(changes);
+          return;
         }
+        const formModel = formModels[form?.dataset?.id];
+        await processFieldChanges(changes, formModel);
       }
 
       if (e.data.name === 'applyLiveFormChange') {
