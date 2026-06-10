@@ -3,10 +3,10 @@
   "fieldType": "form",
   "title": "Synopsys Contact Sales",
   "lang": "en",
-  "action": "/adobe/forms/af/submit/synopsys-contact-sales",
+  "action": "https://forms.adobe.com/adobe/forms/af/submit/forms/customers/synopsis/contactsales",
   "actionType": "POST",
   "thankYouMessage": "Thank you for contacting us. A Synopsys representative will be in touch with you shortly.",
-  "id": "/content/forms/af/synopsys/contact-sales",
+  "id": "forms/customers/synopsis/contactsales",
   "events": {
     "custom:setProperty": [
       "$event.payload"
