@@ -3,7 +3,7 @@
   "fieldType": "form",
   "title": "Synopsys Contact Sales",
   "lang": "en",
-  "action": "https://forms.adobe.com/adobe/forms/af/submit/forms/customers/synopsis/contactsales",
+  "action": "https://forms.adobe.com/adobe/forms/af/submit/L2Zvcm1zL2N1c3RvbWVycy9zeW5vcHNpcy9jb250YWN0c2FsZXMuanNvbg==",
   "actionType": "POST",
   "thankYouMessage": "Thank you for contacting us. A Synopsys representative will be in touch with you shortly.",
   "id": "forms/customers/synopsis/contactsales",
