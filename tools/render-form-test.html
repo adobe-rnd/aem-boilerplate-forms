@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adaptive Form Block Playground</title>
+
+  <!-- CodeMirror 5 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/lint/lint.min.js"></script>
+
+  <!-- AEM Form styles -->
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/blocks/form/form.css">
+
+  <style>
+    /* Adobe Spectrum tokens */
+    :root {
+      --gray-50:  #fff;
+      --gray-75:  #fafafa;
+      --gray-100: #f5f5f5;
+      --gray-200: #eaeaea;
+      --gray-300: #e1e1e1;
+      --gray-400: #cacaca;
+      --gray-600: #8d8d8d;
+      --gray-700: #6e6e6e;
+      --gray-800: #4b4b4b;
+      --gray-900: #2c2c2c;
+      --blue-400: #2680eb;
+      --blue-500: #1473e6;
+      --red-500:  #e1251b;
+      --green-500: #2d9d78;
+      --orange-500: #e68619;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Adobe Clean', adobe-clean, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      background: var(--gray-100);
+      color: var(--gray-900);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header (AEM-style dark bar) ── */
+    header {
+      background: var(--gray-900);
+      color: var(--gray-50);
+      padding: 0 1.25rem;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 0.88rem;
+      font-weight: 400;
+      margin: 0;
+      color: var(--gray-50);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--gray-300);
+      overflow: hidden;
+    }
+
+    /* ── Panels ── */
+    .panel {
+      background: var(--gray-50);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 0 0.875rem;
+      height: 40px;
+      border-bottom: 1px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      background: var(--gray-75);
+    }
+
+    .panel-title {
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--gray-700);
+      flex: 1;
+    }
+
+    .tab-panel { display: none; flex: 1; overflow: auto; }
+    .tab-panel.active { display: flex; flex-direction: column; }
+
+    /* ── URL bar ── */
+    .url-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.875rem;
+      border-bottom: 1px solid var(--gray-300);
+      background: var(--gray-50);
+      flex-shrink: 0;
+    }
+
+    .url-bar input {
+      flex: 1;
+      border: 1px solid var(--gray-400);
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--gray-900);
+      background: var(--gray-50);
+      outline: none;
+      min-width: 0;
+    }
+
+    .url-bar input:focus { border-color: var(--blue-400); box-shadow: 0 0 0 2px rgba(38,128,235,0.2); }
+    .url-bar input::placeholder { color: var(--gray-600); font-family: inherit; }
+
+    /* ── CodeMirror overrides ── */
+    .CodeMirror {
+      height: 100%;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      border: none;
+    }
+
+    .CodeMirror-gutters { border-right: 1px solid var(--gray-200); background: var(--gray-75); }
+
+    .editor-body {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editor-body .CodeMirror { flex: 1; }
+
+    /* ── Status bar ── */
+    #status {
+      padding: 0 0.875rem;
+      font-size: 0.72rem;
+      border-top: 1px solid var(--gray-300);
+      background: var(--gray-75);
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    #status.error   { color: var(--red-500); }
+    #status.success { color: var(--green-500); }
+    #status.loading { color: var(--orange-500); }
+
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+    /* ── Spectrum buttons ── */
+    .btn {
+      padding: 0.3rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 400;
+      cursor: pointer;
+      border: 1px solid var(--gray-400);
+      border-radius: 16px;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      transition: background 0.1s, border-color 0.1s;
+      white-space: nowrap;
+      line-height: 1.5;
+    }
+
+    .btn:hover { background: var(--gray-100); border-color: var(--gray-800); }
+    .btn:focus-visible { outline: 2px solid var(--blue-400); outline-offset: 2px; }
+    .btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+
+    .btn.primary {
+      background: var(--blue-400);
+      border-color: var(--blue-400);
+      color: #fff;
+      font-weight: 600;
+    }
+    .btn.primary:hover { background: var(--blue-500); border-color: var(--blue-500); }
+
+    .btn.danger { color: var(--red-500); border-color: transparent; background: transparent; }
+    .btn.danger:hover { background: #fff0ee; border-color: #ffb2ad; }
+
+    /* ── Preview panel ── */
+    #preview-body {
+      flex: 1;
+      overflow: auto;
+      padding: 1.5rem;
+      background: var(--gray-50);
+    }
+
+    #form-container form { max-width: 640px; }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--gray-600);
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .empty-state svg { width: 36px; height: 36px; opacity: 0.3; }
+    .empty-state p   { font-size: 0.82rem; margin: 0; }
+
+    /* ── API Docs ── */
+    #docs-body {
+      flex: 1;
+      overflow: auto;
+      padding: 1.5rem 2rem;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #docs-body h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 0 0 0.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--gray-300);
+    }
+
+    #docs-body h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin: 1.5rem 0 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    #docs-body p { margin: 0.3rem 0 0.6rem; color: var(--gray-800); }
+
+    #docs-body .sig {
+      display: inline-block;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      padding: 0.4rem 0.75rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.78rem;
+      color: var(--blue-400);
+      margin-bottom: 0.5rem;
+    }
+
+    #docs-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin: 0.5rem 0 1rem;
+    }
+
+    #docs-body th {
+      background: var(--gray-100);
+      text-align: left;
+      padding: 0.4rem 0.6rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      border: 1px solid var(--gray-300);
+    }
+
+    #docs-body td {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--gray-300);
+      vertical-align: top;
+      color: var(--gray-800);
+    }
+
+    #docs-body td code, #docs-body p code {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 3px;
+      padding: 0 4px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.76rem;
+      color: var(--blue-400);
+    }
+
+    #docs-body pre {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      margin: 0.5rem 0 1rem;
+      font-size: 0.75rem;
+      line-height: 1.55;
+    }
+
+    #docs-body pre code {
+      background: none;
+      border: none;
+      color: var(--gray-900);
+      padding: 0;
+      font-size: inherit;
+    }
+
+    #docs-body .tag {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    #docs-body .tag.returns { background: #d5e9ff; color: #084b8a; }
+    #docs-body .tag.async   { background: #fdefd1; color: #7d4600; }
+    #docs-body .tag.event   { background: #d5f5ec; color: #0d5c43; }
+
+    .method-block {
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      margin: 0.75rem 0;
+      overflow: hidden;
+    }
+
+    .method-block .method-sig {
+      background: var(--gray-75);
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--gray-300);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.78rem;
+      color: var(--blue-400);
+      font-weight: 600;
+    }
+
+    .method-block .method-body { padding: 0.6rem 0.75rem; }
+    .method-block .method-body p { margin: 0 0 0.4rem; }
+
+    .divider { border: none; border-top: 1px solid var(--gray-300); margin: 1.5rem 0; }
+
+    /* ── Export modal ── */
+    #export-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #export-modal.open { display: flex; }
+
+    .modal-card {
+      background: var(--gray-50);
+      border-radius: 4px;
+      width: min(580px, 90vw);
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.28);
+    }
+
+    .modal-header {
+      background: var(--gray-75);
+      color: var(--gray-900);
+      border-radius: 4px 4px 0 0;
+      height: 44px;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--gray-300);
+    }
+
+    .modal-header h2 { font-size: 0.88rem; font-weight: 600; margin: 0; flex: 1; color: var(--gray-900); }
+
+    .modal-card pre {
+      flex: 1;
+      overflow: auto;
+      margin: 0;
+      padding: 1rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: var(--gray-900);
+      background: var(--gray-100);
+      border-radius: 0 0 4px 4px;
+    }
+
+    @media (max-width: 700px) {
+      main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Adaptive Forms Block Playground</h1>
+</header>
+
+<main>
+  <!-- ── Left: JSON editor ── -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Form Definition (JSON)</span>
+      <button class="btn" id="sample-btn">Sample</button>
+      <button class="btn" id="format-btn">Format</button>
+      <button class="btn danger" id="clear-btn">Clear</button>
+    </div>
+
+    <div class="url-bar">
+      <input type="url" id="url-input"
+        placeholder="/path/to/form.json or https://… — press Enter to fetch" />
+      <button class="btn primary" id="fetch-btn">Fetch</button>
+    </div>
+
+    <div class="editor-body">
+      <textarea id="json-input" spellcheck="false"></textarea>
+    </div>
+
+    <div id="status">
+      <span class="status-dot"></span>
+      <span id="status-text">Ready — paste JSON, enter a URL, or click Sample</span>
+    </div>
+  </div>
+
+  <!-- ── Right: Preview + Docs ── -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title" id="right-panel-title">Preview</span>
+      <button class="btn" id="export-btn" style="display:none">Export Data</button>
+      <button class="btn" id="docs-toggle-btn" style="display:flex;align-items:center;gap:5px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        API Reference
+      </button>
+    </div>
+
+    <!-- Preview tab -->
+    <div class="tab-panel active" id="tab-preview">
+      <div id="preview-body">
+        <div class="empty-state" id="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="5" width="18" height="14" rx="2"/>
+            <path d="M7 9h10M7 12h6"/>
+          </svg>
+          <p>Paste JSON, enter a URL, or click Sample</p>
+        </div>
+        <div id="form-container" class="form block"></div>
+      </div>
+    </div>
+
+    <!-- API Reference tab -->
+    <div class="tab-panel" id="tab-docs">
+      <div id="docs-body">
+
+        <h2>renderForm SDK Reference</h2>
+        <p>A simplified entry point for rendering AEM Adaptive Forms directly from a form definition object — no DOM block boilerplate required.</p>
+
+        <!-- renderForm() -->
+        <h3><span class="tag async">async</span> renderForm(formDef, element)</h3>
+        <div class="sig">import { renderForm } from '/blocks/form/form.js';</div>
+        <p>Renders a form definition into a target DOM element. Handles both AEM (adaptive) and document-based (spreadsheet) form types automatically. Initialises the rule engine, registers custom functions, and wires all event handling.</p>
+
+        <table>
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td><code>formDef</code></td><td><code>Object</code></td><td>Parsed form definition JSON (adaptive form schema).</td></tr>
+          <tr><td><code>element</code></td><td><code>HTMLElement</code></td><td>Target container element. The rendered <code>&lt;form&gt;</code> is appended here.</td></tr>
+        </table>
+
+        <p><span class="tag returns">Returns</span> <code>Promise&lt;{ form, afbForm }&gt;</code></p>
+
+        <table>
+          <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          <tr><td><code>form</code></td><td><code>HTMLFormElement</code></td><td>The rendered form element. Has <code>dataset.id</code>, <code>dataset.action</code>, <code>dataset.source</code>, <code>dataset.rules</code>.</td></tr>
+          <tr><td><code>afbForm</code></td><td><code>FormModel | null</code></td><td>The live form model instance. <code>null</code> when using Web Worker mode (model lives in worker thread).</td></tr>
+        </table>
+
+        <pre><code>import { renderForm } from '/blocks/form/form.js';
+
+const container = document.getElementById('my-container');
+const { form, afbForm } = await renderForm(formDef, container);
+
+// form is now in the DOM
+console.log(form.dataset.id);   // form ID
+console.log(form.dataset.source); // 'aem' or 'sheet'</code></pre>
+
+        <hr class="divider">
+
+        <!-- afbForm API -->
+        <h2>Form Model API (afbForm)</h2>
+        <p>The <code>afbForm</code> instance is the live rule-engine model. Available when the form runs without a Web Worker (e.g. environments where <code>typeof Worker === 'undefined'</code>).</p>
+
+        <div class="method-block">
+          <div class="method-sig">afbForm.exportData() → Object</div>
+          <div class="method-body">
+            <p>Returns the current form data as a plain object, keyed by field <code>name</code>. Excludes disabled and unbound (<code>dataRef: null</code>) fields.</p>
+            <pre><code>const data = afbForm.exportData();
+// { firstName: 'Jane', email: 'jane@example.com', ... }</code></pre>
+          </div>
+        </div>
+
+        <div class="method-block">
+          <div class="method-sig">afbForm.importData(data: Object) → void</div>
+          <div class="method-body">
+            <p>Prefills the form with the provided data object. Keys must match field <code>name</code> values. Triggers change events and rule re-evaluation for each updated field.</p>
+            <pre><code>afbForm.importData({
+  firstName: 'Jane',
+  email: 'jane@example.com',
+  country: 'US',
+});</code></pre>
+          </div>
+        </div>
+
+        <div class="method-block">
+          <div class="method-sig">afbForm.validate() → ValidationError[]</div>
+          <div class="method-body">
+            <p>Runs validation on all fields. Returns an array of validation error objects — empty array means the form is valid.</p>
+            <pre><code>const errors = afbForm.validate();
+if (errors.length === 0) {
+  console.log('Form is valid');
+} else {
+  errors.forEach(e => console.log(e.fieldName, e.message));
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="method-block">
+          <div class="method-sig">afbForm.getState(includeData?: boolean) → Object</div>
+          <div class="method-body">
+            <p>Returns a serialisable snapshot of the current form state. Pass <code>true</code> to include current field values in the snapshot.</p>
+            <pre><code>const state = afbForm.getState(true);
+console.log(state.items); // all field states</code></pre>
+          </div>
+        </div>
+
+        <div class="method-block">
+          <div class="method-sig">afbForm.getElement(fieldId: string) → FieldModel</div>
+          <div class="method-body">
+            <p>Returns the model for a single field by its <code>id</code> or <code>qualifiedName</code>. Useful for reading or imperatively setting a field's properties.</p>
+            <pre><code>const emailField = afbForm.getElement('emailinput-abc123');
+console.log(emailField.value);      // current value
+console.log(emailField.valid);      // validation state
+emailField.value = 'new@email.com'; // set value directly</code></pre>
+          </div>
+        </div>
+
+        <div class="method-block">
+          <div class="method-sig">afbForm.subscribe(callback, eventType?: string) → void</div>
+          <div class="method-body">
+            <p>Subscribes to model events. If <code>eventType</code> is omitted, receives all events.</p>
+            <table>
+              <tr><th>Event type</th><th>When it fires</th></tr>
+              <tr><td><code>'fieldChanged'</code></td><td>Any field property changed (value, visible, enabled, enum…)</td></tr>
+              <tr><td><code>'change'</code></td><td>A field's value changed</td></tr>
+              <tr><td><code>'submitSuccess'</code></td><td>Form submitted successfully</td></tr>
+              <tr><td><code>'submitFailure'</code></td><td>Submission rejected by server</td></tr>
+              <tr><td><code>'submitError'</code></td><td>Network or unexpected error on submit</td></tr>
+            </table>
+            <pre><code>afbForm.subscribe((event) => {
+  const { field } = event.payload;
+  console.log(`${field.name} changed:`, field.value);
+}, 'fieldChanged');
+
+// Listen to value changes only
+afbForm.subscribe((event) => {
+  console.log('value changed', event.payload);
+}, 'change');</code></pre>
+          </div>
+        </div>
+
+        <div class="method-block">
+          <div class="method-sig">afbForm.dispatch(event: Event) → void</div>
+          <div class="method-body">
+            <p>Dispatches a custom event into the rule engine. Used to trigger custom event handlers defined in the form rules.</p>
+            <pre><code>// Trigger a custom event on the form
+afbForm.dispatch(new CustomEvent('custom:refresh'));
+
+// Trigger click on a specific field
+const btn = afbForm.getElement('submit-button-id');
+btn.dispatch({ type: 'click' });</code></pre>
+          </div>
+        </div>
+
+        <div class="method-block">
+          <div class="method-sig">afbForm.reset() → void</div>
+          <div class="method-body">
+            <p>Resets all fields to their initial values as defined in the form definition. Equivalent to the HTML form reset but operates through the model so rules re-evaluate.</p>
+            <pre><code>afbForm.reset();</code></pre>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- subscribe helper -->
+        <h2>Component Subscribe Helper</h2>
+        <div class="sig">import { subscribe } from '/blocks/form/rules/index.js';</div>
+        <p>A higher-level helper for custom components that need to react to field model changes after the DOM has been rendered. Called inside a component decorator.</p>
+
+        <div class="method-block">
+          <div class="method-sig">subscribe(fieldDiv, formId, callback, options?) → void</div>
+          <div class="method-body">
+            <table>
+              <tr><th>Parameter</th><th>Description</th></tr>
+              <tr><td><code>fieldDiv</code></td><td>The field's wrapper DOM element (<code>data-id</code> must be set).</td></tr>
+              <tr><td><code>formId</code></td><td>The form's <code>dataset.id</code> value.</td></tr>
+              <tr><td><code>callback(div, model, eventType, payload)</code></td><td>Called with <code>'register'</code> once on init, then <code>'change'</code> on each value update.</td></tr>
+              <tr><td><code>options.listenChanges</code></td><td>Set <code>true</code> to receive <code>'change'</code> callbacks after registration.</td></tr>
+            </table>
+            <pre><code>// Inside a component decorator:
+export default async function decorateRating(element, fd, container, formId) {
+  subscribe(element, formId, (div, model, eventType, payload) => {
+    if (eventType === 'register') {
+      renderStars(div, model.value);
+    }
+    if (eventType === 'change') {
+      renderStars(div, payload.changes[0].currentValue);
+    }
+  }, { listenChanges: true });
+}</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Export data modal -->
+<div id="export-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>Exported Form Data</h2>
+      <button class="btn" id="close-export">&#10005;</button>
+    </div>
+    <pre id="export-pre"></pre>
+  </div>
+</div>
+
+<script type="module">
+  import { renderForm } from '/blocks/form/form.js';
+
+  // ── CodeMirror setup ────────────────────────────────────────────────────────
+  const editor = CodeMirror.fromTextArea(document.getElementById('json-input'), {
+    mode: { name: 'javascript', json: true },
+    theme: 'default',
+    lineNumbers: true,
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    indentUnit: 2,
+    tabSize: 2,
+    lineWrapping: false,
+    extraKeys: { 'Ctrl-Enter': () => renderFromJSON(), 'Cmd-Enter': () => renderFromJSON() },
+  });
+
+  // ── DOM refs ────────────────────────────────────────────────────────────────
+  const urlInput    = document.getElementById('url-input');
+  const container   = document.getElementById('form-container');
+  const emptyState  = document.getElementById('empty-state');
+  const statusEl    = document.getElementById('status');
+  const statusText  = document.getElementById('status-text');
+  const exportBtn   = document.getElementById('export-btn');
+  const exportModal = document.getElementById('export-modal');
+  const exportPre   = document.getElementById('export-pre');
+
+  let lastAfbForm = null;
+  let debounceTimer = null;
+
+  function setStatus(msg, type = '') {
+    statusEl.className = type;
+    statusText.textContent = msg;
+  }
+
+  // ── API Reference toggle ────────────────────────────────────────────────────
+  const docsToggleBtn   = document.getElementById('docs-toggle-btn');
+  const rightPanelTitle = document.getElementById('right-panel-title');
+  let docsVisible = false;
+
+  docsToggleBtn.addEventListener('click', () => {
+    docsVisible = !docsVisible;
+    document.getElementById('tab-preview').classList.toggle('active', !docsVisible);
+    document.getElementById('tab-docs').classList.toggle('active', docsVisible);
+    rightPanelTitle.textContent = docsVisible ? 'API Reference' : 'Preview';
+    docsToggleBtn.classList.toggle('primary', docsVisible);
+    docsToggleBtn.blur();
+    docsToggleBtn.innerHTML = docsVisible
+      ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> Back to Preview`
+      : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> API Reference`;
+  });
+
+  // ── Render from JSON editor ─────────────────────────────────────────────────
+  async function renderFromJSON() {
+    const raw = editor.getValue().trim();
+    if (!raw) {
+      container.innerHTML = '';
+      emptyState.style.display = '';
+      exportBtn.style.display = 'none';
+      lastAfbForm = null;
+      setStatus('Ready — paste JSON, enter a URL, or click Sample');
+      return;
+    }
+
+    let formDef;
+    try {
+      formDef = JSON.parse(raw);
+    } catch (e) {
+      setStatus(`JSON parse error: ${e.message}`, 'error');
+      return;
+    }
+
+    container.innerHTML = '';
+    emptyState.style.display = 'none';
+    exportBtn.style.display = 'none';
+    lastAfbForm = null;
+    setStatus('Rendering…', 'loading');
+
+    if (docsVisible) docsToggleBtn.click();  // switch back to preview
+
+    try {
+      const { afbForm } = await renderForm(formDef, container);
+      lastAfbForm = afbForm;
+      setStatus('Rendered successfully.', 'success');
+      if (afbForm && typeof afbForm.exportData === 'function') {
+        exportBtn.style.display = '';
+      }
+    } catch (err) {
+      container.innerHTML = '';
+      emptyState.style.display = '';
+      setStatus(`Error: ${err.message}`, 'error');
+    }
+  }
+
+  // ── Fetch from URL ──────────────────────────────────────────────────────────
+  async function fetchAndRender() {
+    const url = urlInput.value.trim();
+    if (!url) return;
+
+    setStatus(`Fetching ${url}…`, 'loading');
+    container.innerHTML = '';
+    emptyState.style.display = 'none';
+    exportBtn.style.display = 'none';
+    lastAfbForm = null;
+
+    let json;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
+      json = await resp.json();
+    } catch (e) {
+      emptyState.style.display = '';
+      setStatus(`Fetch failed: ${e.message}`, 'error');
+      return;
+    }
+
+    editor.setValue(JSON.stringify(json, null, 2));
+    await renderFromJSON();
+  }
+
+  // ── Auto-render wiring ──────────────────────────────────────────────────────
+  function scheduleRender(delay) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(renderFromJSON, delay);
+  }
+
+  editor.on('change', (cm, change) => {
+    if (change.origin === 'setValue') return; // skip programmatic sets
+    scheduleRender(600);
+  });
+
+  editor.on('paste', () => scheduleRender(0));
+
+  urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') fetchAndRender(); });
+  document.getElementById('fetch-btn').addEventListener('click', (e) => { e.currentTarget.blur(); fetchAndRender(); });
+
+  document.getElementById('sample-btn').addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    editor.setValue(JSON.stringify(SAMPLE_FORM, null, 2));
+    urlInput.value = '';
+    renderFromJSON();
+  });
+
+  document.getElementById('format-btn').addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    try {
+      editor.setValue(JSON.stringify(JSON.parse(editor.getValue()), null, 2));
+      setStatus('Formatted.');
+    } catch (err) {
+      setStatus(`Cannot format: ${err.message}`, 'error');
+    }
+  });
+
+  document.getElementById('clear-btn').addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    editor.setValue('');
+    urlInput.value = '';
+    renderFromJSON();
+  });
+
+  exportBtn.addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    exportPre.textContent = JSON.stringify(lastAfbForm?.exportData?.() ?? null, null, 2);
+    exportModal.classList.add('open');
+  });
+
+  document.getElementById('close-export').addEventListener('click', () => exportModal.classList.remove('open'));
+  exportModal.addEventListener('click', (e) => { if (e.target === exportModal) exportModal.classList.remove('open'); });
+
+  // Auto-render if browser restored editor content on load
+  if (editor.getValue().trim()) renderFromJSON();
+
+  // ── Sample form ─────────────────────────────────────────────────────────────
+  const SAMPLE_FORM = {
+    adaptiveform: '0.10.0',
+    action: '/submit',
+    id: 'sample-contact-form',
+    items: [
+      {
+        id: 'name', name: 'name',
+        label: { value: 'Full Name' },
+        fieldType: 'text-input',
+        required: true,
+        placeholder: 'Jane Smith',
+        constraintMessages: { required: 'Name is required.' },
+      },
+      {
+        id: 'email', name: 'email',
+        label: { value: 'Email Address' },
+        fieldType: 'text-input',
+        format: 'email',
+        required: true,
+        placeholder: 'jane@example.com',
+        constraintMessages: { required: 'Email is required.', format: 'Enter a valid email address.' },
+      },
+      {
+        id: 'subject', name: 'subject',
+        label: { value: 'Subject' },
+        fieldType: 'drop-down',
+        enum: ['General Enquiry', 'Support', 'Feedback', 'Other'],
+        enumNames: ['General Enquiry', 'Support', 'Feedback', 'Other'],
+      },
+      {
+        id: 'message', name: 'message',
+        label: { value: 'Message' },
+        fieldType: 'multiline-input',
+        required: true,
+        placeholder: 'Your message…',
+      },
+      {
+        id: 'subscribe', name: 'subscribe',
+        label: { value: 'Subscribe to newsletter' },
+        fieldType: 'checkbox',
+        enum: ['yes'],
+      },
+      {
+        id: 'submit', name: 'submit',
+        label: { value: 'Send Message' },
+        fieldType: 'button',
+        buttonType: 'submit',
+      },
+    ],
+  };
+</script>
+</body>
+</html>
