@@ -51,7 +51,7 @@
             "value": "Business Email"
           },
           "constraintMessages": {
-            "format": "Specify the value in allowed format1: email",
+            "format": "Specify the value in allowed format1: email"
           },
           "description": "Please use your work email address",
           "properties": {
