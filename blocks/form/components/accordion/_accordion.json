@@ -33,6 +33,16 @@
             "id": "accordion",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "panel"
+                },
+                {
+                    "component": "hidden",
+                    "name": "fd:viewType",
+                    "default": "accordion"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

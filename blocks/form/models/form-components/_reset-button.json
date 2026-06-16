@@ -22,6 +22,11 @@
       "id": "form-reset-button",
       "fields": [
         {
+          "component": "hidden",
+          "name": "fieldType",
+          "default": "button"
+        },
+        {
           "component": "tab",
           "label": "Basic",
           "name": "basic"

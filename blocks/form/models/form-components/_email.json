@@ -21,6 +21,11 @@
             "id": "email",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "email"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

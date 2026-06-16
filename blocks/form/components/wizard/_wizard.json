@@ -33,6 +33,16 @@
       "id": "wizard",
       "fields": [
         {
+          "component": "hidden",
+          "name": "fieldType",
+          "default": "panel"
+        },
+        {
+          "component": "hidden",
+          "name": "fd:viewType",
+          "default": "wizard"
+        },
+        {
           "component": "tab",
           "label": "Basic",
           "name": "basic"
