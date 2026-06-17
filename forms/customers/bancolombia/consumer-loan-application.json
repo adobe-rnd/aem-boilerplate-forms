@@ -1,0 +1,1967 @@
+{
+  "id": "guideContainer-solicitud-credito-consumo",
+  "fieldType": "form",
+  "title": "Solicitud de crédito de consumo",
+  "action": "/adobe/forms/af/submit/L2NvbnRlbnQvZm9ybXMvYWYvYmFuY29sb21iaWEvcGVyc29uYXMteS1weW1lcy9jcmVkaXRvLWRlLWNvbnN1bW8vdDE2MDQ0My9zb2xpY2l0dWQtZGUtY3JlZGl0by1kZS1jb25zdW1v",
+  "properties": {
+    "fd:changeEventBehaviour": "deps",
+    "custodia": "no",
+    "extractionTechnology": "FormulariosDigitales",
+    "signature": "si",
+    "channel": "FORMULARIO WEB",
+    "signatureType": "simple",
+    "autentificacion": "si",
+    "custody": "si",
+    "version": "2.0.0",
+    "precarga": "no",
+    "idTramite": "109",
+    "themeRef": "/conf/global/frontend/deployments/bancolombia-core-components-theme/bancolombia-core-components-theme-1.0.0-1748984789-a040fbb",
+    "pdfAdjunto": "si",
+    "subtype": "Solicitud credito consumo hd",
+    "processId": "T160443",
+    "processName": "Realizar estudio de credito persona natural",
+    "schemaType": "none",
+    "tipoFirmaElectronica": "no aplica",
+    "firmaElectronica": "si",
+    "entity": "Bancolombia",
+    "fd:dor": {
+      "dorType": "select",
+      "dorTemplateRef": "/content/dam/formsanddocuments/bancolombia/personas-y-pymes/credito-de-consumo/t160443/V8-CibestSolicitudCreditodeconsumo.pdf"
+    },
+    "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer",
+    "fd:schemaType": "BASIC",
+    "fd:isHamburgerMenuEnabled": false,
+    "fd:roleAttribute": null,
+    "fd:formDataEnabled": true,
+    "fd:customFunctionsUrl": "/adobe/forms/af/customfunctions/L2NvbnRlbnQvZm9ybXMvYWYvYmFuY29sb21iaWEvcGVyc29uYXMteS1weW1lcy9jcmVkaXRvLWRlLWNvbnN1bW8vdDE2MDQ0My9zb2xpY2l0dWQtZGUtY3JlZGl0by1kZS1jb25zdW1v",
+    "fd:dataUrl": "/adobe/forms/af/data/L2NvbnRlbnQvZm9ybXMvYWYvYmFuY29sb21iaWEvcGVyc29uYXMteS1weW1lcy9jcmVkaXRvLWRlLWNvbnN1bW8vdDE2MDQ0My9zb2xpY2l0dWQtZGUtY3JlZGl0by1kZS1jb25zdW1v"
+  },
+  "columnCount": 12,
+  "columnClassNames": {
+    "text_bienvenida": "aem-GridColumn aem-GridColumn--default--12",
+    "field_fecha_diligenciamiento": "aem-GridColumn aem-GridColumn--default--12",
+    "field_document_reception_date": "aem-GridColumn aem-GridColumn--default--12",
+    "field_expedition_date": "aem-GridColumn aem-GridColumn--default--12",
+    "field_id_session": "aem-GridColumn aem-GridColumn--default--12",
+    "submit": "aem-GridColumn aem-GridColumn--default--12",
+    "button": "aem-GridColumn aem-GridColumn--default--12",
+    "panelcontainer_solicitud": "aem-GridColumn aem-GridColumn--default--12"
+  },
+  "gridClassNames": "aem-Grid aem-Grid--12 aem-Grid--default--12",
+  "events": {
+    "custom:setProperty": [
+      "$event.payload"
+    ]
+  },
+  "lang": "es",
+  "adaptiveform": "0.15.2",
+  "metadata": {
+    "grammar": "json-formula-1.0.0",
+    "version": "1.0.0"
+  },
+  ":type": "bancolombia/components/adaptiveForm/formcontainer",
+  ":itemsOrder": [
+    "text_bienvenida",
+    "field_document_reception_date",
+    "field_expedition_date",
+    "field_fecha_diligenciamiento",
+    "field_id_session",
+    "panelcontainer_solicitud",
+    "button",
+    "submit"
+  ],
+  ":items": {
+    "text_bienvenida": {
+      "id": "text-bienvenida",
+      "fieldType": "plain-text",
+      "name": "text_bienvenida",
+      "value": "<p>Hola, te damos la bienvenida a nuestro formulario para que solicites tu crédito de consumo. Llena todos los campos necesarios y envíalo. Te estaremos dando respuesta los próximos días.</p>\r\n",
+      "richText": true,
+      "events": {
+        "custom:setProperty": [
+          "$event.payload"
+        ]
+      },
+      "properties": {
+        "fd:dor": {
+          "dorExclusion": false
+        },
+        "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/text_bienvenida"
+      },
+      ":type": "bancolombia/components/adaptiveForm/text"
+    },
+    "field_document_reception_date": {
+      "id": "field-document-reception-date",
+      "fieldType": "text-input",
+      "name": "documentReceptionDate",
+      "visible": false,
+      "type": "string",
+      "enabled": true,
+      "readOnly": true,
+      "label": {
+        "visible": true,
+        "value": "documentReceptionDate"
+      },
+      "events": {
+        "custom:setProperty": [
+          "$event.payload"
+        ]
+      },
+      "properties": {
+        "fd:dor": {
+          "dorExclusion": false
+        },
+        "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/field_document_reception_date"
+      },
+      "autocomplete": "off",
+      ":type": "bancolombia/components/adaptiveForm/textinput"
+    },
+    "field_expedition_date": {
+      "id": "field-expedition-date",
+      "fieldType": "text-input",
+      "name": "expeditionDate",
+      "visible": false,
+      "type": "string",
+      "enabled": true,
+      "readOnly": true,
+      "label": {
+        "visible": true,
+        "value": "expeditionDate"
+      },
+      "events": {
+        "custom:setProperty": [
+          "$event.payload"
+        ]
+      },
+      "properties": {
+        "fd:dor": {
+          "dorExclusion": false
+        },
+        "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/field_expedition_date"
+      },
+      "autocomplete": "off",
+      ":type": "bancolombia/components/adaptiveForm/textinput"
+    },
+    "field_fecha_diligenciamiento": {
+      "id": "field-fecha-diligenciamiento",
+      "fieldType": "text-input",
+      "name": "fecha_diligenciamiento",
+      "visible": false,
+      "type": "string",
+      "enabled": true,
+      "readOnly": true,
+      "label": {
+        "visible": true,
+        "value": "Fecha de diligenciamiento / Fill Date"
+      },
+      "rules": {
+        "value": "obtenerFechaHoraLocal('dd-MM-yyyy')"
+      },
+      "events": {
+        "custom:setProperty": [
+          "$event.payload"
+        ]
+      },
+      "properties": {
+        "fd:dor": {
+          "dorExclusion": false,
+          "dorBindRef": "fecha_diligenciamiento"
+        },
+        "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/field_fecha_diligenciamiento",
+        "fd:rules": {
+          "validationStatus": "valid"
+        }
+      },
+      ":type": "bancolombia/components/adaptiveForm/textinput"
+    },
+    "field_id_session": {
+      "id": "field-id-session",
+      "fieldType": "text-input",
+      "name": "idSession",
+      "visible": false,
+      "type": "string",
+      "enabled": true,
+      "readOnly": true,
+      "label": {
+        "visible": true,
+        "value": "idSession"
+      },
+      "events": {
+        "custom:setProperty": [
+          "$event.payload"
+        ]
+      },
+      "properties": {
+        "fd:dor": {
+          "dorExclusion": false
+        },
+        "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/field_id_session"
+      },
+      "autocomplete": "off",
+      ":type": "bancolombia/components/adaptiveForm/textinput"
+    },
+    "submit": {
+      "id": "submit-a707a39dab",
+      "fieldType": "button",
+      "name": "submit1744750756723",
+      "buttonType": "submit",
+      "visible": true,
+      "enabled": true,
+      "label": {
+        "value": "Enviar"
+      },
+      "events": {
+        "click": [
+          "generateDoRAndSubmitFunctionHeadless()"
+        ],
+        "custom:setProperty": [
+          "$event.payload"
+        ]
+      },
+      "properties": {
+        "fd:dor": {
+          "dorExclusion": true
+        },
+        "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/submit",
+        "fd:rules": {
+          "validationStatus": "valid"
+        },
+        "fd:buttonType": "submit"
+      },
+      ":type": "bancolombia/components/adaptiveForm/button"
+    },
+    "button": {
+      "id": "button-6a4ef0b690",
+      "fieldType": "button",
+      "name": "pdfbutton",
+      "visible": false,
+      "type": "string",
+      "enabled": true,
+      "buttonType": "button",
+      "label": {
+        "value": "Previsualizar"
+      },
+      "events": {
+        "click": [
+          "getDoRHeadless(true())"
+        ],
+        "custom:setProperty": [
+          "$event.payload"
+        ]
+      },
+      "properties": {
+        "fd:dor": {
+          "dorExclusion": false
+        },
+        "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/button",
+        "fd:rules": {
+          "validationStatus": "valid"
+        },
+        "fd:buttonType": "button"
+      },
+      ":type": "bancolombia/components/adaptiveForm/button"
+    },
+    "panelcontainer_solicitud": {
+      "id": "accordion-solicitud-credito",
+      "fieldType": "panel",
+      "name": "panelcontainer_solicitud",
+      "visible": true,
+      "enabled": true,
+      "repeatable": false,
+      "readOnly": false,
+      "label": {
+        "visible": false,
+        "value": "Solicitud de crédito de consumo"
+      },
+      "events": {
+        "custom:setProperty": [
+          "$event.payload"
+        ]
+      },
+      "properties": {
+        "fd:dor": {
+          "dorExclusion": false,
+          "dorExcludeTitle": false,
+          "dorExcludeDescription": false
+        },
+        "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud"
+      },
+      ":itemsOrder": [
+        "panel_informacion_personal",
+        "panel_informacion_laboral",
+        "panel_credito_tarjeta_vehiculo",
+        "panel_correspondencia",
+        "panel_representante_apoderado",
+        "panel_espacio_firma"
+      ],
+      ":type": "bancolombia/components/adaptiveForm/panelcontainer",
+      ":items": {
+        "panel_informacion_personal": {
+          "id": "panel-informacion-personal",
+          "fieldType": "panel",
+          "name": "panel_informacion_personal",
+          "visible": true,
+          "enabled": true,
+          "repeatable": false,
+          "readOnly": false,
+          "columnCount": 12,
+          "columnClassNames": {
+            "field_tipo_documento": "aem-GridColumn aem-GridColumn--default--12",
+            "field_no_identificacion": "aem-GridColumn aem-GridColumn--default--12",
+            "field_primer_nombre": "aem-GridColumn aem-GridColumn--default--6",
+            "field_segundo_nombre": "aem-GridColumn aem-GridColumn--default--6",
+            "field_primer_apellido": "aem-GridColumn aem-GridColumn--default--6",
+            "field_segundo_apellido": "aem-GridColumn aem-GridColumn--default--6",
+            "field_telefono": "aem-GridColumn aem-GridColumn--default--6",
+            "field_celular": "aem-GridColumn aem-GridColumn--default--6",
+            "field_correo_electronico": "aem-GridColumn aem-GridColumn--default--12",
+            "field_direccion_residencia": "aem-GridColumn aem-GridColumn--default--12",
+            "field_ciudad": "aem-GridColumn aem-GridColumn--default--12"
+          },
+          "gridClassNames": "aem-Grid aem-Grid--12 aem-Grid--default--12",
+          "label": {
+            "visible": true,
+            "value": "Información Personal"
+          },
+          "events": {
+            "custom:setProperty": [
+              "$event.payload"
+            ]
+          },
+          "properties": {
+            "fd:dor": {
+              "dorExclusion": false,
+              "dorExcludeTitle": false,
+              "dorExcludeDescription": false
+            },
+            "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal",
+            "cq:panelTitle": "Informacion Personal"
+          },
+          ":itemsOrder": [
+            "field_tipo_documento",
+            "field_no_identificacion",
+            "field_primer_nombre",
+            "field_segundo_nombre",
+            "field_primer_apellido",
+            "field_segundo_apellido",
+            "field_telefono",
+            "field_celular",
+            "field_correo_electronico",
+            "field_direccion_residencia",
+            "field_ciudad"
+          ],
+          ":type": "bancolombia/components/adaptiveForm/panelcontainer",
+          ":items": {
+            "field_tipo_documento": {
+              "id": "field-tipo-documento",
+              "fieldType": "drop-down",
+              "name": "tipo_documento",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "enforceEnum": true,
+              "enumNames": [
+                "Cédula de ciudadanía / Citizen ID",
+                "Tarjeta de identidad / Identity Card",
+                "Número de identificación tributario (NIT) / Tax ID",
+                "Cédula de extranjería / Foreign ID",
+                "Pasaporte / Passport",
+                "Carné diplomático / Diplomatic Card"
+              ],
+              "enum": [
+                "cedula_ciudadania",
+                "tarjeta_identidad",
+                "nit",
+                "cedula_extranjeria",
+                "pasaporte",
+                "carne_diplomatico"
+              ],
+              "label": {
+                "visible": true,
+                "value": "Tipo de documento / Document Type"
+              },
+              "constraintMessages": {
+                "required": "Elige un tipo de documento / Select a document type"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_tipo_documento"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_tipo_documento"
+              },
+              ":type": "bancolombia/components/adaptiveForm/dropdown"
+            },
+            "field_no_identificacion": {
+              "id": "field-no-identificacion",
+              "fieldType": "text-input",
+              "name": "no_identificacion",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "minLength": 5,
+              "maxLength": 15,
+              "label": {
+                "visible": true,
+                "value": "Número de documento / Document Number"
+              },
+              "constraintMessages": {
+                "required": "Ingresa tu número de documento / Enter your document number",
+                "minLength": "Mínimo 5 caracteres / Minimum 5 characters",
+                "maxLength": "Máximo 15 caracteres / Maximum 15 characters"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_no_identificacion"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_no_identificacion"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_primer_nombre": {
+              "id": "field-primer-nombre",
+              "fieldType": "text-input",
+              "name": "primer_nombre",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "minLength": 2,
+              "label": {
+                "visible": true,
+                "value": "Primer nombre / First Name"
+              },
+              "constraintMessages": {
+                "required": "Ingresa tu primer nombre / Enter your first name",
+                "minLength": "Mínimo 2 caracteres / Minimum 2 characters"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_primer_nombre"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_primer_nombre"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_segundo_nombre": {
+              "id": "field-segundo-nombre",
+              "fieldType": "text-input",
+              "name": "segundo_nombre",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Segundo nombre / Middle Name"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_segundo_nombre"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_segundo_nombre"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_primer_apellido": {
+              "id": "field-primer-apellido",
+              "fieldType": "text-input",
+              "name": "primer_apellido",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "minLength": 2,
+              "label": {
+                "visible": true,
+                "value": "Primer apellido / First Surname"
+              },
+              "constraintMessages": {
+                "required": "Ingresa tu primer apellido / Enter your first surname",
+                "minLength": "Mínimo 2 caracteres / Minimum 2 characters"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_primer_apellido"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_primer_apellido"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_segundo_apellido": {
+              "id": "field-segundo-apellido",
+              "fieldType": "text-input",
+              "name": "segundo_apellido",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Segundo apellido / Second Surname"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_segundo_apellido"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_segundo_apellido"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_telefono": {
+              "id": "field-telefono",
+              "fieldType": "number-input",
+              "name": "telefono",
+              "visible": true,
+              "type": "integer",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "minimum": 1000000,
+              "maximum": 9999999,
+              "label": {
+                "visible": true,
+                "value": "Teléfono de residencia / Home Phone"
+              },
+              "constraintMessages": {
+                "required": "Ingresa tu teléfono de residencia, si no aplica escribe 0 / Enter home phone, write 0 if not applicable",
+                "minimum": "Ingresa un número de teléfono válido de 7 dígitos / Enter a valid 7-digit phone number",
+                "maximum": "Ingresa un número de teléfono válido de 7 dígitos / Enter a valid 7-digit phone number"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_telefono_residencia"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_telefono"
+              },
+              ":type": "bancolombia/components/adaptiveForm/numberinput"
+            },
+            "field_celular": {
+              "id": "field-celular",
+              "fieldType": "number-input",
+              "name": "celular",
+              "visible": true,
+              "type": "integer",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "minimum": 3000000000,
+              "maximum": 3999999999,
+              "label": {
+                "visible": true,
+                "value": "Número de celular / Mobile Number"
+              },
+              "constraintMessages": {
+                "required": "Ingresa tu número de celular / Enter your mobile number",
+                "minimum": "Ingresa un celular válido de 10 dígitos que empiece por 3 / Enter valid 10-digit mobile starting with 3",
+                "maximum": "Ingresa un celular válido de 10 dígitos que empiece por 3 / Enter valid 10-digit mobile starting with 3"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_celular"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_celular"
+              },
+              ":type": "bancolombia/components/adaptiveForm/numberinput"
+            },
+            "field_correo_electronico": {
+              "id": "field-correo-electronico",
+              "fieldType": "text-input",
+              "name": "correo_electronico",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "validationExpression": "$field.$value == 'NA' || (contains($field.$value, '@') && contains($field.$value, '.'))",
+              "label": {
+                "visible": true,
+                "value": "Correo electrónico / Email Address"
+              },
+              "constraintMessages": {
+                "required": "Completa la información, si no aplica escribe NA / Enter info, write NA if not applicable",
+                "validationExpression": "Ingresa un correo electrónico válido o escribe NA / Enter a valid email or write NA"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_correo_electronico"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_correo_electronico",
+                "fd:rules": {
+                  "validationStatus": "valid"
+                }
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_direccion_residencia": {
+              "id": "field-direccion-residencia",
+              "fieldType": "text-input",
+              "name": "direccion_residencia",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "minLength": 5,
+              "label": {
+                "visible": true,
+                "value": "Dirección de residencia / Home Address"
+              },
+              "constraintMessages": {
+                "required": "Completa la información / Complete the information",
+                "minLength": "Mínimo 5 caracteres / Minimum 5 characters"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_direccion_residencia"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_direccion_residencia"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_ciudad": {
+              "id": "field-ciudad",
+              "fieldType": "text-input",
+              "name": "ciudad",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "minLength": 3,
+              "label": {
+                "visible": true,
+                "value": "Ciudad / City"
+              },
+              "constraintMessages": {
+                "required": "Completa la información / Complete the information",
+                "minLength": "Mínimo 3 caracteres / Minimum 3 characters"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ip_ciudad"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_personal/field_ciudad"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            }
+          }
+        },
+        "panel_informacion_laboral": {
+          "id": "panel-informacion-laboral",
+          "fieldType": "panel",
+          "name": "panel_informacion_laboral",
+          "visible": true,
+          "enabled": true,
+          "repeatable": false,
+          "readOnly": false,
+          "columnCount": 12,
+          "columnClassNames": {
+            "text_dedicas": "aem-GridColumn aem-GridColumn--default--12",
+            "field_ocupacion_oficio": "aem-GridColumn aem-GridColumn--default--12",
+            "field_nombre_empresa": "aem-GridColumn aem-GridColumn--default--12",
+            "field_nit": "aem-GridColumn aem-GridColumn--default--12",
+            "field_fecha_ingreso_empresa": "aem-GridColumn aem-GridColumn--default--12",
+            "field_tipo_contrato": "aem-GridColumn aem-GridColumn--default--12",
+            "field_tipo_contrato_otro": "aem-GridColumn aem-GridColumn--default--12",
+            "field_salario_fijo": "aem-GridColumn aem-GridColumn--default--12",
+            "text_actividad_economica": "aem-GridColumn aem-GridColumn--default--12",
+            "field_actividad_economica_principal": "aem-GridColumn aem-GridColumn--default--12",
+            "text_situacion_financiera": "aem-GridColumn aem-GridColumn--default--12",
+            "field_salario_variable": "aem-GridColumn aem-GridColumn--default--12",
+            "field_otros_ingresos": "aem-GridColumn aem-GridColumn--default--12",
+            "field_informacion_financiera_cuales": "aem-GridColumn aem-GridColumn--default--12"
+          },
+          "gridClassNames": "aem-Grid aem-Grid--12 aem-Grid--default--12",
+          "label": {
+            "visible": true,
+            "value": "Información Laboral"
+          },
+          "events": {
+            "custom:setProperty": [
+              "$event.payload"
+            ]
+          },
+          "properties": {
+            "fd:dor": {
+              "dorExclusion": false,
+              "dorExcludeTitle": false,
+              "dorExcludeDescription": false
+            },
+            "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral",
+            "cq:panelTitle": "Informacion Laboral"
+          },
+          ":itemsOrder": [
+            "text_dedicas",
+            "field_ocupacion_oficio",
+            "field_nombre_empresa",
+            "field_nit",
+            "field_fecha_ingreso_empresa",
+            "field_tipo_contrato",
+            "field_tipo_contrato_otro",
+            "text_actividad_economica",
+            "field_actividad_economica_principal",
+            "text_situacion_financiera",
+            "field_salario_fijo",
+            "field_salario_variable",
+            "field_otros_ingresos",
+            "field_informacion_financiera_cuales"
+          ],
+          ":type": "bancolombia/components/adaptiveForm/panelcontainer",
+          ":items": {
+            "text_dedicas": {
+              "id": "text-dedicas",
+              "fieldType": "plain-text",
+              "name": "text_dedicas",
+              "value": "<p><b>¿A qué te dedicas? / What do you do for a living?</b></p>\r\n",
+              "richText": true,
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/text_dedicas"
+              },
+              ":type": "bancolombia/components/adaptiveForm/text"
+            },
+            "field_ocupacion_oficio": {
+              "id": "field-ocupacion-oficio",
+              "fieldType": "checkbox-group",
+              "name": "ocupacion_oficio",
+              "visible": true,
+              "type": "string[]",
+              "enabled": true,
+              "readOnly": false,
+              "enforceEnum": true,
+              "enumNames": [
+                "Empleado / Employed",
+                "Pensionado / Pensioner",
+                "Ama de Casa / Homemaker",
+                "Desempleado con Ingresos / Unemployed with Income",
+                "Estudiante / Student",
+                "Ganadero / Livestock Farmer",
+                "Profesional Independiente / Independent Professional",
+                "Desempleado sin Ingresos / Unemployed without Income",
+                "Rentista de Capital / Capital Income Earner",
+                "Agricultor / Farmer",
+                "Comerciante / Merchant",
+                "Independiente / Self-Employed",
+                "Socio o Empleado-Socio / Partner or Employee-Partner"
+              ],
+              "enum": [
+                "empleado",
+                "pensionado",
+                "ama_de_casa",
+                "desempleado_con_ingresos",
+                "estudiante",
+                "ganadero",
+                "profesional_independiente",
+                "desempleado_sin_ingresos",
+                "rentista_capital",
+                "agricultor",
+                "comerciante",
+                "independiente",
+                "socio_empleado"
+              ],
+              "label": {
+                "visible": false,
+                "value": "Ocupación / Occupation"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ],
+                "change": [
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado'), dispatchEvent(nombre_empresa, 'custom:setProperty', {visible : true()}), dispatchEvent(nombre_empresa, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado')), dispatchEvent(nombre_empresa, 'custom:setProperty', {value : ''}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado'), dispatchEvent(nit, 'custom:setProperty', {visible : true()}), dispatchEvent(nit, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado')), dispatchEvent(nit, 'custom:setProperty', {value : ''}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado'), dispatchEvent(fecha_ingreso_empresa, 'custom:setProperty', {visible : true()}), dispatchEvent(fecha_ingreso_empresa, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado')), dispatchEvent(fecha_ingreso_empresa, 'custom:setProperty', {value : ''}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado'), dispatchEvent(tipo_contrato, 'custom:setProperty', {visible : true()}), dispatchEvent(tipo_contrato, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado')), dispatchEvent(tipo_contrato, 'custom:setProperty', {value : ''}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado'), dispatchEvent(salario_fijo, 'custom:setProperty', {visible : true()}), dispatchEvent(salario_fijo, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado')), dispatchEvent(salario_fijo, 'custom:setProperty', {value : ''}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado'), dispatchEvent(salario_variable, 'custom:setProperty', {visible : true()}), dispatchEvent(salario_variable, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado')), dispatchEvent(salario_variable, 'custom:setProperty', {value : ''}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado')), dispatchEvent(tipo_contrato_otro, 'custom:setProperty', {visible : false()}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'empleado') || contains($field, 'pensionado') || contains($field, 'socio_empleado')), dispatchEvent(tipo_contrato_otro, 'custom:setProperty', {value : ''}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(contains($field, 'ganadero') || contains($field, 'agricultor') || contains($field, 'independiente') || contains($field, 'rentista_capital'), dispatchEvent(actividad_economica_principal, 'custom:setProperty', {visible : true()}), dispatchEvent(actividad_economica_principal, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!(contains($field, 'ganadero') || contains($field, 'agricultor') || contains($field, 'independiente') || contains($field, 'rentista_capital')), dispatchEvent(actividad_economica_principal, 'custom:setProperty', {value : []}), {}), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(contains($field, 'ganadero') || contains($field, 'agricultor') || contains($field, 'independiente') || contains($field, 'rentista_capital'), dispatchEvent(text_actividad_economica, 'custom:setProperty', {visible : true()}), dispatchEvent(text_actividad_economica, 'custom:setProperty', {visible : false()})), {})"
+                ]
+              },
+              "properties": {
+                "afs:layout": {
+                  "orientation": "horizontal"
+                },
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "ocupacion_oficio"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_ocupacion_oficio",
+                "fd:rules": {
+                  "validationStatus": "valid"
+                }
+              },
+              ":type": "bancolombia/components/adaptiveForm/checkboxgroup"
+            },
+            "field_nombre_empresa": {
+              "id": "field-nombre-empresa",
+              "fieldType": "text-input",
+              "name": "nombre_empresa",
+              "visible": false,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "minLength": 2,
+              "label": {
+                "visible": true,
+                "value": "Nombre de la Empresa o Establecimiento / Company or Establishment Name"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido, si no aplica llenar con NA / Field required, write NA if not applicable",
+                "minLength": "Mínimo 2 caracteres / Minimum 2 characters"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_laboral_nombre_empresa"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_nombre_empresa"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput",
+              "required": true
+            },
+            "field_nit": {
+              "id": "field-nit",
+              "fieldType": "number-input",
+              "name": "nit",
+              "visible": false,
+              "type": "integer",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "minimum": 0,
+              "maximum": 999999999,
+              "label": {
+                "visible": true,
+                "value": "NIT de la empresa / Company Tax ID (NIT)"
+              },
+              "constraintMessages": {
+                "required": "Completa la información, si no aplica escribe 0 / Complete the info, write 0 if not applicable",
+                "maximum": "El NIT no puede superar 9 dígitos / NIT cannot exceed 9 digits"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_laboral_nit"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_nit"
+              },
+              ":type": "bancolombia/components/adaptiveForm/numberinput"
+            },
+            "field_fecha_ingreso_empresa": {
+              "id": "field-fecha-ingreso-empresa",
+              "fieldType": "date-input",
+              "name": "fecha_ingreso_empresa",
+              "visible": false,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "dataFormat": "DDMMYYYY",
+              "label": {
+                "visible": true,
+                "value": "Fecha de ingreso a la empresa / Company Start Date"
+              },
+              "constraintMessages": {
+                "required": "Elige una fecha / Select a date"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_laboral_fecha_ingreso_empresa"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_fecha_ingreso_empresa"
+              },
+              "format": "date",
+              ":type": "bancolombia/components/adaptiveForm/datepicker",
+              "required": true
+            },
+            "field_tipo_contrato": {
+              "id": "field-tipo-contrato",
+              "fieldType": "drop-down",
+              "name": "tipo_contrato",
+              "visible": false,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "enforceEnum": true,
+              "enumNames": [
+                "Indefinido / Permanent",
+                "Fijo / Fixed-Term",
+                "Otro, ¿Cuál? / Other, specify",
+                "No Aplica / Not Applicable"
+              ],
+              "enum": [
+                "indefinido",
+                "fijo",
+                "otro",
+                "NA"
+              ],
+              "label": {
+                "visible": true,
+                "value": "Tipo de contrato / Contract Type"
+              },
+              "constraintMessages": {
+                "required": "Elige una opción / Select an option"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ],
+                "change": [
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if($field.$value == 'otro', dispatchEvent(tipo_contrato_otro, 'custom:setProperty', {visible : true()}), dispatchEvent(tipo_contrato_otro, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if($field.$value != 'otro', dispatchEvent(tipo_contrato_otro, 'custom:setProperty', {value : ''}), {}), {})"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_laboral_tipo_contrato"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_tipo_contrato",
+                "fd:rules": {
+                  "validationStatus": "valid"
+                }
+              },
+              ":type": "bancolombia/components/adaptiveForm/dropdown",
+              "required": true
+            },
+            "field_tipo_contrato_otro": {
+              "id": "field-tipo-contrato-otro",
+              "fieldType": "text-input",
+              "name": "tipo_contrato_otro",
+              "visible": false,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Otro ¿Cuál? / Other, specify"
+              },
+              "constraintMessages": {
+                "required": "Completa la información, si no aplica escribe NA / Complete the info, write NA if not applicable"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_laboral_tipo_contrato_otro"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_tipo_contrato_otro"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_salario_fijo": {
+              "id": "field-salario-fijo",
+              "fieldType": "number-input",
+              "name": "salario_fijo",
+              "visible": false,
+              "type": "number",
+              "enabled": true,
+              "readOnly": false,
+              "minimum": 0,
+              "label": {
+                "visible": true,
+                "value": "Salario fijo mensual / Monthly Fixed Salary"
+              },
+              "constraintMessages": {
+                "required": "Completa la información / Complete the information",
+                "minimum": "El salario no puede ser negativo / Salary cannot be negative"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "detalle_info_financiera_salario_fijo"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_salario_fijo"
+              },
+              ":type": "bancolombia/components/adaptiveForm/numberinput",
+              "required": true
+            },
+            "text_actividad_economica": {
+              "id": "text-actividad-economica",
+              "fieldType": "plain-text",
+              "name": "text_actividad_economica",
+              "value": "<p><b>¿Cuál es tu actividad económica principal? / What is your main economic activity?</b></p>\r\n",
+              "richText": true,
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/text_actividad_economica"
+              },
+              ":type": "bancolombia/components/adaptiveForm/text",
+              "visible": false
+            },
+            "field_actividad_economica_principal": {
+              "id": "field-actividad-economica-principal",
+              "fieldType": "checkbox-group",
+              "name": "actividad_economica_principal",
+              "visible": false,
+              "type": "string[]",
+              "enabled": true,
+              "readOnly": false,
+              "enforceEnum": true,
+              "enumNames": [
+                "Cultivar, Cosechar, Criar / Cultivate, Harvest, Raise Livestock",
+                "Suministrar o Prestar Servicios / Supply or Provide Services",
+                "Fabricar, Manufacturar, Transformar / Manufacture or Transform Goods",
+                "Explotar, Extraer, Explorar El Subsuelo / Extract or Explore Subsoil Resources",
+                "Construir / Construction",
+                "Transportar / Transportation",
+                "Vender o Comprar / Buy or Sell Goods",
+                "Rentista de Capital / Capital Income Earner"
+              ],
+              "enum": [
+                "cultivar_cosechar_criar",
+                "suministrar_prestar_servicios",
+                "fabricar_manufacturar_transformar",
+                "explotar_extraer_explorar_subsuelo",
+                "construir",
+                "transportar",
+                "vender_comprar",
+                "rentista_capital"
+              ],
+              "label": {
+                "visible": false,
+                "value": "Actividad Económica Principal / Main Economic Activity"
+              },
+              "constraintMessages": {
+                "required": "Selecciona al menos una actividad económica / Select at least one economic activity"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "afs:layout": {
+                  "orientation": "horizontal"
+                },
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "actividad_economica_principal"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_actividad_economica_principal",
+                "fd:rules": {
+                  "validationStatus": "valid"
+                }
+              },
+              ":type": "bancolombia/components/adaptiveForm/checkboxgroup",
+              "required": true
+            },
+            "field_salario_variable": {
+              "id": "field-salario-variable",
+              "fieldType": "number-input",
+              "name": "salario_variable",
+              "visible": false,
+              "type": "number",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Salario variable / Variable Salary"
+              },
+              "constraintMessages": {
+                "required": "Completa la información, si no aplica escribe 0 / Complete the info, write 0 if not applicable"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "detalle_info_financiera_salario_variable"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_salario_variable"
+              },
+              ":type": "bancolombia/components/adaptiveForm/numberinput"
+            },
+            "text_situacion_financiera": {
+              "id": "text-e478c04d69",
+              "fieldType": "plain-text",
+              "name": "text_situacion_financiera",
+              "value": "<p><b>Queremos conocerte mejor. Cuéntanos un poco sobre tu situación financiera.</b></p>\r\n",
+              "richText": true,
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/text_situacion_financiera"
+              },
+              ":type": "bancolombia/components/adaptiveForm/text"
+            },
+            "field_otros_ingresos": {
+              "id": "field-otros-ingresos",
+              "fieldType": "number-input",
+              "name": "otros_ingresos",
+              "visible": true,
+              "type": "number",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Otros ingresos / Other Income"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido si no aplica llenar con 0 / Field required, write 0 if not applicable"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ],
+                "change": [
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if($field.$value > 0, dispatchEvent(informacion_financiera_cuales, 'custom:setProperty', {visible : true()}), dispatchEvent(informacion_financiera_cuales, 'custom:setProperty', {visible : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if($field.$value > 0, dispatchEvent(informacion_financiera_cuales, 'custom:setProperty', {required : true()}), dispatchEvent(informacion_financiera_cuales, 'custom:setProperty', {required : false()})), {})",
+                  "if(contains($event.payload.changes[].propertyName, 'value'), if(!($field.$value), dispatchEvent(informacion_financiera_cuales, 'custom:setProperty', {value : ''}), {}), {})"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "detalle_info_financiera_otros_ingresos"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_otros_ingresos",
+                "fd:rules": {
+                  "validationStatus": "valid"
+                }
+              },
+              ":type": "bancolombia/components/adaptiveForm/numberinput"
+            },
+            "field_informacion_financiera_cuales": {
+              "id": "field-informacion-financiera-cuales",
+              "fieldType": "text-input",
+              "name": "informacion_financiera_cuales",
+              "visible": false,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "¿Cuáles? / Which ones?"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido ¿Cuáles otros ingresos? / Specify your other income sources"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "detalle_info_financiera_otros_ingresos_cuales"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_informacion_laboral/field_informacion_financiera_cuales"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            }
+          }
+        },
+        "panel_credito_tarjeta_vehiculo": {
+          "id": "panelcontainer-51d2409518",
+          "fieldType": "panel",
+          "name": "panel_credito_tarjeta_vehiculo",
+          "visible": true,
+          "enabled": true,
+          "repeatable": false,
+          "readOnly": false,
+          "columnCount": 12,
+          "gridClassNames": "aem-Grid aem-Grid--12 aem-Grid--default--12",
+          "columnClassNames": {
+            "field_nombre_apellido_personalizacion_tarjeta": "aem-GridColumn aem-GridColumn--default--12",
+            "field_ciudad_entrega_tarjeta": "aem-GridColumn aem-GridColumn--default--12",
+            "field_direccion_entrega_tarjeta": "aem-GridColumn aem-GridColumn--default--12",
+            "field_autorizo_debito_automatico": "aem-GridColumn aem-GridColumn--default--12",
+            "field_tipo_cuenta_debitar": "aem-GridColumn aem-GridColumn--default--12",
+            "field_numero_cuenta_debitar": "aem-GridColumn aem-GridColumn--default--12",
+            "field_codigo_referido_portafolio": "aem-GridColumn aem-GridColumn--default--12",
+            "field_cliente_firmo_pagare": "aem-GridColumn aem-GridColumn--default--12",
+            "field_tipo_beneficio": "aem-GridColumn aem-GridColumn--default--12"
+          },
+          "label": {
+            "visible": true,
+            "value": "Información del crédito, tarjeta o vehículo"
+          },
+          "events": {
+            "custom:setProperty": [
+              "$event.payload"
+            ]
+          },
+          "properties": {
+            "fd:dor": {
+              "dorExclusion": false,
+              "dorExcludeTitle": false,
+              "dorExcludeDescription": false
+            },
+            "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo",
+            "cq:panelTitle": "Informacion del credito / tarjeta / vehículo"
+          },
+          ":itemsOrder": [
+            "field_nombre_apellido_personalizacion_tarjeta",
+            "field_ciudad_entrega_tarjeta",
+            "field_direccion_entrega_tarjeta",
+            "field_autorizo_debito_automatico",
+            "field_tipo_cuenta_debitar",
+            "field_numero_cuenta_debitar",
+            "field_codigo_referido_portafolio",
+            "field_cliente_firmo_pagare",
+            "field_tipo_beneficio"
+          ],
+          ":type": "bancolombia/components/adaptiveForm/panelcontainer",
+          ":items": {
+            "field_nombre_apellido_personalizacion_tarjeta": {
+              "id": "textinput-292f678a04",
+              "fieldType": "text-input",
+              "name": "nombre_apellido_personalizacion_tarjeta",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Nombre y apellido para personalización de tarjeta (Máx. 20 caracteres) / Name and surname for card personalization"
+              },
+              "constraintMessages": {
+                "required": "Completa la información, si no aplica escribe NA / Complete the info, write NA if not applicable"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_nombre_personalizacion_tarjeta"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_nombre_apellido_personalizacion_tarjeta"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_ciudad_entrega_tarjeta": {
+              "id": "textinput-4388e96f28",
+              "fieldType": "text-input",
+              "name": "ciudad_entrega_tarjeta_credito",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Ciudad de entrega de la tarjeta de crédito / Credit card delivery city"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido / Field is required"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_ciudad_entrega_tarjeta_credito"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_ciudad_entrega_tarjeta"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_direccion_entrega_tarjeta": {
+              "id": "textinput-8486b1703c",
+              "fieldType": "multiline-input",
+              "name": "direccion_entrega_tarjeta_credito",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Dirección de entrega de la tarjeta de crédito / Credit card delivery address"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido / Field is required"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_direccion_entrega_tarjeta_credito"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_direccion_entrega_tarjeta"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_autorizo_debito_automatico": {
+              "id": "radiobutton-7b8035f263",
+              "fieldType": "radio-group",
+              "name": "autorizo_debito_automatico",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "enforceEnum": true,
+              "enumNames": [
+                "Pago Mínimo / Minimum Payment",
+                "Pago Total / Full Payment"
+              ],
+              "enum": [
+                "Pago Minimo",
+                "Pago Total"
+              ],
+              "label": {
+                "visible": true,
+                "value": "Autorizo débito automático / I authorize automatic debit"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido / Field is required"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "afs:layout": {
+                  "orientation": "horizontal"
+                },
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_autorizo_debito_automatico"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_autorizo_debito_automatico"
+              },
+              ":type": "bancolombia/components/adaptiveForm/radiobutton"
+            },
+            "field_tipo_cuenta_debitar": {
+              "id": "radiobutton-4814412e16",
+              "fieldType": "radio-group",
+              "name": "tipo_cuenta_debitar",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "enforceEnum": true,
+              "enumNames": [
+                "Ahorros / Savings",
+                "Corriente / Checking"
+              ],
+              "enum": [
+                "ahorros",
+                "corriente"
+              ],
+              "label": {
+                "visible": true,
+                "value": "Tipo de cuenta a debitar / Account type to debit"
+              },
+              "constraintMessages": {
+                "required": "Elige una opción / Select an option"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "afs:layout": {
+                  "orientation": "horizontal"
+                },
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_tipo_cuenta_a_debitar"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_tipo_cuenta_debitar"
+              },
+              ":type": "bancolombia/components/adaptiveForm/radiobutton"
+            },
+            "field_numero_cuenta_debitar": {
+              "id": "numberinput-ee188edced",
+              "fieldType": "number-input",
+              "name": "numero_cuenta_debitar",
+              "visible": true,
+              "type": "integer",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Número de cuenta a debitar / Account number to debit"
+              },
+              "constraintMessages": {
+                "required": "Completa la información para el debito automatico / Complete info for automatic debit"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_numero_cuenta_a_debitar"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_numero_cuenta_debitar"
+              },
+              ":type": "bancolombia/components/adaptiveForm/numberinput"
+            },
+            "field_codigo_referido_portafolio": {
+              "id": "textinput-9440cc5903",
+              "fieldType": "text-input",
+              "name": "codigo_referido_portafolio",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Código referido/ejecutivo portafolio / Referral/portfolio executive code"
+              },
+              "constraintMessages": {
+                "required": "Completa la información, si no aplica escribe NA / Complete the info, write NA if not applicable"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_codigo_referido"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_codigo_referido_portafolio"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_cliente_firmo_pagare": {
+              "id": "radiobutton-2b17cc8703",
+              "fieldType": "radio-group",
+              "name": "cliente_firmo_pagare",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "enforceEnum": true,
+              "enumNames": [
+                "Sí / Yes",
+                "No / No"
+              ],
+              "enum": [
+                "si",
+                "no"
+              ],
+              "label": {
+                "visible": true,
+                "value": "¿El cliente firmó pagaré y contrato? / Did the client sign the promissory note and contract?"
+              },
+              "constraintMessages": {
+                "required": "Selecciona una opción / Select an option"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "afs:layout": {
+                  "orientation": "horizontal"
+                },
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_cliente_firmo_pagare"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_cliente_firmo_pagare"
+              },
+              ":type": "bancolombia/components/adaptiveForm/radiobutton"
+            },
+            "field_tipo_beneficio": {
+              "id": "textinput-46d2dafc8a",
+              "fieldType": "text-input",
+              "name": "tipo_beneficio",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Tipo de beneficio / Benefit type"
+              },
+              "constraintMessages": {
+                "required": "Completa la información, si no aplica escribe NA / Complete the info, write NA if not applicable"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "info_credito_consumo_tipo_beneficio"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_tipo_beneficio"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            }
+          }
+        },
+        "panel_correspondencia": {
+          "id": "panelcontainer-5d1df340a1",
+          "fieldType": "panel",
+          "name": "panel_correspondencia",
+          "visible": true,
+          "enabled": true,
+          "repeatable": false,
+          "readOnly": false,
+          "columnCount": 12,
+          "gridClassNames": "aem-Grid aem-Grid--12 aem-Grid--default--12",
+          "columnClassNames": {
+            "text_correspondencia_info": "aem-GridColumn aem-GridColumn--default--12",
+            "field_correspondencia_fisica_virtual": "aem-GridColumn aem-GridColumn--default--12"
+          },
+          "label": {
+            "visible": true,
+            "value": "Correspondencia"
+          },
+          "events": {
+            "custom:setProperty": [
+              "$event.payload"
+            ]
+          },
+          "properties": {
+            "fd:dor": {
+              "dorExclusion": false,
+              "dorExcludeTitle": false,
+              "dorExcludeDescription": false
+            },
+            "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_correspondencia",
+            "cq:panelTitle": "Correspondencia"
+          },
+          ":itemsOrder": [
+            "text_correspondencia_info",
+            "field_correspondencia_fisica_virtual"
+          ],
+          ":type": "bancolombia/components/adaptiveForm/panelcontainer",
+          ":items": {
+            "text_correspondencia_info": {
+              "id": "text-41953a9d8d",
+              "fieldType": "plain-text",
+              "name": "text_correspondencia_info",
+              "value": "<p><b>CORRESPONDENCIA</b>. Autorizo que la correspondencia en general y los extractos me sean enviados a través de los medios virtuales, previamente habilitados e informados por LAS ENTIDADES. Declaramos conocer y aceptar que si deseamos recibirlos por otro medio, podemos solicitarlo a través de la sucursal virtual/actualización de datos, o a través de la sucursal telefónica.</p>\r\n",
+              "richText": true,
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_correspondencia/text_correspondencia_info"
+              },
+              ":type": "bancolombia/components/adaptiveForm/text"
+            },
+            "field_correspondencia_fisica_virtual": {
+              "id": "radiobutton-9d3931bf9d",
+              "fieldType": "radio-group",
+              "name": "correspondencia_fisica_virtual",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "enforceEnum": true,
+              "enumNames": [
+                "Físico / Physical",
+                "Virtual / Virtual"
+              ],
+              "enum": [
+                "fisico",
+                "virtual"
+              ],
+              "label": {
+                "visible": true,
+                "value": "El Reporte Anual de Costos Totales lo deseo recibir / I wish to receive the Annual Total Cost Report"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido / Field is required"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "afs:layout": {
+                  "orientation": "horizontal"
+                },
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "recibir_reporte_anual"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_correspondencia/field_correspondencia_fisica_virtual"
+              },
+              ":type": "bancolombia/components/adaptiveForm/radiobutton"
+            }
+          }
+        },
+        "panel_representante_apoderado": {
+          "id": "panelcontainer-d7cb1a01a6",
+          "fieldType": "panel",
+          "name": "panel_representante_apoderado",
+          "visible": true,
+          "enabled": true,
+          "repeatable": false,
+          "readOnly": false,
+          "columnCount": 12,
+          "gridClassNames": "aem-Grid aem-Grid--12 aem-Grid--default--12",
+          "columnClassNames": {
+            "field_nombre_apoderado": "aem-GridColumn aem-GridColumn--default--12",
+            "field_representante_no_identificacion": "aem-GridColumn aem-GridColumn--default--12",
+            "field_calidad_en_que_firma": "aem-GridColumn aem-GridColumn--default--12",
+            "field_espacio": "aem-GridColumn aem-GridColumn--default--12"
+          },
+          "label": {
+            "visible": true,
+            "value": "Completa si actúas en calidad de representante o apoderado"
+          },
+          "events": {
+            "custom:setProperty": [
+              "$event.payload"
+            ]
+          },
+          "properties": {
+            "fd:dor": {
+              "dorExclusion": false,
+              "dorExcludeTitle": false,
+              "dorExcludeDescription": false
+            },
+            "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_representante_apoderado",
+            "cq:panelTitle": "Completa si actuas en calidad de representante o apoderado"
+          },
+          ":itemsOrder": [
+            "field_nombre_apoderado",
+            "field_representante_no_identificacion",
+            "field_calidad_en_que_firma",
+            "field_espacio"
+          ],
+          ":type": "bancolombia/components/adaptiveForm/panelcontainer",
+          ":items": {
+            "field_nombre_apoderado": {
+              "id": "textinput-1decdfe604",
+              "fieldType": "text-input",
+              "name": "nombre_apoderado",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Nombre / Name"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido / Field is required"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "actua_como_representante_nombre"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_representante_apoderado/field_nombre_apoderado"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_representante_no_identificacion": {
+              "id": "numberinput-af21c3e0e9",
+              "fieldType": "number-input",
+              "name": "representante_apoderado_no_identificacion",
+              "visible": true,
+              "type": "number",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Número de identificación / ID Number"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido / Field is required"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "actua_como_representante_no_identificacion"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_representante_apoderado/field_representante_no_identificacion"
+              },
+              ":type": "bancolombia/components/adaptiveForm/numberinput"
+            },
+            "field_calidad_en_que_firma": {
+              "id": "textinput-c78d604d96",
+              "fieldType": "text-input",
+              "name": "calidad_en_que_firma",
+              "visible": true,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Calidad en la que firmas / Capacity in which you sign"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido / Field is required"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "actua_como_representante_calidad_en_la_que_firma"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_representante_apoderado/field_calidad_en_que_firma"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            },
+            "field_espacio": {
+              "id": "textinput-f094f8a691",
+              "fieldType": "text-input",
+              "name": "espacio",
+              "visible": false,
+              "type": "string",
+              "enabled": true,
+              "readOnly": false,
+              "default": " ",
+              "label": {
+                "visible": true,
+                "value": "espacio entre nombre y apellido firma / space between first and last name signature"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_representante_apoderado/field_espacio"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            }
+          }
+        },
+        "panel_espacio_firma": {
+          "id": "panelcontainer-f37975d937",
+          "fieldType": "panel",
+          "name": "panel_espacio_firma",
+          "visible": true,
+          "enabled": true,
+          "repeatable": false,
+          "readOnly": false,
+          "columnCount": 12,
+          "gridClassNames": "aem-Grid aem-Grid--12 aem-Grid--default--12",
+          "columnClassNames": {
+            "field_firma_cliente": "aem-GridColumn aem-GridColumn--default--12"
+          },
+          "label": {
+            "visible": true,
+            "value": "Espacio para tu firma"
+          },
+          "events": {
+            "custom:setProperty": [
+              "$event.payload"
+            ]
+          },
+          "properties": {
+            "fd:dor": {
+              "dorExclusion": false,
+              "dorExcludeTitle": false,
+              "dorExcludeDescription": false
+            },
+            "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_espacio_firma",
+            "cq:panelTitle": "Espacio para tu firma"
+          },
+          ":itemsOrder": [
+            "field_firma_cliente"
+          ],
+          ":type": "bancolombia/components/adaptiveForm/panelcontainer",
+          ":items": {
+            "field_firma_cliente": {
+              "id": "textinput-4dcc4737ab",
+              "fieldType": "text-input",
+              "name": "firma_cliente",
+              "visible": true,
+              "type": "string",
+              "required": true,
+              "enabled": true,
+              "readOnly": false,
+              "label": {
+                "visible": true,
+                "value": "Escribe tu nombre completo / Write your full name"
+              },
+              "constraintMessages": {
+                "required": "El campo es requerido / Field is required"
+              },
+              "events": {
+                "custom:setProperty": [
+                  "$event.payload"
+                ]
+              },
+              "properties": {
+                "fd:dor": {
+                  "dorExclusion": false,
+                  "dorBindRef": "firma"
+                },
+                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_espacio_firma/field_firma_cliente"
+              },
+              ":type": "bancolombia/components/adaptiveForm/textinput"
+            }
+          }
+        }
+      }
+    }
+  }
+}
