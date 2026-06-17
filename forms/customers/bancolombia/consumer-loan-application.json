@@ -1302,8 +1302,7 @@
             "field_tipo_cuenta_debitar": "aem-GridColumn aem-GridColumn--default--12",
             "field_numero_cuenta_debitar": "aem-GridColumn aem-GridColumn--default--12",
             "field_codigo_referido_portafolio": "aem-GridColumn aem-GridColumn--default--12",
-            "field_cliente_firmo_pagare": "aem-GridColumn aem-GridColumn--default--12",
-            "field_tipo_beneficio": "aem-GridColumn aem-GridColumn--default--12"
+            "field_cliente_firmo_pagare": "aem-GridColumn aem-GridColumn--default--12"
           },
           "label": {
             "visible": true,
@@ -1331,8 +1330,7 @@
             "field_tipo_cuenta_debitar",
             "field_numero_cuenta_debitar",
             "field_codigo_referido_portafolio",
-            "field_cliente_firmo_pagare",
-            "field_tipo_beneficio"
+            "field_cliente_firmo_pagare"
           ],
           ":type": "bancolombia/components/adaptiveForm/panelcontainer",
           ":items": {
@@ -1603,35 +1601,6 @@
                 "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_cliente_firmo_pagare"
               },
               ":type": "bancolombia/components/adaptiveForm/radiobutton"
-            },
-            "field_tipo_beneficio": {
-              "id": "textinput-46d2dafc8a",
-              "fieldType": "text-input",
-              "name": "tipo_beneficio",
-              "visible": true,
-              "type": "string",
-              "enabled": true,
-              "readOnly": false,
-              "label": {
-                "visible": true,
-                "value": "Tipo de beneficio / Benefit type"
-              },
-              "constraintMessages": {
-                "required": "Completa la información, si no aplica escribe NA / Complete the info, write NA if not applicable"
-              },
-              "events": {
-                "custom:setProperty": [
-                  "$event.payload"
-                ]
-              },
-              "properties": {
-                "fd:dor": {
-                  "dorExclusion": false,
-                  "dorBindRef": "info_credito_consumo_tipo_beneficio"
-                },
-                "fd:path": "/content/forms/af/bancolombia/personas-y-pymes/credito-de-consumo/t160443/solicitud-de-credito-de-consumo/jcr:content/guideContainer/panelcontainer_solicitud/panel_credito_tarjeta_vehiculo/field_tipo_beneficio"
-              },
-              ":type": "bancolombia/components/adaptiveForm/textinput"
             }
           }
         },
@@ -1961,6 +1930,14 @@
             }
           }
         }
+      },
+      "columnClassNames": {
+        "panel_informacion_personal": "aem-GridColumn aem-GridColumn--default--12",
+        "panel_informacion_laboral": "aem-GridColumn aem-GridColumn--default--12",
+        "panel_credito_tarjeta_vehiculo": "aem-GridColumn aem-GridColumn--default--12",
+        "panel_correspondencia": "aem-GridColumn aem-GridColumn--default--12",
+        "panel_representante_apoderado": "aem-GridColumn aem-GridColumn--default--12",
+        "panel_espacio_firma": "aem-GridColumn aem-GridColumn--default--12"
       }
     }
   }
