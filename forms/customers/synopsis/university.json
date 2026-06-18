@@ -53,7 +53,7 @@
           "constraintMessages": {
             "format": "Specify the value in allowed format: email"
           },
-          "description": "Please use your work email address",
+          "description": "Please use your work email address"
         },
         {
           "name": "firstName",
