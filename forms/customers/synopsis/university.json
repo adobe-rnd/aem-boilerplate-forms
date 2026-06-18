@@ -618,15 +618,6 @@
           }
         },
         {
-          "name": "city",
-          "fieldType": "text-input",
-          "type": "string",
-          "required": true,
-          "label": {
-            "value": "City"
-          }
-        },
-        {
           "name": "Additional_Information__c",
           "fieldType": "multiline-input",
           "type": "string",
