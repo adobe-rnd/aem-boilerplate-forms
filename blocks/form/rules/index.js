@@ -390,7 +390,7 @@ function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false) {
 }
 
 export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
-  const ruleEngine = await import('./model/afb-runtime.js');
+  const ruleEngine = await import('./model/afb-runtime.min.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
@@ -438,7 +438,7 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
     // No worker: fetch prefill only when enabled (worker path does the same in RuleEngineWorker.js)
     const needsPrefill = formDef?.properties?.['fd:formDataEnabled'] === true;
     const data = needsPrefill ? await fetchData(formDef?.id, window.location.search || '') : null;
-    const ruleEngine = await import('./model/afb-runtime.js');
+    const ruleEngine = await import('./model/afb-runtime.min.js');
     const formDefWithData = { ...formDef, ...(data != null && { data }) };
     const afbForm = ruleEngine.createFormInstance(formDefWithData, undefined, LOG_LEVEL);
     const formState = afbForm.getState(true);

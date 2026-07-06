@@ -5,24 +5,6 @@ import { dirname, resolve } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const mappingsPath = resolve(__dirname, '../../blocks/form/mappings.js');
-const mappingsStatic = resolve(__dirname, './src/mappings-static.js');
-
-// Redirects imports of blocks/form/mappings.js to the static registry so
-// esbuild can bundle all components without window.hlx path lookups.
-const mappingsAliasPlugin = {
-  name: 'mappings-alias',
-  setup(build) {
-    build.onResolve({ filter: /mappings\.js/ }, (args) => {
-      const resolved = resolve(args.resolveDir, args.path);
-      if (resolved === mappingsPath) {
-        return { path: mappingsStatic };
-      }
-      return null;
-    });
-  },
-};
-
 // Replaces `typeof Worker` with `"undefined"` across all JS files so every
 // Worker guard evaluates to true. This covers both rules/index.js (which
 // decides the no-worker path) and form.js (which guards the loadRuleEngine

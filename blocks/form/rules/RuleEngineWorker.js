@@ -17,7 +17,7 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import { createFormInstance } from './model/afb-runtime.js';
+import { createFormInstance } from './model/afb-runtime.min.js';
 import registerCustomFunctions from './functionRegistration.js';
 import { fetchData } from '../util.js';
 import { getLogLevelFromURL } from '../constant.js';
