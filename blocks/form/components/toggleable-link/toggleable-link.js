@@ -19,7 +19,10 @@ function decorateLink(link) {
   label.appendChild(newAnchor);
 
   label.addEventListener('click', () => {
+    // dispatch focus → click → blur so the form tracker can see the interaction
+    checkbox.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
     checkbox.click();
+    checkbox.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
   });
   return link;
 }

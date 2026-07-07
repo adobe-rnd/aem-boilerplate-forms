@@ -24,6 +24,8 @@ export function submitSuccess(e, form) {
 }
 
 export function submitFailure(e, form) {
+  // eslint-disable-next-line no-console
+  console.error('Form submission failed:', e?.payload || e?.message || e);
   let errorMessage = form.querySelector('.form-message.error-message');
   if (!errorMessage) {
     errorMessage = document.createElement('div');

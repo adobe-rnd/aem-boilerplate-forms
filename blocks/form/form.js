@@ -1,4 +1,5 @@
 import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
+import { trackForm } from '../form-tracker/form-tracker.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import { emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
@@ -536,7 +537,9 @@ export default async function decorate(block) {
         : window.location.pathname;
       formDef.action = SUBMISSION_SERVICE + btoa(pathname || iframePath);
     } else {
-      formDef.action = getSubmitBaseUrl() + (formDef.action || '');
+      const submitBase = getSubmitBaseUrl();
+      const currentAction = formDef.action || '';
+      formDef.action = (submitBase && !currentAction.startsWith('http')) ? submitBase + currentAction : currentAction || submitBase;
     }
     if (isDocumentBasedForm(formDef)) {
       const transform = new DocBasedFormToAF();
@@ -568,5 +571,7 @@ export default async function decorate(block) {
       form.dataset.formpath = formDef.properties['fd:path'];
     }
     container.replaceWith(form);
+    if (block.dataset.formId) form.dataset.formId = block.dataset.formId;
+    try { trackForm(form); } catch { /* tracker must never break the form */ }
   }
 }

@@ -54,8 +54,10 @@ export default function decorate(fieldDiv, fieldJson) {
       if (!ratingDiv.classList.contains('disabled')) {
         // set the value of the input element to the index of the star element
         input.value = i;
-        // trigger a change event that bubbles on the input element
+        // dispatch focus → change → blur so the form tracker can see the interaction
+        input.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
         input.dispatchEvent(new Event('change', { bubbles: true }));
+        input.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
         // add the selected class to the star elements till the index of the clicked star element
         for (let j = 0; j < i; j += 1) {
           ratingDiv.children[j].classList.add('selected');

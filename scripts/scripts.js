@@ -11,6 +11,24 @@ import {
   loadSections,
   loadCSS,
 } from './aem.js';
+import { setSubmitBaseUrl } from '../blocks/form/constant.js';
+import { trackForm } from '../blocks/form-tracker/form-tracker.js';
+
+// point form submissions to local mock server during development
+if (window.location.hostname === 'localhost') {
+  setSubmitBaseUrl('http://localhost:3000');
+}
+
+// auto-attach form tracker to every form on the page
+function attachFormTracker() {
+  document.querySelectorAll('form').forEach((form) => trackForm(form));
+}
+
+// forms may render after page load (EDS lazy sections) — observe for new ones
+const formObserver = new MutationObserver(() => {
+  document.querySelectorAll('form:not([data-fis-tracked])').forEach((form) => trackForm(form));
+});
+formObserver.observe(document.body, { childList: true, subtree: true });
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
@@ -116,6 +134,7 @@ async function loadEager(doc) {
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
   await loadSections(main);
+  attachFormTracker();
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
