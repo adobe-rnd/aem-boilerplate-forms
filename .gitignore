@@ -10,6 +10,7 @@ helix-importer-ui
 .nyc_output
 
 .env*
+.env
 .vscode
 /test-results/
 /playwright-report/
@@ -20,3 +21,27 @@ LoginAuth.json
 
 # Skill distribution zip
 create-custom-component.zip
+
+# FIS runtime data — session/insights/fixes are generated at runtime, not source
+server/data/
+
+# Claude Code personal memory — not project source
+.claude/
+
+# Local test/demo files — not project source
+test-form.html
+track-*.png
+test/e2e/local/
+test-form.json
+test-form1.html
+test-form1.json
+terms-and-conditions.html
+fis-tracker.js
+SKILLS.md
+test-multi-url.html
+en/
+fr/
+de/
+en-form.json
+fr-form.json
+de-form.json

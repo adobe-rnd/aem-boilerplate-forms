@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      width: 260px;
+      padding: 16px;
+      margin: 0;
+      color: #222;
+    }
+    h2 {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 4px;
+    }
+    p {
+      font-size: 12px;
+      color: #666;
+      margin: 0 0 14px;
+      line-height: 1.4;
+    }
+    button {
+      width: 100%;
+      padding: 9px 0;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #1a7f4b;
+      color: #fff;
+      transition: background 0.15s;
+    }
+    button:hover { background: #15693e; }
+    button:disabled { background: #aaa; cursor: default; }
+    #server-status {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    #server-status.online  { background: #e6f4ee; color: #1a7f4b; }
+    #server-status.offline { background: #fdecea; color: #c0392b; }
+    #server-status.checking { background: #f5f5f5; color: #888; }
+    #status {
+      margin-top: 10px;
+      font-size: 12px;
+      min-height: 18px;
+      color: #444;
+      text-align: center;
+    }
+    #status.ok { color: #1a7f4b; font-weight: 600; }
+    #status.err { color: #c0392b; }
+    details {
+      margin-top: 14px;
+      font-size: 12px;
+    }
+    summary {
+      cursor: pointer;
+      color: #666;
+      user-select: none;
+    }
+    summary:hover { color: #222; }
+    .settings-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .settings-row input {
+      flex: 1;
+      padding: 5px 8px;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+    }
+    .settings-row input:focus { border-color: #1a7f4b; }
+    .settings-row button {
+      width: auto;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    #save-feedback {
+      font-size: 11px;
+      color: #1a7f4b;
+      margin-top: 4px;
+      min-height: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Form Intelligence Tracker</h2>
+  <p>Click below to start tracking the form on this page.</p>
+  <div id="server-status">Checking server…</div>
+  <button id="btn" disabled>Start Tracking</button>
+  <button id="pin-btn" style="background:#1a56db;margin-top:6px;" disabled>Track this form automatically</button>
+  <div id="status"></div>
+  <div id="pinned-list" style="margin-top:8px;font-size:11px;color:#555;"></div>
+
+  <details id="settings">
+    <summary>Server settings</summary>
+    <div class="settings-row">
+      <input id="server-input" type="text" placeholder="http://localhost:3000" />
+      <button id="save-btn" type="button">Save</button>
+    </div>
+    <div id="save-feedback"></div>
+  </details>
+
+  <script src="popup.js"></script>
+</body>
+</html>

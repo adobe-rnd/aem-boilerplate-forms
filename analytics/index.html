@@ -4,76 +4,449 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Form Intelligence — Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="analytics.css" />
+  <link rel="stylesheet" href="analytics.css?v=3" />
 </head>
 <body>
-  <header class="fis-header">
-    <h1>Form Intelligence Dashboard</h1>
-    <div class="fis-controls">
-      <input type="text" id="formIdInput" placeholder="Enter form ID or path" />
-      <button id="loadBtn">Load Analytics</button>
+
+  <div class="fis-app">
+
+    <!-- ── Left nav ──────────────────────────────────────────────────────── -->
+    <nav class="fis-nav" id="projectNav">
+      <div class="fis-nav-header">
+        <span class="fis-nav-title">Form Intelligence</span>
+        <button class="fis-nav-toggle" id="navToggle" title="Collapse sidebar">&#9776;</button>
+      </div>
+
+      <div class="fis-nav-add" id="addProjectArea">
+        <button class="fis-nav-add-btn" id="addProjectBtn">+ Add Form</button>
+        <div class="fis-nav-add-form hidden" id="addProjectForm">
+          <input type="text" id="addProjectName" placeholder="Form name" />
+          <input type="text" id="addProjectPath" placeholder="Form URL or ID/path" />
+          <div class="fis-nav-add-actions">
+            <button id="addProjectConfirm">Add</button>
+            <button id="addProjectCancel" class="fis-btn-ghost-sm">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fis-nav-section-label">Forms</div>
+      <div class="fis-project-search-wrap">
+        <input type="search" id="projectSearch" class="fis-project-search" placeholder="Search forms or paste form URL…" autocomplete="off" />
+      </div>
+      <ul class="fis-project-list" id="projectList"></ul>
+
+      <div class="fis-nav-footer"></div>
+    </nav>
+
+    <!-- ── Main content ───────────────────────────────────────────────────── -->
+    <div class="fis-content">
+
+      <!-- Top bar -->
+      <header class="fis-header">
+        <!-- Row 1: form breadcrumb + load controls -->
+        <div class="fis-header-topbar">
+          <div class="fis-header-left">
+            <span class="fis-header-form-label">Form</span>
+            <span class="fis-header-form-id" id="headerFormId">—</span>
+          </div>
+          <div class="fis-controls">
+            <input type="text" id="formIdInput" placeholder="Paste form URL or ID/path" />
+            <button id="loadBtn">Load</button>
+            <button id="generateInsightsBtn" class="fis-btn-insights" disabled>Generate Insights</button>
+          </div>
+        </div>
+
+        <!-- Row 2: tabs + date range + actions -->
+        <div class="fis-header-navbar">
+          <div class="fis-tab-btns">
+            <button class="fis-tab-btn active" data-tab="analytics">Analytics</button>
+            <button class="fis-tab-btn" data-tab="sessions">Journeys</button>
+            <button class="fis-tab-btn fis-tab-errors" data-tab="errors">Errors <span class="fis-err-tab-badge hidden" id="errTabBadge">0</span></button>
+          </div>
+          <!-- Date range filter -->
+          <div class="fis-range-dropdown" id="rangeDropdown">
+            <button class="fis-range-trigger" id="rangeTrigger">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span id="rangeLabel">All time</span>
+              <svg class="fis-range-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="fis-range-menu hidden" id="rangeMenu">
+              <button class="fis-range-option" data-range="today" data-label="Today">Today</button>
+              <button class="fis-range-option" data-range="yesterday" data-label="Yesterday">Yesterday</button>
+              <button class="fis-range-option" data-range="1h" data-label="Last hour">Last hour</button>
+              <button class="fis-range-option" data-range="24h" data-label="Last 24 hours">Last 24 hours</button>
+              <button class="fis-range-option" data-range="7d" data-label="Last 7 days">Last 7 days</button>
+              <button class="fis-range-option" data-range="14d" data-label="Last 14 days">Last 14 days</button>
+              <button class="fis-range-option" data-range="28d" data-label="Last 28 days">Last 28 days</button>
+              <button class="fis-range-option" data-range="30d" data-label="Last 30 days">Last 30 days</button>
+              <button class="fis-range-option" data-range="90d" data-label="Last 90 days">Last 90 days</button>
+              <button class="fis-range-option" data-range="180d" data-label="Last 180 days">Last 180 days</button>
+              <button class="fis-range-option" data-range="this_week" data-label="This week">This week</button>
+              <button class="fis-range-option" data-range="this_month" data-label="This month">This month</button>
+              <button class="fis-range-option" data-range="ytd" data-label="Year to date">Year to date</button>
+              <button class="fis-range-option fis-range-option--active" data-range="all" data-label="All time">All time</button>
+              <!-- In the last stepper -->
+              <div class="fis-range-inlast" id="rangeInlast">
+                <span class="fis-range-inlast-label">In the last</span>
+                <button class="fis-range-inlast-btn" id="inlastDec">−</button>
+                <span class="fis-range-inlast-num" id="inlastNum">3</span>
+                <button class="fis-range-inlast-btn" id="inlastInc">+</button>
+                <select class="fis-range-inlast-unit" id="inlastUnit">
+                  <option value="days">days</option>
+                  <option value="weeks">weeks</option>
+                  <option value="months">months</option>
+                  <option value="years">years</option>
+                </select>
+                <button class="fis-range-apply-btn fis-inlast-apply" id="inlastApply">Apply</button>
+              </div>
+              <!-- Custom date links -->
+              <div class="fis-range-custom-links">
+                <button class="fis-range-custom-btn" id="fromCustomBtn">From custom date until now...</button>
+                <div class="fis-range-custom-input hidden" id="fromCustomArea">
+                  <input type="date" id="fromCustomDate" class="fis-range-date-input" />
+                  <button class="fis-range-apply-btn" id="fromCustomApply">Apply</button>
+                </div>
+                <button class="fis-range-custom-btn" id="fixedRangeBtn">Custom fixed date range...</button>
+                <div class="fis-range-custom-input hidden" id="fixedRangeArea">
+                  <input type="date" id="fixedStart" class="fis-range-date-input" />
+                  <span class="fis-range-to-label">to</span>
+                  <input type="date" id="fixedEnd" class="fis-range-date-input" />
+                  <button class="fis-range-apply-btn" id="fixedRangeApply">Apply</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fis-header-actions">
+            <button id="compareBtn" class="fis-btn-compare" title="Compare two time periods">⇄ Compare</button>
+
+            <!-- Deploy cycles -->
+            <div class="fis-cycles-area" id="cyclesArea">
+              <button class="fis-cycles-trigger" id="cyclesTrigger">
+                <span class="fis-cycles-icon">⟳</span>
+                <span id="cyclesLabel">Cycles</span>
+              </button>
+              <div class="fis-cycles-panel hidden" id="cyclesPanel">
+                <div class="fis-cycles-panel-hdr">
+                  <span>Deploy Cycles</span>
+                  <button class="fis-cycle-new-btn" id="newCycleBtn" title="Record a new deploy cycle">+ New</button>
+                </div>
+                <div class="fis-cycle-add-row hidden" id="cycleAddRow">
+                  <input class="fis-cycle-name-inp" id="cycleNameInp" type="text" placeholder="e.g. Sprint 42, June release…" maxlength="40" />
+                  <button class="fis-cycle-confirm-btn" id="cycleConfirmBtn" title="Save">✓</button>
+                  <button class="fis-cycle-cancel-btn" id="cycleCancelBtn" title="Cancel">×</button>
+                </div>
+                <div class="fis-cycles-list" id="cyclesList"></div>
+                <button class="fis-cycles-view-all" id="viewAllBtn">View all journeys</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+
+      <div id="notReady" class="fis-not-ready hidden">
+        <p id="notReadyMsg"></p>
+      </div>
+
+      <div id="dashboard" class="fis-layout hidden">
+
+        <main class="fis-main">
+
+          <!-- Trend Over Time timeline chart -->
+          <section class="fis-section" id="timelineSection">
+            <div class="fis-section-header-row">
+              <h2>Trend Over Time <span class="fis-section-hint">journeys · completions · drop-offs · errors per day</span></h2>
+            </div>
+            <div class="fis-timeline-chart-wrap">
+              <div id="timelineInner" class="fis-timeline-inner">
+                <canvas id="timelineChart"></canvas>
+              </div>
+            </div>
+            <p class="fis-timeline-empty hidden" id="timelineEmpty">Not enough data — need sessions across at least 2 time periods.</p>
+          </section>
+
+          <!-- Overview + sparkline -->
+          <section class="fis-section">
+            <h2>Overview</h2>
+            <div class="fis-cards" id="overviewCards">
+              <div class="fis-card">
+                <span class="fis-card-label">Total Journeys</span>
+                <span class="fis-card-value" id="totalSessions">—</span>
+                <span class="fis-card-delta hidden" id="totalSessionsDelta"></span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Completion Rate</span>
+                <span class="fis-card-value" id="completionRate">—</span>
+                <span class="fis-card-delta hidden" id="completionRateDelta"></span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Drop-off Rate</span>
+                <span class="fis-card-value fis-card-danger" id="dropOffRate">—</span>
+                <span class="fis-card-delta hidden" id="dropOffRateDelta"></span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Return Rate</span>
+                <span class="fis-card-value" id="returnRate">—</span>
+                <span class="fis-card-delta hidden" id="returnRateDelta"></span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Device breakdown -->
+          <section class="fis-section hidden" id="deviceSection">
+            <h2>By Device <span class="fis-section-hint">completion rate split by device type</span></h2>
+            <div class="fis-cards" id="deviceCards"></div>
+          </section>
+
+          <!-- Platform breakdown (OS / browser) -->
+          <section class="fis-section hidden" id="platformSection">
+            <h2>By Platform <span class="fis-section-hint">completion &amp; error rate split by OS and browser</span></h2>
+            <h3 class="fis-subhead">Operating System</h3>
+            <div class="fis-cards" id="osCards"></div>
+            <h3 class="fis-subhead">Browser</h3>
+            <div class="fis-cards" id="browserCards"></div>
+          </section>
+
+          <!-- Scan behaviour -->
+          <section class="fis-section">
+            <h2>Scan Behaviour <span class="fis-section-hint">Users who scroll before filling</span></h2>
+            <div class="fis-cards">
+              <div class="fis-card">
+                <span class="fis-card-label">Scroll-only Rate</span>
+                <span class="fis-card-value fis-card-danger" id="scanOnlyRate">—</span>
+                <span class="fis-card-sub">viewed but never filled</span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Bounce Rate</span>
+                <span class="fis-card-value fis-card-danger" id="bounceRate">—</span>
+                <span class="fis-card-sub">left within 15s, &lt;25% scrolled</span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Avg Scan Time</span>
+                <span class="fis-card-value" id="avgScanTime">—</span>
+                <span class="fis-card-sub">before first interaction</span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Avg Fields Previewed</span>
+                <span class="fis-card-value" id="avgFieldsScanned">—</span>
+                <span class="fis-card-sub">seen before filling starts</span>
+              </div>
+            </div>
+          </section>
+
+
+          <!-- Validation Thrashing -->
+          <section class="fis-section hidden" id="thrashSection">
+            <h2>Validation Thrashing <span class="fis-section-hint">fields where users got stuck in error loops (3+ errors)</span></h2>
+            <div id="thrashList" class="fis-thrash-list"></div>
+          </section>
+
+          <!-- Errors -->
+          <section class="fis-section">
+            <h2>Errors &amp; Frustration</h2>
+            <div class="fis-cards">
+              <div class="fis-card">
+                <span class="fis-card-label">JS Errors</span>
+                <span class="fis-card-value fis-card-danger" id="jsErrors">—</span>
+                <span class="fis-card-delta hidden" id="jsErrorsDelta"></span>
+                <span class="fis-card-sub">journeys with runtime errors</span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">API Failures</span>
+                <span class="fis-card-value fis-card-danger" id="apiErrors">—</span>
+                <span class="fis-card-delta hidden" id="apiErrorsDelta"></span>
+                <span class="fis-card-sub">journeys with failed requests</span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Rage Clicks</span>
+                <span class="fis-card-value fis-card-danger" id="rageClicks">—</span>
+                <span class="fis-card-sub" id="rageClickSub">repeated frustrated clicks</span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Blocked by UI</span>
+                <span class="fis-card-value" id="disabledClicks">—</span>
+                <span class="fis-card-sub">clicked a disabled button</span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Dead Clicks</span>
+                <span class="fis-card-value fis-card-danger" id="deadClicks">—</span>
+                <span class="fis-card-sub">clicked non-interactive area</span>
+              </div>
+              <div class="fis-card">
+                <span class="fis-card-label">Form Errors</span>
+                <span class="fis-card-value fis-card-danger" id="submitErrors">—</span>
+                <span class="fis-card-sub" id="submitErrorSub">submit · prefill · captcha · rule</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- API Latency -->
+          <section class="fis-section hidden" id="apiLatencySection">
+            <h2>API Latency <span class="fis-section-hint">avg response time per call type across all sessions</span></h2>
+            <div id="apiLatencyGrid" class="fis-stat-grid"></div>
+          </section>
+
+          <!-- Funnel -->
+          <section class="fis-section" id="funnelSection">
+            <h2>Conversion Funnel <span class="fis-section-hint">how many users made it through each step</span></h2>
+            <div id="funnelChart" class="fis-funnel"></div>
+          </section>
+
+          <!-- Flow comparison: completers vs abandoners -->
+          <section class="fis-section" id="flowSection">
+            <h2>Where People Leave <span class="fis-section-hint">completers vs abandoners — where the flow breaks and why</span></h2>
+            <div id="flowComparison"></div>
+          </section>
+
+        </main>
+
+        <!-- Divider -->
+        <div class="fis-divider hidden" id="sidebarDivider">
+          <button id="sidebarToggle" title="Show Insights">‹</button>
+        </div>
+
+        <!-- AI Insights -->
+        <aside class="fis-sidebar">
+          <div class="fis-sidebar-header">
+            <h2>AI Insights</h2>
+            <span id="insightsStatus" class="fis-insights-status"></span>
+            <button class="fis-insights-close" id="insightsCloseBtn" title="Close insights">×</button>
+          </div>
+          <div id="insightsContainer" class="fis-insights">
+            <p class="fis-insights-empty">Click "Generate Insights" to get AI-powered fix suggestions.</p>
+          </div>
+        </aside>
+
+      </div><!-- /#dashboard -->
+      <!-- Sessions view (replaces dashboard when Sessions tab is active) -->
+      <div id="sessionsView" class="fis-sessions-view hidden">
+        <div class="fis-sessions-toolbar">
+          <div class="fis-sessions-filter" id="sessionFilter">
+            <button class="fis-filter-pill active" data-cat="all">All</button>
+            <button class="fis-filter-pill" data-cat="successful">Successful</button>
+            <button class="fis-filter-pill" data-cat="abandoned">Abandoned</button>
+            <button class="fis-filter-pill" data-cat="bounced">Bounced</button>
+            <button class="fis-filter-pill" data-cat="scan-only">Scan Only</button>
+            <button class="fis-filter-pill" data-cat="in-progress">In Progress</button>
+          </div>
+          <select class="fis-sort-select" id="sessionSort">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="longest">Longest duration</option>
+            <option value="most-errors">Most errors</option>
+          </select>
+          <input type="search" class="fis-journey-search" id="journeySearch"
+            placeholder="Search errors: 404, api_error, rage, field name…" />
+          <span class="fis-sessions-count" id="sessionsCount"></span>
+        </div>
+        <div id="sessionsList" class="fis-sessions-list"></div>
+      </div>
+
+      <div id="errorsView" class="fis-errors-view hidden"></div>
+
+
+      <!-- Compare view -->
+      <div id="compareView" class="fis-compare-view hidden">
+        <div class="fis-compare-header">
+          <div>
+            <h2>Compare Time Periods</h2>
+            <p class="fis-compare-subtitle">Select two date ranges to see how your form metrics changed.</p>
+          </div>
+          <button id="closeCompareBtn" class="fis-compare-close-btn" title="Back to Analytics">✕ Close</button>
+        </div>
+        <div class="fis-compare-pickers">
+          <div class="fis-compare-period">
+            <div class="fis-compare-period-label">Period A</div>
+            <div class="fis-compare-date-row">
+              <input type="date" id="cmpAStart" class="fis-compare-date-input" />
+              <span class="fis-compare-to">to</span>
+              <input type="date" id="cmpAEnd" class="fis-compare-date-input" />
+            </div>
+          </div>
+          <div class="fis-compare-vs">vs</div>
+          <div class="fis-compare-period">
+            <div class="fis-compare-period-label">Period B</div>
+            <div class="fis-compare-date-row">
+              <input type="date" id="cmpBStart" class="fis-compare-date-input" />
+              <span class="fis-compare-to">to</span>
+              <input type="date" id="cmpBEnd" class="fis-compare-date-input" />
+            </div>
+          </div>
+          <button id="runCompareBtn" class="fis-compare-run-btn">Run Comparison</button>
+        </div>
+        <div id="compareNoForm" class="fis-compare-no-form hidden">Load a form first using the input in the top right.</div>
+        <div id="compareResults" class="fis-compare-results hidden">
+          <div class="fis-compare-periods-bar">
+            <span id="cmpLabelA" class="fis-compare-period-badge fis-compare-period-a">Period A</span>
+            <span id="cmpLabelB" class="fis-compare-period-badge fis-compare-period-b">Period B</span>
+          </div>
+          <!-- Trend overlay chart -->
+          <div class="fis-compare-chart-section">
+            <h3 class="fis-compare-chart-title">Trend Overlay <span class="fis-compare-chart-hint">solid = Period A &nbsp;·&nbsp; dashed = Period B</span></h3>
+            <div class="fis-compare-chart-wrap">
+              <canvas id="compareChart"></canvas>
+            </div>
+          </div>
+          <div class="fis-cmp-legend">
+            <span><span class="fis-cmp-pill fis-cmp-good">▲ / ▼</span> improved</span>
+            <span><span class="fis-cmp-pill fis-cmp-bad">▲ / ▼</span> worsened</span>
+            <span><span class="fis-cmp-win">●</span> better period</span>
+            <span class="fis-cmp-legend-note">Change = Period A → Period B</span>
+          </div>
+          <table class="fis-compare-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th class="fis-cmp-num fis-cmp-th-a">Period A</th>
+                <th class="fis-cmp-num fis-cmp-th-b">Period B</th>
+                <th class="fis-cmp-change">Change (A → B)</th>
+              </tr>
+            </thead>
+            <tbody id="compareTableBody"></tbody>
+          </table>
+          <div id="compareSteps" class="fis-compare-steps hidden">
+            <h3>Abandonment by Step</h3>
+            <table class="fis-compare-table">
+              <thead>
+                <tr>
+                  <th>Step</th>
+                  <th class="fis-cmp-num fis-cmp-th-a">Period A</th>
+                  <th class="fis-cmp-num fis-cmp-th-b">Period B</th>
+                  <th class="fis-cmp-change">Change (A → B)</th>
+                </tr>
+              </thead>
+              <tbody id="compareStepsBody"></tbody>
+            </table>
+
+          </div>
+        </div>
+        <div id="compareLoading" class="fis-compare-loading hidden">Fetching data…</div>
+        <div id="compareError" class="fis-compare-error hidden"></div>
+      </div>
+
+    </div><!-- /.fis-content -->
+  </div><!-- /.fis-app -->
+
+  <!-- Session timeline modal -->
+  <div id="timelineModal" class="fis-modal hidden">
+    <div class="fis-modal-backdrop"></div>
+    <div class="fis-modal-content">
+      <div class="fis-modal-header">
+        <div>
+          <h3 id="timelineTitle">Session Timeline</h3>
+          <p id="timelineSubtitle" class="fis-modal-subtitle"></p>
+        </div>
+        <button id="closeTimeline" class="fis-modal-close">×</button>
+      </div>
+      <div id="timelineBody" class="fis-timeline"></div>
     </div>
-  </header>
-
-  <main id="dashboard" class="fis-dashboard hidden">
-
-    <!-- Overview -->
-    <section class="fis-section">
-      <h2>Overview</h2>
-      <div class="fis-cards">
-        <div class="fis-card">
-          <span class="fis-card-label">Total Sessions</span>
-          <span class="fis-card-value" id="totalSessions">—</span>
-        </div>
-        <div class="fis-card">
-          <span class="fis-card-label">Completion Rate</span>
-          <span class="fis-card-value" id="completionRate">—</span>
-        </div>
-        <div class="fis-card">
-          <span class="fis-card-label">Drop-off Rate</span>
-          <span class="fis-card-value" id="dropOffRate">—</span>
-        </div>
-        <div class="fis-card">
-          <span class="fis-card-label">Return Rate</span>
-          <span class="fis-card-value" id="returnRate">—</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Field Breakdown -->
-    <section class="fis-section">
-      <h2>Field Breakdown</h2>
-      <div class="fis-charts">
-        <div class="fis-chart-box">
-          <h3>Drop-off Rate per Field</h3>
-          <canvas id="dropOffChart"></canvas>
-        </div>
-        <div class="fis-chart-box">
-          <h3>Avg Time Spent per Field (seconds)</h3>
-          <canvas id="timeChart"></canvas>
-        </div>
-        <div class="fis-chart-box">
-          <h3>Avg Errors per Field</h3>
-          <canvas id="errorChart"></canvas>
-        </div>
-      </div>
-      <div id="fieldTable" class="fis-field-table"></div>
-    </section>
-
-    <!-- AI Insights -->
-    <section class="fis-section">
-      <h2>AI Insights & Fix Suggestions</h2>
-      <button id="generateInsightsBtn" class="fis-btn-primary">Generate Insights</button>
-      <div id="insightsContainer" class="fis-insights"></div>
-    </section>
-
-  </main>
-
-  <div id="notReady" class="fis-not-ready hidden">
-    <p id="notReadyMsg"></p>
   </div>
 
-  <script type="module" src="analytics.js"></script>
+  <script type="module" src="analytics.js?v=2"></script>
 </body>
 </html>
