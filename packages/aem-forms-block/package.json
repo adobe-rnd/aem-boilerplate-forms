@@ -1,6 +1,6 @@
 {
   "name": "@aemforms/af-forms-block",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "AEM Adaptive Forms block for Edge Delivery Services",
   "type": "module",
   "exports": {
