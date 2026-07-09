@@ -223,7 +223,7 @@ app.get('/timeline/:formId', (req, res) => {
     sinceTs,
     untilTs,
   );
-  res.json(buildTimeline(mergeIntoJourneySessions(sessions), sinceTs, untilTs));
+  res.json(buildTimeline(filterGhostSessions(mergeIntoJourneySessions(sessions)), sinceTs, untilTs));
 });
 
 // flow comparison: completers vs abandoners — where the flow breaks + why
@@ -430,7 +430,18 @@ app.get('/form-journeys/:formId', (req, res) => {
 
 // get a single full session (for timeline view)
 app.get('/session/:sessionId', (req, res) => {
-  const session = getAllSessions().find((s) => s.sessionId === req.params.sessionId);
+  const all = getAllSessions();
+  let session = all.find((s) => s.sessionId === req.params.sessionId);
+  // A multi-page journey's sessions are merged (mergeIntoJourneySessions) into one
+  // synthetic session whose sessionId is set to the journeyId — so error-panel chips
+  // and other UI built from merged data pass a journeyId here, not a real sessionId.
+  // Fall back to the earliest raw page for that journey so the timeline can still open.
+  if (!session) {
+    const pages = all.filter((s) => s.journeyId === req.params.sessionId);
+    if (pages.length) {
+      [session] = [...pages].sort((a, b) => (a.startTime || 0) - (b.startTime || 0));
+    }
+  }
   if (!session) return res.status(404).json({ error: 'Session not found' });
   return res.json(session);
 });
@@ -599,7 +610,7 @@ app.get('/errors/:formId', (req, res) => {
   const formId = decodeURIComponent(req.params.formId);
   const sinceTs = resolveSinceTs(req.query);
   const untilTs = resolveUntilTs(req.query);
-  const sessions = mergeIntoJourneySessions(getSessionsByFormIdAndRange(formId, null, sinceTs, untilTs));
+  const sessions = filterGhostSessions(mergeIntoJourneySessions(getSessionsByFormIdAndRange(formId, null, sinceTs, untilTs)));
 
   // All problem signals that surface in a session timeline belong in the Errors tab —
   // not just runtime/API errors, but also frustration (rage/dead/disabled clicks) and
@@ -608,6 +619,7 @@ app.get('/errors/:formId', (req, res) => {
     'js_error', 'form_error', 'api_error', 'console_error',
     'rage_click', 'dead_click', 'disabled_click', 'suspected_crash', 'storage_quota',
   ]);
+  const MAIN_SCREENSHOT_ERROR_TYPES = new Set(['js_error', 'form_error', 'api_error']);
   const CLICK_TYPES = new Set(['rage_click', 'dead_click', 'disabled_click']);
   const groups = {};
 
@@ -660,13 +672,28 @@ app.get('/errors/:formId', (req, res) => {
       const eventsAfter = s.events.slice(evIdx + 1);
       const abandonAfter = eventsAfter.find((e) => e.type === 'form_abandon');
       const fieldAfter = eventsAfter.find((e) => e.type === 'field_focus' || e.type === 'field_change' || e.type === 'field_blur');
-      if (abandonAfter && !fieldAfter && (abandonAfter.timestamp - ev.timestamp) < 60000) {
+      const isBlockingDropoff = abandonAfter && !fieldAfter && (abandonAfter.timestamp - ev.timestamp) < 60000;
+      if (isBlockingDropoff) {
         g.blockedSessionIds.add(s.sessionId);
       }
       g.sessionFireCounts[s.sessionId] = (g.sessionFireCounts[s.sessionId] || 0) + 1;
       g.devices[s.device || 'desktop'] = (g.devices[s.device || 'desktop'] || 0) + 1;
-      if (ev.screenshot && g.sampleScreenshots.length < 3) {
-        g.sampleScreenshots.push(ev.screenshot);
+      const shouldSampleScreenshot = ev.screenshot
+        && (CLICK_TYPES.has(ev.type)
+          || (MAIN_SCREENSHOT_ERROR_TYPES.has(ev.type) && (ev.screenshotBefore || isBlockingDropoff)));
+      if (shouldSampleScreenshot && g.sampleScreenshots.length < 3) {
+        g.sampleScreenshots.push({
+          before: ev.screenshotBefore || null,
+          after: ev.screenshot,
+          // triggeredByLabel/Kind come only from sessions recorded with the newer
+          // tracker. nearestField has been recorded on error events for a long
+          // time, so it's the fallback that makes this caption work retroactively
+          // on older sessions too — just less precise (nearby field, not confirmed click).
+          triggeredByLabel: ev.triggeredByLabel || null,
+          triggeredByKind: ev.triggeredByKind || null,
+          nearestField: ev.triggeredByLabel ? null : (ev.nearestField || null),
+          stepName: ev.stepName || null,
+        });
       }
       if (ev.timestamp < g.firstSeen) g.firstSeen = ev.timestamp;
       if (ev.timestamp > g.lastSeen) g.lastSeen = ev.timestamp;

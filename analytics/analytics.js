@@ -636,7 +636,7 @@ function renderFieldTable(fields) {
             <td>${pct(f.autofillRate ?? 0)}</td>
             <td>${pct(f.labelCopyRate ?? 0)}</td>
             <td>${pct(f.visibilityRate)}</td>
-            <td>${f.abandonCount > 0 ? `${f.abandonCount} session${f.abandonCount !== 1 ? 's' : ''}` : '—'}</td>
+            <td>${f.abandonCount > 0 ? `${f.abandonCount} journey${f.abandonCount !== 1 ? 's' : ''}` : '—'}</td>
             <td>
               <div class="fis-friction-wrap" title="Friction score: ${f.frictionScore ?? 0}/100">
                 <div class="fis-friction-bar"><div class="fis-friction-fill fis-friction-${f.frictionLevel ?? 'low'}" style="width:${f.frictionScore ?? 0}%"></div></div>
@@ -1270,7 +1270,7 @@ function renderDeviceBreakdown(summary) {
         <div class="fis-card">
           <span class="fis-card-label">${deviceLabels[device] || device}</span>
           <span class="fis-card-value ${cls}">${pct(completionRate)}</span>
-          <span class="fis-card-sub">${d.total} session${d.total !== 1 ? 's' : ''} · ${d.completed} completed</span>
+          <span class="fis-card-sub">${d.total} journey${d.total !== 1 ? 's' : ''} · ${d.completed} completed</span>
         </div>`;
     }).join('');
 }
@@ -1297,7 +1297,7 @@ function renderPlatformBreakdown(summary) {
         <div class="fis-card">
           <span class="fis-card-label">${name}</span>
           <span class="fis-card-value ${cls}">${pct(errorRate)} <span style="font-size:11px;font-weight:400;color:#888">errors</span></span>
-          <span class="fis-card-sub">${d.total} session${d.total !== 1 ? 's' : ''} · ${pct(completionRate)} completed · ${d.withError} w/ error</span>
+          <span class="fis-card-sub">${d.total} journey${d.total !== 1 ? 's' : ''} · ${pct(completionRate)} completed · ${d.withError} w/ error</span>
         </div>`;
     }).join('');
 
@@ -1375,7 +1375,7 @@ async function renderErrorPanel(formId, sinceTs, untilTs) {
     const badge = getBadge(err.type, err);
     const msgPreview = esc((err.message || err.statusText || '').slice(0, 100));
     const freqHtml = err.avgPerSession > 1
-      ? `<div class="fis-error-freq">Fired <strong>${err.avgPerSession}×</strong> per session on avg${err.maxPerSession > err.avgPerSession ? ` (up to ${err.maxPerSession}×)` : ''}</div>`
+      ? `<div class="fis-error-freq">Fired <strong>${err.avgPerSession}×</strong> per journey on avg${err.maxPerSession > err.avgPerSession ? ` (up to ${err.maxPerSession}×)` : ''}</div>`
       : '';
     const patternHtml = err.pattern
       ? `<div class="fis-error-pattern"><span class="fis-pattern-icon">⚠</span> ${esc(err.pattern)}</div>`
@@ -1415,10 +1415,10 @@ function generateErrorInsights(errors, totalSessions) {
   if (top.sessionRate > 0.25 && top.diagnosis) {
     insights.push({
       priority: top.diagnosis.severity === 'critical' ? 'critical' : 'high',
-      impact: `${(top.sessionRate * 100).toFixed(0)}% of sessions`,
+      impact: `${(top.sessionRate * 100).toFixed(0)}% of journeys`,
       insight: top.diagnosis.cause,
       fix: top.diagnosis.fix,
-      why: `Affects ${top.sessionCount} of ${totalSessions} sessions — highest-priority fix.`,
+      why: `Affects ${top.sessionCount} of ${totalSessions} journeys — highest-priority fix.`,
     });
   }
 
@@ -1427,7 +1427,7 @@ function generateErrorInsights(errors, totalSessions) {
   if (corsErrors.length) {
     insights.push({
       priority: 'critical',
-      impact: `${sessionUnion(corsErrors)} session${sessionUnion(corsErrors) !== 1 ? 's' : ''}`,
+      impact: `${sessionUnion(corsErrors)} journey${sessionUnion(corsErrors) !== 1 ? 's' : ''}`,
       insight: 'CORS policy is blocking API calls — form features fail silently when the browser rejects cross-origin requests.',
       fix: 'Add Access-Control-Allow-Origin headers to all API endpoints. Configure the Cross-Origin Resource Sharing policy on the server.',
       why: 'CORS errors are invisible to users but silently break validation, prefill, and submission.',
@@ -1440,7 +1440,7 @@ function generateErrorInsights(errors, totalSessions) {
     const affected = ruleErrors.reduce((s, e) => s + e.sessionCount, 0);
     insights.push({
       priority: 'critical',
-      impact: `${affected} session${affected !== 1 ? 's' : ''}`,
+      impact: `${affected} journey${affected !== 1 ? 's' : ''}`,
       insight: 'afb-runtime is crashing — form rules (show/hide, calculated fields, validation) stop working for affected users.',
       fix: 'Check for circular rule dependencies. Run `npm run update:core` to get the latest runtime. Test each rule individually in authoring.',
       why: 'Rule engine crashes are silent from the user\'s side — the form loads but conditional logic is dead, causing confusion and abandonment.',
@@ -1453,7 +1453,7 @@ function generateErrorInsights(errors, totalSessions) {
     const affected = sessionUnion(submitFails);
     insights.push({
       priority: 'critical',
-      impact: `${((affected / totalSessions) * 100).toFixed(0)}% of sessions`,
+      impact: `${((affected / totalSessions) * 100).toFixed(0)}% of journeys`,
       insight: 'Form submission is failing with server or network errors — users who complete the form cannot submit it.',
       fix: submitFails[0].diagnosis?.fix || 'Check server logs for the stack trace. Verify the submission endpoint is deployed and reachable.',
       why: 'Submission failures are the worst outcome — users did the work but their data was never received.',
@@ -1465,7 +1465,7 @@ function generateErrorInsights(errors, totalSessions) {
     const affected = sessionUnion(errors);
     insights.push({
       priority: 'high',
-      impact: `${((affected / totalSessions) * 100).toFixed(0)}% of sessions`,
+      impact: `${((affected / totalSessions) * 100).toFixed(0)}% of journeys`,
       insight: `${errors.length} distinct error types detected — this volume points to systemic instability rather than isolated bugs.`,
       fix: 'Fix critical errors first. Audit recent deploys and dependency changes that coincide with when errors started appearing.',
       why: 'Many different errors appearing together usually share a common root cause: a bad deploy, a missing dependency, or a config change.',
@@ -1518,7 +1518,7 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
     container.innerHTML = `
       <div class="fis-errors-clean">
         <div class="fis-errors-clean-icon">✓</div>
-        <div class="fis-errors-clean-msg">No errors recorded across ${totalSessions} session${totalSessions !== 1 ? 's' : ''}</div>
+        <div class="fis-errors-clean-msg">No errors recorded across ${totalSessions} journey${totalSessions !== 1 ? 's' : ''}</div>
         <div class="fis-errors-clean-sub">Your form is error-free in this time range</div>
       </div>`;
     return;
@@ -1612,15 +1612,39 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
       const layer = getErrLayer(err);
       const descHtml = layer?.desc ? `<div class="fis-err-desc"><span class="fis-err-desc-label">What</span>${layer.desc}</div>` : '';
       const causeHtml = err.diagnosis?.cause ? `<div class="fis-err-cause">${esc(err.diagnosis.cause)}</div>` : '';
+      function ssTriggerText(ss) {
+        const at = ss.stepName ? ` at step "${esc(ss.stepName)}"` : '';
+        if (ss.triggeredByLabel) {
+          const verb = ss.triggeredByKind === 'field' ? 'Focused' : 'Clicked';
+          return `${verb} "${esc(ss.triggeredByLabel)}"${at} right before this error`;
+        }
+        if (ss.nearestField) return `Occurred near field "${esc(ss.nearestField)}"${at}`;
+        if (ss.stepName) return `At step "${esc(ss.stepName)}"`;
+        return null;
+      }
       const ssHtml = (err.sampleScreenshots || []).length ? `
         <div class="fis-err-screenshots"><div class="fis-err-ss-strip">
-          ${(err.sampleScreenshots || []).map((ss, i) => `
-            <div class="fis-err-ss-item">
-              <img class="fis-err-ss-thumb" src="${ss}" alt="Screenshot ${i + 1}" title="Click to enlarge" />
-            </div>`).join('')}
+          ${(err.sampleScreenshots || []).map((ss, i) => {
+            const trigger = ssTriggerText(ss);
+            return `
+            <div class="fis-err-ss-sample">
+              ${trigger ? `<div class="fis-err-ss-trigger">${trigger}</div>` : ''}
+              <div class="fis-err-ss-pair">
+                ${ss.before ? `
+                  <div class="fis-err-ss-item">
+                    <span class="fis-err-ss-tag">Where it happened</span>
+                    <img class="fis-err-ss-thumb" src="${ss.before}" alt="Before error ${i + 1}" title="Click to enlarge" />
+                  </div>` : `
+                  <div class="fis-err-ss-item">
+                    <span class="fis-err-ss-tag">Error screen</span>
+                  <img class="fis-err-ss-thumb" src="${ss.after}" alt="Screenshot ${i + 1}" title="Click to enlarge" />
+                  </div>`}
+              </div>
+            </div>`;
+          }).join('')}
         </div></div>` : '';
       const freqHtml = err.avgPerSession > 1
-        ? `<div class="fis-err-freq">Fired <strong>${err.avgPerSession}×</strong> per session on avg · max <strong>${err.maxPerSession}×</strong> in one session</div>`
+        ? `<div class="fis-err-freq">Fired <strong>${err.avgPerSession}×</strong> per journey on avg · max <strong>${err.maxPerSession}×</strong> in one journey</div>`
         : '';
       const blockedHtml = err.blockedRate >= 50
         ? `<div class="fis-err-blocked"><span class="fis-err-blocked-icon">🚫</span> Blocked <strong>${err.blockedRate}%</strong> of affected users — they abandoned immediately after this error</div>`
@@ -1636,7 +1660,7 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
         ? `First seen ${firstSeen} · Last seen ${lastSeen}`
         : firstSeen ? `First seen ${firstSeen}` : '';
       const footerParts = [
-        sessionChips ? `<div class="fis-err-sessions-row"><span class="fis-err-sessions-label">Sessions:</span>${sessionChips}</div>` : '',
+        sessionChips ? `<div class="fis-err-sessions-row"><span class="fis-err-sessions-label">Journeys:</span>${sessionChips}</div>` : '',
         (timeStr || deviceStr) ? `<div class="fis-err-meta">${[timeStr, deviceStr].filter(Boolean).join(' · ')}</div>` : '',
       ].filter(Boolean).join('');
       return `
@@ -1645,7 +1669,7 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
           <div class="fis-err-card-body">
             <div class="fis-err-card-header">
               <div class="fis-err-card-header-left">${typeBadge}${statusBit}<span class="fis-err-sev-pill fis-err-sev-pill-${sev}">${sev}</span></div>
-              <span class="fis-err-count">${err.sessionCount} session${err.sessionCount !== 1 ? 's' : ''} <span class="fis-err-pct">${pct}</span></span>
+              <span class="fis-err-count">${err.sessionCount} journey${err.sessionCount !== 1 ? 's' : ''} <span class="fis-err-pct">${pct}</span></span>
             </div>
             <div class="fis-err-msg-full">${msgFull}</div>
             ${descHtml}
@@ -1662,7 +1686,7 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
   const summaryHtml = `
     <div class="fis-errors-section-header">
       <span class="fis-errors-section-title">Error Overview</span>
-      <span class="fis-errors-section-sub">${errors.length} unique error${errors.length !== 1 ? 's' : ''} across ${totalSessions} session${totalSessions !== 1 ? 's' : ''}</span>
+      <span class="fis-errors-section-sub">${errors.length} unique error${errors.length !== 1 ? 's' : ''} across ${totalSessions} journey${totalSessions !== 1 ? 's' : ''}</span>
     </div>
     <div class="fis-errors-summary">
       <div class="fis-err-stat fis-err-stat-total"><span class="fis-err-stat-n">${errors.length}</span><span class="fis-err-stat-lbl">Total</span></div>
@@ -1670,7 +1694,7 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
       ${highCount ? `<div class="fis-err-stat fis-err-stat-high"><span class="fis-err-stat-n">${highCount}</span><span class="fis-err-stat-lbl">High</span></div>` : ''}
       ${medCount ? `<div class="fis-err-stat fis-err-stat-medium"><span class="fis-err-stat-n">${medCount}</span><span class="fis-err-stat-lbl">Medium</span></div>` : ''}
       ${unknownCount ? `<div class="fis-err-stat fis-err-stat-unknown"><span class="fis-err-stat-n">${unknownCount}</span><span class="fis-err-stat-lbl">Unknown</span></div>` : ''}
-      <div class="fis-err-stat"><span class="fis-err-stat-n">${totalSessions}</span><span class="fis-err-stat-lbl">Sessions</span></div>
+      <div class="fis-err-stat"><span class="fis-err-stat-n">${totalSessions}</span><span class="fis-err-stat-lbl">Journeys</span></div>
     </div>`;
 
   const cardsHtml = buildErrCards(errors);
@@ -1718,7 +1742,7 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
       <span class="fis-errors-toolbar-sep"></span>
       <span class="fis-errors-toolbar-label">Sort</span>
       <select class="fis-sort-select" id="errorSort">
-        <option value="sessions">Most sessions affected</option>
+        <option value="sessions">Most journeys affected</option>
         <option value="newest">Newest first</option>
         <option value="oldest">Oldest first</option>
         <option value="severity">Severity</option>
@@ -2319,7 +2343,11 @@ function renderJourneys(journeys, category) {
   const sumErr = (j) => (j.pages || []).reduce((t, p) => t + (p.errorCount || 0), 0);
   const sortVal = document.getElementById('sessionSort')?.value || 'newest';
   const sortFns = {
-    newest: (a, b) => (b.startTime || 0) - (a.startTime || 0),
+    // lastActivityTime falls back to startTime for a journey that never resumed
+    // (single page, or data predating this field) — "newest" means most recent
+    // activity, not first-start time, so a returned-to journey doesn't sink to
+    // the bottom forever just because it began hours earlier.
+    newest: (a, b) => (b.lastActivityTime || b.startTime || 0) - (a.lastActivityTime || a.startTime || 0),
     oldest: (a, b) => (a.startTime || 0) - (b.startTime || 0),
     longest: (a, b) => sumDur(b) - sumDur(a),
     'most-errors': (a, b) => sumErr(b) - sumErr(a),
@@ -2464,6 +2492,17 @@ async function loadJourneys(formId, range) {
 
 // ── Client-side error pattern matching (mirrors server/error-patterns.js) ─────
 
+function isFinalSubmissionFailureEvent(event = {}) {
+  const text = [
+    event.statusText,
+    event.message,
+    event.reason,
+    event.responseBody,
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  return /personal loan request could not be submitted|request could not be submitted|could not be submitted|application number\s*not generated|not generated|there seems to be an error in the application|contact nearest branch|try later/.test(text);
+}
+
 function diagnoseEventClient(event) {
   const msg = event.message || event.reason || event.statusText || '';
   const src = event.source || '';
@@ -2549,9 +2588,11 @@ function explainAbandonment(session) {
   const jsErrors = events.filter((e) => e.type === 'js_error' || e.type === 'console_error');
   const apiErrors = events.filter((e) => e.type === 'form_error' || e.type === 'api_error');
   const fieldsInteracted = [...new Set(events.filter((e) => e.type === 'field_focus').map((e) => e.field).filter(Boolean))];
-  const abandon = events.find((e) => e.type === 'form_abandon');
-  const isSuccess = events.some((e) => e.type === 'form_submit' && !e.failed);
-  const isSubmitFail = events.some((e) => e.type === 'form_submit' && e.failed);
+  // last abandon = the final exit point, not wherever they first stepped away from
+  const abandon = [...events].reverse().find((e) => e.type === 'form_abandon');
+  const hasFinalSubmitFailure = events.some((e) => e.type === 'form_error' && isFinalSubmissionFailureEvent(e));
+  const isSuccess = events.some((e) => e.type === 'form_submit' && !e.failed) && !hasFinalSubmitFailure;
+  const isSubmitFail = hasFinalSubmitFailure || events.some((e) => e.type === 'form_submit' && e.failed);
   const hasSessionReturned = events.some((e) => e.type === 'session_returned');
 
   // Detect brief exits: form_abandon followed by field_focus in the same session
@@ -2682,13 +2723,23 @@ async function showTimeline(sessionId) {
 
   // ── Multi-page journey stitching ────────────────────────────────────────
   // If this session belongs to a journey, fetch all pages and stitch together.
+  // A journey can span multiple forms (e.g. landing page → the actual form); when the
+  // requested sessionId is really a journeyId (see /session/:sessionId fallback), the
+  // server picks an arbitrary representative page, which may belong to a different
+  // form than the one currently loaded. /form-journeys/:formId is scoped per-form, so
+  // prefer the form the dashboard actually has open — that's the context the chip was
+  // clicked from — falling back to the fetched session's own formId otherwise.
   let journeyPages = null; // array of { session, pageIndex, pagePath }
-  if (session.journeyId && session.formId) {
-    const journeyRes = await fetch(`${API}/form-journeys/${encodeURIComponent(session.formId)}`).catch(() => null);
+  const journeyFormId = currentFormId || session.formId;
+  if (session.journeyId && journeyFormId) {
+    const journeyRes = await fetch(`${API}/form-journeys/${encodeURIComponent(journeyFormId)}`).catch(() => null);
     if (journeyRes && journeyRes.ok) {
       const journeys = await journeyRes.json();
+      // sessionId may itself be a journeyId (see /session/:sessionId fallback) rather
+      // than an individual page's sessionId, so match on either.
       const journey = Array.isArray(journeys)
-        ? journeys.find((j) => j.pages && j.pages.some((p) => p.sessionId === sessionId))
+        ? journeys.find((j) => j.journeyId === sessionId
+          || (j.pages && j.pages.some((p) => p.sessionId === sessionId)))
         : null;
       if (journey && journey.pages && journey.pages.length > 1) {
         // Fetch each page's full session data in parallel
@@ -2714,17 +2765,18 @@ async function showTimeline(sessionId) {
   } else {
     document.getElementById('timelineTitle').textContent = 'Session';
   }
-  const summary = allSessionsCache.find((s) => s.sessionId === sessionId);
-  const shortId = sessionId.slice(-8);
+  const summary = allSessionsCache.find((s) => s.sessionId === sessionId || s.journeyId === sessionId);
+  const timelineId = session.journeyId || sessionId;
+  const idLabel = session.journeyId ? 'Journey ID' : 'Session ID';
   document.getElementById('timelineSubtitle').textContent = summary
-    ? `${summary.category} · ${summary.errorCount} error${summary.errorCount !== 1 ? 's' : ''} · ${timeAgo(summary.timestamp)} · ID: ${shortId}`
-    : `ID: ${shortId}`;
+    ? `${summary.category} · ${summary.errorCount} error${summary.errorCount !== 1 ? 's' : ''} · ${timeAgo(summary.timestamp)} · ${idLabel}: ${timelineId}`
+    : `${idLabel}: ${timelineId}`;
 
   const importantTypes = new Set([
     'form_start', 'form_submit', 'form_abandon', 'field_focus', 'field_error',
     'validation_thrash', 'rage_click', 'step_change', 'js_error', 'console_error',
-    'form_error', 'api_error', 'disabled_click', 'label_copied', 'returned',
-    'session_returned', 'step_thrash', 'page_refreshed', 'url_change',
+    'form_error', 'api_error', 'disabled_click', 'dead_click', 'label_copied', 'returned',
+    'session_returned', 'step_thrash', 'page_refreshed', 'url_change', 'button_click',
   ]);
 
   const eventMeta = {
@@ -2755,6 +2807,8 @@ async function showTimeline(sessionId) {
     form_error: { icon: '🚫', cls: 'formerr', label: (e) => `${e.callType} error: ${e.statusText}` },
     api_error: { icon: '🌐', cls: 'formerr', label: (e) => `Network error: ${(e.reason || '').slice(0, 50)}` },
     disabled_click: { icon: '🚷', cls: 'disabled', label: (e) => `Clicked disabled "${e.element}"` },
+    dead_click: { icon: '💀', cls: 'dead', label: (e) => `Dead click on "${e.element}" (no response)` },
+    button_click: { icon: '🖱', cls: 'click', label: (e) => `Clicked "${e.element}"` },
     label_copied: { icon: '📋', cls: 'copy', label: (e) => `Copied label: ${e.field}` },
     returned: { icon: '↩', cls: 'return', label: (e) => `Returned (${e.choice})` },
     session_returned: { icon: '↩', cls: 'return', label: () => 'Returned to continue' },
@@ -2764,7 +2818,14 @@ async function showTimeline(sessionId) {
   };
 
   const { startTime } = session;
-  const analysis = explainAbandonment(session);
+  // For a journey, judge the outcome from ALL pages' events, not just the one that
+  // was clicked — a "session_returned" or later completion lives on a LATER page's
+  // session object, so looking at only the clicked page would miss it and wrongly
+  // call a mid-journey exit a plain "Abandoned".
+  const analysisSession = isJourney
+    ? { ...session, events: journeyPages.flatMap((p) => p.session.events || []) }
+    : session;
+  const analysis = explainAbandonment(analysisSession);
 
   // build analysis header HTML
   const analysisHtml = analysis ? `
@@ -2781,6 +2842,8 @@ async function showTimeline(sessionId) {
     </div>` : '';
 
   const ERROR_TYPES = new Set(['js_error', 'form_error', 'api_error', 'console_error']);
+  const MAIN_SCREENSHOT_ERROR_TYPES = new Set(['js_error', 'form_error', 'api_error']);
+  const INLINE_SCREENSHOT_TYPES = new Set(['rage_click', 'dead_click']);
   // Returns { cls, label, source } describing WHERE the error came from.
   function getErrorLayer(e) {
     if (e.type === 'form_error') {
@@ -2856,9 +2919,12 @@ async function showTimeline(sessionId) {
   };
 
   // ── Helper: collapse + annotate events for one session ─────────────────
-  function collapseSessionEvents(sess) {
+  // hasNextPage: true when this page's abandon was followed by a LATER page in the
+  // same journey — i.e. the user came back (possibly minutes later, on a new
+  // session), so this was never a true drop-off and should read as "switched away".
+  function collapseSessionEvents(sess, hasNextPage = false) {
     const filtered = sess.events.filter((e) => importantTypes.has(e.type));
-    const COLLAPSIBLE = new Set([...ERROR_TYPES, 'disabled_click', 'rage_click']);
+    const COLLAPSIBLE = new Set([...ERROR_TYPES, 'disabled_click', 'rage_click', 'dead_click']);
     const collapsed = [];
     const seenTypes = new Map();
 
@@ -2866,9 +2932,19 @@ async function showTimeline(sessionId) {
     filtered.forEach((e) => {
       if (COLLAPSIBLE.has(e.type)) {
         if (seenTypes.has(e.type)) {
-          seenTypes.get(e.type)._count += 1;
-          if (!seenTypes.get(e.type).screenshot && e.screenshot) {
-            seenTypes.get(e.type).screenshot = e.screenshot;
+          const existing = seenTypes.get(e.type);
+          existing._count += 1;
+          if (!existing.screenshot && e.screenshot) {
+            existing.screenshot = e.screenshot;
+          }
+          if (!existing.screenshotBefore && e.screenshotBefore) {
+            existing.screenshotBefore = e.screenshotBefore;
+          }
+          if (!existing.triggeredByLabel && e.triggeredByLabel) {
+            existing.triggeredByLabel = e.triggeredByLabel;
+          }
+          if (!existing.triggeredByKind && e.triggeredByKind) {
+            existing.triggeredByKind = e.triggeredByKind;
           }
         } else {
           const entry = { ...e, _count: 1 };
@@ -2890,9 +2966,13 @@ async function showTimeline(sessionId) {
     const focusTs = sess.events.filter((ev) => ev.type === 'field_focus').map((ev) => ev.timestamp);
     deduped.forEach((ev) => {
       if (ev.type === 'form_abandon') {
-        ev.switched = submitTs.some((ts) => ts > ev.timestamp);
+        ev.switched = hasNextPage || submitTs.some((ts) => ts > ev.timestamp);
         if (!ev.switched) {
           ev.leftBriefly = focusTs.some((ts) => ts > ev.timestamp);
+        }
+        if (ev.switched || ev.leftBriefly) {
+          delete ev.screenshot;
+          delete ev.screenshotBefore;
         }
       }
     });
@@ -2921,7 +3001,8 @@ async function showTimeline(sessionId) {
       // On pages 2+, suppress form_start and form_fields — session_returned
       // already marks the re-entry, so these are redundant duplicates.
       const suppressOnReturn = idx > 0 ? new Set(['form_start', 'form_fields']) : new Set();
-      collapseSessionEvents(page.session).forEach((e) => {
+      const hasNextPage = idx < journeyPages.length - 1;
+      collapseSessionEvents(page.session, hasNextPage).forEach((e) => {
         if (suppressOnReturn.has(e.type)) return;
         segments.push({ kind: 'event', event: e, session: page.session });
       });
@@ -2931,6 +3012,58 @@ async function showTimeline(sessionId) {
 
   const renderSegments = buildRenderSegments();
 
+  function fallbackBeforeScreenshot(segIdx, currentSession) {
+    for (let i = segIdx - 1; i >= 0; i -= 1) {
+      const seg = renderSegments[i];
+      if (!seg || seg.kind !== 'event') continue;
+      // Prefer screenshots from the same page/session. In stitched journeys, allow
+      // the previous page only if nothing exists on the current page.
+      if (seg.session !== currentSession && currentSession) continue;
+      const ev = seg.event;
+      if (ev?.screenshot) return ev.screenshot;
+      if (ev?.screenshotBefore) return ev.screenshotBefore;
+    }
+    if (!currentSession) return null;
+    for (let i = segIdx - 1; i >= 0; i -= 1) {
+      const seg = renderSegments[i];
+      if (!seg || seg.kind !== 'event') continue;
+      const ev = seg.event;
+      if (ev?.screenshot) return ev.screenshot;
+      if (ev?.screenshotBefore) return ev.screenshotBefore;
+    }
+    return null;
+  }
+
+  function isDropoffCausingError(e, sess) {
+    if (e.screenshotBefore) return true;
+    const idx = (sess.events || []).findIndex((ev) => ev.type === e.type
+      && ev.timestamp === e.timestamp
+      && (ev.message || ev.reason || ev.statusText || '') === (e.message || e.reason || e.statusText || ''));
+    if (idx < 0) return false;
+    const eventsAfter = (sess.events || []).slice(idx + 1);
+    const abandonAfter = eventsAfter.find((ev) => ev.type === 'form_abandon');
+    if (!abandonAfter) return false;
+    const fieldAfter = eventsAfter.find((ev) => ev.type === 'field_focus' || ev.type === 'field_change' || ev.type === 'field_blur');
+    return !fieldAfter && (abandonAfter.timestamp - e.timestamp) < 60000;
+  }
+
+  function isSeparateErrorScreen(e) {
+    if (!e || e.type !== 'form_error') return false;
+    const text = [
+      e.callType,
+      e.statusText,
+      e.message,
+      e.reason,
+      e.responseBody,
+      e.url,
+    ].filter(Boolean).join(' ').toLowerCase();
+
+    // Only use the two-panel "where + error" view when the user was moved into
+    // a full error state/screen. Inline validation already shows cause + location
+    // in one screenshot, so a separate before-shot adds noise.
+    return /screenfragmenterrorscreen|error screen|ln\d+|service error|we are sorry|something went wrong|start again|could not be submitted|request could not be submitted|personal loan request|contact nearest branch|try later/.test(text);
+  }
+
   // For multi-page journeys, anchor all event times to the first page's startTime
   // so the timeline is one continuous clock rather than resetting to 0:00 per page.
   const journeyStartTime = isJourney
@@ -2938,11 +3071,12 @@ async function showTimeline(sessionId) {
     : startTime;
 
   // build event rows
-  const eventsHtml = renderSegments.length ? renderSegments.map((seg) => {
+  const eventsHtml = renderSegments.length ? renderSegments.map((seg, segIdx) => {
     if (seg.kind === 'divider') {
+      const dividerId = session.journeyId ? ` · ${session.journeyId}` : '';
       return `
         <div class="fis-tl-page-divider">
-          <span class="fis-tl-page-sep">${seg.gapStr ? `↩ continued${seg.gapStr}` : '↩ continued'}</span>
+          <span class="fis-tl-page-sep">${seg.gapStr ? `↩ continued${seg.gapStr}${dividerId}` : `↩ continued${dividerId}`}</span>
         </div>`;
     }
     const { event: e, session: evSession } = seg;
@@ -2956,8 +3090,14 @@ async function showTimeline(sessionId) {
       const diag = diagnoseEventClient(e);
       const badge = (typeof ERROR_BADGE[e.type] === 'function' ? ERROR_BADGE[e.type](e) : ERROR_BADGE[e.type]) || '';
       const rawMsg = (e.message || e.reason || e.statusText || '').slice(0, 160);
-      const viewBtn = e.screenshot
-        ? `<button class="fis-tl-view-btn" data-ss="${e.screenshot}">View Screenshot</button>`
+      const separateErrorScreen = isSeparateErrorScreen(e);
+      const beforeScreenshot = e.screenshotBefore || (separateErrorScreen ? fallbackBeforeScreenshot(segIdx, evSession) : null);
+      const showScreenshot = e.screenshot
+        && MAIN_SCREENSHOT_ERROR_TYPES.has(e.type)
+        && (isDropoffCausingError(e, evSession) || separateErrorScreen);
+      const showBeforeAndAfter = showScreenshot && separateErrorScreen;
+      const viewBtn = showScreenshot
+        ? `<button class="fis-tl-view-btn" data-ss="${e.screenshot}"${showBeforeAndAfter ? ` data-force-pair="1"${beforeScreenshot ? ` data-before="${beforeScreenshot}"` : ''}` : ''}>${showBeforeAndAfter ? 'View Where + Error' : 'View Error Screen'}</button>`
         : '';
       const causeHtml = diag
         ? `<div class="fis-tl-err-cause">${diag.cause}</div>
@@ -3020,8 +3160,11 @@ async function showTimeline(sessionId) {
     const evCls = typeof meta.cls === 'function' ? meta.cls(e) : meta.cls;
     const evIcon = typeof meta.icon === 'function' ? meta.icon(e) : meta.icon;
     let ssBtn = '';
-    if (e.screenshot) {
-      ssBtn = `<button class="fis-tl-view-btn fis-tl-view-btn-inline" data-ss="${e.screenshot}">Screenshot</button>`;
+    const showInlineScreenshot = e.screenshot
+      && ((e.type === 'form_abandon' && !e.switched && !e.leftBriefly)
+        || INLINE_SCREENSHOT_TYPES.has(e.type));
+    if (showInlineScreenshot) {
+      ssBtn = `<button class="fis-tl-view-btn fis-tl-view-btn-inline" data-ss="${e.screenshot}"${e.screenshotBefore ? ` data-before="${e.screenshotBefore}"` : ''}>${e.screenshotBefore ? 'Where + Error' : 'Screenshot'}</button>`;
     } else if (e.screenshotDeduped) {
       ssBtn = '<span class="fis-tl-repeated-badge">Repeated error</span>';
     }
@@ -3044,7 +3187,21 @@ async function showTimeline(sessionId) {
     lightbox = document.createElement('div');
     lightbox.id = 'fis-ss-lightbox';
     lightbox.className = 'fis-screenshot-lightbox hidden';
-    lightbox.innerHTML = '<div class="fis-ss-lb-inner"><button class="fis-ss-lb-close">✕</button><img class="fis-ss-lb-img" src="" alt="Screenshot" /></div>';
+    lightbox.innerHTML = `
+      <div class="fis-ss-lb-inner">
+        <button class="fis-ss-lb-close">✕</button>
+        <div class="fis-ss-lb-pair">
+          <div class="fis-ss-lb-item fis-ss-lb-before">
+            <div class="fis-ss-lb-label">Where It Happened</div>
+            <img class="fis-ss-lb-img fis-ss-lb-before-img" src="" alt="Before error" />
+            <div class="fis-ss-lb-missing hidden">Before screenshot was not captured for this older event.</div>
+          </div>
+          <div class="fis-ss-lb-item">
+            <div class="fis-ss-lb-label fis-ss-lb-after-label">Error Screen</div>
+            <img class="fis-ss-lb-img fis-ss-lb-after-img" src="" alt="Screenshot" />
+          </div>
+        </div>
+      </div>`;
     document.body.appendChild(lightbox);
     lightbox.querySelector('.fis-ss-lb-close').addEventListener('click', () => lightbox.classList.add('hidden'));
     lightbox.addEventListener('click', (ev) => { if (ev.target === lightbox) lightbox.classList.add('hidden'); });
@@ -3053,12 +3210,40 @@ async function showTimeline(sessionId) {
   document.getElementById('timelineBody').addEventListener('click', (ev) => {
     const thumb = ev.target.closest('.fis-tl-screenshot-thumb');
     const viewBtn = ev.target.closest('.fis-tl-view-btn');
+    const showLightbox = ({ after, before = '', forcePair = false }) => {
+      const beforeItem = lightbox.querySelector('.fis-ss-lb-before');
+      const beforeImg = lightbox.querySelector('.fis-ss-lb-before-img');
+      const beforeMissing = lightbox.querySelector('.fis-ss-lb-missing');
+      const afterImg = lightbox.querySelector('.fis-ss-lb-after-img');
+      const afterLabel = lightbox.querySelector('.fis-ss-lb-after-label');
+      if (before) {
+        beforeItem.classList.remove('hidden');
+        beforeImg.classList.remove('hidden');
+        beforeMissing.classList.add('hidden');
+        beforeImg.src = before;
+        afterLabel.textContent = 'Error Screen';
+        afterImg.src = after;
+      } else if (forcePair) {
+        beforeItem.classList.remove('hidden');
+        beforeImg.removeAttribute('src');
+        beforeImg.classList.add('hidden');
+        beforeMissing.classList.remove('hidden');
+        afterLabel.textContent = 'Error Screen';
+        afterImg.src = after;
+      } else {
+        beforeImg.removeAttribute('src');
+        beforeImg.classList.remove('hidden');
+        beforeMissing.classList.add('hidden');
+        beforeItem.classList.add('hidden');
+        afterLabel.textContent = 'Error Screen';
+        afterImg.src = after;
+      }
+      lightbox.classList.remove('hidden');
+    };
     if (thumb) {
-      lightbox.querySelector('.fis-ss-lb-img').src = thumb.src;
-      lightbox.classList.remove('hidden');
+      showLightbox({ after: thumb.src });
     } else if (viewBtn) {
-      lightbox.querySelector('.fis-ss-lb-img').src = viewBtn.dataset.ss;
-      lightbox.classList.remove('hidden');
+      showLightbox({ after: viewBtn.dataset.ss, before: viewBtn.dataset.before, forcePair: viewBtn.dataset.forcePair === '1' });
     }
   });
 
@@ -3256,7 +3441,7 @@ async function runComparison() {
     const n = (v) => (v != null ? v : '—');
 
     const rows = [
-      buildCompareRow('Total Sessions', a?.totalSessions, b?.totalSessions, 'up-good', n),
+      buildCompareRow('Total Journeys', a?.totalSessions, b?.totalSessions, 'up-good', n),
       buildCompareRow('Completion Rate', a?.completionRate, b?.completionRate, 'up-good', p),
       buildCompareRow('Drop-off Rate', a?.dropOffRate, b?.dropOffRate, 'down-good', p),
       buildCompareRow('Bounce Rate', a?.bounceRate, b?.bounceRate, 'down-good', p),
@@ -3311,8 +3496,8 @@ async function runComparison() {
         data: {
           labels: chartLabels,
           datasets: [
-            cds('Sessions A',     bkA.map((b) => b.sessions),     '#2563eb'),
-            cds('Sessions B',     bkB.map((b) => b.sessions),     '#2563eb', true),
+            cds('Journeys A',     bkA.map((b) => b.sessions),     '#2563eb'),
+            cds('Journeys B',     bkB.map((b) => b.sessions),     '#2563eb', true),
             cds('Completions A',  bkA.map((b) => b.completions),  '#16a34a'),
             cds('Completions B',  bkB.map((b) => b.completions),  '#16a34a', true),
             cds('Drop-offs A',    bkA.map((b) => b.dropoffs),     '#dc2626'),
@@ -3428,7 +3613,7 @@ async function renderTimeline(formId, sinceTs, untilTs) {
     data: {
       labels,
       datasets: [
-        ds('Sessions',              'sessions',      '#2563eb'),
+        ds('Journeys',              'sessions',      '#2563eb'),
         ds('Completions',           'completions',   '#16a34a'),
         ds('Drop-offs',             'dropoffs',      '#dc2626'),
         ds('Total Errors',          'totalErrors',   '#ca8a04'),

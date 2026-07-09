@@ -1,7 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import { config } from './config.js';
-import { buildSessionSummaries, groupSessionsIntoJourneys } from './analyzer.js';
+import {
+  buildSessionSummaries,
+  didSessionComplete,
+  groupSessionsIntoJourneys,
+  sessionHasFinalSubmissionFailure,
+} from './analyzer.js';
 
 const dbPath = path.resolve(config.dbFile);
 const insightsCachePath = path.resolve('./server/data/insights-cache.json');
@@ -14,15 +19,21 @@ let sessionsCache = null;
 
 // Keep up to MAX_SS_PER_KEY screenshots per error identity per session so repeated
 // failures are visible without unbounded storage. Successful submit resets the counters.
-const SS_EVENT_TYPES = new Set(['disabled_click', 'form_error', 'form_abandon', 'dead_click', 'api_error']);
+const SS_EVENT_TYPES = new Set([
+  'disabled_click', 'dead_click', 'rage_click',
+  'form_error', 'form_abandon', 'api_error', 'js_error',
+]);
+const ONE_SHOT_SS_TYPES = new Set(['disabled_click', 'dead_click', 'rage_click']);
 const MAX_SS_PER_KEY = 3;
 
 function ssKey(ev) {
-  if (ev.type === 'disabled_click') return `disabled_click:${ev.element || ''}`;
-  if (ev.type === 'dead_click') return `dead_click:${ev.element || ''}`;
+  if (ev.type === 'disabled_click') return 'disabled_click';
+  if (ev.type === 'dead_click') return 'dead_click';
+  if (ev.type === 'rage_click') return 'rage_click';
   if (ev.type === 'form_error') return `form_error:${ev.status || ''}`;
   if (ev.type === 'form_abandon') return 'form_abandon';
   if (ev.type === 'api_error') return `api_error:${ev.url || ev.reason?.slice(0, 60) || ''}`;
+  if (ev.type === 'js_error') return `js_error:${ev.message?.slice(0, 60) || ev.source || ''}`;
   return null;
 }
 
@@ -41,8 +52,9 @@ function deduplicateScreenshots(existingEvents, newEvents) {
     const k = ssKey(ev);
     if (!k) return ev;
     const count = counts.get(k) || 0;
-    if (count >= MAX_SS_PER_KEY) {
-      const { screenshot, ...rest } = ev;
+    const maxForType = ONE_SHOT_SS_TYPES.has(ev.type) ? 1 : MAX_SS_PER_KEY;
+    if (count >= maxForType) {
+      const { screenshot, screenshotBefore, ...rest } = ev;
       return { ...rest, screenshotDeduped: true };
     }
     counts.set(k, count + 1);
@@ -57,17 +69,31 @@ function ensureDb() {
   if (!fs.existsSync(dbPath)) { fs.writeFileSync(dbPath, JSON.stringify([])); sessionsCache = []; }
 }
 
+function writeScreenshotFile(sessionId, timestamp, suffix, dataUrl) {
+  const match = dataUrl.match(/^data:image\/(\w+);base64,(.+)$/s);
+  if (!match) return null;
+  const [, ext, b64] = match;
+  const filename = `${sessionId}_${timestamp || Date.now()}${suffix}.${ext}`;
+  const filepath = path.join(screenshotsDir, filename);
+  fs.writeFileSync(filepath, Buffer.from(b64, 'base64'));
+  return `/screenshots/${filename}`;
+}
+
 function extractScreenshots(sessionId, events) {
   return events.map((ev) => {
-    if (!ev.screenshot || !ev.screenshot.startsWith('data:image')) return ev;
+    if ((!ev.screenshot || !ev.screenshot.startsWith('data:image'))
+      && (!ev.screenshotBefore || !ev.screenshotBefore.startsWith('data:image'))) return ev;
     try {
-      const match = ev.screenshot.match(/^data:image\/(\w+);base64,(.+)$/s);
-      if (!match) return ev;
-      const [, ext, b64] = match;
-      const filename = `${sessionId}_${ev.timestamp || Date.now()}.${ext}`;
-      const filepath = path.join(screenshotsDir, filename);
-      fs.writeFileSync(filepath, Buffer.from(b64, 'base64'));
-      return { ...ev, screenshot: `/screenshots/${filename}` };
+      const updated = { ...ev };
+      if (ev.screenshot?.startsWith('data:image')) {
+        const url = writeScreenshotFile(sessionId, ev.timestamp, '', ev.screenshot);
+        if (url) updated.screenshot = url;
+      }
+      if (ev.screenshotBefore?.startsWith('data:image')) {
+        const url = writeScreenshotFile(sessionId, ev.timestamp, '_before', ev.screenshotBefore);
+        if (url) updated.screenshotBefore = url;
+      }
+      return updated;
     } catch {
       return ev;
     }
@@ -176,7 +202,8 @@ export function getJourneysByDomain(domain) {
 
   return [...map.entries()].map(([journeyId, pages]) => {
     const sorted = [...pages].sort((a, b) => (a.pageIndex ?? 0) - (b.pageIndex ?? 0));
-    const completed = sorted.some((p) => p.events?.some((e) => e.type === 'form_submit' && !e.failed));
+    const journeyHasFinalFailure = sorted.some(sessionHasFinalSubmissionFailure);
+    const completed = sorted.some(didSessionComplete) && !journeyHasFinalFailure;
     const abandonPage = sorted.find((p) => p.events?.some((e) => e.type === 'form_abandon'));
     return {
       journeyId,
@@ -187,15 +214,24 @@ export function getJourneysByDomain(domain) {
         startTime: p.startTime,
         fieldCount: (p.events || []).filter((e) => e.type === 'field_change').length,
         errorCount: (p.events || []).filter((e) => ['api_error', 'js_error', 'console_error', 'form_error', 'field_error'].includes(e.type)).length,
-        completed: p.events?.some((e) => e.type === 'form_submit' && !e.failed) ?? false,
+        completed: didSessionComplete(p),
         abandoned: p.events?.some((e) => e.type === 'form_abandon') ?? false,
       })),
       startTime: sorted[0]?.startTime ?? 0,
+      // A resumed journey (session_returned) keeps startTime anchored to when it
+      // FIRST began, sometimes hours earlier — sorting "newest first" by startTime
+      // alone sinks a journey with activity happening right now to the bottom of
+      // the list forever. lastActivityTime tracks the most recent event across all
+      // of the journey's pages, so "newest" reflects recency of activity instead.
+      lastActivityTime: Math.max(
+        sorted[0]?.startTime ?? 0,
+        ...sorted.flatMap((p) => (p.events || []).map((e) => e.timestamp || 0)),
+      ),
       pagesVisited: sorted.length,
       completed,
       droppedAtPage: completed ? null : (abandonPage?.pagePath || abandonPage?.formId || null),
     };
-  }).sort((a, b) => b.startTime - a.startTime);
+  }).sort((a, b) => b.lastActivityTime - a.lastActivityTime);
 }
 
 // Group all sessions for ONE form into journeys. A journey = one user's fill of the
@@ -216,11 +252,12 @@ export function getJourneysByFormId(formId) {
 
   return groupSessionsIntoJourneys(sessions).map(({ key: journeyId, members: pageSessions }) => {
     const sorted = [...pageSessions].sort((a, b) => (a.pageIndex ?? 0) - (b.pageIndex ?? 0));
-    const completed = sorted.some((p) => p.events?.some((e) => e.type === 'form_submit' && !e.failed));
+    const journeyHasFinalFailure = sorted.some(sessionHasFinalSubmissionFailure);
+    const completed = sorted.some(didSessionComplete) && !journeyHasFinalFailure;
     // last page (highest pageIndex) that abandoned without completing = where they dropped
     const abandonPage = [...sorted].reverse()
       .find((p) => p.events?.some((e) => e.type === 'form_abandon')
-        && !p.events?.some((e) => e.type === 'form_submit' && !e.failed));
+        && !didSessionComplete(p));
 
     // collect distinct error types + a searchable blob (types, statuses, messages, fields)
     // across the journey so the dashboard can filter/search journeys by error.
@@ -249,18 +286,25 @@ export function getJourneysByFormId(formId) {
           category: sum.category || 'in-progress',
           errorCount: sum.errorCount ?? 0,
           durationMs: sum.durationMs ?? 0,
-          completed: p.events?.some((e) => e.type === 'form_submit' && !e.failed) ?? false,
+          completed: didSessionComplete(p),
           abandoned: p.events?.some((e) => e.type === 'form_abandon') ?? false,
         };
       }),
       startTime: sorted[0]?.startTime ?? 0,
+      // See getJourneysByDomain's lastActivityTime comment — a resumed journey
+      // keeps startTime anchored to when it first began, so "newest first" must
+      // sort by most recent activity, not by first-start time.
+      lastActivityTime: Math.max(
+        sorted[0]?.startTime ?? 0,
+        ...sorted.flatMap((p) => (p.events || []).map((e) => e.timestamp || 0)),
+      ),
       pagesVisited: sorted.length,
       completed,
       droppedAtPage: completed ? null : (abandonPage?.pagePath || abandonPage?.formId || null),
       errorTypes: [...errorTypes],
       searchBlob,
     };
-  }).sort((a, b) => b.startTime - a.startTime);
+  }).sort((a, b) => b.lastActivityTime - a.lastActivityTime);
 }
 
 export function getJourneyStats(domain) {

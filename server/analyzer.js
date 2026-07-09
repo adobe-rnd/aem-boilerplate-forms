@@ -7,11 +7,33 @@ const FRICTION_EVENT_TYPES = new Set([
   'rage_click', 'dead_click', 'disabled_click', 'field_error', 'validation_thrash',
 ]);
 
+export function isFinalSubmissionFailureEvent(event = {}) {
+  const text = [
+    event.statusText,
+    event.message,
+    event.reason,
+    event.responseBody,
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  return /personal loan request could not be submitted|request could not be submitted|could not be submitted|application number\s*not generated|not generated|there seems to be an error in the application|contact nearest branch|try later/.test(text);
+}
+
+export function sessionHasFinalSubmissionFailure(session = {}) {
+  return (session.events || []).some((event) => event.type === 'form_error' && isFinalSubmissionFailureEvent(event));
+}
+
+export function didSessionComplete(session = {}) {
+  return (session.events || []).some((event) => event.type === 'form_submit' && !event.failed)
+    && !sessionHasFinalSubmissionFailure(session);
+}
+
 export function buildSessionSummaries(sessions) {
   return sessions.map((s) => {
     const submitEvent = s.events.find((e) => e.type === 'form_submit');
     const hasSubmit = !!submitEvent;
-    const submitFailed = submitEvent?.failed === true;
+    const submitFailed = s.events.some((e) => e.type === 'form_submit' && e.failed === true)
+      || sessionHasFinalSubmissionFailure(s);
+    const completed = didSessionComplete(s);
     const hasFieldFocus = s.events.some((e) => e.type === 'field_focus');
     const hasFriction = s.events.some((e) => FRICTION_EVENT_TYPES.has(e.type));
     const abandonEvent = s.events.find((e) => e.type === 'form_abandon');
@@ -22,7 +44,7 @@ export function buildSessionSummaries(sessions) {
     let category;
     if (hasSubmit && submitFailed) {
       category = 'submit_error';
-    } else if (hasSubmit) {
+    } else if (completed) {
       category = 'successful';
     } else if (abandonEvent) {
       // Only "viewed only" / "bounced" if the user never interacted AND hit no error.
@@ -70,7 +92,7 @@ export function buildFunnel(sessions) {
   // that were recorded before tracker fixes (e.g. outer wizard panel included)
   const stepsInfo = [...formStartEvents].reverse().find((e) => e.stepsInfo?.length)?.stepsInfo || [];
 
-  const submitted = sessions.filter((s) => s.events.some((e) => e.type === 'form_submit' && !e.failed)).length;
+  const submitted = sessions.filter(didSessionComplete).length;
 
   if (stepsInfo.length > 1) {
     const MAX_FUNNEL = 6;
@@ -78,7 +100,7 @@ export function buildFunnel(sessions) {
     // which causes every abandon to satisfy step.index>=0 for every such panel.
     const rawSteps = stepsInfo.map((step, i) => {
       const count = sessions.filter((s) => {
-        if (s.events.some((e) => e.type === 'form_submit')) return true;
+        if (didSessionComplete(s)) return true;
         const abandon = s.events.find((e) => e.type === 'form_abandon');
         if (abandon) return (abandon.step ?? -1) >= i;
         // Sessions that closed without firing form_abandon: use the highest step reached
@@ -150,7 +172,7 @@ export function buildFunnel(sessions) {
   const completionCounts = new Array(fieldOrder.length).fill(0);
 
   sessions.forEach((s) => {
-    const didSubmit = s.events.some((e) => e.type === 'form_submit' && !e.failed);
+    const didSubmit = didSessionComplete(s);
     const abandon = s.events.find((e) => e.type === 'form_abandon');
 
     let maxIdx = -1;
@@ -433,8 +455,8 @@ function buildCohortContrast(completed, abandoned) {
 
 export function buildFlowComparison(sessions) {
   const real = filterGhostSessions(sessions);
-  const completed = real.filter((s) => s.events.some((e) => e.type === 'form_submit' && !e.failed));
-  const abandoned = real.filter((s) => !s.events.some((e) => e.type === 'form_submit' && !e.failed)
+  const completed = real.filter(didSessionComplete);
+  const abandoned = real.filter((s) => !didSessionComplete(s)
     && s.events.some((e) => e.type === 'field_focus'));
 
   if (completed.length === 0 || abandoned.length === 0) {
@@ -605,7 +627,7 @@ export function buildFlowComparison(sessions) {
   // Summarise one session into an ordered list of the meaningful things the user
   // did — used to show the exact path a user followed across refresh attempts.
   const summarizeSteps = (session) => {
-    const didComplete = session.events.some((e) => e.type === 'form_submit' && !e.failed);
+    const didComplete = didSessionComplete(session);
     const out = [];
     const seenSteps = new Set();
     session.events.forEach((e) => {
@@ -624,7 +646,7 @@ export function buildFlowComparison(sessions) {
         // Only a genuine give-up — suppress false abandons (tab-blur) on sessions
         // that ultimately submitted.
         out.push({ kind: 'end', text: 'Gave up and left' });
-      } else if (e.type === 'form_submit' && !e.failed) {
+      } else if (e.type === 'form_submit' && !e.failed && didComplete) {
         out.push({ kind: 'success', text: 'Submitted successfully' });
       }
     });
@@ -660,7 +682,7 @@ export function buildFlowComparison(sessions) {
     const ordered = [...siblings, s].sort((a, b) => (a.startTime || 0) - (b.startTime || 0));
     const attempts = ordered.map((sess, idx) => ({
       attempt: idx + 1,
-      outcome: sess.events.some((e) => e.type === 'form_submit' && !e.failed) ? 'completed' : 'abandoned',
+      outcome: didSessionComplete(sess) ? 'completed' : 'abandoned',
       steps: summarizeSteps(sess),
     }));
     avoidanceJourneys.push({ journeyId: s.journeyId, attempts });
@@ -792,12 +814,12 @@ export function analyzeSessions(sessions) {
   }
 
   const totalSessions = sessions.length;
-  const completed = sessions.filter((s) => s.events.some((e) => e.type === 'form_submit' && !e.failed)).length;
+  const completed = sessions.filter(didSessionComplete).length;
   const submitErrors = sessions.filter((s) => s.events.some((e) => e.type === 'form_submit' && e.failed)).length;
   // A session is a drop-off if the user engaged (focused a field OR hit a friction/error
   // signal) but never successfully submitted. This includes explicit abandons, failed-submit
   // sessions, and users blocked by an error before they could focus a field.
-  const abandoned = sessions.filter((s) => !s.events.some((e) => e.type === 'form_submit' && !e.failed)
+  const abandoned = sessions.filter((s) => !didSessionComplete(s)
     && (s.events.some((e) => e.type === 'field_focus')
       || s.events.some((e) => FRICTION_EVENT_TYPES.has(e.type)))).length;
   const returned = sessions.filter((s) => s.returned).length;
@@ -914,7 +936,7 @@ export function analyzeSessions(sessions) {
   const abandonmentByStep = {};
   sessions.forEach((s) => {
     const ae = s.events.find((e) => e.type === 'form_abandon');
-    if (!ae || s.events.some((e) => e.type === 'form_submit')) return;
+    if (!ae || didSessionComplete(s)) return;
     if (!s.events.some((e) => e.type === 'field_focus')) return;
     const key = ae.stepName || (ae.step != null ? `Step ${ae.step + 1}` : null);
     if (!key) return;
@@ -930,7 +952,7 @@ export function analyzeSessions(sessions) {
   // that hit a friction/error signal is NOT a passive scan — exclude it.
   const scanOnlySessions = sessions.filter((s) => {
     if (s.events.some((e) => e.type === 'field_focus')) return false;
-    if (s.events.some((e) => e.type === 'form_submit')) return false;
+    if (didSessionComplete(s)) return false;
     if (s.events.some((e) => FRICTION_EVENT_TYPES.has(e.type))) return false;
     return true;
   });
@@ -972,7 +994,7 @@ export function analyzeSessions(sessions) {
   const requiredFieldCount = fieldMetaSrc.filter((m) => m.isRequired).length;
   const requiredRatio = totalFieldCount > 0 ? requiredFieldCount / totalFieldCount : 0;
   const deepAbandons = sessions.filter((s) => {
-    const hasSubmit = s.events.some((e) => e.type === 'form_submit');
+    const hasSubmit = didSessionComplete(s);
     if (hasSubmit) return false;
     const filledFields = new Set(s.events.filter((e) => e.type === 'field_blur' && !e.skipped).map((e) => e.field));
     return totalFieldCount > 0 && filledFields.size / totalFieldCount > 0.5;
@@ -1012,7 +1034,9 @@ export function analyzeSessions(sessions) {
   sessions.forEach((session) => {
     const blurEvents = session.events.filter((e) => e.type === 'field_blur');
     const abandonEvent = session.events.find((e) => e.type === 'form_abandon');
-    const submitEvent = session.events.find((e) => e.type === 'form_submit');
+    const submitEvent = didSessionComplete(session)
+      ? session.events.find((e) => e.type === 'form_submit' && !e.failed)
+      : null;
 
     // label copy events — one count per session per field (not per copy action)
     const labelCopiedFields = new Set(
@@ -1150,7 +1174,7 @@ export function analyzeSessions(sessions) {
     const d = s.device || 'desktop';
     if (!deviceBreakdown[d]) deviceBreakdown[d] = { total: 0, completed: 0, abandoned: 0 };
     deviceBreakdown[d].total += 1;
-    if (s.events.some((e) => e.type === 'form_submit' && !e.failed)) deviceBreakdown[d].completed += 1;
+    if (didSessionComplete(s)) deviceBreakdown[d].completed += 1;
     else if (s.events.some((e) => e.type === 'form_abandon') && s.events.some((e) => e.type === 'field_focus')) deviceBreakdown[d].abandoned += 1;
   });
 
@@ -1166,7 +1190,7 @@ export function analyzeSessions(sessions) {
       };
     }
     map[key].total += 1;
-    if (s.events.some((e) => e.type === 'form_submit' && !e.failed)) map[key].completed += 1;
+    if (didSessionComplete(s)) map[key].completed += 1;
     else if (s.events.some((e) => e.type === 'form_abandon') && s.events.some((e) => e.type === 'field_focus')) map[key].abandoned += 1;
     if (hasError(s)) map[key].withError += 1;
   };
@@ -1319,7 +1343,7 @@ export function buildTimeline(sessions, sinceTs, untilTs) {
     if (!map[key]) map[key] = empty();
     const b = map[key];
     b.sessions += 1;
-    const hasSuccessfulSubmit = s.events.some((e) => e.type === 'form_submit' && !e.failed);
+    const hasSuccessfulSubmit = didSessionComplete(s);
     const hasFocus = s.events.some((e) => e.type === 'field_focus');
     const hasError = s.events.some((e) => ERROR_TYPES.has(e.type));
     if (hasSuccessfulSubmit) b.completions += 1;

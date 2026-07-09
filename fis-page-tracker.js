@@ -14,6 +14,12 @@
   'use strict';
 
   const JOURNEY_KEY_PREFIX = 'fis_journey:';
+  // Not scoped by path — lets a same-origin redirect to a different path (no
+  // _fis_jid URL param involved, e.g. a JS-driven redirect rather than a link
+  // click) still hand off the journey via sessionStorage. The per-path key above
+  // can't help there since each path has its own storageKey.
+  const ORIGIN_JOURNEY_KEY = 'fis_journey_origin';
+  const ORIGIN_JOURNEY_TTL_MS = 60 * 1000;
   const JID_PARAM = '_fis_jid';
   const PIDX_PARAM = '_fis_pidx';
   const PREV_SID_PARAM = '_fis_prev_sid';
@@ -49,6 +55,19 @@
     const val = JSON.stringify(obj);
     try { sessionStorage.setItem(storageKey, val); } catch { /* quota */ }
     try { localStorage.setItem(storageKey, val); } catch { /* quota */ }
+    // Same-origin, path-agnostic mirror — see ORIGIN_JOURNEY_KEY comment above.
+    try { sessionStorage.setItem(ORIGIN_JOURNEY_KEY, val); } catch { /* quota */ }
+  }
+
+  function readOriginJourney() {
+    try {
+      const raw = sessionStorage.getItem(ORIGIN_JOURNEY_KEY);
+      if (!raw) return null;
+      sessionStorage.removeItem(ORIGIN_JOURNEY_KEY); // consume — see other trackers
+      const parsed = JSON.parse(raw);
+      if (!parsed.journeyId || (Date.now() - (parsed.savedAt || 0)) > ORIGIN_JOURNEY_TTL_MS) return null;
+      return parsed;
+    } catch { return null; }
   }
 
   function getOrCreateJourney() {
@@ -64,6 +83,14 @@
       const prevSid = urlPrevSid || stored.prevSessionId || null;
       saveJourney(stored.journeyId, pageCount, prevSid);
       return { journeyId: stored.journeyId, pageIndex: pageCount, prevSessionId: prevSid };
+    }
+
+    const originJourney = readOriginJourney();
+    if (originJourney) {
+      const pageCount = originJourney.pageCount + 1;
+      const prevSid = urlPrevSid || originJourney.prevSessionId || null;
+      saveJourney(originJourney.journeyId, pageCount, prevSid);
+      return { journeyId: originJourney.journeyId, pageIndex: pageCount, prevSessionId: prevSid };
     }
 
     if (urlJid) {

@@ -569,6 +569,49 @@ function classifyNetworkError(reason) {
   return 'unknown';
 }
 
+// HDFC's own backend APIs routinely return HTTP 200 while reporting a real failure
+// inside the response body (e.g. panEnquiry.json's "TH99500: Backend Service
+// Provided Unexpected Response", consentreceipts.json's "aemInternalError", or
+// docUpload.json's "AEM-FDM-001-016") — response.ok is true in every one of these
+// cases, so a plain HTTP-status check never sees them. This inspects the body for
+// the error shapes we've actually seen across these endpoints and returns a plain-
+// English description when one matches, or null for a genuinely successful body.
+function extractEmbeddedError(bodyText) {
+  let json;
+  try { json = JSON.parse(bodyText); } catch { return null; }
+  const candidates = [
+    json?.status,
+    ...(Array.isArray(json) ? json.map((e) => e?.status || e) : []),
+    json,
+  ].filter((c) => c && typeof c === 'object');
+
+  for (const c of candidates) {
+    const errorCode = typeof c.errorCode === 'string' ? c.errorCode.trim() : c.errorCode;
+    const errorDesc = (c.errorDesc || c.errorMessage || '').toString().trim();
+    const responseCode = c.responseCode != null ? String(c.responseCode) : null;
+    const statusField = c.status != null ? String(c.status) : null;
+
+    const isFailure = (errorCode && !/^0+$/.test(String(errorCode)))
+      || responseCode === '1'
+      || (statusField && /^[45]\d\d$/.test(statusField))
+      || /does not exist|unable to process|unexpected response|not found|fail|invalid/i.test(errorDesc);
+
+    if (isFailure) {
+      const detail = errorDesc || errorCode || statusField || 'unspecified failure';
+      return {
+        description: `Backend reported a failure despite HTTP 200: ${detail}`,
+        errorCode: errorCode || null,
+        errorDesc: errorDesc || null,
+      };
+    }
+  }
+  return null;
+}
+
+function isFinalSubmissionFailureText(text = '') {
+  return /personal loan request could not be submitted|request could not be submitted|could not be submitted|application number\s*not generated|not generated|there seems to be an error in the application|contact nearest branch|try later/i.test(text);
+}
+
 // ── Screenshot capture ────────────────────────────────────────────────────────
 
 let html2canvasReady = false;
@@ -623,6 +666,14 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
     }
     if (eventType === 'api_error' && context.btnRect) {
       preRects.__btn = context.btnRect;
+    }
+    // action_context: rolling "what was the user just doing" snapshot, used as the
+    // "before" shot for errors that replace the whole screen (form_error/js_error/
+    // console_error) — those errors' own screenshot can no longer show the field or
+    // button that caused them, so this highlights it ahead of time.
+    if (eventType === 'action_context') {
+      if (context.btnRect) preRects.__btn = context.btnRect;
+      else if (context.fieldRect) preRects.__field = context.fieldRect;
     }
 
     // Find images that already failed to load (404) on the live page so
@@ -683,6 +734,26 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
     });
     const ctx = canvas.getContext('2d');
 
+    // Screen-replacing errors (js/console/form) draw a top banner with the error
+    // message. When we know what the user clicked right before it (from the rolling
+    // action-context cache), add it as a second banner line so the "why" is baked
+    // into the image itself, not just a separate dashboard caption.
+    const triggerText = context.triggerLabel
+      ? `${context.triggerKind === 'field' ? 'Focused' : 'Clicked'} "${context.triggerLabel}"${context.triggerStep ? ` at step "${context.triggerStep}"` : ''} right before this`
+      : null;
+    function drawErrorBanner(bg, mainText) {
+      const h = triggerText ? 38 : 24;
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, h);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillText(mainText, 6, 15);
+      if (triggerText) {
+        ctx.font = '8px sans-serif';
+        ctx.fillText(triggerText, 6, 30);
+      }
+    }
+
     if (eventType === 'disabled_click') {
       (context.invalidFields || []).forEach((name) => {
         const r = preRects[name];
@@ -721,27 +792,18 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
     }
 
     if (eventType === 'js_error') {
-      ctx.fillStyle = 'rgba(197,48,48,0.92)';
-      ctx.fillRect(0, 0, canvas.width, 24);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 9px sans-serif';
-      ctx.fillText(`JS ERROR: ${(context.message || 'unknown').slice(0, 90)}`, 6, 15);
+      drawErrorBanner('rgba(197,48,48,0.92)', `JS ERROR: ${(context.message || 'unknown').slice(0, 90)}`);
     }
 
     if (eventType === 'console_error') {
-      ctx.fillStyle = 'rgba(197,48,48,0.92)';
-      ctx.fillRect(0, 0, canvas.width, 24);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 9px sans-serif';
-      ctx.fillText(`CONSOLE ERROR: ${(context.message || 'unknown').slice(0, 85)}`, 6, 15);
+      drawErrorBanner('rgba(197,48,48,0.92)', `CONSOLE ERROR: ${(context.message || 'unknown').slice(0, 85)}`);
     }
 
     if (eventType === 'form_error') {
-      ctx.fillStyle = (context.status || 0) >= 500 ? 'rgba(197,48,48,0.92)' : 'rgba(201,99,0,0.92)';
-      ctx.fillRect(0, 0, canvas.width, 24);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 9px sans-serif';
-      ctx.fillText(`${(context.callType || 'API').toUpperCase()} ERROR ${context.status || ''}: ${(context.statusText || '').slice(0, 70)}`, 6, 15);
+      drawErrorBanner(
+        (context.status || 0) >= 500 ? 'rgba(197,48,48,0.92)' : 'rgba(201,99,0,0.92)',
+        `${(context.callType || 'API').toUpperCase()} ERROR ${context.status || ''}: ${(context.statusText || '').slice(0, 70)}`,
+      );
     }
 
     if (eventType === 'api_error') {
@@ -816,6 +878,25 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
       }
     }
 
+    if (eventType === 'action_context') {
+      const r = preRects.__btn || preRects.__field;
+      if (r && r.bottom >= 0 && r.top <= vpH) {
+        const x = r.left * SCALE;
+        const y = r.top * SCALE;
+        const w = r.width * SCALE;
+        const h = r.height * SCALE;
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(x - 3, y - 3, w + 6, h + 6);
+        const lbl = (context.label || (preRects.__btn ? 'CLICKED' : 'FOCUSED')).slice(0, 20).toUpperCase();
+        ctx.fillStyle = '#2563eb';
+        ctx.fillRect(x - 3, y - 16, lbl.length * 6 + 6, 13);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 8px sans-serif';
+        ctx.fillText(lbl, x, y - 5);
+      }
+    }
+
     return canvas.toDataURL('image/jpeg', 0.85);
   } catch { return null; }
 }
@@ -876,6 +957,19 @@ function trackForm(formEl, serverBaseUrl) {
           },
         });
       }
+    } catch { /* ignore */ }
+
+    // Same-origin mirror of the handoff above, written synchronously so a same-origin
+    // redirect to a different path (no async round-trip to race against) reliably
+    // continues the journey even when the next page's document_start read fires
+    // before the chrome.storage.local write above has landed.
+    try {
+      sessionStorage.setItem(ORIGIN_JOURNEY_KEY, JSON.stringify({
+        journeyId: session.journeyId,
+        pageIndex: session.pageIndex,
+        savedAt: Date.now(),
+        prevSessionId: session.sessionId,
+      }));
     } catch { /* ignore */ }
 
     // If this page was reached via a cross-domain redirect, the previous session
@@ -1179,6 +1273,19 @@ function trackForm(formEl, serverBaseUrl) {
             step: currentStep.index,
             stepName: currentStep.name,
           });
+          // A "thank you" / success panel becoming visible is the form's own rule
+          // engine confirming real completion — a reliable signal independent of
+          // which network mechanism the actual submit call used (fetch, XHR, an
+          // iframe we don't patch, or even a native form POST that bypasses both).
+          // Without this, a genuinely successful submission can be missed entirely
+          // and later reported as abandoned.
+          if (isNowVisible && !wasVisible && /thank.?you/i.test(fieldName)
+            && !session.events.some((e) => e.type === 'form_submit')) {
+            addEvent(session, 'form_submit', { attemptNumber: submitAttempts || 1, viaRuleEngine: true });
+            clearProgress();
+            clearJourney(session.formId);
+            sendToServer(session);
+          }
         } catch { /* ignore */ }
       });
     });
@@ -1203,16 +1310,44 @@ function trackForm(formEl, serverBaseUrl) {
 
     function attachScreenshot(eventType, context) {
       try {
-        if (session.events.some((e) => e.type === eventType && e.screenshot)) return;
-        const capture = () => captureAnnotatedScreenshot(formEl, eventType, context).then((dataUrl) => {
+        const isFinalSubmitFailure = eventType === 'form_error'
+          && isFinalSubmissionFailureText(context?.statusText || context?.message || '');
+        if (!isFinalSubmitFailure && session.events.some((e) => e.type === eventType && e.screenshot)) return;
+        // These error types replace the whole screen, so their OWN screenshot can no
+        // longer show what the user clicked right before it — freeze the rolling
+        // "before" snapshot now (it can be overwritten before capture resolves) and
+        // pass its label into the capture so the AFTER banner shows it too, not just
+        // the dashboard caption.
+        const screenReplacingError = ['form_error', 'api_error', 'js_error', 'console_error'].includes(eventType);
+        const cache = cachedActionScreenshot;
+        const actionShotAge = cache ? Date.now() - cache.time : Infinity;
+        const maxActionAge = isFinalSubmitFailure ? FINAL_ERROR_CONTEXT_MAX_AGE_MS : ACTION_CONTEXT_MAX_AGE_MS;
+        const trigger = screenReplacingError && actionShotAge < maxActionAge ? cache : null;
+        const captureContext = trigger
+          ? {
+            ...context,
+            triggerLabel: trigger.label,
+            triggerKind: trigger.kind,
+            triggerStep: currentStep.name,
+          }
+          : context;
+        const capture = () => captureAnnotatedScreenshot(formEl, eventType, captureContext).then((dataUrl) => {
           if (!dataUrl) return;
           const ev = [...session.events].reverse().find((e) => e.type === eventType && !e.screenshot);
           if (!ev) return;
           ev.screenshot = dataUrl;
+          if (trigger) {
+            ev.screenshotBefore = trigger.dataUrl;
+            // Caption text for the dashboard — "what did they click right before this"
+            // — shown even when the screenshot itself isn't visible/loaded yet.
+            ev.triggeredByLabel = trigger.label;
+            ev.triggeredByKind = trigger.kind;
+          }
           // Screenshots are large (300KB–1MB base64). Persist to sessionStorage
           // without them so we never hit the 5MB quota; the server is the store.
           try {
-            const lean = { ...session, events: session.events.map((e) => (e.screenshot ? { ...e, screenshot: undefined } : e)) };
+            const stripShots = (e) => (e.screenshot ? { ...e, screenshot: undefined, screenshotBefore: undefined } : e);
+            const lean = { ...session, events: session.events.map(stripShots) };
             sessionStorage.setItem(SESSION_KEY, JSON.stringify(lean));
           } catch { /* quota exceeded — skip storage, server copy is authoritative */ }
           // Rewind lastSentIndex to include this event — the event was already sent
@@ -1444,6 +1579,10 @@ function trackForm(formEl, serverBaseUrl) {
       [/\/adobe\/forms\/af\/fileupload\//i, 'file_upload'],
       [/\/adobe\/forms\/af\/captcha\//i, 'captcha'],
       [/\/libs\/granite\/csrf\/token\.json/i, 'csrf'],
+      // HDFC's own PL journey isn't an AEM Adaptive Forms submit — it's a custom
+      // banking API. applyForLoan.json is the call that actually files the
+      // application, so it's the real "submit" moment for this journey.
+      [/\/applyForLoan\.json/i, 'submit'],
     ];
 
     const originalFetch = window.fetch.bind(window);
@@ -1464,7 +1603,29 @@ function trackForm(formEl, serverBaseUrl) {
               status: response.status,
               step: currentStep.index,
             });
+            let embeddedError = null;
             if (response.ok) {
+              try { embeddedError = extractEmbeddedError(await response.clone().text()); } catch { /* ignore */ }
+            }
+            if (response.ok && embeddedError) {
+              // HTTP 200 but the body reports a real failure (e.g. applyForLoan.json
+              // can return 200 with a business-level rejection) — don't record this
+              // as a successful form_submit just because the transport layer was fine.
+              addEvent(session, 'form_error', {
+                callType,
+                status: response.status,
+                statusText: embeddedError.description,
+                responseBody: embeddedError.errorDesc || embeddedError.errorCode,
+                layer: 'backend',
+                url: url.replace(/[?#].*/, '').split('/').slice(-3).join('/'),
+                step: currentStep.index,
+                stepName: currentStep.name,
+              });
+              attachScreenshot('form_error', { callType, status: response.status, statusText: embeddedError.description });
+              if (callType === 'submit') {
+                addEvent(session, 'form_submit', { attemptNumber: submitAttempts, failed: true });
+              }
+            } else if (response.ok) {
               if (callType === 'submit') {
                 addEvent(session, 'form_submit', { attemptNumber: submitAttempts });
                 clearProgress();
@@ -1545,7 +1706,10 @@ function trackForm(formEl, serverBaseUrl) {
           // ── All other fetch calls — catch silent 4xx/5xx and network failures ─
           // Skip static assets, platform infra, the analytics server itself, and extensions
           // so we don't flood the tracker with irrelevant noise.
-          const isStaticAsset = /\.(css|js|mjs|html|png|jpg|jpeg|gif|svg|woff2?|ttf|ico|webp|avif|json)(\?|$)/i.test(url);
+          // Deliberately excludes "json" — HDFC's own business APIs (panEnquiry.json,
+          // consentreceipts.json, docUpload.json, …) all end in .json, so including it
+          // here silently skipped every one of them from failure tracking.
+          const isStaticAsset = /\.(css|js|mjs|html|png|jpg|jpeg|gif|svg|woff2?|ttf|ico|webp|avif)(\?|$)/i.test(url);
           const isAemInfra = /nav\.plain|footer\.plain|metadata\.json|\.plain\.html|\/aem\/|\/scripts\/|\/styles\/|\/fonts\/|\/icons\//i.test(url);
           const isAnalyticsServer = SERVER_BASE && url.startsWith(SERVER_BASE);
           const isExtension = /^(chrome|moz|safari)-extension:\/\//i.test(url);
@@ -1574,6 +1738,26 @@ function trackForm(formEl, serverBaseUrl) {
               });
               attachScreenshot('api_error', { reason, btnRect: triggeredByBtn?.rect || null });
               sendToServer(session);
+            } else {
+              // HTTP 200 doesn't mean success on these APIs — check the body too
+              let bodyText = null;
+              try { bodyText = await response.clone().text(); } catch { /* ignore */ }
+              const embedded = bodyText ? extractEmbeddedError(bodyText) : null;
+              if (embedded) {
+                const triggeredByBtn = lastButtonClick && Date.now() - lastButtonClick.time < 5000 ? lastButtonClick : null;
+                addEvent(session, 'api_error', {
+                  reason: `${embedded.description} — ${shortUrl}`,
+                  errorClass: 'backend_business_error',
+                  status: response.status,
+                  url: shortUrl,
+                  nearestField: getNearestField(),
+                  triggeredBy: triggeredByBtn?.label || null,
+                  step: currentStep.index,
+                  stepName: currentStep.name,
+                });
+                attachScreenshot('api_error', { reason: `${embedded.description} — ${shortUrl}`, btnRect: triggeredByBtn?.rect || null });
+                sendToServer(session);
+              }
             }
             return response;
           } catch (err) {
@@ -1688,11 +1872,20 @@ function trackForm(formEl, serverBaseUrl) {
       const xhrMethod = this._fisMethod || 'GET';
       const isStaticAsset = /\.(css|js|html|png|jpg|jpeg|gif|svg|woff2?|ttf|ico|webp|avif)(\?|$)/i.test(xhrUrl);
       const isAnalyticsServer = SERVER_BASE && xhrUrl.startsWith(SERVER_BASE);
+      // Lifecycle calls (submit/prefill/validate/…) can go out via XHR just as
+      // easily as fetch — without this check here too, a 'submit' call that
+      // happens to use XHR (e.g. applyForLoan.json) never gets recorded as
+      // form_submit, and sendAbandon() then fires a false form_abandon on the
+      // very next pagehide even though the form actually completed successfully.
+      const xhrMatched = FORM_CALL_PATTERNS.find(([pattern]) => pattern.test(xhrUrl));
       if (!isStaticAsset && !isAnalyticsServer && xhrUrl) {
         this.addEventListener('load', () => {
           try {
+            const shortUrl = xhrUrl.replace(/[?#].*/, '').split('/').slice(-3).join('/');
             if (this.status >= 400) {
-              const shortUrl = xhrUrl.replace(/[?#].*/, '').split('/').slice(-3).join('/');
+              if (xhrMatched?.[1] === 'submit') {
+                addEvent(session, 'form_submit', { attemptNumber: submitAttempts, failed: true });
+              }
               addEvent(session, 'api_error', {
                 reason: `HTTP ${this.status} — ${shortUrl}`,
                 url: shortUrl,
@@ -1704,6 +1897,30 @@ function trackForm(formEl, serverBaseUrl) {
                 stepName: currentStep.name,
               });
               sendToServer(session);
+            } else {
+              // HTTP 2xx doesn't mean success on these APIs — check the body too
+              const embedded = extractEmbeddedError(this.responseText || '');
+              if (embedded) {
+                if (xhrMatched?.[1] === 'submit') {
+                  addEvent(session, 'form_submit', { attemptNumber: submitAttempts, failed: true });
+                }
+                addEvent(session, 'api_error', {
+                  reason: `${embedded.description} — ${shortUrl}`,
+                  url: shortUrl,
+                  status: this.status,
+                  method: xhrMethod,
+                  errorClass: 'backend_business_error',
+                  nearestField: getNearestField(),
+                  step: currentStep.index,
+                  stepName: currentStep.name,
+                });
+                sendToServer(session);
+              } else if (xhrMatched?.[1] === 'submit') {
+                addEvent(session, 'form_submit', { attemptNumber: submitAttempts });
+                clearProgress();
+                clearJourney(session.formId);
+                sendToServer(session);
+              }
             }
           } catch { /* ignore */ }
         });
@@ -1891,6 +2108,26 @@ function trackForm(formEl, serverBaseUrl) {
 
     // Track the last button clicked so api_error events can be attributed to it.
     let lastButtonClick = null;
+    // Rolling "before" snapshot, refreshed on every button click (not polled — this
+    // file deliberately avoids timer-based capture, see captureAbandonShot above) so
+    // form_error/js_error/console_error — which replace the whole screen — can still
+    // show what was clicked right before, via attachScreenshot's screenshotBefore.
+    const ACTION_CONTEXT_MAX_AGE_MS = 45000;
+    const FINAL_ERROR_CONTEXT_MAX_AGE_MS = 10 * 60 * 1000;
+    const ACTION_CONTEXT_STORAGE_KEY = 'fis_action_context';
+    let cachedActionScreenshot = (() => {
+      try {
+        const stored = JSON.parse(sessionStorage.getItem(ACTION_CONTEXT_STORAGE_KEY) || localStorage.getItem(ACTION_CONTEXT_STORAGE_KEY) || 'null');
+        if (!stored || !stored.dataUrl || Date.now() - stored.time > FINAL_ERROR_CONTEXT_MAX_AGE_MS) return null;
+        if (stored.journeyId && session.journeyId && stored.journeyId !== session.journeyId) return null;
+        return stored;
+      } catch { return null; }
+    })();
+    function rememberActionScreenshot(action) {
+      cachedActionScreenshot = { ...action, journeyId: session.journeyId || null };
+      try { sessionStorage.setItem(ACTION_CONTEXT_STORAGE_KEY, JSON.stringify(cachedActionScreenshot)); } catch { /* ignore */ }
+      try { localStorage.setItem(ACTION_CONTEXT_STORAGE_KEY, JSON.stringify(cachedActionScreenshot)); } catch { /* ignore */ }
+    }
 
     // Rage click: 3+ clicks on same button within 600ms
     let rageState = { el: null, count: 0, time: 0, fired: false };
@@ -1898,11 +2135,16 @@ function trackForm(formEl, serverBaseUrl) {
       try {
         const target = e.target.closest('button, [role="button"], input[type="submit"]');
         if (!target) return;
-        lastButtonClick = {
-          label: target.textContent?.trim().slice(0, 40) || target.id || target.value || 'button',
-          rect: target.getBoundingClientRect(),
-          time: Date.now(),
-        };
+        const label = target.textContent?.trim().slice(0, 40) || target.id || target.value || 'button';
+        lastButtonClick = { label, rect: target.getBoundingClientRect(), time: Date.now() };
+        addEvent(session, 'button_click', {
+          element: label,
+          step: currentStep.index,
+          stepName: currentStep.name,
+        });
+        captureAnnotatedScreenshot(formEl, 'action_context', { btnRect: lastButtonClick.rect, label }).then((dataUrl) => {
+          if (dataUrl) rememberActionScreenshot({ dataUrl, time: Date.now(), label, kind: 'button' });
+        }).catch(() => {});
         const now = Date.now();
         if (target === rageState.el && now - rageState.time < 600) {
           rageState.count += 1;
@@ -1910,12 +2152,12 @@ function trackForm(formEl, serverBaseUrl) {
           if (rageState.count >= 2 && !rageState.fired) {
             rageState.fired = true;
             addEvent(session, 'rage_click', {
-              element: target.textContent?.trim().slice(0, 40) || target.id || 'button',
+              element: label,
               clicks: rageState.count + 1,
               step: currentStep.index,
               stepName: currentStep.name,
             });
-            attachScreenshot('rage_click', { element: target.textContent?.trim().slice(0, 40) || target.id || 'button' });
+            attachScreenshot('rage_click', { element: label });
           }
         } else {
           rageState = { el: target, count: 0, time: now, fired: false };
@@ -2106,6 +2348,16 @@ function trackForm(formEl, serverBaseUrl) {
             step: currentStep.index,
             stepName: currentStep.name,
           });
+          if (isFinalSubmissionFailureText(text)
+            && !session.events.some((e) => e.type === 'form_submit' && e.failed)) {
+            addEvent(session, 'form_submit', {
+              attemptNumber: submitAttempts,
+              failed: true,
+              source: 'final_ui_failure',
+              step: currentStep.index,
+              stepName: currentStep.name,
+            });
+          }
           attachScreenshot('form_error', { callType: 'ui_message', statusText: text });
           sendToServer(session);
         });

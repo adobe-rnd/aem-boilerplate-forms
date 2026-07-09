@@ -3310,10 +3310,12 @@ body {
 .fis-tl-error .fis-tl-label   { color: #e53e3e; }
 .fis-tl-thrash .fis-tl-label  { color: #e53e3e; font-weight: 700; }
 .fis-tl-rage .fis-tl-label    { color: #e53e3e; font-weight: 600; }
+.fis-tl-dead .fis-tl-label    { color: #b7791f; }
 .fis-tl-step .fis-tl-label    { color: #0070f3; font-weight: 500; }
 .fis-tl-formerr .fis-tl-label { color: #c05621; }
 .fis-tl-jserr .fis-tl-label   { color: #c05621; }
 .fis-tl-focus .fis-tl-label   { color: #888; }
+.fis-tl-click .fis-tl-label   { color: #555; }
 .fis-tl-return .fis-tl-label  { color: #0070f3; font-weight: 500; }
 .fis-tl-info .fis-tl-label    { color: #64748b; }
 
@@ -3532,12 +3534,65 @@ body {
     max-height: 90vh;
 }
 
+.fis-ss-lb-pair {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    max-width: 92vw;
+    max-height: 90vh;
+}
+
+.fis-ss-lb-item {
+    min-width: 0;
+}
+
+.fis-ss-lb-item.hidden {
+    display: none;
+}
+
+.fis-ss-lb-label {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.92);
+    color: #111827;
+    font-size: 12px;
+    font-weight: 700;
+}
+
 .fis-ss-lb-img {
     display: block;
-    max-width: 90vw;
+    max-width: 44vw;
     max-height: 85vh;
     border-radius: 8px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.fis-ss-lb-missing {
+    width: min(44vw, 520px);
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    border: 1px dashed rgba(255,255,255,0.45);
+    border-radius: 8px;
+    background: rgba(15,23,42,0.84);
+    color: rgba(255,255,255,0.86);
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+.fis-ss-lb-missing.hidden,
+.fis-ss-lb-img.hidden {
+    display: none;
+}
+
+.fis-ss-lb-before.hidden + .fis-ss-lb-item .fis-ss-lb-img {
+    max-width: 90vw;
 }
 
 .fis-ss-lb-close {
@@ -3560,6 +3615,18 @@ body {
 
 .fis-ss-lb-close:hover {
     background: #fee2e2;
+}
+
+@media (max-width: 900px) {
+    .fis-ss-lb-pair {
+        flex-direction: column;
+        overflow: auto;
+    }
+
+    .fis-ss-lb-img {
+        max-width: 88vw;
+        max-height: 70vh;
+    }
 }
 
 /* ── Errors & Diagnostics panel ──────────────────────────────────────────── */
@@ -4257,11 +4324,36 @@ body {
     flex-wrap: wrap;
 }
 
+.fis-err-ss-sample {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fis-err-ss-trigger {
+    font-size: 11px;
+    color: #475569;
+    font-style: italic;
+}
+
+.fis-err-ss-pair {
+    display: flex;
+    gap: 6px;
+}
+
 .fis-err-ss-item {
     display: flex;
     flex-direction: column;
     gap: 4px;
     max-width: 200px;
+}
+
+.fis-err-ss-tag {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
 }
 
 .fis-err-ss-thumb {
