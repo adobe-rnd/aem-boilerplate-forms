@@ -4,7 +4,9 @@ import { config } from './config.js';
 import {
   buildSessionSummaries,
   didSessionComplete,
+  filterGhostSessions,
   groupSessionsIntoJourneys,
+  mergeIntoJourneySessions,
   sessionHasFinalSubmissionFailure,
 } from './analyzer.js';
 
@@ -60,6 +62,29 @@ function deduplicateScreenshots(existingEvents, newEvents) {
     counts.set(k, count + 1);
     return ev;
   });
+}
+
+function mergeEventUpdates(existingEvents, newEvents) {
+  const merged = [...existingEvents];
+  newEvents.forEach((ev) => {
+    const matchIdx = merged.findIndex((old) => old.type === ev.type
+      && old.timestamp === ev.timestamp);
+    if (matchIdx < 0) {
+      merged.push(ev);
+      return;
+    }
+    merged[matchIdx] = {
+      ...merged[matchIdx],
+      ...ev,
+      screenshot: ev.screenshot || merged[matchIdx].screenshot,
+      screenshotBefore: ev.screenshotBefore || merged[matchIdx].screenshotBefore,
+    };
+  });
+  return merged;
+}
+
+function isRealJourney(pageSessions) {
+  return filterGhostSessions(mergeIntoJourneySessions(pageSessions)).length > 0;
 }
 
 function ensureDb() {
@@ -147,7 +172,7 @@ export function appendEvents(sessionId, newEvents, meta = null) {
     }
     const deduped = deduplicateScreenshots(existing, incoming);
     const extracted = extractScreenshots(sessionId, deduped);
-    sessions[idx].events = [...existing, ...extracted];
+    sessions[idx].events = mergeEventUpdates(existing, extracted);
     if (meta) Object.assign(sessions[idx], meta);
   } else if (meta) {
     const deduped = deduplicateScreenshots([], newEvents);
@@ -200,7 +225,7 @@ export function getJourneysByDomain(domain) {
     map.get(s.journeyId).push(s);
   });
 
-  return [...map.entries()].map(([journeyId, pages]) => {
+  return [...map.entries()].filter(([, pages]) => isRealJourney(pages)).map(([journeyId, pages]) => {
     const sorted = [...pages].sort((a, b) => (a.pageIndex ?? 0) - (b.pageIndex ?? 0));
     const journeyHasFinalFailure = sorted.some(sessionHasFinalSubmissionFailure);
     const completed = sorted.some(didSessionComplete) && !journeyHasFinalFailure;
@@ -250,7 +275,7 @@ export function getJourneysByFormId(formId) {
     'rage_click', 'dead_click', 'disabled_click', 'suspected_crash', 'storage_quota', 'field_error',
   ]);
 
-  return groupSessionsIntoJourneys(sessions).map(({ key: journeyId, members: pageSessions }) => {
+  return groupSessionsIntoJourneys(sessions).filter(({ members }) => isRealJourney(members)).map(({ key: journeyId, members: pageSessions }) => {
     const sorted = [...pageSessions].sort((a, b) => (a.pageIndex ?? 0) - (b.pageIndex ?? 0));
     const journeyHasFinalFailure = sorted.some(sessionHasFinalSubmissionFailure);
     const completed = sorted.some(didSessionComplete) && !journeyHasFinalFailure;

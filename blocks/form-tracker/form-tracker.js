@@ -235,9 +235,12 @@ function addEvent(session, type, data = {}) {
 async function sendToServer(session) {
   // Guard against concurrent sends (e.g. the periodic flush overlapping an
   // event-driven send). Both would slice from the same lastSentIndex before it
-  // advances, double-posting the same events. Skipped events are picked up by the
-  // next call — the 5s flush guarantees they aren't stranded.
-  if (session.sendInFlight) return;
+  // advances, double-posting the same events. If a screenshot finishes while a
+  // send is open, queue one more pass so the updated event is not stranded.
+  if (session.sendInFlight) {
+    session.sendAgain = true;
+    return;
+  }
   const fromIdx = session.lastSentIndex || 0;
   const newEvents = session.events.slice(fromIdx);
   if (!newEvents.length) return;
@@ -262,7 +265,12 @@ async function sendToServer(session) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    session.lastSentIndex = fromIdx + newEvents.length;
+    session.lastSentIndex = Math.max(session.lastSentIndex || 0, fromIdx + newEvents.length);
+    if (typeof session.resendFromIndex === 'number') {
+      session.lastSentIndex = Math.min(session.lastSentIndex, session.resendFromIndex);
+      session.resendFromIndex = null;
+      session.sendAgain = true;
+    }
     saveSession(session);
   } catch {
     // offline or server not running — queue for retry
@@ -273,6 +281,10 @@ async function sendToServer(session) {
     } catch { /* quota exceeded — discard, tracker continues working */ }
   } finally {
     session.sendInFlight = false;
+    if (session.sendAgain) {
+      session.sendAgain = false;
+      sendToServer(session);
+    }
   }
 }
 
@@ -357,6 +369,12 @@ function restoreProgress(formEl, session) {
 }
 
 
+function rememberInteractionContext(kind, label, rect) {
+  try {
+    window.__FIS_lastInteractionContext = { kind, label, rect, time: Date.now() };
+  } catch { /* ignore */ }
+}
+
 function trackField(fieldEl, session, formEl, getVisibleMs, onScreenshot) {
   const fieldName = fieldEl.name || fieldEl.id || 'unknown';
   let focusVisibleMs = null; // visible-time snapshot taken at focus
@@ -386,6 +404,7 @@ function trackField(fieldEl, session, formEl, getVisibleMs, onScreenshot) {
       idleTotalMs += 1000;
     }, 1000);
 
+    rememberInteractionContext('field', fieldName, fieldEl.getBoundingClientRect());
     addEvent(session, 'field_focus', { field: fieldName, visitCount });
   });
 
@@ -579,6 +598,10 @@ function isFinalSubmissionFailureText(text = '') {
   return /personal loan request could not be submitted|request could not be submitted|could not be submitted|application number\s*not generated|not generated|there seems to be an error in the application|contact nearest branch|try later/i.test(text);
 }
 
+function compactText(text = '') {
+  return String(text || '').trim().replace(/\s+/g, ' ');
+}
+
 // ── Screenshot capture ────────────────────────────────────────────────────────
 
 let html2canvasReady = false;
@@ -606,6 +629,7 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
     const SCALE = Math.min(window.devicePixelRatio || 1, 2);
     const vpW = window.innerWidth;
     const vpH = window.innerHeight;
+    const stripExternalMedia = false;
 
     // Pre-capture all element positions NOW — before html2canvas (which takes 100–500ms).
     // By the time html2canvas resolves, the page may have scrolled or re-rendered,
@@ -660,6 +684,12 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
       windowWidth: vpW,
       windowHeight: vpH,
       onclone: (_doc, clonedEl) => {
+        if (stripExternalMedia) {
+          clonedEl.querySelectorAll('img, picture, source, iframe, video, canvas, object, embed').forEach((el) => el.remove());
+          clonedEl.querySelectorAll('*').forEach((el) => {
+            if (el.style) el.style.backgroundImage = 'none';
+          });
+        }
         // Mask all user-entered values — never expose PII in screenshots
         clonedEl.querySelectorAll('input, textarea').forEach((el) => {
           if (!el.value) return;
@@ -1028,7 +1058,7 @@ export function trackForm(formEl, serverBaseUrl) {
     // that replace the whole screen (form_error/js_error/console_error) can no longer
     // show the trigger in their OWN screenshot, so this is attached as screenshotBefore.
     const ACTION_CONTEXT_MAX_AGE_MS = 45000;
-    const FINAL_ERROR_CONTEXT_MAX_AGE_MS = 10 * 60 * 1000;
+    const FINAL_ERROR_CONTEXT_MAX_AGE_MS = 2 * 60 * 1000;
     const ACTION_CONTEXT_STORAGE_KEY = 'fis_action_context';
     let cachedActionScreenshot = (() => {
       try {
@@ -1042,6 +1072,25 @@ export function trackForm(formEl, serverBaseUrl) {
       cachedActionScreenshot = { ...action, journeyId: session.journeyId || null };
       try { sessionStorage.setItem(ACTION_CONTEXT_STORAGE_KEY, JSON.stringify(cachedActionScreenshot)); } catch { /* ignore */ }
       try { localStorage.setItem(ACTION_CONTEXT_STORAGE_KEY, JSON.stringify(cachedActionScreenshot)); } catch { /* ignore */ }
+    }
+    async function getFallbackTriggerContext() {
+      try {
+        const cache = cachedActionScreenshot;
+        const actionShotAge = cache ? Date.now() - cache.time : Infinity;
+        const maxActionAge = ACTION_CONTEXT_MAX_AGE_MS;
+        if (cache && actionShotAge < maxActionAge) return cache;
+        const interaction = window.__FIS_lastInteractionContext;
+        if (!interaction || Date.now() - interaction.time > maxActionAge) return null;
+        const context = interaction.kind === 'button'
+          ? { btnRect: interaction.rect, label: interaction.label }
+          : { fieldRect: interaction.rect, label: interaction.label };
+        const dataUrl = await captureAnnotatedScreenshot(formEl, 'action_context', context);
+        if (dataUrl) {
+          rememberActionScreenshot({ dataUrl, time: Date.now(), label: interaction.label, kind: interaction.kind });
+          return cachedActionScreenshot;
+        }
+      } catch { /* ignore */ }
+      return null;
     }
     function scheduleActionScreenshotCache() {
       const capture = () => {
@@ -1302,12 +1351,8 @@ export function trackForm(formEl, serverBaseUrl) {
           // iframe we don't patch, or even a native form POST that bypasses both).
           // Without this, a genuinely successful submission can be missed entirely
           // and later reported as abandoned.
-          if (isNowVisible && !wasVisible && /thank.?you/i.test(fieldName)
-            && !session.events.some((e) => e.type === 'form_submit')) {
-            addEvent(session, 'form_submit', { attemptNumber: submitAttempts || 1, viaRuleEngine: true });
-            clearProgress();
-            clearJourney(session.formId);
-            sendToServer(session);
+          if (isNowVisible && !wasVisible && /thank.?you/i.test(fieldName)) {
+            recordSubmitOutcomeFromPanel(wrapper, 'thank_you_fragment');
           }
         } catch { /* ignore */ }
       });
@@ -1322,10 +1367,47 @@ export function trackForm(formEl, serverBaseUrl) {
     let abandonSent = false;
     let submitAttempts = 0;
 
+    function recordSubmitOutcomeFromPanel(panel, source = 'submit_panel') {
+      window.setTimeout(() => {
+        try {
+          const text = compactText(panel?.textContent || document.body?.textContent || '').slice(0, 500);
+          if (isFinalSubmissionFailureText(text)) {
+            if (!session.events.some((e) => e.type === 'form_error' && isFinalSubmissionFailureText(e.statusText || e.message || ''))) {
+              addEvent(session, 'form_error', {
+                callType: 'ui_message',
+                statusText: text.slice(0, 300),
+                nearestField: getNearestField(),
+                step: currentStep.index,
+                stepName: currentStep.name,
+              });
+            }
+            if (!session.events.some((e) => e.type === 'form_submit' && e.failed)) {
+              addEvent(session, 'form_submit', {
+                attemptNumber: submitAttempts || 1,
+                failed: true,
+                source: 'final_ui_failure',
+                step: currentStep.index,
+                stepName: currentStep.name,
+              });
+            }
+            attachScreenshot('form_error', { callType: 'ui_message', statusText: text.slice(0, 300) });
+            sendToServer(session);
+            return;
+          }
+          if (!session.events.some((e) => e.type === 'form_submit')) {
+            addEvent(session, 'form_submit', { attemptNumber: submitAttempts || 1, viaRuleEngine: true, source });
+            clearProgress();
+            clearJourney(session.formId);
+            sendToServer(session);
+          }
+        } catch { /* ignore */ }
+      }, 800);
+    }
+
     // attach a screenshot to the most recently added event of the given type.
     // Only one screenshot is captured per event type per session to avoid data bloat —
     // repeated firings are counted in the analytics timeline, not re-screenshotted.
-    function attachScreenshot(eventType, context) {
+    async function attachScreenshot(eventType, context) {
       try {
         const isFinalSubmitFailure = eventType === 'form_error'
           && isFinalSubmissionFailureText(context?.statusText || context?.message || '');
@@ -1344,7 +1426,17 @@ export function trackForm(formEl, serverBaseUrl) {
         const cache = cachedActionScreenshot;
         const actionShotAge = cache ? Date.now() - cache.time : Infinity;
         const maxActionAge = isFinalSubmitFailure ? FINAL_ERROR_CONTEXT_MAX_AGE_MS : ACTION_CONTEXT_MAX_AGE_MS;
-        const trigger = screenReplacingError && actionShotAge < maxActionAge ? cache : null;
+        const latestClick = window.__FIS_lastButtonClick || null;
+        const cacheMatchesLatestClick = !isFinalSubmitFailure
+          || !latestClick
+          || cache?.time >= (latestClick.time - 250);
+        let trigger = null;
+        if (screenReplacingError && !isFinalSubmitFailure) {
+          trigger = actionShotAge < maxActionAge && cacheMatchesLatestClick ? cache : null;
+          if (!trigger) {
+            trigger = await getFallbackTriggerContext();
+          }
+        }
         const captureContext = trigger
           ? {
             ...context,
@@ -1372,12 +1464,18 @@ export function trackForm(formEl, serverBaseUrl) {
             const lean = { ...session, events: session.events.map(stripShots) };
             sessionStorage.setItem(SESSION_KEY, JSON.stringify(lean));
           } catch { /* quota exceeded — skip storage, server copy is authoritative */ }
-          // Rewind lastSentIndex to include this event — the event was already sent
-          // without a screenshot (sendToServer ran before html2canvas resolved), so
-          // we need to re-send it with the screenshot attached.
+          // The event may already be sent, or the original send may still be in
+          // flight. Mark the event index for resend so the server receives the
+          // screenshot and screenshotBefore once capture finishes.
           const evIdx = session.events.indexOf(ev);
-          if (evIdx >= 0 && evIdx < (session.lastSentIndex || 0)) {
-            session.lastSentIndex = evIdx;
+          if (evIdx >= 0) {
+            session.resendFromIndex = Math.min(
+              typeof session.resendFromIndex === 'number' ? session.resendFromIndex : evIdx,
+              evIdx,
+            );
+            if (evIdx < (session.lastSentIndex || 0)) {
+              session.lastSentIndex = evIdx;
+            }
           }
           sendToServer(session);
         }).catch(() => {});
@@ -2319,11 +2417,13 @@ export function trackForm(formEl, serverBaseUrl) {
         const target = e.target.closest('button, [role="button"], input[type="submit"]');
         if (!target) return;
         const label = target.textContent?.trim().slice(0, 40) || target.id || target.value || 'button';
+        const rect = target.getBoundingClientRect();
         window.__FIS_lastButtonClick = {
           label,
-          rect: target.getBoundingClientRect(),
+          rect,
           time: Date.now(),
         };
+        rememberInteractionContext('button', label, rect);
         addEvent(session, 'button_click', {
           element: label,
           step: currentStep.index,

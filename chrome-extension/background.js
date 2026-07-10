@@ -2,7 +2,19 @@
 // Injected scripts run in the page's context and are blocked by the page's CSP.
 // Background workers have no such restriction and can reach localhost freely.
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'FIS_CAPTURE_VISIBLE_TAB') {
+    const windowId = sender.tab?.windowId;
+    chrome.tabs.captureVisibleTab(windowId, { format: 'jpeg', quality: 85 }, (dataUrl) => {
+      if (chrome.runtime.lastError) {
+        sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+        return;
+      }
+      sendResponse({ ok: true, dataUrl });
+    });
+    return true;
+  }
+
   if (message.type !== 'FIS_FETCH') return false;
 
   const { url, body } = message;

@@ -3110,6 +3110,7 @@ body {
 
 .fis-jc-success    .fis-jc-dot { background: #38a169; }
 .fis-jc-abandoned  .fis-jc-dot { background: #e53e3e; }
+.fis-jc-submiterr  .fis-jc-dot { background: #c05621; }
 .fis-jc-bounced    .fis-jc-dot { background: #dd6b20; }
 .fis-jc-scan       .fis-jc-dot { background: #0070f3; }
 .fis-jc-inprogress .fis-jc-dot { background: #888; }
@@ -3141,6 +3142,7 @@ body {
 
 .fis-journey-page-row.fis-session-success    { border-left-color: #38a169; }
 .fis-journey-page-row.fis-session-abandoned  { border-left-color: #e53e3e; }
+.fis-journey-page-row.fis-session-submiterr  { border-left-color: #c05621; }
 .fis-journey-page-row.fis-session-bounced    { border-left-color: #dd6b20; }
 .fis-journey-page-row.fis-session-scan       { border-left-color: #0070f3; }
 .fis-journey-page-row.fis-session-inprogress { border-left-color: #888; }
@@ -3302,6 +3304,21 @@ body {
     line-height: 1.3;
 }
 
+.fis-tl-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 18px;
+    padding: 0 6px;
+    margin-left: 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 11px;
+    font-weight: 700;
+}
+
 .fis-tl-start .fis-tl-label   { color: #38a169; font-weight: 600; }
 .fis-tl-submit .fis-tl-label      { color: #38a169; font-weight: 700; }
 .fis-tl-submit-fail .fis-tl-label { color: #e53e3e; font-weight: 700; }
@@ -3318,6 +3335,10 @@ body {
 .fis-tl-click .fis-tl-label   { color: #555; }
 .fis-tl-return .fis-tl-label  { color: #0070f3; font-weight: 500; }
 .fis-tl-info .fis-tl-label    { color: #64748b; }
+
+.fis-tl-submit-fail-card {
+    border-left-color: #e53e3e;
+}
 
 /* ── Multi-page journey divider ─────────────────────────────────────────── */
 
@@ -3567,28 +3588,6 @@ body {
     max-height: 85vh;
     border-radius: 8px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-
-.fis-ss-lb-missing {
-    width: min(44vw, 520px);
-    min-height: 260px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    border: 1px dashed rgba(255,255,255,0.45);
-    border-radius: 8px;
-    background: rgba(15,23,42,0.84);
-    color: rgba(255,255,255,0.86);
-    font-size: 14px;
-    line-height: 1.4;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-}
-
-.fis-ss-lb-missing.hidden,
-.fis-ss-lb-img.hidden {
-    display: none;
 }
 
 .fis-ss-lb-before.hidden + .fis-ss-lb-item .fis-ss-lb-img {

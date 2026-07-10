@@ -7,6 +7,11 @@ const FRICTION_EVENT_TYPES = new Set([
   'rage_click', 'dead_click', 'disabled_click', 'field_error', 'validation_thrash',
 ]);
 
+const SUMMARY_ERROR_EVENT_TYPES = new Set([
+  'field_error', 'form_error', 'api_error', 'js_error', 'console_error',
+  'rule_failed', 'suspected_crash', 'storage_quota',
+]);
+
 export function isFinalSubmissionFailureEvent(event = {}) {
   const text = [
     event.statusText,
@@ -19,11 +24,15 @@ export function isFinalSubmissionFailureEvent(event = {}) {
 }
 
 export function sessionHasFinalSubmissionFailure(session = {}) {
-  return (session.events || []).some((event) => event.type === 'form_error' && isFinalSubmissionFailureEvent(event));
+  return (session.events || []).some((event) => (event.type === 'form_error' && isFinalSubmissionFailureEvent(event))
+    || (event.type === 'form_submit' && event.failed && event.source === 'final_ui_failure'));
 }
 
 export function didSessionComplete(session = {}) {
-  return (session.events || []).some((event) => event.type === 'form_submit' && !event.failed)
+  const submitEvents = (session.events || []).filter((event) => event.type === 'form_submit');
+  const lastSubmit = submitEvents[submitEvents.length - 1];
+  return !!lastSubmit
+    && !lastSubmit.failed
     && !sessionHasFinalSubmissionFailure(session);
 }
 
@@ -37,7 +46,8 @@ export function buildSessionSummaries(sessions) {
     const hasFieldFocus = s.events.some((e) => e.type === 'field_focus');
     const hasFriction = s.events.some((e) => FRICTION_EVENT_TYPES.has(e.type));
     const abandonEvent = s.events.find((e) => e.type === 'form_abandon');
-    const errorCount = s.events.filter((e) => e.type === 'field_error').length;
+    const errorCount = s.events.filter((e) => SUMMARY_ERROR_EVENT_TYPES.has(e.type)
+      || (e.type === 'form_submit' && e.failed === true)).length;
     const thrashFields = [...new Set(s.events.filter((e) => e.type === 'validation_thrash').map((e) => e.field))];
     const lastEvent = s.events[s.events.length - 1];
 

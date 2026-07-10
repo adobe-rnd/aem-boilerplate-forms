@@ -275,9 +275,12 @@ function postToServer(url, body) {
 async function sendToServer(session) {
   // Guard against concurrent sends (e.g. the periodic flush overlapping an
   // event-driven send). Both would slice from the same lastSentIndex before it
-  // advances, double-posting the same events. Skipped events are picked up by the
-  // next call — the 5s flush guarantees they aren't stranded.
-  if (session.sendInFlight) return;
+  // advances, double-posting the same events. If a screenshot finishes while a
+  // send is open, queue one more pass so the updated event is not stranded.
+  if (session.sendInFlight) {
+    session.sendAgain = true;
+    return;
+  }
   const fromIdx = session.lastSentIndex || 0;
   const newEvents = session.events.slice(fromIdx);
   if (!newEvents.length) return;
@@ -304,7 +307,12 @@ async function sendToServer(session) {
     session.sendInFlight = false;
   }
   if (ok) {
-    session.lastSentIndex = fromIdx + newEvents.length;
+    session.lastSentIndex = Math.max(session.lastSentIndex || 0, fromIdx + newEvents.length);
+    if (typeof session.resendFromIndex === 'number') {
+      session.lastSentIndex = Math.min(session.lastSentIndex, session.resendFromIndex);
+      session.resendFromIndex = null;
+      session.sendAgain = true;
+    }
     saveSession(session);
   } else {
     try {
@@ -312,6 +320,10 @@ async function sendToServer(session) {
       pending.push(payload);
       localStorage.setItem('fis_pending', JSON.stringify(pending));
     } catch { /* quota exceeded — discard, tracker continues working */ }
+  }
+  if (session.sendAgain) {
+    session.sendAgain = false;
+    sendToServer(session);
   }
 }
 
@@ -389,6 +401,12 @@ function restoreProgress(formEl, session) {
 }
 
 
+function rememberInteractionContext(kind, label, rect) {
+  try {
+    window.__FIS_lastInteractionContext = { kind, label, rect, time: Date.now() };
+  } catch { /* ignore */ }
+}
+
 function trackField(fieldEl, session, formEl, getVisibleMs, onScreenshot) {
   const fieldName = fieldEl.name || fieldEl.id || 'unknown';
   let focusVisibleMs = null; // visible-time snapshot taken at focus
@@ -418,6 +436,7 @@ function trackField(fieldEl, session, formEl, getVisibleMs, onScreenshot) {
       idleTotalMs += 1000;
     }, 1000);
 
+    rememberInteractionContext('field', fieldName, fieldEl.getBoundingClientRect());
     addEvent(session, 'field_focus', { field: fieldName, visitCount });
   });
 
@@ -612,6 +631,24 @@ function isFinalSubmissionFailureText(text = '') {
   return /personal loan request could not be submitted|request could not be submitted|could not be submitted|application number\s*not generated|not generated|there seems to be an error in the application|contact nearest branch|try later/i.test(text);
 }
 
+function compactText(text = '') {
+  return String(text || '').trim().replace(/\s+/g, ' ');
+}
+
+function captureVisibleTabScreenshot() {
+  return new Promise((resolve) => {
+    try {
+      if (!chrome?.runtime?.sendMessage) { resolve(null); return; }
+      chrome.runtime.sendMessage({ type: 'FIS_CAPTURE_VISIBLE_TAB' }, (response) => {
+        if (chrome.runtime.lastError) { resolve(null); return; }
+        resolve(response?.ok && response.dataUrl ? response.dataUrl : null);
+      });
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
 // ── Screenshot capture ────────────────────────────────────────────────────────
 
 let html2canvasReady = false;
@@ -630,11 +667,21 @@ function loadHtml2Canvas() {
 async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
   try {
     await loadHtml2Canvas();
-    if (!window.html2canvas) return null;
+    const isFinalSubmitFailure = eventType === 'form_error'
+      && isFinalSubmissionFailureText(context.statusText || context.message || '');
+    if (isFinalSubmitFailure) {
+      const browserShot = await captureVisibleTabScreenshot();
+      if (browserShot) return browserShot;
+    }
+    if (!window.html2canvas) {
+      if (eventType === 'action_context') return captureVisibleTabScreenshot();
+      return null;
+    }
     // use device pixel ratio for sharp screenshots on retina screens, capped at 2×
     const SCALE = Math.min(window.devicePixelRatio || 1, 2);
     const vpW = window.innerWidth;
     const vpH = window.innerHeight;
+    const stripExternalMedia = false;
 
     // Pre-capture all element positions NOW — before html2canvas (which takes 100–500ms).
     // By the time html2canvas resolves, the page may have scrolled or re-rendered,
@@ -699,6 +746,12 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
       windowWidth: vpW,
       windowHeight: vpH,
       onclone: (_doc, clonedEl) => {
+        if (stripExternalMedia) {
+          clonedEl.querySelectorAll('img, picture, source, iframe, video, canvas, object, embed').forEach((el) => el.remove());
+          clonedEl.querySelectorAll('*').forEach((el) => {
+            if (el.style) el.style.backgroundImage = 'none';
+          });
+        }
         // Mask all user-entered values — never expose PII in screenshots
         clonedEl.querySelectorAll('input, textarea').forEach((el) => {
           if (!el.value) return;
@@ -1279,12 +1332,8 @@ function trackForm(formEl, serverBaseUrl) {
           // iframe we don't patch, or even a native form POST that bypasses both).
           // Without this, a genuinely successful submission can be missed entirely
           // and later reported as abandoned.
-          if (isNowVisible && !wasVisible && /thank.?you/i.test(fieldName)
-            && !session.events.some((e) => e.type === 'form_submit')) {
-            addEvent(session, 'form_submit', { attemptNumber: submitAttempts || 1, viaRuleEngine: true });
-            clearProgress();
-            clearJourney(session.formId);
-            sendToServer(session);
+          if (isNowVisible && !wasVisible && /thank.?you/i.test(fieldName)) {
+            recordSubmitOutcomeFromPanel(wrapper, 'thank_you_fragment');
           }
         } catch { /* ignore */ }
       });
@@ -1298,6 +1347,43 @@ function trackForm(formEl, serverBaseUrl) {
 
     let abandonSent = false;
     let submitAttempts = 0;
+
+    function recordSubmitOutcomeFromPanel(panel, source = 'submit_panel') {
+      window.setTimeout(() => {
+        try {
+          const text = compactText(panel?.textContent || document.body?.textContent || '').slice(0, 500);
+          if (isFinalSubmissionFailureText(text)) {
+            if (!session.events.some((e) => e.type === 'form_error' && isFinalSubmissionFailureText(e.statusText || e.message || ''))) {
+              addEvent(session, 'form_error', {
+                callType: 'ui_message',
+                statusText: text.slice(0, 300),
+                nearestField: getNearestField(),
+                step: currentStep.index,
+                stepName: currentStep.name,
+              });
+            }
+            if (!session.events.some((e) => e.type === 'form_submit' && e.failed)) {
+              addEvent(session, 'form_submit', {
+                attemptNumber: submitAttempts || 1,
+                failed: true,
+                source: 'final_ui_failure',
+                step: currentStep.index,
+                stepName: currentStep.name,
+              });
+            }
+            attachScreenshot('form_error', { callType: 'ui_message', statusText: text.slice(0, 300) });
+            sendToServer(session);
+            return;
+          }
+          if (!session.events.some((e) => e.type === 'form_submit')) {
+            addEvent(session, 'form_submit', { attemptNumber: submitAttempts || 1, viaRuleEngine: true, source });
+            clearProgress();
+            clearJourney(session.formId);
+            sendToServer(session);
+          }
+        } catch { /* ignore */ }
+      }, 800);
+    }
 
     // attach a screenshot to the most recently added event of the given type.
     // Only one screenshot is captured per event type per session to avoid data bloat —
@@ -1319,19 +1405,29 @@ function trackForm(formEl, serverBaseUrl) {
         // pass its label into the capture so the AFTER banner shows it too, not just
         // the dashboard caption.
         const screenReplacingError = ['form_error', 'api_error', 'js_error', 'console_error'].includes(eventType);
-        const cache = cachedActionScreenshot;
-        const actionShotAge = cache ? Date.now() - cache.time : Infinity;
-        const maxActionAge = isFinalSubmitFailure ? FINAL_ERROR_CONTEXT_MAX_AGE_MS : ACTION_CONTEXT_MAX_AGE_MS;
-        const trigger = screenReplacingError && actionShotAge < maxActionAge ? cache : null;
-        const captureContext = trigger
-          ? {
-            ...context,
-            triggerLabel: trigger.label,
-            triggerKind: trigger.kind,
-            triggerStep: currentStep.name,
+        const capture = async () => {
+          const cache = cachedActionScreenshot;
+          const actionShotAge = cache ? Date.now() - cache.time : Infinity;
+          const maxActionAge = isFinalSubmitFailure ? FINAL_ERROR_CONTEXT_MAX_AGE_MS : ACTION_CONTEXT_MAX_AGE_MS;
+          const cacheMatchesLatestClick = !isFinalSubmitFailure
+            || !lastButtonClick
+            || cache?.time >= (lastButtonClick.time - 250);
+          let trigger = null;
+          if (screenReplacingError && !isFinalSubmitFailure) {
+            trigger = actionShotAge < maxActionAge && cacheMatchesLatestClick ? cache : null;
+            if (!trigger) {
+              trigger = await getFallbackTriggerContext();
+            }
           }
-          : context;
-        const capture = () => captureAnnotatedScreenshot(formEl, eventType, captureContext).then((dataUrl) => {
+          const captureContext = trigger
+            ? {
+              ...context,
+              triggerLabel: trigger.label,
+              triggerKind: trigger.kind,
+              triggerStep: currentStep.name,
+            }
+            : context;
+          const dataUrl = await captureAnnotatedScreenshot(formEl, eventType, captureContext);
           if (!dataUrl) return;
           const ev = [...session.events].reverse().find((e) => e.type === eventType && !e.screenshot);
           if (!ev) return;
@@ -1350,15 +1446,21 @@ function trackForm(formEl, serverBaseUrl) {
             const lean = { ...session, events: session.events.map(stripShots) };
             sessionStorage.setItem(SESSION_KEY, JSON.stringify(lean));
           } catch { /* quota exceeded — skip storage, server copy is authoritative */ }
-          // Rewind lastSentIndex to include this event — the event was already sent
-          // without a screenshot (sendToServer ran before html2canvas resolved), so
-          // we need to re-send it with the screenshot attached.
+          // The event may already be sent, or the original send may still be in
+          // flight. Mark the event index for resend so the server receives the
+          // screenshot and screenshotBefore once capture finishes.
           const evIdx = session.events.indexOf(ev);
-          if (evIdx >= 0 && evIdx < (session.lastSentIndex || 0)) {
-            session.lastSentIndex = evIdx;
+          if (evIdx >= 0) {
+            session.resendFromIndex = Math.min(
+              typeof session.resendFromIndex === 'number' ? session.resendFromIndex : evIdx,
+              evIdx,
+            );
+            if (evIdx < (session.lastSentIndex || 0)) {
+              session.lastSentIndex = evIdx;
+            }
           }
           sendToServer(session);
-        }).catch(() => {});
+        };
         if (SETTLE_TYPES.has(eventType)) setTimeout(capture, SETTLE_DELAY_MS);
         else capture();
       } catch { /* ignore */ }
@@ -2113,7 +2215,7 @@ function trackForm(formEl, serverBaseUrl) {
     // form_error/js_error/console_error — which replace the whole screen — can still
     // show what was clicked right before, via attachScreenshot's screenshotBefore.
     const ACTION_CONTEXT_MAX_AGE_MS = 45000;
-    const FINAL_ERROR_CONTEXT_MAX_AGE_MS = 10 * 60 * 1000;
+    const FINAL_ERROR_CONTEXT_MAX_AGE_MS = 2 * 60 * 1000;
     const ACTION_CONTEXT_STORAGE_KEY = 'fis_action_context';
     let cachedActionScreenshot = (() => {
       try {
@@ -2128,6 +2230,25 @@ function trackForm(formEl, serverBaseUrl) {
       try { sessionStorage.setItem(ACTION_CONTEXT_STORAGE_KEY, JSON.stringify(cachedActionScreenshot)); } catch { /* ignore */ }
       try { localStorage.setItem(ACTION_CONTEXT_STORAGE_KEY, JSON.stringify(cachedActionScreenshot)); } catch { /* ignore */ }
     }
+    async function getFallbackTriggerContext() {
+      try {
+        const cache = cachedActionScreenshot;
+        const actionShotAge = cache ? Date.now() - cache.time : Infinity;
+        const maxActionAge = ACTION_CONTEXT_MAX_AGE_MS;
+        if (cache && actionShotAge < maxActionAge) return cache;
+        const interaction = window.__FIS_lastInteractionContext;
+        if (!interaction || Date.now() - interaction.time > maxActionAge) return null;
+        const context = interaction.kind === 'button'
+          ? { btnRect: interaction.rect, label: interaction.label }
+          : { fieldRect: interaction.rect, label: interaction.label };
+        const dataUrl = await captureAnnotatedScreenshot(formEl, 'action_context', context);
+        if (dataUrl) {
+          rememberActionScreenshot({ dataUrl, time: Date.now(), label: interaction.label, kind: interaction.kind });
+          return cachedActionScreenshot;
+        }
+      } catch { /* ignore */ }
+      return null;
+    }
 
     // Rage click: 3+ clicks on same button within 600ms
     let rageState = { el: null, count: 0, time: 0, fired: false };
@@ -2137,6 +2258,7 @@ function trackForm(formEl, serverBaseUrl) {
         if (!target) return;
         const label = target.textContent?.trim().slice(0, 40) || target.id || target.value || 'button';
         lastButtonClick = { label, rect: target.getBoundingClientRect(), time: Date.now() };
+        rememberInteractionContext('button', label, target.getBoundingClientRect());
         addEvent(session, 'button_click', {
           element: label,
           step: currentStep.index,
@@ -2523,7 +2645,7 @@ function trackForm(formEl, serverBaseUrl) {
       }
     } catch { /* ignore quota/security errors */ }
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      chrome.storage.local.get(['serverUrl', 'pinnedUrls', 'fis_xdomain_journey'], function(result) {
+      chrome.storage.local.get(['serverUrl', 'pinnedUrls', 'fis_xdomain_journey', 'fis_force_tracking'], function(result) {
         if (result.serverUrl) {
           SERVER = result.serverUrl.replace(/\/$/, '');
           SERVER_BASE = SERVER;
@@ -2553,6 +2675,18 @@ function trackForm(formEl, serverBaseUrl) {
           if (xj.prevSessionId) {
             window.__FIS_RETRACT_SESSION_ID = xj.prevSessionId;
           }
+        }
+        // A manual "Start Tracking" is only known to sessionStorage, which doesn't
+        // survive an origin change — so a journey that redirects through an
+        // unpinned third-party domain (KYC/OTP/statement provider) would silently
+        // stop being tracked there. Carry the force forward via extension storage
+        // instead (same 15-min rolling TTL as the journey handoff above), and
+        // refresh it on every page so a long multi-step flow keeps it alive.
+        var ft = result.fis_force_tracking;
+        var forceWithinTTL = ft && (Date.now() - ft.savedAt) < 15 * 60 * 1000;
+        if (forced || forceWithinTTL) {
+          forced = true;
+          chrome.storage.local.set({ fis_force_tracking: { savedAt: Date.now() } });
         }
         var pinned = result.pinnedUrls || [];
         if (forced || pinned.indexOf(location.host) !== -1) {

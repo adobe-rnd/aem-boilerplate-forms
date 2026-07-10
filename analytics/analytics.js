@@ -1616,7 +1616,7 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
         const at = ss.stepName ? ` at step "${esc(ss.stepName)}"` : '';
         if (ss.triggeredByLabel) {
           const verb = ss.triggeredByKind === 'field' ? 'Focused' : 'Clicked';
-          return `${verb} "${esc(ss.triggeredByLabel)}"${at} right before this error`;
+          return `User ${verb.toLowerCase()} "${esc(ss.triggeredByLabel)}"${at} before this error`;
         }
         if (ss.nearestField) return `Occurred near field "${esc(ss.nearestField)}"${at}`;
         if (ss.stepName) return `At step "${esc(ss.stepName)}"`;
@@ -1632,7 +1632,7 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
               <div class="fis-err-ss-pair">
                 ${ss.before ? `
                   <div class="fis-err-ss-item">
-                    <span class="fis-err-ss-tag">Where it happened</span>
+                    <span class="fis-err-ss-tag">Before error</span>
                     <img class="fis-err-ss-thumb" src="${ss.before}" alt="Before error ${i + 1}" title="Click to enlarge" />
                   </div>` : `
                   <div class="fis-err-ss-item">
@@ -2292,6 +2292,7 @@ let allJourneysCache = [];
 const JOURNEY_CAT_META = {
   successful: { cls: 'success', icon: '✓' },
   abandoned: { cls: 'abandoned', icon: '✗' },
+  submit_error: { cls: 'submiterr', icon: '!' },
   bounced: { cls: 'bounced', icon: '↩' },
   'scan-only': { cls: 'scan', icon: '👁' },
   'in-progress': { cls: 'inprogress', icon: '…' },
@@ -2310,7 +2311,8 @@ function mapJourneyCategory(journey) {
   if (journey.completed) return 'successful';
   const pages = [...(journey.pages || [])].sort((a, b) => (a.pageIndex ?? 0) - (b.pageIndex ?? 0));
   const last = pages[pages.length - 1];
-  const lastCat = last?.category === 'submit_error' ? 'abandoned' : last?.category;
+  if (pages.some((p) => p.category === 'submit_error')) return 'submit_error';
+  const lastCat = last?.category;
   if (lastCat === 'bounced') return 'bounced';
   if (lastCat === 'scan-only') return 'scan-only';
   if (journey.droppedAtPage || lastCat === 'abandoned') return 'abandoned';
@@ -2319,6 +2321,7 @@ function mapJourneyCategory(journey) {
 
 function journeyStatusLabel(journey, category) {
   if (category === 'successful') return 'Completed';
+  if (category === 'submit_error') return 'Submission failed';
   if (category === 'abandoned') {
     return journey.droppedAtPage ? `Abandoned at ${shortPath(journey.droppedAtPage)}` : 'Abandoned';
   }
@@ -2380,7 +2383,7 @@ function renderJourneys(journeys, category) {
     });
     const crumbs = [...crumbMap.entries()].map(([path, entry]) => {
       const lastCat = entry.pages[entry.pages.length - 1].category;
-      const pc = lastCat === 'submit_error' ? 'abandoned' : lastCat;
+      const pc = lastCat;
       const dotCls = (JOURNEY_CAT_META[pc] || {}).cls || 'inprogress';
       const errRing = entry.hasError ? ' fis-jc-haserror' : '';
       const badge = entry.pages.length > 1 ? ` ×${entry.pages.length}` : '';
@@ -2393,7 +2396,7 @@ function renderJourneys(journeys, category) {
     const pageRowsHtml = [...crumbMap.entries()].map(([path, entry]) => {
       if (entry.pages.length === 1) {
         const p = entry.pages[0];
-        const pc = p.category === 'submit_error' ? 'abandoned' : p.category;
+        const pc = p.category;
         const rowCls = (JOURNEY_CAT_META[pc] || {}).cls || 'inprogress';
         return `<div class="fis-journey-page-row fis-session-${rowCls}">
             <span class="fis-jpr-path" title="${p.pagePath}">${shortPath(p.pagePath)}</span>
@@ -2406,10 +2409,10 @@ function renderJourneys(journeys, category) {
       const totalVisitDur = entry.pages.reduce((t, p) => t + (p.durationMs || 0), 0);
       const totalVisitErr = entry.pages.reduce((t, p) => t + (p.errorCount || 0), 0);
       const lastCat = entry.pages[entry.pages.length - 1].category;
-      const pc = lastCat === 'submit_error' ? 'abandoned' : lastCat;
+      const pc = lastCat;
       const rowCls = (JOURNEY_CAT_META[pc] || {}).cls || 'inprogress';
       const visitRows = entry.pages.map((p, vi) => {
-        const vc = p.category === 'submit_error' ? 'abandoned' : (p.category || 'in-progress');
+        const vc = p.category || 'in-progress';
         return `<div class="fis-journey-visit-sub">
             <span class="fis-jpr-cat">visit ${vi + 1} · ${vc} · ${durLabel(p.durationMs)}${p.errorCount > 0 ? ` · ${p.errorCount} err` : ''}</span>
           </div>`;
@@ -2493,6 +2496,7 @@ async function loadJourneys(formId, range) {
 // ── Client-side error pattern matching (mirrors server/error-patterns.js) ─────
 
 function isFinalSubmissionFailureEvent(event = {}) {
+  if (event.type === 'form_submit' && event.failed && event.source === 'final_ui_failure') return true;
   const text = [
     event.statusText,
     event.message,
@@ -2590,8 +2594,10 @@ function explainAbandonment(session) {
   const fieldsInteracted = [...new Set(events.filter((e) => e.type === 'field_focus').map((e) => e.field).filter(Boolean))];
   // last abandon = the final exit point, not wherever they first stepped away from
   const abandon = [...events].reverse().find((e) => e.type === 'form_abandon');
-  const hasFinalSubmitFailure = events.some((e) => e.type === 'form_error' && isFinalSubmissionFailureEvent(e));
-  const isSuccess = events.some((e) => e.type === 'form_submit' && !e.failed) && !hasFinalSubmitFailure;
+  const hasFinalSubmitFailure = events.some((e) => isFinalSubmissionFailureEvent(e));
+  const submitEvents = events.filter((e) => e.type === 'form_submit');
+  const lastSubmit = submitEvents[submitEvents.length - 1];
+  const isSuccess = !!lastSubmit && !lastSubmit.failed && !hasFinalSubmitFailure;
   const isSubmitFail = hasFinalSubmitFailure || events.some((e) => e.type === 'form_submit' && e.failed);
   const hasSessionReturned = events.some((e) => e.type === 'session_returned');
 
@@ -2716,6 +2722,14 @@ function eventWhy(e, session) {
   }
 }
 
+function timelineEsc(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 async function showTimeline(sessionId) {
   const res = await fetch(`${API}/session/${sessionId}`).catch(() => null);
   if (!res || !res.ok) return;
@@ -2781,7 +2795,7 @@ async function showTimeline(sessionId) {
 
   const eventMeta = {
     form_start: { icon: '▶', cls: 'start', label: () => 'Form started' },
-    form_submit: { icon: (e) => (e.failed ? '✗' : '✓'), cls: (e) => (e.failed ? 'submit-fail' : 'submit'), label: (e) => (e.failed ? `Submission failed (${e.status || 'error'})` : 'Form submitted') },
+    form_submit: { icon: (e) => (e.failed ? '!' : '✓'), cls: (e) => (e.failed ? 'submit-fail' : 'submit'), label: (e) => (e.failed ? `Submission failed (${e.status || 'error'})` : 'Form submitted') },
     form_abandon: {
       icon: (e) => {
         if (e.switched || e.leftBriefly) return '⇢';
@@ -2807,8 +2821,8 @@ async function showTimeline(sessionId) {
     form_error: { icon: '🚫', cls: 'formerr', label: (e) => `${e.callType} error: ${e.statusText}` },
     api_error: { icon: '🌐', cls: 'formerr', label: (e) => `Network error: ${(e.reason || '').slice(0, 50)}` },
     disabled_click: { icon: '🚷', cls: 'disabled', label: (e) => `Clicked disabled "${e.element}"` },
-    dead_click: { icon: '💀', cls: 'dead', label: (e) => `Dead click on "${e.element}" (no response)` },
-    button_click: { icon: '🖱', cls: 'click', label: (e) => `Clicked "${e.element}"` },
+    dead_click: { icon: '×', cls: 'dead', label: (e) => `Dead click on "${e.element}" (no response)` },
+    button_click: { icon: '•', cls: 'click', label: (e) => `Clicked "${e.element}"` },
     label_copied: { icon: '📋', cls: 'copy', label: (e) => `Copied label: ${e.field}` },
     returned: { icon: '↩', cls: 'return', label: (e) => `Returned (${e.choice})` },
     session_returned: { icon: '↩', cls: 'return', label: () => 'Returned to continue' },
@@ -2927,12 +2941,22 @@ async function showTimeline(sessionId) {
     const COLLAPSIBLE = new Set([...ERROR_TYPES, 'disabled_click', 'rage_click', 'dead_click']);
     const collapsed = [];
     const seenTypes = new Map();
+    const collapseKey = (e) => {
+      if (e.type === 'button_click' || e.type === 'dead_click' || e.type === 'disabled_click' || e.type === 'rage_click') {
+        return `${e.type}:${e.element || e.selector || ''}`;
+      }
+      if (e.type === 'form_error') {
+        return `${e.type}:${e.callType || ''}:${e.status || ''}:${(e.statusText || e.message || '').slice(0, 80)}`;
+      }
+      return e.type;
+    };
 
     // collapse same-type collapsible events
     filtered.forEach((e) => {
       if (COLLAPSIBLE.has(e.type)) {
-        if (seenTypes.has(e.type)) {
-          const existing = seenTypes.get(e.type);
+        const key = collapseKey(e);
+        if (seenTypes.has(key)) {
+          const existing = seenTypes.get(key);
           existing._count += 1;
           if (!existing.screenshot && e.screenshot) {
             existing.screenshot = e.screenshot;
@@ -2948,7 +2972,7 @@ async function showTimeline(sessionId) {
           }
         } else {
           const entry = { ...e, _count: 1 };
-          seenTypes.set(e.type, entry);
+          seenTypes.set(key, entry);
           collapsed.push(entry);
         }
       } else {
@@ -2977,7 +3001,12 @@ async function showTimeline(sessionId) {
       }
     });
 
-    return deduped;
+    return deduped.filter((ev) => {
+      if (ev.type !== 'form_error' || !isFinalSubmissionFailureEvent(ev)) return true;
+      return !deduped.some((other) => other.type === 'form_submit'
+        && other.failed
+        && Math.abs((other.timestamp || 0) - (ev.timestamp || 0)) < 10000);
+    });
   }
 
   // ── Build ordered list of render segments (events or page-dividers) ────
@@ -3034,6 +3063,23 @@ async function showTimeline(sessionId) {
     return null;
   }
 
+  function pairedFinalSubmitScreenshot(e, currentSession) {
+    if (e.type !== 'form_submit' || !e.failed) return null;
+    const finalError = (currentSession?.events || []).find((ev) => ev.type === 'form_error'
+      && ev.screenshot
+      && isFinalSubmissionFailureEvent(ev)
+      && Math.abs((ev.timestamp || 0) - (e.timestamp || 0)) < 10000);
+    if (!finalError) return null;
+    const message = (finalError.statusText || finalError.message || finalError.reason || '').slice(0, 240);
+    return {
+      after: finalError.screenshot,
+      before: finalError.screenshotBefore || null,
+      message,
+      triggeredByKind: finalError.triggeredByKind || null,
+      triggeredByLabel: finalError.triggeredByLabel || null,
+    };
+  }
+
   function isDropoffCausingError(e, sess) {
     if (e.screenshotBefore) return true;
     const idx = (sess.events || []).findIndex((ev) => ev.type === e.type
@@ -3084,20 +3130,21 @@ async function showTimeline(sessionId) {
     const evStartTime = journeyStartTime;
     const offset = Math.max(0, (e.timestamp || 0) - evStartTime);
     const timeStr = `${Math.floor(offset / 60000)}:${String(Math.floor((offset % 60000) / 1000)).padStart(2, '0')}`;
-    const firedBadge = '';
+    const firedBadge = e._count > 1 ? `<span class="fis-tl-count-badge">×${e._count}</span>` : '';
 
     if (ERROR_TYPES.has(e.type)) {
       const diag = diagnoseEventClient(e);
       const badge = (typeof ERROR_BADGE[e.type] === 'function' ? ERROR_BADGE[e.type](e) : ERROR_BADGE[e.type]) || '';
       const rawMsg = (e.message || e.reason || e.statusText || '').slice(0, 160);
       const separateErrorScreen = isSeparateErrorScreen(e);
-      const beforeScreenshot = e.screenshotBefore || (separateErrorScreen ? fallbackBeforeScreenshot(segIdx, evSession) : null);
+      const beforeScreenshot = separateErrorScreen
+        ? (e.screenshotBefore || fallbackBeforeScreenshot(segIdx, evSession))
+        : null;
       const showScreenshot = e.screenshot
         && MAIN_SCREENSHOT_ERROR_TYPES.has(e.type)
         && (isDropoffCausingError(e, evSession) || separateErrorScreen);
-      const showBeforeAndAfter = showScreenshot && separateErrorScreen;
       const viewBtn = showScreenshot
-        ? `<button class="fis-tl-view-btn" data-ss="${e.screenshot}"${showBeforeAndAfter ? ` data-force-pair="1"${beforeScreenshot ? ` data-before="${beforeScreenshot}"` : ''}` : ''}>${showBeforeAndAfter ? 'View Where + Error' : 'View Error Screen'}</button>`
+        ? `<button class="fis-tl-view-btn" data-ss="${e.screenshot}"${beforeScreenshot ? ` data-before="${beforeScreenshot}"` : ''}>${beforeScreenshot ? 'View Before + Error' : 'View Error Screen'}</button>`
         : '';
       const causeHtml = diag
         ? `<div class="fis-tl-err-cause">${diag.cause}</div>
@@ -3154,6 +3201,29 @@ async function showTimeline(sessionId) {
         </div>`;
     }
 
+    const submitFailureScreenshot = pairedFinalSubmitScreenshot(e, evSession);
+    if (e.type === 'form_submit' && e.failed && submitFailureScreenshot) {
+      const triggerVerb = submitFailureScreenshot.triggeredByKind === 'field' ? 'focused' : 'clicked';
+      const triggerLabel = submitFailureScreenshot.triggeredByLabel || 'the last action';
+      const triggerText = submitFailureScreenshot.triggeredByLabel
+        ? `User ${triggerVerb} "${timelineEsc(triggerLabel)}" before this error`
+        : 'After the last recorded action';
+      const viewBtn = `<button class="fis-tl-view-btn" data-ss="${submitFailureScreenshot.after}"${submitFailureScreenshot.before ? ` data-before="${submitFailureScreenshot.before}"` : ''}>${submitFailureScreenshot.before ? 'View Before + Error' : 'View Error Screen'}</button>`;
+      return `
+        <div class="fis-tl-error-card fis-tl-submit-fail-card">
+          <div class="fis-tl-err-header">
+            <div class="fis-tl-err-header-left">
+              <span class="fis-tl-err-badge fis-tl-err-badge-server">Submission failed</span>
+              <span class="fis-tl-err-time">${timeStr}</span>
+              ${firedBadge}
+            </div>
+            ${viewBtn}
+          </div>
+          <div class="fis-tl-err-msg">${timelineEsc(submitFailureScreenshot.message || 'The form showed a final submission failure screen.')}</div>
+          <div class="fis-tl-err-source"><span class="fis-tl-source-label">Before</span>${triggerText}</div>
+        </div>`;
+    }
+
     // regular event — compact row
     const label = meta.label(e);
     const why = eventWhy(e, evSession);
@@ -3164,7 +3234,9 @@ async function showTimeline(sessionId) {
       && ((e.type === 'form_abandon' && !e.switched && !e.leftBriefly)
         || INLINE_SCREENSHOT_TYPES.has(e.type));
     if (showInlineScreenshot) {
-      ssBtn = `<button class="fis-tl-view-btn fis-tl-view-btn-inline" data-ss="${e.screenshot}"${e.screenshotBefore ? ` data-before="${e.screenshotBefore}"` : ''}>${e.screenshotBefore ? 'Where + Error' : 'Screenshot'}</button>`;
+      ssBtn = `<button class="fis-tl-view-btn fis-tl-view-btn-inline" data-ss="${e.screenshot}"${e.screenshotBefore ? ` data-before="${e.screenshotBefore}"` : ''}>${e.screenshotBefore ? 'Before + Error' : 'Screenshot'}</button>`;
+    } else if (submitFailureScreenshot) {
+      ssBtn = `<button class="fis-tl-view-btn fis-tl-view-btn-inline" data-ss="${submitFailureScreenshot.after}"${submitFailureScreenshot.before ? ` data-before="${submitFailureScreenshot.before}"` : ''}>${submitFailureScreenshot.before ? 'Before + Error' : 'Error Screen'}</button>`;
     } else if (e.screenshotDeduped) {
       ssBtn = '<span class="fis-tl-repeated-badge">Repeated error</span>';
     }
@@ -3192,9 +3264,8 @@ async function showTimeline(sessionId) {
         <button class="fis-ss-lb-close">✕</button>
         <div class="fis-ss-lb-pair">
           <div class="fis-ss-lb-item fis-ss-lb-before">
-            <div class="fis-ss-lb-label">Where It Happened</div>
+            <div class="fis-ss-lb-label">Before Error</div>
             <img class="fis-ss-lb-img fis-ss-lb-before-img" src="" alt="Before error" />
-            <div class="fis-ss-lb-missing hidden">Before screenshot was not captured for this older event.</div>
           </div>
           <div class="fis-ss-lb-item">
             <div class="fis-ss-lb-label fis-ss-lb-after-label">Error Screen</div>
@@ -3210,40 +3281,28 @@ async function showTimeline(sessionId) {
   document.getElementById('timelineBody').addEventListener('click', (ev) => {
     const thumb = ev.target.closest('.fis-tl-screenshot-thumb');
     const viewBtn = ev.target.closest('.fis-tl-view-btn');
-    const showLightbox = ({ after, before = '', forcePair = false }) => {
+    const showLightbox = ({ after, before = '' }) => {
       const beforeItem = lightbox.querySelector('.fis-ss-lb-before');
       const beforeImg = lightbox.querySelector('.fis-ss-lb-before-img');
-      const beforeMissing = lightbox.querySelector('.fis-ss-lb-missing');
       const afterImg = lightbox.querySelector('.fis-ss-lb-after-img');
       const afterLabel = lightbox.querySelector('.fis-ss-lb-after-label');
+      // No "before" screenshot means one wasn't captured for this event — show
+      // the error screen alone rather than a placeholder for the missing pane.
       if (before) {
         beforeItem.classList.remove('hidden');
-        beforeImg.classList.remove('hidden');
-        beforeMissing.classList.add('hidden');
         beforeImg.src = before;
-        afterLabel.textContent = 'Error Screen';
-        afterImg.src = after;
-      } else if (forcePair) {
-        beforeItem.classList.remove('hidden');
-        beforeImg.removeAttribute('src');
-        beforeImg.classList.add('hidden');
-        beforeMissing.classList.remove('hidden');
-        afterLabel.textContent = 'Error Screen';
-        afterImg.src = after;
       } else {
-        beforeImg.removeAttribute('src');
-        beforeImg.classList.remove('hidden');
-        beforeMissing.classList.add('hidden');
         beforeItem.classList.add('hidden');
-        afterLabel.textContent = 'Error Screen';
-        afterImg.src = after;
+        beforeImg.removeAttribute('src');
       }
+      afterLabel.textContent = 'Error Screen';
+      afterImg.src = after;
       lightbox.classList.remove('hidden');
     };
     if (thumb) {
       showLightbox({ after: thumb.src });
     } else if (viewBtn) {
-      showLightbox({ after: viewBtn.dataset.ss, before: viewBtn.dataset.before, forcePair: viewBtn.dataset.forcePair === '1' });
+      showLightbox({ after: viewBtn.dataset.ss, before: viewBtn.dataset.before });
     }
   });
 
