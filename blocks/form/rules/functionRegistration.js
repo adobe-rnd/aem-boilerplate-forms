@@ -22,6 +22,47 @@ import { registerFunctions } from './model/afb-runtime.min.js';
 const preloadedUrls = new Set();
 
 /**
+ * Joins codeBasePath and a path into a single URL, collapsing any overlap where the
+ * end of codeBasePath repeats the start of path so a shared mount folder is not
+ * duplicated. The overlap is matched at path-segment boundaries and may span one or
+ * more segments, e.g.:
+ *   resolveFunctionUrl('/a/b/eds-cc', '/eds-cc/blocks/form/functions.js')
+ *     -> '/a/b/eds-cc/blocks/form/functions.js'
+ * An absolute origin in codeBasePath (e.g. https://host) is preserved as-is. Used for
+ * both the modulepreload hint and the actual dynamic import so the two can never
+ * resolve to different URLs.
+ * @param {string} [codeBasePath] - e.g. window.hlx?.codeBasePath
+ * @param {string} path - path to join, with or without a leading slash
+ * @returns {string} the joined URL
+ */
+export function resolveFunctionUrl(codeBasePath, path) {
+  const cbp = typeof codeBasePath === 'string' ? codeBasePath : '';
+  const cfp = (typeof path === 'string' ? path : '').trim();
+  // Keep an absolute origin (scheme://host) out of the segment merge so it is not mangled.
+  const originMatch = cbp.match(/^[a-z][a-z0-9+.-]*:\/\/[^/]+/i);
+  const origin = originMatch ? originMatch[0] : '';
+  const baseSegments = (originMatch ? cbp.slice(origin.length) : cbp).split('/').filter(Boolean);
+  const pathSegments = cfp.split('/').filter(Boolean);
+  // Longest overlap: last `i` segments of codeBasePath === first `i` segments of path.
+  let overlap = 0;
+  for (let i = Math.min(baseSegments.length, pathSegments.length); i >= 1; i -= 1) {
+    let matches = true;
+    for (let j = 0; j < i; j += 1) {
+      if (baseSegments[baseSegments.length - i + j] !== pathSegments[j]) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) {
+      overlap = i;
+      break;
+    }
+  }
+  const merged = [...baseSegments, ...pathSegments.slice(overlap)].join('/');
+  return origin ? `${origin}/${merged}` : `/${merged}`;
+}
+
+/**
  * Preloads script URLs so the browser fetches them once; main and worker
  * then get cache on import(). Call as soon as formDef is available (runtime).
  * customFunctionsPath comes from form JSON (formDef.properties.customFunctionsPath).
@@ -30,13 +71,9 @@ const preloadedUrls = new Set();
  */
 export function preloadFunctionScripts(customFunctionsPath, codeBasePath) {
   if (typeof document === 'undefined' || !document?.head) return;
-  const base = (typeof codeBasePath === 'string' && codeBasePath !== '')
-    ? codeBasePath.replace(/\/$/, '')
-    : '';
-  const prefix = base ? `${base}/` : '/';
-  const paths = [`${prefix}blocks/form/rules/functions.js`];
+  const paths = [resolveFunctionUrl(codeBasePath, 'blocks/form/rules/functions.js')];
   if (typeof customFunctionsPath === 'string' && customFunctionsPath.trim() !== '') {
-    paths.push(`${prefix}${customFunctionsPath.replace(/^\//, '').trim()}`);
+    paths.push(resolveFunctionUrl(codeBasePath, customFunctionsPath));
   }
   paths.forEach((href) => {
     try {
@@ -74,7 +111,8 @@ export default async function registerCustomFunctions(customFunctionsPath, codeB
     registerFunctionsInRuntime(ootbFunctionModule);
     if (codeBasePath != null && codeBasePath !== undefined && customFunctionsPath
       && customFunctionsPath !== undefined) {
-      const customFunctionModule = await import(`${codeBasePath}${customFunctionsPath}`);
+      const customFunctionUrl = resolveFunctionUrl(codeBasePath, customFunctionsPath);
+      const customFunctionModule = await import(customFunctionUrl);
       registerFunctionsInRuntime(customFunctionModule);
     }
   } catch (e) {
