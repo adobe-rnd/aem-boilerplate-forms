@@ -66,7 +66,7 @@ app.get('/fis-page-tracker.js', (_req, res) => {
 // Returns the requested HTTP error code (form_error with status)
 app.all('/adobe/forms/af/submit/test-error/:code', (req, res) => {
   const code = parseInt(req.params.code, 10);
-  const valid = [400, 401, 403, 404, 422, 429, 500, 502, 503, 504];
+  const valid = [400, 401, 403, 404, 409, 413, 422, 429, 500, 502, 503, 504];
   if (!valid.includes(code)) return res.status(400).json({ error: 'Use one of: ' + valid.join(', ') });
   res.status(code).json({ error: `Simulated ${code} error` });
 });
@@ -621,6 +621,13 @@ app.get('/errors/:formId', (req, res) => {
   ]);
   const MAIN_SCREENSHOT_ERROR_TYPES = new Set(['js_error', 'form_error', 'api_error']);
   const CLICK_TYPES = new Set(['rage_click', 'dead_click', 'disabled_click']);
+  const shouldShowBeforeForError = (ev) => {
+    const text = `${ev.statusText || ''} ${ev.message || ''} ${ev.reason || ''}`;
+    // Keep before+after only when the error is a separate terminal/service screen.
+    // Same-page validation messages already show both the issue and location in
+    // the error screenshot itself, so the before screenshot is redundant noise.
+    return /error screen|we are sorry|it's not you|something went wrong|LN\d+|personal loan request could not be submitted|request could not be submitted|application number\s*not generated|permanent account number .* invalid|update your PAN|contact nearest branch|try later/i.test(text);
+  };
   const groups = {};
 
   sessions.forEach((s) => {
@@ -682,8 +689,9 @@ app.get('/errors/:formId', (req, res) => {
         && (CLICK_TYPES.has(ev.type)
           || (MAIN_SCREENSHOT_ERROR_TYPES.has(ev.type) && (ev.screenshotBefore || isBlockingDropoff)));
       if (shouldSampleScreenshot && g.sampleScreenshots.length < 3) {
+        const showBefore = ev.screenshotBefore && shouldShowBeforeForError(ev);
         g.sampleScreenshots.push({
-          before: ev.screenshotBefore || null,
+          before: showBefore ? ev.screenshotBefore : null,
           after: ev.screenshot,
           // triggeredByLabel/Kind come only from sessions recorded with the newer
           // tracker. nearestField has been recorded on error events for a long

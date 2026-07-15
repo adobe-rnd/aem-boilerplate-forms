@@ -20,7 +20,7 @@
   // can't help there since each path has its own storageKey.
   const ORIGIN_JOURNEY_KEY = 'fis_journey_origin';
   const ORIGIN_JOURNEY_TTL_MS = 60 * 1000;
-  const JID_PARAM = '_fis_jid';z
+  const JID_PARAM = '_fis_jid';
   const PIDX_PARAM = '_fis_pidx';
   const PREV_SID_PARAM = '_fis_prev_sid';
   const JOURNEY_TTL_MS = (window.FIS_JOURNEY_TTL_MS || 2 * 60 * 60 * 1000);

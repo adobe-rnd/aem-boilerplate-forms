@@ -26,6 +26,45 @@ let sidebarWidth = 340;
 let stepChart = null;
 let timelineChart = null;
 
+const cycleMarkerPlugin = {
+  id: 'cycleMarkers',
+  afterDatasetsDraw(chart, _args, opts = {}) {
+    const markers = opts.markers || [];
+    if (!markers.length) return;
+    const xScale = chart.scales.x;
+    const { ctx, chartArea } = chart;
+    if (!xScale || !chartArea) return;
+
+    ctx.save();
+    markers.forEach((marker) => {
+      if (marker.index == null || marker.index < 0) return;
+      const x = xScale.getPixelForValue(marker.index);
+      if (!Number.isFinite(x) || x < chartArea.left || x > chartArea.right) return;
+
+      ctx.strokeStyle = '#4f46e5';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.moveTo(x, chartArea.top + 4);
+      ctx.lineTo(x, chartArea.bottom);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#4f46e5';
+      ctx.beginPath();
+      ctx.arc(x, chartArea.top + 8, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      const label = marker.name.length > 18 ? `${marker.name.slice(0, 17)}...` : marker.name;
+      ctx.font = '600 10px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, Math.min(x + 7, chartArea.right - 90), chartArea.top + 9);
+    });
+    ctx.restore();
+  },
+};
+
 // client-side insights cache — avoids re-hitting the server on repeated clicks
 // for the same form + date range. Cleared when form or range changes.
 let insightsCache = null; // { formId, range, since, until, data }
@@ -122,6 +161,46 @@ function buildQueryStr(sinceTs, untilTs) {
   let q = sinceTs ? `since=${sinceTs}` : 'range=all';
   if (untilTs) q += `&until=${untilTs}`;
   return q;
+}
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function timelineBucketKey(ts, granularity) {
+  const d = new Date(ts);
+  const Y = d.getFullYear();
+  const M = pad2(d.getMonth() + 1);
+  const D = pad2(d.getDate());
+  const H = pad2(d.getHours());
+  if (granularity === 'hour') return `${Y}-${M}-${D}T${H}`;
+  if (granularity === 'week') {
+    const day = d.getDay();
+    const diffToMon = day === 0 ? -6 : 1 - day;
+    const mon = new Date(ts + diffToMon * 86400000);
+    return `${mon.getFullYear()}-${pad2(mon.getMonth() + 1)}-${pad2(mon.getDate())}`;
+  }
+  return `${Y}-${M}-${D}`;
+}
+
+function getTimelineCycleMarkers(formId, buckets, granularity, sinceTs, untilTs) {
+  const bucketIndex = new Map(buckets.map((bucket, index) => [bucket.key, index]));
+  const firstIdx = 0;
+  const lastIdx = buckets.length - 1;
+  return getCycles(formId)
+    .filter((cycle) => !sinceTs || cycle.timestamp >= sinceTs)
+    .filter((cycle) => !untilTs || cycle.timestamp <= untilTs)
+    .map((cycle) => ({
+      ...cycle,
+      key: timelineBucketKey(cycle.timestamp, granularity),
+      index: bucketIndex.get(timelineBucketKey(cycle.timestamp, granularity)),
+      timeLabel: new Date(cycle.timestamp).toLocaleString('en', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    }))
+    .filter((cycle) => cycle.index != null && cycle.index >= firstIdx && cycle.index <= lastIdx)
+    .sort((a, b) => a.timestamp - b.timestamp);
 }
 
 function ageLabel(ts) {
@@ -1495,6 +1574,76 @@ async function updateErrorsBadge(formId, sinceTs, untilTs) {
   badge.classList.toggle('hidden', errors.length === 0);
 }
 
+function ensureScreenshotLightbox() {
+  let lb = document.getElementById('fis-ss-lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'fis-ss-lightbox';
+    lb.className = 'fis-screenshot-lightbox hidden';
+    document.body.appendChild(lb);
+  }
+  if (!lb.querySelector('.fis-ss-lb-pair')) {
+    lb.innerHTML = `
+      <div class="fis-ss-lb-inner">
+        <button class="fis-ss-lb-close">✕</button>
+        <div class="fis-ss-lb-pair">
+          <div class="fis-ss-lb-item fis-ss-lb-before">
+            <div class="fis-ss-lb-label">Before Error</div>
+            <img class="fis-ss-lb-img fis-ss-lb-before-img" src="" alt="Before error" />
+          </div>
+          <div class="fis-ss-lb-item">
+            <div class="fis-ss-lb-label fis-ss-lb-after-label">Error Screen</div>
+            <img class="fis-ss-lb-img fis-ss-lb-after-img" src="" alt="Error screen" />
+          </div>
+        </div>
+      </div>`;
+  }
+  lb.querySelector('.fis-ss-lb-close').onclick = () => lb.classList.add('hidden');
+  lb.onclick = (ev) => { if (ev.target === lb) lb.classList.add('hidden'); };
+  return lb;
+}
+
+function openScreenshotLightbox({ after, before = '' }) {
+  const lb = ensureScreenshotLightbox();
+  const beforeItem = lb.querySelector('.fis-ss-lb-before');
+  const beforeImg = lb.querySelector('.fis-ss-lb-before-img');
+  const afterImg = lb.querySelector('.fis-ss-lb-after-img');
+  const afterLabel = lb.querySelector('.fis-ss-lb-after-label');
+  if (before) {
+    beforeItem.classList.remove('hidden');
+    beforeImg.src = before;
+  } else {
+    beforeItem.classList.add('hidden');
+    beforeImg.removeAttribute('src');
+  }
+  afterLabel.textContent = 'Error Screen';
+  afterImg.src = after;
+  lb.classList.remove('hidden');
+}
+
+function getHttpStatusInfo(status) {
+  const s = Number(status);
+  const map = {
+    0:   { cls: 'net',    label: '0 - No Response',              desc: 'The request never reached a usable server response. This is usually offline/network failure, CORS/CSP blocking, or a cancelled request.' },
+    400: { cls: 'client', label: '400 - Bad Request',             desc: 'The server rejected the request because the payload, parameters, or format were invalid.' },
+    401: { cls: 'client', label: '401 - Unauthorized',            desc: 'The server rejected the request because the user session or authentication token is missing or expired.' },
+    403: { cls: 'client', label: '403 - Forbidden',               desc: 'The server rejected the request because permission, CSRF, or authorization checks failed.' },
+    404: { cls: 'client', label: '404 - Endpoint Missing',        desc: 'The requested endpoint or asset does not exist. The URL may be wrong, undeployed, or removed.' },
+    409: { cls: 'client', label: '409 - Conflict',                desc: 'The server found a conflict, commonly a duplicate submission or data integrity issue.' },
+    413: { cls: 'client', label: '413 - Payload Too Large',       desc: 'The submitted data or uploaded file is larger than the server allows.' },
+    422: { cls: 'client', label: '422 - Validation Failed',       desc: 'The server understood the request but rejected the submitted data during backend validation.' },
+    429: { cls: 'client', label: '429 - Rate Limited',            desc: 'The server is throttling the user because too many requests were made in a short time.' },
+    500: { cls: 'server', label: '500 - Internal Server Error',   desc: 'The backend crashed or hit an unhandled exception while processing the request.' },
+    502: { cls: 'server', label: '502 - Bad Gateway',             desc: 'A gateway or proxy could not reach a healthy upstream backend service.' },
+    503: { cls: 'server', label: '503 - Service Unavailable',     desc: 'The backend service is down, overloaded, or temporarily under maintenance.' },
+    504: { cls: 'server', label: '504 - Gateway Timeout',         desc: 'The gateway waited too long for the backend service to respond.' },
+  };
+  if (map[s]) return map[s];
+  if (s >= 500) return { cls: 'server', label: `${s} - Server Error`, desc: 'The backend returned a server-side failure.' };
+  if (s >= 400) return { cls: 'client', label: `${s} - Client/Request Error`, desc: 'The server rejected the request.' };
+  return null;
+}
+
 async function renderErrorsTab(formId, sinceTs, untilTs) {
   const container = document.getElementById('errorsView');
   if (!container) return;
@@ -1538,6 +1687,14 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
       if (err.callType === 'ui_message') {
         return { cls: 'server', label: 'Service Error', desc: "The form's error handler fired and showed an error screen to the user. This is triggered by the backend service failing or returning an unexpected response — the form itself rendered correctly, but the service it depends on did not." };
       }
+      const exact = getHttpStatusInfo(s);
+      if (exact) {
+        return {
+          cls: exact.cls,
+          label: exact.label,
+          desc: `${exact.desc}${err.url ? ` URL: "${esc(err.url)}".` : ''}`,
+        };
+      }
       const layer = err.layer || (s >= 500 ? 'backend' : s === 0 ? 'network' : s >= 400 ? 'client' : null);
       const map = {
         backend:    { cls: 'server', label: `Server Error (${s || '5xx'})`, desc: `The server returned HTTP ${s || '5xx'} while processing the form submission — it crashed or hit an unhandled exception. This is a backend bug, not a user input problem.` },
@@ -1554,6 +1711,14 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
     if (err.type === 'api_error') {
       const cls = err.errorClass;
       const urlStr = err.url ? `"${esc(err.url)}"` : 'the API';
+      const exact = getHttpStatusInfo(s);
+      if (exact) {
+        return {
+          cls: exact.cls,
+          label: exact.label,
+          desc: `${exact.desc} The call was made to ${urlStr}.`,
+        };
+      }
       const map = {
         cors:         { cls: 'net',    label: 'CORS Blocked',           desc: `The browser blocked the call to ${urlStr} because the server did not include the required CORS headers. This is a server configuration issue — the server needs to allow cross-origin requests from this page's origin.` },
         network_down: { cls: 'net',    label: 'Server Unreachable',     desc: `The call to ${urlStr} failed before getting any response. The user may be offline, the server may be down, or DNS resolution failed.` },
@@ -1633,12 +1798,12 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
                 ${ss.before ? `
                   <div class="fis-err-ss-item">
                     <span class="fis-err-ss-tag">Before error</span>
-                    <img class="fis-err-ss-thumb" src="${ss.before}" alt="Before error ${i + 1}" title="Click to enlarge" />
-                  </div>` : `
+                    <img class="fis-err-ss-preview" src="${ss.before}" alt="Before error ${i + 1}" />
+                  </div>` : ''}
                   <div class="fis-err-ss-item">
                     <span class="fis-err-ss-tag">Error screen</span>
-                  <img class="fis-err-ss-thumb" src="${ss.after}" alt="Screenshot ${i + 1}" title="Click to enlarge" />
-                  </div>`}
+                    <img class="fis-err-ss-thumb" src="${ss.after}" data-before="${ss.before || ''}" data-after="${ss.after}" alt="Error screen ${i + 1}" title="Click to enlarge" />
+                  </div>
               </div>
             </div>`;
           }).join('')}
@@ -1801,18 +1966,10 @@ async function renderErrorsTab(formId, sinceTs, untilTs) {
     }
     const thumb = ev.target.closest('.fis-err-ss-thumb');
     if (thumb && container.contains(thumb)) {
-      let lb = document.getElementById('fis-ss-lightbox');
-      if (!lb) {
-        lb = document.createElement('div');
-        lb.id = 'fis-ss-lightbox';
-        lb.className = 'fis-screenshot-lightbox hidden';
-        lb.innerHTML = '<div class="fis-ss-lb-inner"><button class="fis-ss-lb-close">✕</button><img class="fis-ss-lb-img" src="" alt="Screenshot" /></div>';
-        document.body.appendChild(lb);
-        lb.querySelector('.fis-ss-lb-close').addEventListener('click', () => lb.classList.add('hidden'));
-        lb.addEventListener('click', (e) => { if (e.target === lb) lb.classList.add('hidden'); });
-      }
-      lb.querySelector('.fis-ss-lb-img').src = thumb.src;
-      lb.classList.remove('hidden');
+      openScreenshotLightbox({
+        before: thumb.dataset.before || '',
+        after: thumb.dataset.after || thumb.src,
+      });
     }
   });
 }
@@ -2564,6 +2721,17 @@ function diagnoseEventClient(event) {
   }
 
   if (event.type === 'api_error') {
+    const exact = getHttpStatusInfo(event.status);
+    if (exact) {
+      const severity = Number(event.status) >= 500 ? 'critical' : 'high';
+      return {
+        cause: exact.desc,
+        fix: Number(event.status) >= 500
+          ? 'Check backend/upstream service logs for this exact status and add retry or fallback handling where appropriate.'
+          : 'Check the request URL, payload, authentication, and backend validation rules for this exact status.',
+        severity,
+      };
+    }
     const classMap = {
       cors:         { cause: 'CORS block — an API call was rejected by CORS policy', fix: 'Add CORS headers to all API endpoints the form calls.', severity: 'critical' },
       network_down: { cause: 'Network failure — fetch failed before reaching the server', fix: 'Add offline detection and a retry button.', severity: 'high' },
@@ -2582,6 +2750,30 @@ function diagnoseEventClient(event) {
 
 // ── Session timeline modal ────────────────────────────────────────────────
 
+const CONTINUATION_AFTER_ABANDON_TYPES = new Set([
+  'field_focus', 'field_blur', 'field_change', 'field_visible',
+  'button_click', 'dead_click', 'disabled_click', 'rage_click',
+  'step_change', 'step_thrash', 'rule_triggered',
+  'form_submit', 'form_error', 'api_error', 'js_error', 'console_error',
+]);
+
+function isContinuationAfterAbandon(ev) {
+  return CONTINUATION_AFTER_ABANDON_TYPES.has(ev?.type);
+}
+
+function getFinalAbandonEvent(events = []) {
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const abandon = events[i];
+    if (abandon.type !== 'form_abandon') continue;
+    const abandonTs = abandon.timestamp || 0;
+    const continued = events.some((ev) => ev !== abandon
+      && (ev.timestamp || 0) > abandonTs
+      && isContinuationAfterAbandon(ev));
+    if (!continued) return abandon;
+  }
+  return null;
+}
+
 function explainAbandonment(session) {
   const { events } = session;
   const lastStep = [...events].reverse().find((e) => e.type === 'step_change');
@@ -2592,8 +2784,7 @@ function explainAbandonment(session) {
   const jsErrors = events.filter((e) => e.type === 'js_error' || e.type === 'console_error');
   const apiErrors = events.filter((e) => e.type === 'form_error' || e.type === 'api_error');
   const fieldsInteracted = [...new Set(events.filter((e) => e.type === 'field_focus').map((e) => e.field).filter(Boolean))];
-  // last abandon = the final exit point, not wherever they first stepped away from
-  const abandon = [...events].reverse().find((e) => e.type === 'form_abandon');
+  const abandon = getFinalAbandonEvent(events);
   const hasFinalSubmitFailure = events.some((e) => isFinalSubmissionFailureEvent(e));
   const submitEvents = events.filter((e) => e.type === 'form_submit');
   const lastSubmit = submitEvents[submitEvents.length - 1];
@@ -2604,7 +2795,9 @@ function explainAbandonment(session) {
   // Detect brief exits: form_abandon followed by field_focus in the same session
   const focusTimestamps = events.filter((e) => e.type === 'field_focus').map((e) => e.timestamp);
   const abandonEvents = events.filter((e) => e.type === 'form_abandon');
-  const hadBriefExit = abandonEvents.some((ab) => focusTimestamps.some((ts) => ts > ab.timestamp));
+  const hadBriefExit = abandonEvents.some((ab) => events.some((ev) => ev !== ab
+    && (ev.timestamp || 0) > (ab.timestamp || 0)
+    && isContinuationAfterAbandon(ev)));
 
   // Build a factual list of what happened
   const facts = [];
@@ -2864,6 +3057,14 @@ async function showTimeline(sessionId) {
       if (e.callType === 'ui_message') {
         return { cls: 'server', label: 'Service Error', source: "The form's error handler fired and showed an error screen to the user. This is triggered by the backend service failing or returning an unexpected response — the form itself rendered correctly, but the service it depends on did not." };
       }
+      const exact = getHttpStatusInfo(e.status);
+      if (exact) {
+        return {
+          cls: exact.cls,
+          label: exact.label,
+          source: `${exact.desc}${e.url ? ` URL: "${e.url}".` : ''}`,
+        };
+      }
       const layer = e.layer || (e.status >= 500 ? 'backend' : e.status === 0 ? 'network' : e.status >= 400 ? 'client' : null);
       const map = {
         backend:    { cls: 'server', label: `Server Error (${e.status || '5xx'})`, source: `The server returned HTTP ${e.status || '5xx'} while processing the form submission — it crashed or hit an unhandled exception. This is a backend bug, not a user input problem.` },
@@ -2881,6 +3082,14 @@ async function showTimeline(sessionId) {
       const cls = e.errorClass;
       const s = e.status;
       const urlStr = e.url ? `"${e.url}"` : 'the API';
+      const exact = getHttpStatusInfo(s);
+      if (exact) {
+        return {
+          cls: exact.cls,
+          label: exact.label,
+          source: `${exact.desc} The call was made to ${urlStr}.`,
+        };
+      }
       const map = {
         cors:         { cls: 'net',    label: 'CORS Blocked',          source: `The browser blocked the call to ${urlStr} because the server did not include the required CORS headers. This is a server configuration issue — the server needs to allow cross-origin requests from this page's origin.` },
         network_down: { cls: 'net',    label: 'Server Unreachable',    source: `The call to ${urlStr} failed before getting any response. The user may be offline, the server may be down, or DNS resolution failed.` },
@@ -2984,15 +3193,14 @@ async function showTimeline(sessionId) {
     const lastAbandonIdx = collapsed.map((e) => e.type).lastIndexOf('form_abandon');
     const deduped = collapsed.filter((e, i) => e.type !== 'form_abandon' || i === lastAbandonIdx);
 
-    // mark abandon: switched if followed by submit in same session
-    const submitTs = sess.events.filter((ev) => ev.type === 'form_submit').map((ev) => ev.timestamp);
-    // mark abandon: leftBriefly if followed by field_focus in same session
-    const focusTs = sess.events.filter((ev) => ev.type === 'field_focus').map((ev) => ev.timestamp);
     deduped.forEach((ev) => {
       if (ev.type === 'form_abandon') {
-        ev.switched = hasNextPage || submitTs.some((ts) => ts > ev.timestamp);
+        const laterContinuation = sess.events.some((next) => next !== ev
+          && (next.timestamp || 0) > (ev.timestamp || 0)
+          && isContinuationAfterAbandon(next));
+        ev.switched = hasNextPage;
         if (!ev.switched) {
-          ev.leftBriefly = focusTs.some((ts) => ts > ev.timestamp);
+          ev.leftBriefly = laterContinuation;
         }
         if (ev.switched || ev.leftBriefly) {
           delete ev.screenshot;
@@ -3002,6 +3210,7 @@ async function showTimeline(sessionId) {
     });
 
     return deduped.filter((ev) => {
+      if (ev.type === 'form_abandon' && (ev.switched || ev.leftBriefly)) return false;
       if (ev.type !== 'form_error' || !isFinalSubmissionFailureEvent(ev)) return true;
       return !deduped.some((other) => other.type === 'form_submit'
         && other.failed
@@ -3087,7 +3296,7 @@ async function showTimeline(sessionId) {
       && (ev.message || ev.reason || ev.statusText || '') === (e.message || e.reason || e.statusText || ''));
     if (idx < 0) return false;
     const eventsAfter = (sess.events || []).slice(idx + 1);
-    const abandonAfter = eventsAfter.find((ev) => ev.type === 'form_abandon');
+    const abandonAfter = getFinalAbandonEvent(eventsAfter);
     if (!abandonAfter) return false;
     const fieldAfter = eventsAfter.find((ev) => ev.type === 'field_focus' || ev.type === 'field_change' || ev.type === 'field_blur');
     return !fieldAfter && (abandonAfter.timestamp - e.timestamp) < 60000;
@@ -3253,56 +3462,13 @@ async function showTimeline(sessionId) {
 
   document.getElementById('timelineBody').innerHTML = analysisHtml + eventsHtml;
 
-  // screenshot lightbox
-  let lightbox = document.getElementById('fis-ss-lightbox');
-  if (!lightbox) {
-    lightbox = document.createElement('div');
-    lightbox.id = 'fis-ss-lightbox';
-    lightbox.className = 'fis-screenshot-lightbox hidden';
-    lightbox.innerHTML = `
-      <div class="fis-ss-lb-inner">
-        <button class="fis-ss-lb-close">✕</button>
-        <div class="fis-ss-lb-pair">
-          <div class="fis-ss-lb-item fis-ss-lb-before">
-            <div class="fis-ss-lb-label">Before Error</div>
-            <img class="fis-ss-lb-img fis-ss-lb-before-img" src="" alt="Before error" />
-          </div>
-          <div class="fis-ss-lb-item">
-            <div class="fis-ss-lb-label fis-ss-lb-after-label">Error Screen</div>
-            <img class="fis-ss-lb-img fis-ss-lb-after-img" src="" alt="Screenshot" />
-          </div>
-        </div>
-      </div>`;
-    document.body.appendChild(lightbox);
-    lightbox.querySelector('.fis-ss-lb-close').addEventListener('click', () => lightbox.classList.add('hidden'));
-    lightbox.addEventListener('click', (ev) => { if (ev.target === lightbox) lightbox.classList.add('hidden'); });
-  }
-
   document.getElementById('timelineBody').addEventListener('click', (ev) => {
     const thumb = ev.target.closest('.fis-tl-screenshot-thumb');
     const viewBtn = ev.target.closest('.fis-tl-view-btn');
-    const showLightbox = ({ after, before = '' }) => {
-      const beforeItem = lightbox.querySelector('.fis-ss-lb-before');
-      const beforeImg = lightbox.querySelector('.fis-ss-lb-before-img');
-      const afterImg = lightbox.querySelector('.fis-ss-lb-after-img');
-      const afterLabel = lightbox.querySelector('.fis-ss-lb-after-label');
-      // No "before" screenshot means one wasn't captured for this event — show
-      // the error screen alone rather than a placeholder for the missing pane.
-      if (before) {
-        beforeItem.classList.remove('hidden');
-        beforeImg.src = before;
-      } else {
-        beforeItem.classList.add('hidden');
-        beforeImg.removeAttribute('src');
-      }
-      afterLabel.textContent = 'Error Screen';
-      afterImg.src = after;
-      lightbox.classList.remove('hidden');
-    };
     if (thumb) {
-      showLightbox({ after: thumb.src });
+      openScreenshotLightbox({ after: thumb.src });
     } else if (viewBtn) {
-      showLightbox({ after: viewBtn.dataset.ss, before: viewBtn.dataset.before });
+      openScreenshotLightbox({ after: viewBtn.dataset.ss, before: viewBtn.dataset.before });
     }
   });
 
@@ -3641,6 +3807,12 @@ async function renderTimeline(formId, sinceTs, untilTs) {
   const { buckets } = data;
   const labels = buckets.map((b) => b.label);
   const pts = buckets.length > 30 ? 0 : 3;
+  const cycleMarkers = getTimelineCycleMarkers(formId, buckets, data.granularity, sinceTs, untilTs);
+  const cycleNamesByIndex = cycleMarkers.reduce((acc, marker) => {
+    if (!acc[marker.index]) acc[marker.index] = [];
+    acc[marker.index].push(`${marker.name} · ${marker.timeLabel}`);
+    return acc;
+  }, {});
 
   // Size the inner scroll div so each bucket gets a fixed width.
   // The canvas (responsive:true) fills the inner div; the wrap scrolls.
@@ -3722,18 +3894,24 @@ async function renderTimeline(formId, sinceTs, untilTs) {
               return b.label;
             },
             footer(items) {
+              const idx = items[0]?.dataIndex;
+              const footerLines = [];
+              const names = cycleNamesByIndex[idx] || [];
+              if (names.length) footerLines.push(`Cycle: ${names.join(', ')}`);
+
               const errDrop = items.find((i) => i.dataset.label === 'Error → Drop-off');
               const drop = items.find((i) => i.dataset.label === 'Drop-offs');
               if (errDrop && drop && drop.raw > 0) {
                 const pct = Math.round((errDrop.raw / drop.raw) * 100);
-                return errDrop.raw > 0
+                footerLines.push(errDrop.raw > 0
                   ? `↳ ${errDrop.raw} of ${drop.raw} drop-off${drop.raw !== 1 ? 's' : ''} were error-influenced (${pct}%)`
-                  : `↳ none of the ${drop.raw} drop-off${drop.raw !== 1 ? 's' : ''} had errors`;
+                  : `↳ none of the ${drop.raw} drop-off${drop.raw !== 1 ? 's' : ''} had errors`);
               }
-              return undefined;
+              return footerLines.length ? footerLines : undefined;
             },
           },
         },
+        cycleMarkers: { markers: cycleMarkers },
       },
       scales: {
         x: {
@@ -3753,6 +3931,7 @@ async function renderTimeline(formId, sinceTs, untilTs) {
         },
       },
     },
+    plugins: [cycleMarkerPlugin],
   });
 
   // Scroll to the rightmost position so today is immediately visible.

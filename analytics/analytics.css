@@ -4355,7 +4355,8 @@ body {
     color: #64748b;
 }
 
-.fis-err-ss-thumb {
+.fis-err-ss-thumb,
+.fis-err-ss-preview {
     width: 200px;
     height: 120px;
     object-fit: cover;
@@ -4363,9 +4364,16 @@ body {
     border-radius: 5px 5px 0 0;
     border: 1px solid #e2e8f0;
     border-bottom: none;
+    display: block;
+}
+
+.fis-err-ss-thumb {
     cursor: zoom-in;
     transition: transform 0.15s, box-shadow 0.15s;
-    display: block;
+}
+
+.fis-err-ss-preview {
+    opacity: 0.9;
 }
 
 .fis-err-ss-thumb:hover {

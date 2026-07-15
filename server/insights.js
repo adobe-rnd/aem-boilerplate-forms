@@ -46,6 +46,13 @@ const INSIGHT_TOOL = {
   },
 };
 
+function formatBreakdown(obj = {}) {
+  return Object.entries(obj)
+    .sort((a, b) => b[1] - a[1])
+    .map(([label, count]) => `${label}: ${count}`)
+    .join(', ');
+}
+
 // ── Format all analytics into a rich prompt ───────────────────────────────────
 
 function formatAnalysisForClaude(analysis) {
@@ -114,7 +121,8 @@ function formatAnalysisForClaude(analysis) {
   if (e.apiErrors > 0) {
     const totalApiEvents = e.apiErrorEventCount || e.apiErrors;
     const perSession = n ? (totalApiEvents / n).toFixed(1) : '?';
-    lines.push(`- API / fetch failures: ${e.apiErrors} sessions (${rate(e.apiErrors)}) — ${totalApiEvents} total error events, avg ${perSession}×/session${e.topApiError ? ` — endpoint: "${e.topApiError.label}" (${e.topApiError.count} events)` : ''}`);
+    const statusBreakdown = formatBreakdown(e.apiErrorStatusBreakdown);
+    lines.push(`- API / fetch failures: ${e.apiErrors} sessions (${rate(e.apiErrors)}) — ${totalApiEvents} total error events, avg ${perSession}×/session${e.topApiError ? ` — endpoint: "${e.topApiError.label}" (${e.topApiError.count} events)` : ''}${statusBreakdown ? ` — exact HTTP statuses: ${statusBreakdown}` : ''}`);
   } else {
     lines.push('- API / fetch failures: 0 sessions');
   }
@@ -124,7 +132,8 @@ function formatAnalysisForClaude(analysis) {
     const totalSubmitEvents = Object.values(e.submitErrorBreakdown || {}).reduce((a, b) => a + b, 0);
     const perSession = n ? (totalSubmitEvents / n).toFixed(1) : '?';
     const breakdown = Object.entries(e.submitErrorBreakdown || {}).map(([k, v]) => `${k}: ${v}`).join(', ');
-    lines.push(`- Submit / validation errors: ${e.submitErrors} sessions (${rate(e.submitErrors)}) — ${totalSubmitEvents} total error events, avg ${perSession}×/session (${breakdown})${e.topSubmitError ? ` — most common message: "${e.topSubmitError.label}" appeared in ${e.topSubmitError.count} sessions` : ''}`);
+    const statusBreakdown = formatBreakdown(e.submitErrorStatusBreakdown);
+    lines.push(`- Submit / validation errors: ${e.submitErrors} sessions (${rate(e.submitErrors)}) — ${totalSubmitEvents} total error events, avg ${perSession}×/session (${breakdown})${statusBreakdown ? ` — exact HTTP statuses: ${statusBreakdown}` : ''}${e.topSubmitError ? ` — most common message: "${e.topSubmitError.label}" appeared in ${e.topSubmitError.count} sessions` : ''}`);
   }
 
   // Rage clicks
@@ -209,11 +218,16 @@ function formatAnalysisForClaude(analysis) {
   }
   if (e.apiErrors > 0) {
     const totalApiEvents = e.apiErrorEventCount || e.apiErrors;
-    violations.push(`[MUST REPORT] API errors: ${e.apiErrors}/${n} sessions — ${totalApiEvents} total events, avg ${n ? (totalApiEvents / n).toFixed(1) : '?'}×/session${e.topApiError ? ` — endpoint: "${e.topApiError.label}"` : ''}`);
+    const statusBreakdown = formatBreakdown(e.apiErrorStatusBreakdown);
+    violations.push(`[MUST REPORT] API errors: ${e.apiErrors}/${n} sessions — ${totalApiEvents} total events, avg ${n ? (totalApiEvents / n).toFixed(1) : '?'}×/session${e.topApiError ? ` — endpoint: "${e.topApiError.label}"` : ''}${statusBreakdown ? ` — exact HTTP statuses: ${statusBreakdown}` : ''}`);
   }
   if (e.submitErrors > 0) {
     const totalSubmitEvents = Object.values(e.submitErrorBreakdown || {}).reduce((a, b) => a + b, 0);
-    violations.push(`[MUST REPORT] Submit/validation errors: ${e.submitErrors}/${n} sessions — ${totalSubmitEvents} total events, avg ${n ? (totalSubmitEvents / n).toFixed(1) : '?'}×/session${e.topSubmitError ? ` — message: "${e.topSubmitError.label}"` : ''}`);
+    const statusBreakdown = formatBreakdown(e.submitErrorStatusBreakdown);
+    violations.push(`[MUST REPORT] Submit/validation errors: ${e.submitErrors}/${n} sessions — ${totalSubmitEvents} total events, avg ${n ? (totalSubmitEvents / n).toFixed(1) : '?'}×/session${statusBreakdown ? ` — exact HTTP statuses: ${statusBreakdown}` : ''}${e.topSubmitError ? ` — message: "${e.topSubmitError.label}"` : ''}`);
+  }
+  if (e.topHttpStatusError) {
+    violations.push(`[MUST REPORT] Top exact HTTP failure: ${e.topHttpStatusError.label} (${e.topHttpStatusError.count} events). Use this exact status in the insight title/body when explaining backend/service failures.`);
   }
   if ((e.rageClicks || 0) / n2 > 0.10) violations.push(`[MUST REPORT] Rage clicks: ${e.rageClicks} sessions (${rate(e.rageClicks)})${e.topRageClick ? ` on "${e.topRageClick.label}"` : ''}`);
   if ((e.disabledClicks || 0) / n2 > 0.15) violations.push(`[MUST REPORT] Disabled button clicks: ${e.disabledClicks} sessions (${rate(e.disabledClicks)})${e.topDisabledClick ? ` — button: "${e.topDisabledClick.label}"` : ''}`);
@@ -774,12 +788,15 @@ export function generateRuleBasedInsights(analysis, resolvedFixes = [], sessions
     const apiErrRate = (errors.apiErrors || 0) / totalSessions;
     if (apiErrRate > 0.05) {
       const apiTarget = errors.topApiError?.label || 'an API call';
+      const topApiStatus = Object.entries(errors.apiErrorStatusBreakdown || {}).sort((a, b) => b[1] - a[1])[0] || null;
       const apiSig = dominantErrorSignature(sessions, 'api_error');
       insights.push({
         fields: [],
         fieldDetails: [],
-        insight: `${(apiErrRate * 100).toFixed(0)}% of sessions hit an API failure near "${apiTarget}" — the backend call is failing for these users.`,
-        fix: `Investigate the API failure triggered near "${apiTarget}". Add a user-facing error message with a retry option so users are not left stuck when the call fails.`,
+        insight: `${(apiErrRate * 100).toFixed(0)}% of sessions hit an API failure near "${apiTarget}"${topApiStatus ? ` — top status: ${topApiStatus[0]} (${topApiStatus[1]} events)` : ''}.`,
+        fix: topApiStatus
+          ? `Fix the ${topApiStatus[0]} API failure triggered near "${apiTarget}" first. Add a user-facing retry message so users are not left stuck when the call fails.`
+          : `Investigate the API failure triggered near "${apiTarget}". Add a user-facing error message with a retry option so users are not left stuck when the call fails.`,
         why: 'Silent API failures leave users in an unknown state — they cannot tell whether to retry or start over.',
         priority: apiErrRate > 0.2 ? 'high' : 'medium',
         errorSignature: apiSig?.signature || null,
@@ -840,14 +857,17 @@ export function generateRuleBasedInsights(analysis, resolvedFixes = [], sessions
     const submitErrSessions = sessions.filter((s) => s.events.some((e) => e.type === 'form_error' && e.status >= 400));
     if (submitErrSessions.length / totalSessions > 0.05) {
       const topSubmit = errors.topSubmitError;
+      const topSubmitStatus = Object.entries(errors.submitErrorStatusBreakdown || {}).sort((a, b) => b[1] - a[1])[0] || null;
       const submitSig = dominantErrorSignature(sessions, 'form_error');
       insights.push({
         fields: [],
         fieldDetails: [],
-        insight: `${((submitErrSessions.length / totalSessions) * 100).toFixed(0)}% of sessions hit a form API error${topSubmit ? ` — most common: "${topSubmit.label}" (${topSubmit.count} sessions)` : ''}.`,
-        fix: topSubmit
-          ? `Fix the "${topSubmit.label}" error first — it affects ${topSubmit.count} sessions. Check server logs for the root cause.`
-          : 'Check server logs for form submission endpoint errors. Add error boundaries and user-facing retry messages.',
+        insight: `${((submitErrSessions.length / totalSessions) * 100).toFixed(0)}% of sessions hit a form API error${topSubmitStatus ? ` — top status: ${topSubmitStatus[0]} (${topSubmitStatus[1]} events)` : ''}${topSubmit ? ` — most common: "${topSubmit.label}" (${topSubmit.count} sessions)` : ''}.`,
+        fix: topSubmitStatus
+          ? `Fix the ${topSubmitStatus[0]} submit failure first. Check the submission service logs for that status and keep the user on the final screen with a retry option.`
+          : topSubmit
+            ? `Fix the "${topSubmit.label}" error first — it affects ${topSubmit.count} sessions. Check server logs for the root cause.`
+            : 'Check server logs for form submission endpoint errors. Add error boundaries and user-facing retry messages.',
         why: 'API errors after form completion are the most demoralising failure — users filled the whole form and received nothing in return.',
         priority: submitErrSessions.length / totalSessions > 0.15 ? 'high' : 'medium',
         errorSignature: submitSig?.signature || null,

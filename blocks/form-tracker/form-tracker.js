@@ -227,9 +227,62 @@ function saveSession(session) {
   }
 }
 
+const CONTINUATION_AFTER_ABANDON_TYPES = new Set([
+  'field_focus',
+  'field_blur',
+  'field_error',
+  'field_autofilled',
+  'button_click',
+  'rage_click',
+  'disabled_click',
+  'dead_click',
+  'step_change',
+  'url_change',
+  'rule_triggered',
+  'form_submit',
+  'form_error',
+  'api_error',
+  'js_error',
+  'console_error',
+  'progress_restored',
+  'session_returned',
+]);
+
+function retractStaleAbandonIfContinuing(session, type) {
+  if (!CONTINUATION_AFTER_ABANDON_TYPES.has(type)) return false;
+  const abandonIndex = session.events.findIndex((e) => e.type === 'form_abandon');
+  if (abandonIndex < 0) return false;
+
+  session.events = session.events.filter((e) => e.type !== 'form_abandon');
+  if (!session.events.some((e) => e.type === 'form_continued')) {
+    session.events.push({
+      type: 'form_continued',
+      timestamp: Date.now(),
+      reason: 'continued_after_abandon',
+    });
+  }
+  session.resendFromIndex = Math.min(
+    typeof session.resendFromIndex === 'number' ? session.resendFromIndex : abandonIndex,
+    abandonIndex,
+  );
+  session.lastSentIndex = Math.min(session.lastSentIndex || 0, abandonIndex);
+  try { localStorage.removeItem(DEFERRED_SESSION_KEY); } catch { /* ignore */ }
+  try {
+    fetch(`${SERVER_BASE}/retract-abandon`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: session.sessionId }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch { /* ignore */ }
+  return true;
+}
+
 function addEvent(session, type, data = {}) {
+  const retractedAbandon = retractStaleAbandonIfContinuing(session, type);
   session.events.push({ type, timestamp: Date.now(), ...data });
   saveSession(session);
+  if (retractedAbandon) sendToServer(session);
 }
 
 async function sendToServer(session) {
@@ -503,9 +556,12 @@ function trackField(fieldEl, session, formEl, getVisibleMs, onScreenshot) {
   observer.observe(fieldEl);
 }
 
+// Returns null when no wizard step is currently active — e.g. once the form has
+// moved past the wizard entirely to a completion/outcome screen. Callers should
+// keep their last known step in that case rather than treating it as "step 0".
 function getActiveStepInfo(formEl) {
   const active = formEl.querySelector('fieldset.current-wizard-step');
-  if (!active) return { index: 0, name: null };
+  if (!active) return null;
   const index = parseInt(active.dataset.index ?? 0, 10);
   const name = active.querySelector('legend')?.textContent?.trim()
     || active.id
@@ -579,14 +635,16 @@ function extractEmbeddedError(bodyText) {
 
     const isFailure = (errorCode && !/^0+$/.test(String(errorCode)))
       || responseCode === '1'
+      || (responseCode && !/^(0+|success|ok)$/i.test(responseCode))
       || (statusField && /^[45]\d\d$/.test(statusField))
       || /does not exist|unable to process|unexpected response|not found|fail|invalid/i.test(errorDesc);
 
     if (isFailure) {
-      const detail = errorDesc || errorCode || statusField || 'unspecified failure';
+      const detail = errorDesc || errorCode || responseCode || statusField || 'unspecified failure';
       return {
         description: `Backend reported a failure despite HTTP 200: ${detail}`,
         errorCode: errorCode || null,
+        responseCode: responseCode || null,
         errorDesc: errorDesc || null,
       };
     }
@@ -598,8 +656,136 @@ function isFinalSubmissionFailureText(text = '') {
   return /personal loan request could not be submitted|request could not be submitted|could not be submitted|application number\s*not generated|not generated|there seems to be an error in the application|contact nearest branch|try later/i.test(text);
 }
 
+function isBackendServiceErrorText(text = '') {
+  return isFinalSubmissionFailureText(text)
+    || /LN1111|we are sorry|unable to process your request|something went wrong at our end|permanent account number \(?PAN\)? provided is invalid|update your PAN with NSDL|backend service|service error|aeminternalerror/i.test(text);
+}
+
 function compactText(text = '') {
   return String(text || '').trim().replace(/\s+/g, ' ');
+}
+
+const SENSITIVE_SCREENSHOT_CONTEXT = /reference|application|account|loan amount|amount|pan|aadhaar|aadhar|mobile|phone|email|otp|salary|income|emi|ifsc|bank|customer|identity|id\b/i;
+const SENSITIVE_VALUE_PATTERNS = [
+  /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
+  /\b[A-Z]{5}\d{4}[A-Z]\b/gi,
+  /\b[A-Z]{4}0[A-Z0-9]{6}\b/gi,
+  /₹\s*[\d,]+(?:\.\d+)?/g,
+  /\b(?=[A-Z0-9]*\d)[A-Z]{1,8}\d{5,}[A-Z0-9]*\b/gi,
+  /\b\d[\d\s-]{5,}\d\b/g,
+];
+
+function hasSensitiveScreenshotContext(node) {
+  let el = node?.parentElement || node;
+  for (let i = 0; el && i < 4; i += 1, el = el.parentElement) {
+    const bits = [
+      el.getAttribute?.('aria-label'),
+      el.getAttribute?.('name'),
+      el.getAttribute?.('id'),
+      el.getAttribute?.('class'),
+      el.getAttribute?.('data-testid'),
+      el.textContent?.slice(0, 120),
+    ].filter(Boolean).join(' ');
+    if (SENSITIVE_SCREENSHOT_CONTEXT.test(bits)) return true;
+  }
+  return false;
+}
+
+function redactSensitiveScreenshotText(text, node) {
+  if (!text || !text.trim()) return text;
+  let out = text;
+  SENSITIVE_VALUE_PATTERNS.forEach((pattern) => {
+    pattern.lastIndex = 0;
+    out = out.replace(pattern, '[masked]');
+  });
+  if (out !== text) return out;
+
+  const compact = compactText(text);
+  if (hasSensitiveScreenshotContext(node) && /[\d@₹]/.test(compact)) {
+    return text.replace(/\S+/g, (token) => {
+      if (/[A-Za-z]/.test(token) && !/\d|@|₹/.test(token)) return token;
+      if (!/\d{4,}|@|₹|[A-Z]+\d+\w*/i.test(token)) return token;
+      return '[masked]';
+    });
+  }
+  return text;
+}
+
+function shouldMaskChoiceText(el) {
+  const text = compactText(el?.textContent || el?.value || '');
+  if (!text) return false;
+  if (hasSensitiveScreenshotContext(el)) return true;
+  return redactSensitiveScreenshotText(text, el) !== text;
+}
+
+function maskChoiceLabels(clonedEl) {
+  clonedEl.querySelectorAll('select').forEach((select) => {
+    const sensitiveSelect = hasSensitiveScreenshotContext(select);
+    select.querySelectorAll('option').forEach((option, idx) => {
+      if (sensitiveSelect || shouldMaskChoiceText(option)) option.textContent = `Option ${idx + 1}`;
+    });
+  });
+  clonedEl.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach((input) => {
+    input.checked = false;
+    input.defaultChecked = false;
+    input.removeAttribute('checked');
+    const inputSensitive = hasSensitiveScreenshotContext(input);
+    const labels = [];
+    if (input.id) {
+      try {
+        const escapedId = window.CSS?.escape ? CSS.escape(input.id) : input.id.replace(/["\\]/g, '\\$&');
+        labels.push(...clonedEl.querySelectorAll(`label[for="${escapedId}"]`));
+      } catch { /* invalid selector */ }
+    }
+    const closestLabel = input.closest('label');
+    if (closestLabel) labels.push(closestLabel);
+    [...new Set(labels)].forEach((label) => {
+      if (compactText(label.textContent).length <= 120 && (inputSensitive || shouldMaskChoiceText(label))) {
+        label.textContent = 'Option';
+      }
+    });
+  });
+  clonedEl.querySelectorAll([
+    '[role="radio"]',
+    '[role="option"]',
+    '[aria-checked]',
+    '[class*="radio" i]',
+    '[class*="choice" i]',
+    '[class*="option" i]',
+    '[class*="bank" i]',
+    '[class*="salary-account" i]',
+    '[data-testid*="radio" i]',
+    '[data-testid*="choice" i]',
+    '[data-testid*="option" i]',
+    '[data-testid*="bank" i]',
+  ].join(', ')).forEach((el) => {
+    const text = compactText(el.textContent);
+    if (!text || text.length > 180) return;
+    if (el.querySelector('input[type="text"], input[type="tel"], input[type="email"], textarea')) return;
+    if (shouldMaskChoiceText(el)) el.textContent = 'Option';
+  });
+}
+
+function maskScreenshotClone(clonedEl) {
+  clonedEl.querySelectorAll('input, textarea').forEach((el) => {
+    if (el.type === 'checkbox' || el.type === 'radio') return;
+    if (el.type === 'submit' || el.type === 'button') return;
+    if (el.type === 'number' || el.type === 'range') el.type = 'text';
+    if (el.value) el.value = '[masked]';
+    if (el.getAttribute('value')) el.setAttribute('value', '[masked]');
+    if (el.placeholder && SENSITIVE_SCREENSHOT_CONTEXT.test(el.placeholder)) el.placeholder = '[masked]';
+  });
+  maskChoiceLabels(clonedEl);
+  clonedEl.querySelectorAll('[contenteditable="true"]').forEach((el) => {
+    if (el.textContent.trim()) el.textContent = '[masked]';
+  });
+
+  const walker = clonedEl.ownerDocument.createTreeWalker(clonedEl, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach((node) => {
+    node.nodeValue = redactSensitiveScreenshotText(node.nodeValue, node);
+  });
 }
 
 // ── Screenshot capture ────────────────────────────────────────────────────────
@@ -619,12 +805,57 @@ function loadHtml2Canvas() {
   });
 }
 
+function captureFallbackScreenshot(eventType, context = {}) {
+  try {
+    const canvas = document.createElement('canvas');
+    const scale = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.max(360, window.innerWidth || 1280);
+    const height = Math.max(360, window.innerHeight || 720);
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    const isFinalFailure = eventType === 'form_error'
+      && isFinalSubmissionFailureText(context.statusText || context.message || '');
+    ctx.fillStyle = isFinalFailure ? '#c5161d' : '#c96300';
+    ctx.fillRect(0, 0, width, 44);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText(isFinalFailure ? 'Final submission failed screen' : `${eventType.replace(/_/g, ' ')} screen`, 16, 28);
+    ctx.fillStyle = '#111827';
+    ctx.font = '14px sans-serif';
+    const rawText = compactText(context.statusText || context.message || document.body?.innerText || document.body?.textContent || 'Screen text unavailable');
+    const safeText = redactSensitiveScreenshotText(rawText).slice(0, 2200);
+    const words = safeText.split(/\s+/);
+    let line = '';
+    let y = 76;
+    const maxWidth = width - 32;
+    words.forEach((word) => {
+      const test = line ? `${line} ${word}` : word;
+      if (ctx.measureText(test).width > maxWidth) {
+        ctx.fillText(line, 16, y);
+        line = word;
+        y += 22;
+      } else {
+        line = test;
+      }
+      if (y > height - 32) line = '';
+    });
+    if (line && y <= height - 32) ctx.fillText(line, 16, y);
+    return canvas.toDataURL('image/jpeg', 0.85);
+  } catch {
+    return null;
+  }
+}
+
 async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
   try {
     // html2canvas returns a blank white canvas when the tab is hidden — bail early
     if (document.visibilityState === 'hidden') return null;
     await loadHtml2Canvas();
-    if (!window.html2canvas) return null;
+    if (!window.html2canvas) return captureFallbackScreenshot(eventType, context);
     // use device pixel ratio for sharp screenshots on retina screens, capped at 2×
     const SCALE = Math.min(window.devicePixelRatio || 1, 2);
     const vpW = window.innerWidth;
@@ -690,35 +921,7 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
             if (el.style) el.style.backgroundImage = 'none';
           });
         }
-        // Mask all user-entered values — never expose PII in screenshots
-        clonedEl.querySelectorAll('input, textarea').forEach((el) => {
-          if (!el.value) return;
-          if (el.type === 'password' || el.type === 'email' || el.type === 'tel') {
-            el.value = '••••••••';
-          } else if (el.type === 'number' || el.type === 'range') {
-            el.value = '###';
-          } else if (el.type !== 'checkbox' && el.type !== 'radio' && el.type !== 'submit' && el.type !== 'button') {
-            el.value = '•'.repeat(Math.min(el.value.length, 12));
-          }
-        });
-        clonedEl.querySelectorAll('select').forEach((el) => {
-          const opts = el.querySelectorAll('option:checked');
-          opts.forEach((o) => { if (o.value) o.textContent = '••••••'; });
-        });
-        clonedEl.querySelectorAll('[contenteditable="true"]').forEach((el) => {
-          if (el.textContent.trim()) el.textContent = '•'.repeat(12);
-        });
-        // Mask checked state of radio buttons and checkboxes — selected option
-        // can reveal sensitive answers (e.g. disability status, income range).
-        // Clear the property, the default-checked flag, AND the attribute: a
-        // pre-selected option carries the `checked` attribute into the clone,
-        // which html2canvas renders (and which keeps `:checked` card styling
-        // applied) even after the property is set to false.
-        clonedEl.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach((el) => {
-          el.checked = false;
-          el.defaultChecked = false;
-          el.removeAttribute('checked');
-        });
+        maskScreenshotClone(clonedEl);
       },
     });
     const ctx = canvas.getContext('2d');
@@ -902,7 +1105,7 @@ async function captureAnnotatedScreenshot(formEl, eventType, context = {}) {
     }
 
     return canvas.toDataURL('image/jpeg', 0.85);
-  } catch { return null; }
+  } catch { return captureFallbackScreenshot(eventType, context); }
 }
 
 export function trackForm(formEl, serverBaseUrl) {
@@ -1222,13 +1425,16 @@ export function trackForm(formEl, serverBaseUrl) {
     const scannedFields = [];
 
     // step/panel tracking for wizard forms
-    let currentStep = getActiveStepInfo(formEl);
+    let currentStep = getActiveStepInfo(formEl) || { index: 0, name: null };
     // Step thrash detection: same two steps bouncing 3+ times = user is confused
     let stepPairBounce = { a: -1, b: -1, count: 0 };
     const stepThrashFired = new Set();
     const stepObserver = new MutationObserver(() => {
       try {
         const step = getActiveStepInfo(formEl);
+        // No active wizard step (e.g. moved to a completion/outcome screen) —
+        // keep the last known real step instead of resetting to a blank one.
+        if (!step) return;
         if (step.index !== currentStep.index) {
           const direction = step.index > currentStep.index ? 'next' : 'back';
           const fromIdx = currentStep.index;
@@ -1381,6 +1587,20 @@ export function trackForm(formEl, serverBaseUrl) {
                 stepName: currentStep.name,
               });
             }
+            if (isBackendServiceErrorText(text)
+              && !session.events.some((e) => e.type === 'api_error' && e.statusText === text.slice(0, 300))) {
+              addEvent(session, 'api_error', {
+                reason: text.slice(0, 300),
+                statusText: text.slice(0, 300),
+                errorClass: 'final_submission_failure',
+                status: 0,
+                url: window.location.pathname,
+                nearestField: getNearestField(),
+                triggeredBy: window.__FIS_lastButtonClick && Date.now() - window.__FIS_lastButtonClick.time < 5000 ? window.__FIS_lastButtonClick.label : null,
+                step: currentStep.index,
+                stepName: currentStep.name,
+              });
+            }
             if (!session.events.some((e) => e.type === 'form_submit' && e.failed)) {
               addEvent(session, 'form_submit', {
                 attemptNumber: submitAttempts || 1,
@@ -1390,8 +1610,8 @@ export function trackForm(formEl, serverBaseUrl) {
                 stepName: currentStep.name,
               });
             }
-            attachScreenshot('form_error', { callType: 'ui_message', statusText: text.slice(0, 300) });
-            sendToServer(session);
+            attachScreenshot('form_error', { callType: 'ui_message', statusText: text.slice(0, 300) })
+              .finally(() => sendToServer(session));
             return;
           }
           if (!session.events.some((e) => e.type === 'form_submit')) {
@@ -1415,7 +1635,7 @@ export function trackForm(formEl, serverBaseUrl) {
           // mark the latest matching event so the timeline can show "repeated error"
           const latest = [...session.events].reverse().find((e) => e.type === eventType && !e.screenshot && !e.screenshotDeduped);
           if (latest) latest.screenshotDeduped = true;
-          return;
+          return Promise.resolve(false);
         }
         // These error types replace the whole screen, so their OWN screenshot can no
         // longer show what the user clicked/focused just before — freeze the rolling
@@ -1445,10 +1665,10 @@ export function trackForm(formEl, serverBaseUrl) {
             triggerStep: currentStep.name,
           }
           : context;
-        captureAnnotatedScreenshot(formEl, eventType, captureContext).then((dataUrl) => {
-          if (!dataUrl) return;
+        return captureAnnotatedScreenshot(formEl, eventType, captureContext).then((dataUrl) => {
+          if (!dataUrl) return false;
           const ev = [...session.events].reverse().find((e) => e.type === eventType && !e.screenshot);
-          if (!ev) return;
+          if (!ev) return false;
           ev.screenshot = dataUrl;
           if (trigger) {
             ev.screenshotBefore = trigger.dataUrl;
@@ -1477,9 +1697,28 @@ export function trackForm(formEl, serverBaseUrl) {
               session.lastSentIndex = evIdx;
             }
           }
+          if (isFinalSubmitFailure) {
+            const submitEv = [...session.events].reverse().find((e) => e.type === 'form_submit' && e.failed && !e.screenshot);
+            if (submitEv) {
+              submitEv.screenshot = dataUrl;
+              submitEv.statusText = submitEv.statusText || context?.statusText;
+              const submitIdx = session.events.indexOf(submitEv);
+              if (submitIdx >= 0) {
+                session.resendFromIndex = Math.min(
+                  typeof session.resendFromIndex === 'number' ? session.resendFromIndex : submitIdx,
+                  submitIdx,
+                );
+                if (submitIdx < (session.lastSentIndex || 0)) {
+                  session.lastSentIndex = submitIdx;
+                }
+              }
+            }
+          }
           sendToServer(session);
-        }).catch(() => {});
+          return true;
+        }).catch(() => false);
       } catch { /* ignore */ }
+      return Promise.resolve(false);
     }
 
     // ── Refresh vs real-abandon detection ────────────────────────────────────
@@ -1742,6 +1981,16 @@ export function trackForm(formEl, serverBaseUrl) {
                 step: currentStep.index,
                 stepName: currentStep.name,
               });
+              addEvent(session, 'api_error', {
+                reason: `${embeddedError.description} — ${url.replace(/[?#].*/, '').split('/').slice(-3).join('/')}`,
+                errorClass: 'backend_business_error',
+                status: response.status,
+                url: url.replace(/[?#].*/, '').split('/').slice(-3).join('/'),
+                nearestField: getNearestField(),
+                triggeredBy: window.__FIS_lastButtonClick && Date.now() - window.__FIS_lastButtonClick.time < 5000 ? window.__FIS_lastButtonClick.label : null,
+                step: currentStep.index,
+                stepName: currentStep.name,
+              });
               attachScreenshot('form_error', { callType, status: response.status, statusText: embeddedError.description });
               if (callType === 'submit') {
                 addEvent(session, 'form_submit', { attemptNumber: submitAttempts, failed: true });
@@ -1778,6 +2027,16 @@ export function trackForm(formEl, serverBaseUrl) {
                 step: currentStep.index,
                 stepName: currentStep.name,
               });
+              addEvent(session, 'api_error', {
+                reason: `HTTP ${response.status} ${statusText} — ${url.replace(/[?#].*/, '').split('/').slice(-3).join('/')}`,
+                errorClass: classifyNetworkError(String(response.status)),
+                status: response.status,
+                url: url.replace(/[?#].*/, '').split('/').slice(-3).join('/'),
+                nearestField: getNearestField(),
+                triggeredBy: window.__FIS_lastButtonClick && Date.now() - window.__FIS_lastButtonClick.time < 5000 ? window.__FIS_lastButtonClick.label : null,
+                step: currentStep.index,
+                stepName: currentStep.name,
+              });
               attachScreenshot('form_error', { callType, status: response.status, statusText });
             }
             return response;
@@ -1786,6 +2045,16 @@ export function trackForm(formEl, serverBaseUrl) {
               callType,
               status: 0,
               statusText: err.message || 'Network error',
+              step: currentStep.index,
+              stepName: currentStep.name,
+            });
+            addEvent(session, 'api_error', {
+              reason: `${err.message || 'Network error'} — ${url.replace(/[?#].*/, '').split('/').slice(-3).join('/')}`,
+              errorClass: classifyNetworkError(err.message || 'Network error'),
+              status: 0,
+              url: url.replace(/[?#].*/, '').split('/').slice(-3).join('/'),
+              nearestField: getNearestField(),
+              triggeredBy: window.__FIS_lastButtonClick && Date.now() - window.__FIS_lastButtonClick.time < 5000 ? window.__FIS_lastButtonClick.label : null,
               step: currentStep.index,
               stepName: currentStep.name,
             });
@@ -2515,11 +2784,6 @@ export function trackForm(formEl, serverBaseUrl) {
       } catch { /* ignore */ }
     });
 
-    // detect progress indicator presence — no indicator = users can't gauge form length
-    const hasProgressIndicator = !!(
-      document.querySelector('[role="progressbar"], .progress, .progress-bar, .step-indicator, .wizard-steps, .fis-steps, nav[aria-label*="step" i]')
-    );
-
     // detect forced account creation — password field in first visible step
     const firstStep = formEl.querySelector('fieldset') || formEl;
     const hasAccountCreation = !!firstStep.querySelector('input[type="password"]');
@@ -2538,6 +2802,21 @@ export function trackForm(formEl, serverBaseUrl) {
         requiredCount: fs.querySelectorAll('[required]').length,
       };
     });
+
+    // detect progress indicator presence — no indicator = users can't gauge form length.
+    // Custom-styled forms rarely use generic class names, so also fall back to a
+    // structural check: any element (that isn't a step fieldset itself) whose text
+    // contains 2+ of the wizard's own step names is a step/progress header, whatever
+    // it's actually called or styled as.
+    const stepNames = stepsInfo.map((s) => s.name).filter(Boolean);
+    const hasStepNamesHeader = stepNames.length > 1 && [...formEl.querySelectorAll('div, nav, ul, ol, header')].some((el) => {
+      if (el.querySelector('fieldset[data-index]')) return false;
+      const text = el.textContent || '';
+      return stepNames.filter((n) => text.includes(n)).length >= 2;
+    });
+    const hasProgressIndicator = hasStepNamesHeader || !!(
+      document.querySelector('[role="progressbar"], .progress, .progress-bar, .step-indicator, .wizard-steps, .fis-steps, nav[aria-label*="step" i]')
+    );
 
     if (!session.events.some((e) => e.type === 'form_start')) {
       addEvent(session, 'form_start', { hasProgressIndicator, hasAccountCreation, stepsInfo });

@@ -5,6 +5,7 @@ import {
   buildSessionSummaries,
   didSessionComplete,
   filterGhostSessions,
+  getFinalAbandonEvent,
   groupSessionsIntoJourneys,
   mergeIntoJourneySessions,
   sessionHasFinalSubmissionFailure,
@@ -229,7 +230,7 @@ export function getJourneysByDomain(domain) {
     const sorted = [...pages].sort((a, b) => (a.pageIndex ?? 0) - (b.pageIndex ?? 0));
     const journeyHasFinalFailure = sorted.some(sessionHasFinalSubmissionFailure);
     const completed = sorted.some(didSessionComplete) && !journeyHasFinalFailure;
-    const abandonPage = sorted.find((p) => p.events?.some((e) => e.type === 'form_abandon'));
+    const abandonPage = sorted.find((p) => getFinalAbandonEvent(p));
     return {
       journeyId,
       pages: sorted.map((p) => ({
@@ -240,7 +241,7 @@ export function getJourneysByDomain(domain) {
         fieldCount: (p.events || []).filter((e) => e.type === 'field_change').length,
         errorCount: (p.events || []).filter((e) => ['api_error', 'js_error', 'console_error', 'form_error', 'field_error'].includes(e.type)).length,
         completed: didSessionComplete(p),
-        abandoned: p.events?.some((e) => e.type === 'form_abandon') ?? false,
+        abandoned: !!getFinalAbandonEvent(p),
       })),
       startTime: sorted[0]?.startTime ?? 0,
       // A resumed journey (session_returned) keeps startTime anchored to when it
@@ -281,7 +282,7 @@ export function getJourneysByFormId(formId) {
     const completed = sorted.some(didSessionComplete) && !journeyHasFinalFailure;
     // last page (highest pageIndex) that abandoned without completing = where they dropped
     const abandonPage = [...sorted].reverse()
-      .find((p) => p.events?.some((e) => e.type === 'form_abandon')
+      .find((p) => getFinalAbandonEvent(p)
         && !didSessionComplete(p));
 
     // collect distinct error types + a searchable blob (types, statuses, messages, fields)
@@ -312,7 +313,7 @@ export function getJourneysByFormId(formId) {
           errorCount: sum.errorCount ?? 0,
           durationMs: sum.durationMs ?? 0,
           completed: didSessionComplete(p),
-          abandoned: p.events?.some((e) => e.type === 'form_abandon') ?? false,
+          abandoned: !!getFinalAbandonEvent(p),
         };
       }),
       startTime: sorted[0]?.startTime ?? 0,

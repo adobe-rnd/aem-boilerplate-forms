@@ -12,6 +12,59 @@ const SUMMARY_ERROR_EVENT_TYPES = new Set([
   'rule_failed', 'suspected_crash', 'storage_quota',
 ]);
 
+const CONTINUATION_AFTER_ABANDON_TYPES = new Set([
+  'field_focus', 'field_blur', 'field_change', 'field_visible',
+  'button_click', 'dead_click', 'disabled_click', 'rage_click',
+  'step_change', 'step_thrash', 'rule_triggered',
+  'form_submit', 'form_error', 'api_error', 'js_error', 'console_error',
+]);
+
+const HTTP_STATUS_LABELS = {
+  0: '0 - No Response',
+  400: '400 - Bad Request',
+  401: '401 - Unauthorized',
+  403: '403 - Forbidden',
+  404: '404 - Endpoint Missing',
+  409: '409 - Conflict',
+  413: '413 - Payload Too Large',
+  422: '422 - Validation Failed',
+  429: '429 - Rate Limited',
+  500: '500 - Internal Server Error',
+  502: '502 - Bad Gateway',
+  503: '503 - Service Unavailable',
+  504: '504 - Gateway Timeout',
+};
+
+function httpStatusLabel(status) {
+  if (status === undefined || status === null || status === '') return null;
+  const n = Number(status);
+  if (!Number.isFinite(n)) return null;
+  if (HTTP_STATUS_LABELS[n]) return HTTP_STATUS_LABELS[n];
+  if (n >= 500) return `${n} - Server Error`;
+  if (n >= 400) return `${n} - Client/Request Error`;
+  if (n >= 300) return `${n} - Redirect`;
+  if (n >= 200) return `${n} - Success`;
+  return `${n} - HTTP Status`;
+}
+
+function isContinuationAfterAbandon(event = {}) {
+  return CONTINUATION_AFTER_ABANDON_TYPES.has(event.type);
+}
+
+export function getFinalAbandonEvent(session = {}) {
+  const events = session.events || [];
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const abandon = events[i];
+    if (abandon.type !== 'form_abandon') continue;
+    const abandonTs = abandon.timestamp || 0;
+    const continued = events.some((event) => event !== abandon
+      && (event.timestamp || 0) > abandonTs
+      && isContinuationAfterAbandon(event));
+    if (!continued) return abandon;
+  }
+  return null;
+}
+
 export function isFinalSubmissionFailureEvent(event = {}) {
   const text = [
     event.statusText,
@@ -45,7 +98,7 @@ export function buildSessionSummaries(sessions) {
     const completed = didSessionComplete(s);
     const hasFieldFocus = s.events.some((e) => e.type === 'field_focus');
     const hasFriction = s.events.some((e) => FRICTION_EVENT_TYPES.has(e.type));
-    const abandonEvent = s.events.find((e) => e.type === 'form_abandon');
+    const abandonEvent = getFinalAbandonEvent(s);
     const errorCount = s.events.filter((e) => SUMMARY_ERROR_EVENT_TYPES.has(e.type)
       || (e.type === 'form_submit' && e.failed === true)).length;
     const thrashFields = [...new Set(s.events.filter((e) => e.type === 'validation_thrash').map((e) => e.field))];
@@ -111,7 +164,7 @@ export function buildFunnel(sessions) {
     const rawSteps = stepsInfo.map((step, i) => {
       const count = sessions.filter((s) => {
         if (didSessionComplete(s)) return true;
-        const abandon = s.events.find((e) => e.type === 'form_abandon');
+        const abandon = getFinalAbandonEvent(s);
         if (abandon) return (abandon.step ?? -1) >= i;
         // Sessions that closed without firing form_abandon: use the highest step reached
         // via step_change events as a proxy for how far the user got.
@@ -183,7 +236,7 @@ export function buildFunnel(sessions) {
 
   sessions.forEach((s) => {
     const didSubmit = didSessionComplete(s);
-    const abandon = s.events.find((e) => e.type === 'form_abandon');
+    const abandon = getFinalAbandonEvent(s);
 
     let maxIdx = -1;
 
@@ -348,7 +401,7 @@ function buildCohortContrast(completed, abandoned) {
   const rate = (cohort, fn) => (cohort.length ? cohort.filter(fn).length / cohort.length : 0);
   const avg = (cohort, fn) => (cohort.length ? cohort.reduce((sum, s) => sum + fn(s), 0) / cohort.length : 0);
   const duration = (s) => {
-    const ab = s.events.find((e) => e.type === 'form_abandon');
+    const ab = getFinalAbandonEvent(s);
     if (ab?.pageTimeMs) return ab.pageTimeMs;
     const last = s.events[s.events.length - 1];
     return last ? last.timestamp - (s.startTime || 0) : 0;
@@ -652,7 +705,7 @@ export function buildFlowComparison(sessions) {
         out.push({ kind: 'friction', text: `Clicked a disabled button${e.element ? ` (${e.element})` : ''}` });
       } else if (e.type === 'rage_click') {
         out.push({ kind: 'friction', text: 'Rage-clicked (frustration)' });
-      } else if (e.type === 'form_abandon' && !didComplete) {
+      } else if (e.type === 'form_abandon' && !didComplete && getFinalAbandonEvent(s) === e) {
         // Only a genuine give-up — suppress false abandons (tab-blur) on sessions
         // that ultimately submitted.
         out.push({ kind: 'end', text: 'Gave up and left' });
@@ -880,12 +933,21 @@ export function analyzeSessions(sessions) {
   // full breakdown by callType across all form_error events
   const submitErrorBreakdown = {};
   const submitErrorStatuses = {};
+  const submitErrorStatusBreakdown = {};
+  const apiErrorStatusBreakdown = {};
+  const httpStatusBreakdown = {};
   sessions.forEach((s) => {
     const errs = s.events.filter((e) => e.type === 'form_error' || e.type === 'submit_error');
     errs.forEach((e) => {
       const type = e.callType || 'submit';
       submitErrorBreakdown[type] = (submitErrorBreakdown[type] || 0) + 1;
-      const key = e.status ? `${e.status} — ${e.statusText} (${type})` : `${e.statusText} (${type})`;
+      const statusLabel = httpStatusLabel(e.status);
+      if (statusLabel) {
+        submitErrorStatusBreakdown[statusLabel] = (submitErrorStatusBreakdown[statusLabel] || 0) + 1;
+        httpStatusBreakdown[statusLabel] = (httpStatusBreakdown[statusLabel] || 0) + 1;
+      }
+      const base = e.status ? `${e.status} — ${e.statusText} (${type})` : `${e.statusText} (${type})`;
+      const key = e.stepName ? `${base} [${e.stepName}]` : base;
       submitErrorStatuses[key] = (submitErrorStatuses[key] || 0) + 1;
     });
   });
@@ -909,6 +971,11 @@ export function analyzeSessions(sessions) {
   const apiErrorMap = {};
   sessions.forEach((s) => {
     s.events.filter((e) => e.type === 'api_error').forEach((e) => {
+      const statusLabel = httpStatusLabel(e.status);
+      if (statusLabel) {
+        apiErrorStatusBreakdown[statusLabel] = (apiErrorStatusBreakdown[statusLabel] || 0) + 1;
+        httpStatusBreakdown[statusLabel] = (httpStatusBreakdown[statusLabel] || 0) + 1;
+      }
       let key;
       if (e.stepName) {
         if (e.url) {
@@ -930,6 +997,7 @@ export function analyzeSessions(sessions) {
     });
   });
   const topApiError = Object.entries(apiErrorMap).sort((a, b) => b[1] - a[1])[0] || null;
+  const topHttpStatusError = Object.entries(httpStatusBreakdown).sort((a, b) => b[1] - a[1])[0] || null;
 
   // most clicked disabled button — element is the button's text label from the DOM,
   // reliable across old and new sessions. stepName disambiguates "Next" buttons.
@@ -945,7 +1013,7 @@ export function analyzeSessions(sessions) {
 
   const abandonmentByStep = {};
   sessions.forEach((s) => {
-    const ae = s.events.find((e) => e.type === 'form_abandon');
+    const ae = getFinalAbandonEvent(s);
     if (!ae || didSessionComplete(s)) return;
     if (!s.events.some((e) => e.type === 'field_focus')) return;
     const key = ae.stepName || (ae.step != null ? `Step ${ae.step + 1}` : null);
@@ -974,7 +1042,7 @@ export function analyzeSessions(sessions) {
     const hasFieldFocus = s.events.some((e) => e.type === 'field_focus');
     if (hasFieldFocus) return false;
     if (s.events.some((e) => FRICTION_EVENT_TYPES.has(e.type))) return false;
-    const abandonEvent = s.events.find((e) => e.type === 'form_abandon');
+    const abandonEvent = getFinalAbandonEvent(s);
     if (!abandonEvent) return false; // no confirmed departure — don't guess
     const pageTimeMs = abandonEvent.pageTimeMs ?? 0;
     const scrollDepth = abandonEvent.maxScrollDepth ?? 100;
@@ -1043,7 +1111,7 @@ export function analyzeSessions(sessions) {
 
   sessions.forEach((session) => {
     const blurEvents = session.events.filter((e) => e.type === 'field_blur');
-    const abandonEvent = session.events.find((e) => e.type === 'form_abandon');
+    const abandonEvent = getFinalAbandonEvent(session);
     const submitEvent = didSessionComplete(session)
       ? session.events.find((e) => e.type === 'form_submit' && !e.failed)
       : null;
@@ -1185,7 +1253,7 @@ export function analyzeSessions(sessions) {
     if (!deviceBreakdown[d]) deviceBreakdown[d] = { total: 0, completed: 0, abandoned: 0 };
     deviceBreakdown[d].total += 1;
     if (didSessionComplete(s)) deviceBreakdown[d].completed += 1;
-    else if (s.events.some((e) => e.type === 'form_abandon') && s.events.some((e) => e.type === 'field_focus')) deviceBreakdown[d].abandoned += 1;
+    else if (getFinalAbandonEvent(s) && s.events.some((e) => e.type === 'field_focus')) deviceBreakdown[d].abandoned += 1;
   });
 
   // per-platform (OS / browser) breakdown — only sessions carrying deviceInfo
@@ -1201,7 +1269,7 @@ export function analyzeSessions(sessions) {
     }
     map[key].total += 1;
     if (didSessionComplete(s)) map[key].completed += 1;
-    else if (s.events.some((e) => e.type === 'form_abandon') && s.events.some((e) => e.type === 'field_focus')) map[key].abandoned += 1;
+    else if (getFinalAbandonEvent(s) && s.events.some((e) => e.type === 'field_focus')) map[key].abandoned += 1;
     if (hasError(s)) map[key].withError += 1;
   };
   const osBreakdown = {};
@@ -1257,6 +1325,10 @@ export function analyzeSessions(sessions) {
         disabledClicks: sessionsWithDisabledClicks,
         topRageClick: topRageClick ? { label: topRageClick[0], count: topRageClick[1] } : null,
         topApiError: topApiError ? { label: topApiError[0], count: topApiError[1] } : null,
+        httpStatusBreakdown,
+        apiErrorStatusBreakdown,
+        submitErrorStatusBreakdown,
+        topHttpStatusError: topHttpStatusError ? { label: topHttpStatusError[0], count: topHttpStatusError[1] } : null,
         topDisabledClick: topDisabledClick ? { label: topDisabledClick[0], count: topDisabledClick[1] } : null,
         submitErrors: sessionsWithSubmitErrors,
         submitErrorBreakdown,
