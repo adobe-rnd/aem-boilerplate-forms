@@ -9,3 +9,9 @@ tools/forms-scaffolder.js
 tools/update-mappings.js
 /test
 dompurify.min.js
+analytics/**
+server/**
+chrome-extension/**
+blocks/form-tracker/**
+fis-page-tracker.js
+fis-tracker.js
