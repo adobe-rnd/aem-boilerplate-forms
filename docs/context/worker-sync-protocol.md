@@ -50,6 +50,12 @@ After the `setTimeout(0)` yield, Phase 1 and Phase 2 changes are merged into a s
 **Main Thread Handling:**
 - Applied sequentially with `fieldChanged()` (DOM update) + `applyFieldChangeToFormModel()` (model sync)
 
+### Restore Buffering
+
+The `restoreState` and `applyFieldChanges` messages are posted back-to-back by the worker, but the main thread's `restoreState` handler must first `await loadRuleEngine()`, whose dynamic `import()` of the model can span multiple macrotasks. Because each worker message is delivered as its own macrotask, the batched `applyFieldChanges` can arrive while `loadRuleEngine` is still resolving — before `formModels` is populated.
+
+To prevent the batch from being dropped, `initializeRuleEngineWorker` keeps a `restoreInProgress` flag (set synchronously when `restoreState` is received) and a `pendingFieldChanges` buffer. While restore is in progress, incoming `applyFieldChanges` batches are buffered; immediately after `loadRuleEngine` completes they are drained and applied. The live phase is unaffected — once restore is done, changes apply directly.
+
 ### Phase 3: Live (after sync-complete)
 
 **Flags:**
