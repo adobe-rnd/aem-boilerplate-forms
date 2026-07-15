@@ -92,6 +92,26 @@ Different forms can have different submission and redirect behavior. Some forms 
 
 The tracker is designed to handle common flows generically, but final success and failure classification may need form-specific detection rules when a form uses unique final screens or custom backend responses.
 
+## Storage Optimization Notes
+
+Current storage growth is driven mostly by screenshots, not the JSON session log. Session data is comparatively small, while screenshot files can grow quickly during repeated testing or long-running capture windows.
+
+If storage needs to be optimized later, the best first option is screenshot retention and cleanup:
+
+- Delete screenshots that are no longer referenced by stored sessions.
+- Remove screenshots older than a chosen retention window, such as 7 or 14 days.
+- Reduce screenshot quality or dimensions before storing, for example by using lower-quality JPEG/WebP output or resizing very large captures.
+- Keep visual context for final submission failures and abandonment, where screenshots are most useful.
+- Deduplicate repeated screenshots more aggressively for dead clicks, disabled clicks, rage clicks, and repeated service errors.
+
+Secondary optimizations are smaller but still useful:
+
+- Store `sessions.json` as minified JSON instead of pretty-printed JSON.
+- Trim noisy repeated event payloads, such as focus, blur, visibility, and rule-triggered events, when they are not needed for analysis.
+- Move from one large JSON file to per-session files or SQLite if the tracker is used for larger datasets.
+
+The recommended order is to optimize screenshots first, then compact JSON only if storage or write performance is still a concern.
+
 ## Important Files
 
 - `fis-page-tracker.js` - page-level tracker used for injected tracking flows.
