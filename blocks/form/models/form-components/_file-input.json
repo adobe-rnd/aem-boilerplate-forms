@@ -31,6 +31,11 @@
             "id": "file-input",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "file-input"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

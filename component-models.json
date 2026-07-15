@@ -198,6 +198,11 @@
     "id": "form",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "form"
+      },
+      {
         "component": "container",
         "name": "basic",
         "label": "Use the Edit Form Properties extension to configure Adaptive Form properties, including Submit Action, Prefill, and Thank-You options.",
@@ -223,6 +228,11 @@
   {
     "id": "form-button",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "button"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -339,6 +349,11 @@
   {
     "id": "checkbox-group",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "checkbox-group"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -580,6 +595,11 @@
     "id": "checkbox",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "checkbox"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -796,6 +816,11 @@
   {
     "id": "date-input",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "date-input"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -1041,6 +1066,11 @@
     "id": "drop-down",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "drop-down"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -1272,6 +1302,11 @@
     "id": "email",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "email"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -1491,6 +1526,11 @@
     "id": "file-input",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "file-input"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -1693,6 +1733,11 @@
     "id": "form-fragment",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "panel"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -1888,6 +1933,11 @@
   {
     "id": "form-image",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "image"
+      },
       {
         "component": "text",
         "name": "name",
@@ -2214,6 +2264,11 @@
     "id": "number-input",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "number-input"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -2467,6 +2522,11 @@
   {
     "id": "panel",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "panel"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -2740,6 +2800,11 @@
     "id": "radio-group",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "radio-group"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -2979,6 +3044,11 @@
     "id": "captcha",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "captcha"
+      },
+      {
         "component": "text",
         "name": "name",
         "label": "Name",
@@ -2990,6 +3060,11 @@
   {
     "id": "form-reset-button",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "button"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -3107,6 +3182,11 @@
     "id": "form-submit-button",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "button"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -3222,6 +3302,11 @@
   {
     "id": "telephone-input",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "text-input"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -3427,6 +3512,11 @@
   {
     "id": "text-input",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "text-input"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -3653,6 +3743,11 @@
     "id": "plain-text",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "plain-text"
+      },
+      {
         "component": "text",
         "name": "name",
         "label": "Name",
@@ -3734,6 +3829,16 @@
   {
     "id": "accordion",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "panel"
+      },
+      {
+        "component": "hidden",
+        "name": "fd:viewType",
+        "default": "accordion"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -3875,6 +3980,16 @@
     "id": "modal",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "panel"
+      },
+      {
+        "component": "hidden",
+        "name": "fd:viewType",
+        "default": "modal"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -4014,6 +4129,16 @@
   {
     "id": "password",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "text-input"
+      },
+      {
+        "component": "hidden",
+        "name": "fd:viewType",
+        "default": "password"
+      },
       {
         "component": "tab",
         "label": "Basic",
@@ -4222,6 +4347,16 @@
     "id": "range",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "number-input"
+      },
+      {
+        "component": "hidden",
+        "name": "fd:viewType",
+        "default": "range"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -4427,6 +4562,16 @@
     "id": "rating",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "number-input"
+      },
+      {
+        "component": "hidden",
+        "name": "fd:viewType",
+        "default": "rating"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -4620,6 +4765,16 @@
     "id": "tnc",
     "fields": [
       {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "panel"
+      },
+      {
+        "component": "hidden",
+        "name": "fd:viewType",
+        "default": "tnc"
+      },
+      {
         "component": "tab",
         "label": "Basic",
         "name": "basic"
@@ -4765,6 +4920,16 @@
   {
     "id": "wizard",
     "fields": [
+      {
+        "component": "hidden",
+        "name": "fieldType",
+        "default": "panel"
+      },
+      {
+        "component": "hidden",
+        "name": "fd:viewType",
+        "default": "wizard"
+      },
       {
         "component": "tab",
         "label": "Basic",

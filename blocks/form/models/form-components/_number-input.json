@@ -21,6 +21,11 @@
             "id": "number-input",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "number-input"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

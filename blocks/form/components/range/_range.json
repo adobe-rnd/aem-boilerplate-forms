@@ -24,6 +24,16 @@
         "id": "range",
         "fields": [
           {
+            "component": "hidden",
+            "name": "fieldType",
+            "default": "number-input"
+          },
+          {
+            "component": "hidden",
+            "name": "fd:viewType",
+            "default": "range"
+          },
+          {
             "component": "tab",
             "label": "Basic",
             "name": "basic"

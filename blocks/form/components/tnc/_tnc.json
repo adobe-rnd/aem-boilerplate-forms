@@ -60,6 +60,16 @@
       "id": "tnc",
       "fields": [
         {
+          "component": "hidden",
+          "name": "fieldType",
+          "default": "panel"
+        },
+        {
+          "component": "hidden",
+          "name": "fd:viewType",
+          "default": "tnc"
+        },
+        {
           "component": "tab",
           "label": "Basic",
           "name": "basic"

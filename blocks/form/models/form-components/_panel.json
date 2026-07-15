@@ -22,6 +22,11 @@
             "id": "panel",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "panel"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

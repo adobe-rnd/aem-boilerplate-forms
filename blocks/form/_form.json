@@ -42,6 +42,11 @@
       "id": "form",
       "fields": [
         {
+          "component": "hidden",
+          "name": "fieldType",
+          "default": "form"
+        },
+        {
           "component": "container",
           "name": "basic",
           "label": "Use the Edit Form Properties extension to configure Adaptive Form properties, including Submit Action, Prefill, and Thank-You options.",

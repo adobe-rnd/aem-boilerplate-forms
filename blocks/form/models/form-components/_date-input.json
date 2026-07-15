@@ -21,6 +21,11 @@
             "id": "date-input",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "date-input"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"

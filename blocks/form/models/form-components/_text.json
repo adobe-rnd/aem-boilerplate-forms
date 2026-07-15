@@ -23,6 +23,11 @@
       "id": "plain-text",
       "fields": [
         {
+          "component": "hidden",
+          "name": "fieldType",
+          "default": "plain-text"
+        },
+        {
           "component": "text",
           "name": "name",
           "label": "Name",

@@ -22,6 +22,11 @@
             "id": "checkbox",
             "fields": [
                 {
+                    "component": "hidden",
+                    "name": "fieldType",
+                    "default": "checkbox"
+                },
+                {
                     "component": "tab",
                     "label": "Basic",
                     "name": "basic"
