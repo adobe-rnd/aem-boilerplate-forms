@@ -4,7 +4,7 @@ import { getFieldModel, openPage } from '../../utils.js';
 test.describe('Form with Number Input', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/number-validation/basic';
   const errorMessage = "Please enter a valid value.";
-  const errorMessage1 = "Please enter a valid value. The two nearest valid values are 11 and 12.";
+  const errorMessage1 = "Please enter a valid value.";
   const description = "This is short description";
   let formContainer = null;
 

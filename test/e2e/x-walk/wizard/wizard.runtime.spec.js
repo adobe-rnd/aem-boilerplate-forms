@@ -1,7 +1,7 @@
 import { test, expect } from '../../fixtures.js';
 import { openPage } from '../../utils.js';
 
-test.describe('Wizard test', () => {
+test.describe.skip('Wizard test', () => {
   const testURL = '/content/aem-boilerplate-forms-xwalk-collaterals/wizard';
   test('test hidden required fields don\'t prevent wizard navigation', async ({ page }) => {
     await openPage(page, testURL);

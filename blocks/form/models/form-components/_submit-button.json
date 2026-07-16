@@ -22,14 +22,15 @@
       "id": "form-submit-button",
       "fields": [
         {
-          "component": "container",
-          "name": "basic",
+          "component": "tab",
           "label": "Basic",
-          "collapsible": false,
-          "...": "../form-common/_basic-fields.json"
+          "name": "basic"
         },
         {
-          "...": "../form-common/_help-container.json"
+          "...": "../form-common/_basic-fields.json#/fields"
+        },
+        {
+          "...": "../form-common/_help-container.json#/fields"
         }
       ]
     }

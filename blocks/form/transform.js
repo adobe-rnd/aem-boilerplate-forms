@@ -168,7 +168,30 @@ export default class DocBasedFormToAF {
     'Pattern Error Message': 'constraintMessages.pattern',
     'Min Error Message': 'constraintMessages.min',
     'Max Error Message': 'constraintMessages.max',
+    'Custom Type': ':type',
   };
+
+  /**
+   * Parses the form block DOM for config (e.g. "css: path") and sets formDef.properties.style.
+   * Removes config rows from the block.
+   * @param {HTMLElement} [block] - The form block element
+   * @returns {string|undefined} The CSS path if found
+   */
+  static parseStyleFromBlock(block) {
+    if (!block?.children?.length) return undefined;
+    let style;
+    [...block.children].forEach((row) => {
+      const text = row?.textContent?.trim() || '';
+      if (text.includes(':')) {
+        const [key, ...rest] = text.split(':');
+        if (key.trim().toLowerCase() === 'style') {
+          style = rest.join(':').trim();
+          row.remove();
+        }
+      }
+    });
+    return style;
+  }
 
   fieldMapping = new Map([
     ['text', 'text-input'],
@@ -194,10 +217,20 @@ export default class DocBasedFormToAF {
      *
      * @return {{formDef: any, excelData: any}} response
      */
-  transform(exData, { name } = { name: 'Form' }) {
+  transform(exData, { name, block } = { name: 'Form' }) {
     this.errors = [];
+    const applyStyleFromBlock = (def) => {
+      if (block) {
+        const style = DocBasedFormToAF.parseStyleFromBlock(block);
+        if (style) {
+          def.properties = def.properties || {};
+          def.properties.style = style;
+        }
+      }
+    };
     // if its adaptive form json just return it.
     if (exData?.adaptiveform) {
+      applyStyleFromBlock(exData);
       return { formDef: exData, excelData: null };
     }
     if (!exData || !exData.data) {
@@ -243,6 +276,7 @@ export default class DocBasedFormToAF {
       }
     });
     formDef.properties.rules = { fieldIdMap, rules };
+    applyStyleFromBlock(formDef);
     return formDef;
   }
 
@@ -267,10 +301,12 @@ export default class DocBasedFormToAF {
      * @param {any} field FieldJson
      */
   #transformFieldType(field) {
-    field[':type'] = field.fieldType;
+    if (!field[':type']) {
+      field[':type'] = field.fieldType;
+    }
     if (this.fieldMapping.has(field?.fieldType)) {
       field.fieldType = this.fieldMapping.get(field?.fieldType);
-    } if (this.containerNamesSet.has(field.name)) {
+    } else if (this.containerNamesSet.has(field.name)) {
       field.fieldType = 'panel';
     }
   }

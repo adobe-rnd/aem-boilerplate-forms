@@ -50,4 +50,28 @@ test.describe('Modal Form Test', () => {
     await textField.fill('Hello');
     await expect(textField).toHaveValue('Hello');
   });
+
+
+  test('check modal works in newly added repeatable panel', async ({ page }) => {
+    const url = '/content/aem-boilerplate-forms-xwalk-collaterals/subscribe';
+    await openPage(page, url);
+    const button = await page.getByText('Open PopUp').first();
+    await button.click();
+    const dialog = await page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    const closeButton = await page.getByRole('button', { name: 'Close' });
+    await closeButton.click();
+    await expect(dialog).toBeHidden();
+
+    const addButton = await page.getByText('Add Instance');
+    await addButton.click();
+
+    const button_two = await page.getByText('Open PopUp').nth(1);
+    await button_two.click();
+    const dialog_two = await page.getByRole('dialog'); // so we remove a dialog from the html when its closed so at a time we will have only one dialog
+    await expect(dialog_two).toBeVisible();
+    const closeButton_two = await page.getByRole('button', { name: 'Close' });
+    await closeButton_two.click();
+    await expect(dialog_two).toBeHidden();
+  });
 });

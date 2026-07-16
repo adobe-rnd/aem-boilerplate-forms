@@ -31,7 +31,8 @@ test.describe('Preview Validation in UE', async () => {
     const textInput = iframe.locator(universalEditorBase.componentLocatorForPreview(componentNames[0])).locator('input');
     const button = iframe.locator(universalEditorBase.componentLocatorForPreview(componentNames[2]));
     const emailInput = iframe.locator(universalEditorBase.componentLocatorForPreview(componentNames[1]));
-    await textInput.fill(textInputValue);
+    await textInput.click();
+    await page.keyboard.type(textInputValue, { delay: 100 });
     await textInput.blur();
     await expect(button).toBeVisible();
     await button.locator('button').click();

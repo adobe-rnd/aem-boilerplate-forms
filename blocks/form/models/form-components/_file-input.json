@@ -31,11 +31,12 @@
             "id": "file-input",
             "fields": [
                 {
-                    "component": "container",
-                    "name": "basic",
+                    "component": "tab",
                     "label": "Basic",
-                    "collapsible": false,
-                    "...": "../form-common/_basic-input-fields.json"
+                    "name": "basic"
+                },
+                {
+                    "...": "../form-common/_basic-input-fields.json#/fields"
                 },
                 {
                     "component": "text",
@@ -50,43 +51,40 @@
                 "valueType": "string"
                 },
                 {
-                    "...": "../form-common/_help-container.json"
+                    "component": "tab",
+                    "label": "Validation",
+                    "name": "validation"
                 },
                 {
-                    "component": "container",
-                    "name": "validation",
-                    "label": "Validation",
-                    "collapsible": true,
-                    "fields": [
-                        {
-                            "...": "../form-common/_basic-validation-fields.json#/fields"
-                        },
-                        {
-                            "component": "number",
-                            "name": "maxFileSize",
-                            "label": "Maximum file size (MB)",
-                            "valueType": "string"
-                        },
-                        {
-                            "component": "text",
-                            "name": "maxFileSizeMessage",
-                            "label": "Maximum file size error message",
-                            "valueType": "string"
-                        },
-                        {
-                            "component": "text",
-                            "name": "accept",
-                            "label": "Allowed file types",
-                            "valueType": "string",
-                            "multi": true
-                        },
-                        {
-                            "component": "text",
-                            "name": "acceptMessage",
-                            "label": "File type error message",
-                            "valueType": "string"
-                        }
-                    ]
+                    "...": "../form-common/_basic-validation-fields.json#/fields"
+                },
+                {
+                    "component": "number",
+                    "name": "maxFileSize",
+                    "label": "Maximum file size (MB)",
+                    "valueType": "string"
+                },
+                {
+                    "component": "text",
+                    "name": "maxFileSizeMessage",
+                    "label": "Maximum file size error message",
+                    "valueType": "string"
+                },
+                {
+                    "component": "text",
+                    "name": "accept",
+                    "label": "Allowed file types",
+                    "valueType": "string",
+                    "multi": true
+                },
+                {
+                    "component": "text",
+                    "name": "acceptMessage",
+                    "label": "File type error message",
+                    "valueType": "string"
+                },
+                {
+                    "...": "../form-common/_help-container.json#/fields"
                 }
             ]
         }

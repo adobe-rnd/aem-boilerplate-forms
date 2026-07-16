@@ -17,9 +17,10 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import decorate, { generateFormRendition } from '../blocks/form/form.js';
+import decorate, { generateFormRendition, fetchForm } from '../blocks/form/form.js';
 import { loadCSS } from './aem.js';
 import { handleAccordionNavigation } from '../blocks/form/components/accordion/accordion.js';
+import { createButton as createRepeatButton } from '../blocks/form/components/repeat/repeat.js';
 
 window.currentMode = 'preview';
 let activeWizardStep;
@@ -102,6 +103,32 @@ function annotateContainer(fieldWrapper, fd) {
   fieldWrapper.setAttribute('data-aue-filter', 'form');
 }
 
+function annotateRepeatablePanel(fieldWrapper) {
+  const hasAddButton = fieldWrapper.querySelector('.repeat-actions .item-add');
+  const hasRemoveButton = fieldWrapper.querySelector('.item-remove');
+
+  if (!hasAddButton) {
+    let repeatActions = fieldWrapper.querySelector('.repeat-actions');
+    if (!repeatActions) {
+      repeatActions = document.createElement('div');
+      repeatActions.className = 'repeat-actions';
+      const legend = fieldWrapper.querySelector('legend');
+      if (legend) {
+        legend.insertAdjacentElement('afterend', repeatActions);
+      } else {
+        fieldWrapper.insertAdjacentElement('afterbegin', repeatActions);
+      }
+    }
+    const addButton = createRepeatButton('Add', 'add');
+    repeatActions.appendChild(addButton);
+  }
+
+  if (!hasRemoveButton) {
+    const removeButton = createRepeatButton('Delete', 'remove');
+    fieldWrapper.appendChild(removeButton);
+  }
+}
+
 export function getContainerChildNodes(container, fd) {
   if (fd[':type'] === 'modal') {
     return container.querySelector('.modal-content')?.childNodes;
@@ -129,6 +156,9 @@ function annotateItems(items, formDefinition, formFieldMap) {
               annotateFormFragment(fieldWrapper, fd);
             } else {
               annotateContainer(fieldWrapper, fd);
+              if (fd.repeatable === true) {
+                annotateRepeatablePanel(fieldWrapper);
+              }
               annotateItems(getContainerChildNodes(fieldWrapper, fd), formDefinition, formFieldMap);
               // retain wizard step selection
               if (activeWizardStep === fieldWrapper.dataset.id) {
@@ -197,18 +227,37 @@ export function handleEditorSelect(event) {
 
   if (selected && target.closest('.wizard') && !target.classList.contains('wizard')) {
     handleNavigation(target.closest('.wizard'), resource, handleWizardNavigation);
-  } else if (selected && target.closest('.accordion')) {
+  }
+  if (selected && target.closest('.accordion')) {
     handleNavigation(target.closest('.accordion'), resource, handleAccordionNavigationInEditor);
   }
 }
 
-async function renderFormBlock(form, editMode) {
+export async function renderFormBlock(form, editMode) {
   const block = form.closest('.block[data-aue-resource]');
   if ((editMode && !block.classList.contains('edit-mode')) || !editMode) {
     block.classList.toggle('edit-mode', editMode);
-    const formDefResp = await fetch(`${form.dataset.formpath}.model.json`);
-    const formDef = await formDefResp.json();
     const div = form.parentElement;
+    let formDef;
+    try {
+      const formDefResp = await fetch(`${form.dataset.formpath}.model.json`);
+      formDef = await formDefResp.json();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to fetch form model json:', error);
+      try {
+        formDef = await fetchForm(document.location.pathname);
+      } catch (fallbackError) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to fetch fallback form definition:', fallbackError);
+        return null;
+      }
+    }
+
+    if (!formDef) {
+      return null;
+    }
+
     div.replaceChildren();
     const pre = document.createElement('pre');
     const code = document.createElement('code');

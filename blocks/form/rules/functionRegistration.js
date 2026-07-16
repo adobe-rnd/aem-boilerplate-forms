@@ -17,9 +17,43 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import { registerFunctions } from './model/afb-runtime.js';
+import { registerFunctions } from './model/afb-runtime.min.js';
 
-export default async function registerCustomFunctions() {
+const preloadedUrls = new Set();
+
+/**
+ * Preloads script URLs so the browser fetches them once; main and worker
+ * then get cache on import(). Call as soon as formDef is available (runtime).
+ * customFunctionsPath comes from form JSON (formDef.properties.customFunctionsPath).
+ * @param {string} [customFunctionsPath] - From formDef.properties.customFunctionsPath
+ * @param {string} [codeBasePath] - e.g. window.hlx?.codeBasePath
+ */
+export function preloadFunctionScripts(customFunctionsPath, codeBasePath) {
+  if (typeof document === 'undefined' || !document?.head) return;
+  const base = (typeof codeBasePath === 'string' && codeBasePath !== '')
+    ? codeBasePath.replace(/\/$/, '')
+    : '';
+  const prefix = base ? `${base}/` : '/';
+  const paths = [`${prefix}blocks/form/rules/functions.js`];
+  if (typeof customFunctionsPath === 'string' && customFunctionsPath.trim() !== '') {
+    paths.push(`${prefix}${customFunctionsPath.replace(/^\//, '').trim()}`);
+  }
+  paths.forEach((href) => {
+    try {
+      const url = href.startsWith('http') ? href : new URL(href, window.location.origin).href;
+      if (preloadedUrls.has(url)) return;
+      preloadedUrls.add(url);
+      const link = document.createElement('link');
+      link.rel = 'modulepreload';
+      link.href = url;
+      document.head.appendChild(link);
+    } catch {
+      // Skip invalid URL or DOM error; do not break form init
+    }
+  });
+}
+
+export default async function registerCustomFunctions(customFunctionsPath, codeBasePath) {
   try {
     // eslint-disable-next-line no-inner-declarations
     function registerFunctionsInRuntime(module) {
@@ -36,11 +70,15 @@ export default async function registerCustomFunctions() {
       }
     }
 
-    const customFunctionModule = await import('../functions.js');
     const ootbFunctionModule = await import('./functions.js');
     registerFunctionsInRuntime(ootbFunctionModule);
-    registerFunctionsInRuntime(customFunctionModule);
+    if (codeBasePath != null && codeBasePath !== undefined && customFunctionsPath
+      && customFunctionsPath !== undefined) {
+      const customFunctionModule = await import(`${codeBasePath}${customFunctionsPath}`);
+      registerFunctionsInRuntime(customFunctionModule);
+    }
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.log(`error occured while registering custom functions in web worker ${e.message}`);
   }
 }
