@@ -41,7 +41,8 @@ export function resolveFunctionUrl(codeBasePath, path) {
   // Keep an absolute origin (scheme://host) out of the segment merge so it is not mangled.
   const originMatch = cbp.match(/^[a-z][a-z0-9+.-]*:\/\/[^/]+/i);
   const origin = originMatch ? originMatch[0] : '';
-  const baseSegments = (originMatch ? cbp.slice(origin.length) : cbp).split('/').filter(Boolean);
+  const base = originMatch ? cbp.slice(origin.length) : cbp;
+  const baseSegments = base.split('/').filter(Boolean);
   const pathSegments = cfp.split('/').filter(Boolean);
   // Longest overlap: last `i` segments of codeBasePath === first `i` segments of path.
   let overlap = 0;
@@ -59,7 +60,12 @@ export function resolveFunctionUrl(codeBasePath, path) {
     }
   }
   const merged = [...baseSegments, ...pathSegments.slice(overlap)].join('/');
-  return origin ? `${origin}/${merged}` : `/${merged}`;
+  if (origin) return `${origin}/${merged}`;
+  // Root-relative unless codeBasePath was itself a bare relative path (e.g. '../..',
+  // used by the no-Worker/test harness) - in that case the joined result must stay
+  // relative too, or it turns into an invalid "above the origin root" absolute path.
+  const rootRelative = base === '' || base.startsWith('/');
+  return rootRelative ? `/${merged}` : merged;
 }
 
 /**
