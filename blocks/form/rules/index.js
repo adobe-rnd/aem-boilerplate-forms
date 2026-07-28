@@ -403,7 +403,11 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
       const sub = subs?.get(fieldId);
       if (sub?.listenChanges) {
         try {
-          sub.callback(sub.fieldDiv, e.payload.field, 'change', e.payload);
+          // Pass the LIVE field model, not e.payload.field (a getState() snapshot), so the callback
+          // reads current getters/properties/methods — consistent with the 'register' call above.
+          // Falls back to the snapshot if the element can't be resolved (defensive).
+          const liveField = form.getElement(fieldId) || e.payload.field;
+          sub.callback(sub.fieldDiv, liveField, 'change', e.payload);
         } catch (err) {
           console.error(`Error in subscription callback for field "${fieldId}":`, err);
         }
