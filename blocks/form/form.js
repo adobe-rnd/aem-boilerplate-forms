@@ -123,7 +123,14 @@ function createImage(fd) {
   const field = createFieldWrapper(fd);
   field.id = fd?.id;
   const imagePath = fd.value || fd.properties['fd:repoPath'] || '';
-  const altText = fd.altText || fd.name;
+  let altText = (fd.altText || '').trim();
+  if (!altText) {
+    const name = (fd.name || '').trim();
+    const isPlaceholderName = /^form_image[\d_]*$/i.test(name) || /^image\d*$/i.test(name);
+    altText = isPlaceholderName
+      ? (fd['jcr:title'] || fd.label?.value || '').trim() || ''
+      : name;
+  }
   field.append(createOptimizedPicture(imagePath, altText));
   return field;
 }
