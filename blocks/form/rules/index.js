@@ -51,7 +51,17 @@ function compare(fieldVal, htmlVal, type) {
   return fieldVal === htmlVal;
 }
 
-function handleActiveChild(id, form) {
+// Returns the live model state for a panel after rules have run — used instead of
+// stale init-time fieldData when rendering lazily deferred panels.
+function getLivePanelState(panelId, form) {
+  const liveModel = formModels[form.dataset?.id];
+  if (!liveModel) return null;
+  let livePanel = null;
+  liveModel.visit((f) => { if (f.id === panelId) livePanel = f; });
+  return livePanel ? livePanel.getState(true) : null;
+}
+
+function handleActiveChild(id, form, generateFormRendition) {
   form.querySelectorAll('[data-active="true"]').forEach((ele) => ele.removeAttribute('data-active'));
   const field = form.querySelector(`#${id}`);
   if (field) {
@@ -62,6 +72,29 @@ function handleActiveChild(id, form) {
       field.scrollIntoView({ behavior: 'smooth' });
     }
   }
+  // If the newly active wizard panel was lazily deferred, render it now.
+  /* eslint-disable no-underscore-dangle */
+  if (generateFormRendition && form._lazyPanels?.has(id)) {
+    const { fieldData, formId, getItems } = form._lazyPanels.get(id);
+    form._lazyPanels.delete(id);
+    const panelEl = form.querySelector(`#${id}`);
+    if (panelEl) {
+      const renderData = getLivePanelState(id, form) || fieldData;
+      const promise = generateFormRendition(
+        renderData,
+        panelEl,
+        formId,
+        getItems,
+        { lazyComponents: form._lazyComponents },
+      );
+      if (fieldData.qualifiedName) {
+        renderPromises[fieldData.qualifiedName] = promise;
+        promise.then(() => { delete renderPromises[fieldData.qualifiedName]; });
+      }
+      promise.then(() => handleActiveChild(id, form, null));
+    }
+  }
+  /* eslint-enable no-underscore-dangle */
 }
 
 export async function fieldChanged(payload, form, generateFormRendition) {
@@ -161,7 +194,35 @@ export async function fieldChanged(payload, form, generateFormRendition) {
           field.value = valueToSet;
         }
         break;
-      case 'visible':
+      case 'visible': {
+        // Skip no-op mutation — prevents forced reflow when value is already set.
+        if (String(fieldWrapper.dataset.visible) === String(currentValue)) break;
+        /* eslint-disable no-underscore-dangle */
+        // Lazy component: run decorator first, show only after it resolves — prevents CLS.
+        if (currentValue === true && fieldType !== 'panel' && form._lazyComponents?.has(id)) {
+          if (!formModels[form.dataset?.id]) {
+            // Rule engine not ready yet — queue for reconciliation in loadRuleEngine.
+            form._pendingLazyComponents = form._pendingLazyComponents || new Set();
+            form._pendingLazyComponents.add(id);
+          } else {
+            const { thunk, qualifiedName: qn } = form._lazyComponents.get(id);
+            form._lazyComponents.delete(id);
+            const promise = thunk();
+            const setVisible = () => { fieldWrapper.dataset.visible = 'true'; };
+            if (qn) {
+              renderPromises[qn] = promise;
+              promise.then(() => { delete renderPromises[qn]; setVisible(); });
+            } else {
+              promise.then(setVisible);
+            }
+          }
+          break;
+        }
+        // Lazy panel already pre-rendered in loadRuleEngine — wait before showing (prevents CLS).
+        if (currentValue === true && fieldType === 'panel' && form._preRenderPromises?.has(id)) {
+          form._preRenderPromises.get(id).then(() => { fieldWrapper.dataset.visible = 'true'; });
+          break;
+        }
         fieldWrapper.dataset.visible = currentValue;
         if (fieldType === 'panel' && fieldWrapper.querySelector('dialog')) {
           const dialog = fieldWrapper.querySelector('dialog');
@@ -169,7 +230,31 @@ export async function fieldChanged(payload, form, generateFormRendition) {
             dialog.close(); // close triggers the event listener that removes the dialog overlay
           }
         }
+        // Lazy panel not yet pre-rendered: render now, or queue if model not ready yet.
+        if (currentValue === true && fieldType === 'panel' && generateFormRendition && form._lazyPanels?.has(id)) {
+          const liveState = getLivePanelState(id, form);
+          if (!liveState) {
+            form._pendingLazyRenders = form._pendingLazyRenders || new Set();
+            form._pendingLazyRenders.add(id);
+          } else {
+            const { fieldData, formId: storedFormId, getItems } = form._lazyPanels.get(id);
+            form._lazyPanels.delete(id);
+            const promise = generateFormRendition(
+              liveState,
+              field,
+              storedFormId,
+              getItems,
+              { lazyComponents: form._lazyComponents },
+            );
+            if (fieldData.qualifiedName) {
+              renderPromises[fieldData.qualifiedName] = promise;
+              promise.then(() => { delete renderPromises[fieldData.qualifiedName]; });
+            }
+          }
+        }
+        /* eslint-enable no-underscore-dangle */
         break;
+      }
       case 'enabled':
         // If checkboxgroup/radiogroup/drop-down is readOnly then it should remain disabled.
         if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
@@ -243,7 +328,7 @@ export async function fieldChanged(payload, form, generateFormRendition) {
           renderPromises[currentValue?.qualifiedName] = promise;
         }
         break;
-      case 'activeChild': handleActiveChild(activeChild, form);
+      case 'activeChild': handleActiveChild(activeChild, form, generateFormRendition);
         break;
       case 'valid':
         if (currentValue === true) {
@@ -274,12 +359,12 @@ export async function fieldChanged(payload, form, generateFormRendition) {
   });
 }
 
-function formChanged(payload, form) {
+function formChanged(payload, form, generateFormRendition) {
   const { changes } = payload;
   changes.forEach((change) => {
     const { propertyName, currentValue } = change;
     switch (propertyName) {
-      case 'activeChild': handleActiveChild(currentValue?.id, form);
+      case 'activeChild': handleActiveChild(currentValue?.id, form, generateFormRendition);
         break;
       default:
         break;
@@ -292,7 +377,7 @@ function handleRuleEngineEvent(e, form, generateFormRendition) {
   if (type === 'fieldChanged') {
     fieldChanged(payload, form, generateFormRendition);
   } else if (type === 'change') {
-    formChanged(payload, form);
+    formChanged(payload, form, generateFormRendition);
   } else if (type === 'submitSuccess') {
     submitSuccess(e, form);
   } else if (type === 'submitFailure') {
@@ -394,6 +479,90 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
   formModels[htmlForm.dataset?.id] = form;
+  /* eslint-disable no-underscore-dangle */
+  // Pre-render lazy panels that are visible=true in the live model — prevents CLS on restore.
+  if (htmlForm._lazyPanels?.size) {
+    htmlForm._preRenderPromises = new Map();
+    htmlForm._lazyPanels.forEach(({ fieldData, formId, getItems }, id) => {
+      const liveState = getLivePanelState(id, htmlForm);
+      if (liveState && liveState.visible === true) {
+        const panelEl = htmlForm.querySelector(`#${id}`);
+        if (panelEl) {
+          htmlForm._lazyPanels.delete(id);
+          const promise = genFormRendition(
+            liveState,
+            panelEl,
+            formId,
+            getItems,
+            { lazyComponents: htmlForm._lazyComponents },
+          );
+          htmlForm._preRenderPromises.set(id, promise);
+          promise.then(() => htmlForm._preRenderPromises?.delete(id));
+          if (fieldData.qualifiedName) {
+            renderPromises[fieldData.qualifiedName] = promise;
+            promise.then(() => { delete renderPromises[fieldData.qualifiedName]; });
+          }
+        }
+      }
+    });
+  }
+  // Flush panels queued by case 'visible' before the model was ready.
+  if (htmlForm._pendingLazyRenders?.size) {
+    htmlForm._pendingLazyRenders.forEach((id) => {
+      if (!htmlForm._lazyPanels?.has(id)) return;
+      const { fieldData, formId, getItems } = htmlForm._lazyPanels.get(id);
+      const panelEl = htmlForm.querySelector(`#${id}`);
+      if (!panelEl) return;
+      const liveState = getLivePanelState(id, htmlForm);
+      htmlForm._lazyPanels.delete(id);
+      const promise = genFormRendition(
+        liveState || fieldData,
+        panelEl,
+        formId,
+        getItems,
+        { lazyComponents: htmlForm._lazyComponents },
+      );
+      if (fieldData.qualifiedName) {
+        renderPromises[fieldData.qualifiedName] = promise;
+        promise.then(() => { delete renderPromises[fieldData.qualifiedName]; });
+      }
+    });
+    htmlForm._pendingLazyRenders.clear();
+  }
+  // Run thunks for lazy components that are visible=true in the live model.
+  if (htmlForm._lazyComponents?.size) {
+    htmlForm._lazyComponents.forEach(({ thunk, qualifiedName: qn }, id) => {
+      const liveField = formModels[htmlForm.dataset?.id]?.getElement(id);
+      if (liveField && liveField.visible === true) {
+        htmlForm._lazyComponents.delete(id);
+        const promise = thunk();
+        if (qn) {
+          renderPromises[qn] = promise;
+          promise.then(() => { delete renderPromises[qn]; });
+        }
+      }
+    });
+  }
+  // Flush components queued by case 'visible' before the model was ready.
+  if (htmlForm._pendingLazyComponents?.size) {
+    htmlForm._pendingLazyComponents.forEach((id) => {
+      if (!htmlForm._lazyComponents?.has(id)) return;
+      const liveField = formModels[htmlForm.dataset?.id]?.getElement(id);
+      const fieldWrapper = htmlForm.querySelector(`#${id}`)?.closest('.field-wrapper');
+      const { thunk, qualifiedName: qn } = htmlForm._lazyComponents.get(id);
+      htmlForm._lazyComponents.delete(id);
+      const promise = thunk();
+      const setVisible = () => { if (fieldWrapper) fieldWrapper.dataset.visible = 'true'; };
+      if (qn) {
+        renderPromises[qn] = promise;
+        promise.then(() => { delete renderPromises[qn]; if (liveField?.visible) setVisible(); });
+      } else {
+        promise.then(() => { if (liveField?.visible) setVisible(); });
+      }
+    });
+    htmlForm._pendingLazyComponents.clear();
+  }
+  /* eslint-enable no-underscore-dangle */
   const subscriptions = formSubscriptions[htmlForm.dataset?.id];
   form.subscribe((e) => {
     handleRuleEngineEvent(e, htmlForm, genFormRendition);
