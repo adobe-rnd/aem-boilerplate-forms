@@ -74,6 +74,7 @@ export function expect(block) {
   assert.equal(scope.isDone(), true, 'submit call was not made');
   const el = block.querySelector('.form-message.success-message');
   assert.equal(el.textContent, thankYouMessage);
+  assert.equal(el.hasAttribute('aria-live') && el.getAttribute('aria-live') === 'assertive', true);
 }
 
 export function after() {
