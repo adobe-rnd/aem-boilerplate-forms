@@ -35,6 +35,9 @@
                     "valueType": "date"
                 },
                 {
+                    "...": "../form-common/_basic-input-autocomplete-fields.json#/fields"
+                },
+                {
                     "component": "tab",
                     "label": "Validation",
                     "name": "validation"

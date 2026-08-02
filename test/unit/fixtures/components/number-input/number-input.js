@@ -1,3 +1,5 @@
+import assert from 'assert';
+
 // eslint-disable-next-line import/prefer-default-export
 export const fieldDef = {
   items: [{
@@ -9,6 +11,7 @@ export const fieldDef = {
     required: false,
     enabled: true,
     readOnly: false,
+    autoComplete: 'postal-code',
     placeholder: '50065',
     default: 0,
     label: {
@@ -33,3 +36,10 @@ export const fieldDef = {
   },
   ],
 };
+
+export const extraChecks = [
+  (html) => {
+    const input = html.querySelector('#numberinput-40db827550');
+    assert.equal(input.getAttribute('autocomplete'), 'postal-code');
+  },
+];
