@@ -1,3 +1,4 @@
+.worktrees/
 .hlx/*
 coverage/*
 logs/*
