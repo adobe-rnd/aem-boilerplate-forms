@@ -102,8 +102,7 @@ function updateMappings() {
     // Write back to file
     writeFileSync(mappingsPath, updatedContent);
 
-    console.log('✅ Updated mappings.js:');
-    console.log(`   Custom components (${customComponents.length}): [${customArrayString}]`);
+    console.log('✅ Updated mappings.js!');
 
     return true;
   } catch (error) {
