@@ -686,23 +686,6 @@
           }
         },
         {
-          "title": "Countdown Timer",
-          "id": "countdown-timer",
-          "plugins": {
-            "xwalk": {
-              "page": {
-                "resourceType": "core/fd/components/form/button/v1/button",
-                "template": {
-                  "jcr:title": "Countdown Timer",
-                  "fieldType": "button",
-                  "fd:viewType": "countdown-timer",
-                  "enabled": false
-                }
-              }
-            }
-          }
-        },
-        {
           "title": "Custom date picker",
           "id": "custom-date-picker",
           "plugins": {
