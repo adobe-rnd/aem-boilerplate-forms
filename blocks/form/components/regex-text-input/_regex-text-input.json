@@ -1,16 +1,16 @@
 {
   "definitions": [
     {
-      "title": "PAN Input",
-      "id": "pan-input",
+      "title": "Regex Text Input",
+      "id": "regex-text-input",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/fd/components/form/textinput/v1/textinput",
             "template": {
-              "jcr:title": "PAN Input",
+              "jcr:title": "Regex Text Input",
               "fieldType": "text-input",
-              "fd:viewType": "pan-input"
+              "fd:viewType": "regex-text-input"
             }
           }
         }
@@ -19,7 +19,7 @@
   ],
   "models": [
     {
-      "id": "pan-input",
+      "id": "regex-text-input",
       "fields": [
         {
           "component": "container",
@@ -29,17 +29,6 @@
           "fields": [
             {
               "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
-            },
-            {
-              "component": "text",
-              "name": "fourthChar",
-              "label": "Fourth Character",
-              "valueType": "string",
-              "description": "The allowed fourth character in the PAN (e.g., P, H, or any letter)",
-              "default": "P",
-              "maxLength": 1,
-              "pattern": "^[A-Z]$",
-              "patternErrorMessage": "Please enter a single uppercase letter"
             }
           ]
         },
@@ -50,7 +39,21 @@
           "collapsible": true,
           "fields": [
             {
-              "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+              "...": "../../models/form-common/_string-validation-fields.json#/fields"
+            },
+            {
+              "component": "text",
+              "name": "regexPattern",
+              "label": "Regex Pattern",
+              "valueType": "string",
+              "description": "Regular expression pattern to validate input against (e.g., ^[A-Za-z0-9]+$)"
+            },
+            {
+              "component": "text",
+              "name": "regexErrorMessage",
+              "label": "Error Message",
+              "valueType": "string",
+              "description": "Message to display when input doesn't match the regex pattern"
             }
           ]
         },

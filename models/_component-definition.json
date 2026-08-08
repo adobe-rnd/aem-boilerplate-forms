@@ -42,6 +42,18 @@
       "components": [
         {
           "...": "../blocks/form/components/range/_range.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/countdown-timer/_countdown-timer.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/custom-date-picker/_custom-date-picker.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/dynamic-dropdown/_dynamic-dropdown.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/regex-text-input/_regex-text-input.json#/definitions"
         }
       ]
     }
