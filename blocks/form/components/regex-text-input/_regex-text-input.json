@@ -1,0 +1,66 @@
+{
+  "definitions": [
+    {
+      "title": "Regex Text Input",
+      "id": "regex-text-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/textinput/v1/textinput",
+            "template": {
+              "jcr:title": "Regex Text Input",
+              "fieldType": "text-input",
+              "fd:viewType": "regex-text-input"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "regex-text-input",
+      "fields": [
+        {
+          "component": "container",
+          "name": "basic",
+          "label": "Basic",
+          "collapsible": false,
+          "fields": [
+            {
+              "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
+            }
+          ]
+        },
+        {
+          "component": "container",
+          "name": "validation",
+          "label": "Validation",
+          "collapsible": true,
+          "fields": [
+            {
+              "...": "../../models/form-common/_string-validation-fields.json#/fields"
+            },
+            {
+              "component": "text",
+              "name": "regexPattern",
+              "label": "Regex Pattern",
+              "valueType": "string",
+              "description": "Regular expression pattern to validate input against (e.g., ^[A-Za-z0-9]+$)"
+            },
+            {
+              "component": "text",
+              "name": "regexErrorMessage",
+              "label": "Error Message",
+              "valueType": "string",
+              "description": "Message to display when input doesn't match the regex pattern"
+            }
+          ]
+        },
+        {
+          "...": "../../models/form-common/_help-container.json"
+        }
+      ]
+    }
+  ]
+}

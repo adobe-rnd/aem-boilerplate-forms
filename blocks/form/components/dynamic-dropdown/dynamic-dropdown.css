@@ -1,0 +1,32 @@
+.dynamic-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dynamic-dropdown-input {
+  width: 100%;
+}
+
+.dynamic-dropdown-list {
+  position: absolute;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  z-index: 100;
+  display: none;
+}
+
+.dropdown-option {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-option:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-no-results {
+  padding: 8px;
+}

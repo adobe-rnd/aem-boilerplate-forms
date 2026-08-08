@@ -684,6 +684,63 @@
               }
             }
           }
+        },
+        {
+          "title": "Custom date picker",
+          "id": "custom-date-picker",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/datepicker/v1/datepicker",
+                "template": {
+                  "jcr:title": "Custom date picker",
+                  "fieldType": "date-input",
+                  "fd:viewType": "custom-date-picker"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Dynamic Dropdown List",
+          "id": "dynamic-dropdown",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
+                "template": {
+                  "jcr:title": "Dynamic Dropdown List",
+                  "fieldType": "drop-down",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Item 1",
+                    "Item 2"
+                  ],
+                  "type": "string",
+                  "fd:viewType": "dynamic-dropdown"
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Regex Text Input",
+          "id": "regex-text-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Regex Text Input",
+                  "fieldType": "text-input",
+                  "fd:viewType": "regex-text-input"
+                }
+              }
+            }
+          }
         }
       ]
     }
