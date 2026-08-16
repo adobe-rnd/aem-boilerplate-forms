@@ -5,6 +5,7 @@ A date input that replaces the native browser date picker with three separate ke
 ## Features
 
 - Three numeric inputs (day, month, year) with auto-advance on fill
+- Paste support — pasting a full date string into any sub-input populates all three fields automatically
 - Calendar icon button that opens the native date picker — works on desktop (`showPicker()`) and mobile Safari (transparent overlay technique)
 - Floating label support via `data-active` / `data-empty` attributes on the field wrapper
 - Validation errors shown only after the user has interacted with the field; programmatic errors (set by rules) are always shown immediately
@@ -58,3 +59,4 @@ Also subscribes to `reset` to clear all inputs and the hidden native input.
 - A hidden `<input type="date">` is kept off-screen for native form submission and for syncing with the calendar picker.
 - Day and month inputs auto-correct single-digit values to two digits on blur (e.g. `5` → `05`).
 - If any of the three fields is empty when the user leaves the component, all fields are cleared.
+- Paste recognises these formats: `DD/MM/YYYY`, `DD-MM-YYYY`, `DD.MM.YYYY`, `DD MM YYYY`, `MM/DD/YYYY`, `MM-DD-YYYY`, `YYYY-MM-DD` (ISO), `YYYY/MM/DD`, `DDMMYYYY`, `YYYYMMDD`. When day and month are both ≤ 12 and the format is ambiguous, DD/MM order is assumed. Any other pasted text is treated as a partial digit string for the focused sub-input.

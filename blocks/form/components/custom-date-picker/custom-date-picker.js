@@ -338,6 +338,64 @@ class CustomDatePickerComponent {
   }
 
   /**
+   * Parses a pasted string into { day, month, year }.
+   *
+   * Supported formats (sep = any of / - . space):
+   *   YYYY-sep-MM-sep-DD  (ISO / year-first)
+   *   DD-sep-MM-sep-YYYY  (day-first — default for ambiguous cases, Indian convention)
+   *   MM-sep-DD-sep-YYYY  (US month-first — inferred only when month segment > 12 is impossible)
+   *   YYYYMMDD            (compact ISO)
+   *   DDMMYYYY            (compact day-first)
+   *   MMDDYYYY            (compact month-first — fallback)
+   *
+   * Returns null when the text doesn't match any recognised format or produces an invalid date.
+   * @param {string} text
+   * @returns {{ day: string, month: string, year: string } | null}
+   */
+  parsePastedDate(text) {
+    const build = (d, mo, y) => {
+      const dd = parseInt(d, 10);
+      const mm = parseInt(mo, 10);
+      const yy = parseInt(y, 10);
+      if (mm < 1 || mm > 12 || dd < 1 || dd > 31 || yy < 1900 || yy > 2100) return null;
+      return { day: String(dd).padStart(2, '0'), month: String(mm).padStart(2, '0'), year: String(yy) };
+    };
+
+    const S = '[-/. ]'; // any single separator
+    let m;
+
+    // YYYY-sep-MM-sep-DD (year first — unambiguous)
+    m = new RegExp(`^(\\d{4})${S}(\\d{1,2})${S}(\\d{1,2})$`).exec(text);
+    if (m) return build(m[3], m[2], m[1]);
+
+    // XX-sep-YY-sep-ZZZZ (year last — resolve DD/MM vs MM/DD by magnitude)
+    m = new RegExp(`^(\\d{1,2})${S}(\\d{1,2})${S}(\\d{4})$`).exec(text);
+    if (m) {
+      const [, p1, p2, yr] = m;
+      const n1 = parseInt(p1, 10);
+      const n2 = parseInt(p2, 10);
+      if (n1 > 12) return build(p1, p2, yr); // p1 can only be day
+      if (n2 > 12) return build(p2, p1, yr); // p2 can only be day → p1 is month
+      return build(p1, p2, yr);              // ambiguous → DD/MM (Indian default)
+    }
+
+    // 8-digit compact — try YYYYMMDD, then DDMMYYYY, then MMDDYYYY
+    m = /^(\d{8})$/.exec(text);
+    if (m) {
+      const s = m[1];
+      const potentialYear = parseInt(s.slice(0, 4), 10);
+      if (potentialYear >= 1900 && potentialYear <= 2100) {
+        const r = build(s.slice(6), s.slice(4, 6), s.slice(0, 4));
+        if (r) return r;
+      }
+      return build(s.slice(0, 2), s.slice(2, 4), s.slice(4))
+        || build(s.slice(2, 4), s.slice(0, 2), s.slice(4));
+    }
+
+    return null;
+  }
+
+  /**
    * Sets up event listeners for the keyboard inputs
    */
   setupInputEventListeners() {
@@ -367,11 +425,32 @@ class CustomDatePickerComponent {
     // Block non-numeric keys on all inputs
     [this.dayInput, this.monthInput, this.yearInput].forEach((input) => {
       input.addEventListener('keydown', (e) => {
+        // Allow Ctrl/Cmd shortcuts (paste, copy, select-all, etc.)
+        if (e.ctrlKey || e.metaKey) return;
         // Allow: 0-9, Backspace, Delete, Tab, Arrow keys, Home, End
         const isNumber = e.key >= '0' && e.key <= '9';
         const isControl = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key);
         if (!isNumber && !isControl) {
           e.preventDefault();
+        }
+      });
+      // Paste: try to parse a full date string; fall back to digits-only for partial pastes
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = e.clipboardData?.getData('text')?.trim() ?? '';
+        const parsed = this.parsePastedDate(text);
+        if (parsed) {
+          this.dayInput.value = parsed.day;
+          this.monthInput.value = parsed.month;
+          this.yearInput.value = parsed.year;
+          this.updateModelValue();
+          this.updatePlaceholderVisibility();
+          this.yearInput.focus();
+        } else {
+          // Not a full date — paste only the digit portion into the focused input
+          const digits = text.replace(/\D/g, '').slice(0, input.maxLength);
+          input.value = digits;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
         }
       });
       // Show inputs when any field receives focus and handle floating labels
