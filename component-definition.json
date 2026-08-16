@@ -736,7 +736,10 @@
                 "template": {
                   "jcr:title": "Regex Text Input",
                   "fieldType": "text-input",
-                  "fd:viewType": "regex-text-input"
+                  "fd:viewType": "regex-text-input",
+                  "enabled": true,
+                  "visible": true,
+                  "textCase": "none"
                 }
               }
             }
