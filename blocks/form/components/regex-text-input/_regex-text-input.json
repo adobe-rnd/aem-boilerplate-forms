@@ -10,7 +10,10 @@
             "template": {
               "jcr:title": "Regex Text Input",
               "fieldType": "text-input",
-              "fd:viewType": "regex-text-input"
+              "fd:viewType": "regex-text-input",
+              "enabled": true,
+              "visible": true,
+              "textCase": "none"
             }
           }
         }
@@ -22,43 +25,38 @@
       "id": "regex-text-input",
       "fields": [
         {
-          "component": "container",
-          "name": "basic",
+          "component": "tab",
           "label": "Basic",
-          "collapsible": false,
-          "fields": [
-            {
-              "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
-            }
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        },
+        {
+          "component": "select",
+          "name": "textCase",
+          "value": "none",
+          "label": "Text case transform",
+          "description": "View-only case transform applied as typed (and to prefilled/imported values), on top of the pattern char-filter. e.g. codes that should be stored in uppercase.",
+          "options": [
+            { "name": "None", "value": "none" },
+            { "name": "Uppercase", "value": "upper" },
+            { "name": "Lowercase", "value": "lower" }
           ]
         },
         {
-          "component": "container",
-          "name": "validation",
+          "component": "tab",
           "label": "Validation",
-          "collapsible": true,
-          "fields": [
-            {
-              "...": "../../models/form-common/_string-validation-fields.json#/fields"
-            },
-            {
-              "component": "text",
-              "name": "regexPattern",
-              "label": "Regex Pattern",
-              "valueType": "string",
-              "description": "Regular expression pattern to validate input against (e.g., ^[A-Za-z0-9]+$)"
-            },
-            {
-              "component": "text",
-              "name": "regexErrorMessage",
-              "label": "Error Message",
-              "valueType": "string",
-              "description": "Message to display when input doesn't match the regex pattern"
-            }
-          ]
+          "name": "validation"
         },
         {
-          "...": "../../models/form-common/_help-container.json"
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
         }
       ]
     }

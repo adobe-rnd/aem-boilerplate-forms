@@ -1,13 +1,15 @@
-.dynamic-dropdown-wrapper {
+/* Searchable-dropdown view styles. Class names match searchable-dropdown.js. */
+
+.searchable-dropdown-wrapper {
   position: relative;
   width: 100%;
 }
 
-.dynamic-dropdown-input {
+.searchable-dropdown-input {
   width: 100%;
 }
 
-.dynamic-dropdown-list {
+.searchable-dropdown-list {
   position: absolute;
   width: 100%;
   max-height: 200px;
@@ -29,4 +31,24 @@
 
 .dropdown-no-results {
   padding: 8px;
+}
+
+.searchable-dropdown-clear {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='18' y1='6' x2='6' y2='18'/><line x1='6' y1='6' x2='18' y2='18'/></svg>") no-repeat center;
+  background-size: contain;
+  cursor: pointer;
+  z-index: 2;
+  display: none;
+}
+
+.searchable-dropdown-clear.is-visible {
+  display: block;
 }
