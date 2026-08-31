@@ -74,11 +74,32 @@
     main {
       flex: 1;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px;
+      grid-template-columns: var(--left-width, 1fr) 6px 1fr;
       background: var(--gray-300);
       overflow: hidden;
     }
+
+    /* ── Resizer handle ── */
+    #resizer {
+      background: var(--gray-300);
+      cursor: col-resize;
+      position: relative;
+    }
+
+    #resizer:hover, #resizer.dragging {
+      background: var(--blue-400);
+    }
+
+    #resizer::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -2px;
+      right: -2px;
+    }
+
+    body.resizing { cursor: col-resize; user-select: none; }
 
     /* ── Panels ── */
     .panel {
@@ -216,7 +237,7 @@
       background: var(--gray-50);
     }
 
-    #form-container form { max-width: 640px; }
+    #form-container form { max-width: 100%; }
 
     .empty-state {
       display: flex;
@@ -416,6 +437,7 @@
 
     @media (max-width: 700px) {
       main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      #resizer { display: none; }
     }
   </style>
 </head>
@@ -450,6 +472,9 @@
       <span id="status-text">Ready — paste JSON, enter a URL, or click Sample</span>
     </div>
   </div>
+
+  <!-- ── Resizer ── -->
+  <div id="resizer"></div>
 
   <!-- ── Right: Preview + Docs ── -->
   <div class="panel">
@@ -665,6 +690,47 @@ export default async function decorateRating(element, fd, container, formId) {
 
 <script type="module">
   import { renderForm } from '/blocks/form/form.js';
+
+  // ── Resizable panels ─────────────────────────────────────────────────────────
+  const mainEl = document.querySelector('main');
+  const resizer = document.getElementById('resizer');
+  const MIN_WIDTH = 240;
+  const STORAGE_KEY = 'playground-left-width';
+
+  const applyWidth = (px) => {
+    mainEl.style.setProperty('--left-width', `${px}px`);
+  };
+
+  const stored = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+  if (!Number.isNaN(stored)) applyWidth(stored);
+
+  let lastWidth = stored;
+
+  resizer.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    resizer.classList.add('dragging');
+    document.body.classList.add('resizing');
+
+    const onMouseMove = (moveEvent) => {
+      const rect = mainEl.getBoundingClientRect();
+      const maxWidth = rect.width - MIN_WIDTH - resizer.offsetWidth;
+      let width = moveEvent.clientX - rect.left;
+      width = Math.max(MIN_WIDTH, Math.min(width, maxWidth));
+      lastWidth = width;
+      applyWidth(width);
+    };
+
+    const onMouseUp = () => {
+      resizer.classList.remove('dragging');
+      document.body.classList.remove('resizing');
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      if (!Number.isNaN(lastWidth)) localStorage.setItem(STORAGE_KEY, lastWidth);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
 
   // ── CodeMirror setup ────────────────────────────────────────────────────────
   const editor = CodeMirror.fromTextArea(document.getElementById('json-input'), {
