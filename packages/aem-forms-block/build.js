@@ -59,29 +59,6 @@ const stubDocFormsPlugin = {
   },
 };
 
-// Stubs out the entire rule engine (afb-runtime, formula engine, formatters).
-// The form renders with its initial/default field values but rules (show/hide,
-// computed values, validation expressions) do not execute.
-// Eliminates ~170KB from the minified bundle.
-const stubRulesPlugin = {
-  name: 'stub-rules',
-  setup(build) {
-    build.onResolve({ filter: /rules\/index\.js/ }, () => ({ path: 'stub-rules', namespace: 'stub-rules' }));
-    build.onLoad({ filter: /.*/, namespace: 'stub-rules' }, () => ({
-      contents: `
-        export async function initAdaptiveForm(formDef, createForm) {
-          const response = await createForm(formDef, null, 'aem');
-          return response?.form;
-        }
-        export async function loadRuleEngine() {}
-        export async function fieldChanged() {}
-        export function subscribe() {}
-      `,
-      loader: 'js',
-    }));
-  },
-};
-
 async function run() {
   await esbuild.build({
     entryPoints: [resolve(__dirname, '../../blocks/form/form.js')],
