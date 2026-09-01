@@ -22,8 +22,12 @@ async function globalSetup() {
   await expect(page.getByText('Create an account').last()).toBeVisible();
   await page.getByLabel('Email address').fill(emailId);
   await page.locator(selectors.continueButton).click();
-  await expect(page.getByText('Enter your password')).toBeVisible();
-  await page.getByLabel('Password').first().fill(password);
+  // Wait on the password field itself, not IMS heading copy: the sign-in UI text
+  // ("Enter your password") drifts across IMS releases, but the password input is the
+  // stable precondition for the next fill.
+  const passwordField = page.getByLabel('Password').first();
+  await expect(passwordField).toBeVisible();
+  await passwordField.fill(password);
   await page.locator(selectors.submitButton).click();
 
   const frame = page.frameLocator(selectors.iFrame);
