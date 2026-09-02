@@ -1,0 +1,27 @@
+.hlx/*
+coverage/*
+logs/*
+node_modules/*
+
+helix-importer-ui
+.DS_Store
+*.bak
+.idea
+.nyc_output
+
+.env*
+.vscode
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+test/e2e/reports/
+LoginAuth.json
+
+# Skill distribution zip
+create-custom-component.zip
+
+# npm package build artifacts
+packages/aem-forms-block/dist/
+packages/aem-forms-block/node_modules/
+packages/aem-forms-block/*.tgz

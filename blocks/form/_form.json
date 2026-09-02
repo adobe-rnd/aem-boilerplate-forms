@@ -1,0 +1,106 @@
+{
+  "definitions": [
+    {
+      "title": "Adaptive Form",
+      "id": "form",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "fd/franklin/components/form/v1/form",
+            "template": {
+              "fieldType": "form",
+              "fd:version": "2.1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "...": "./models/form-components/_*.json#/definitions"
+    },
+    { 
+      "...": "./components/accordion/_accordion.json#/definitions" 
+    },
+    { 
+      "...": "./components/modal/_modal.json#/definitions" 
+    },
+    { 
+      "...": "./components/password/_password.json#/definitions" 
+    },
+    { 
+      "...": "./components/rating/_rating.json#/definitions" 
+    },
+    { 
+      "...": "./components/tnc/_tnc.json#/definitions" 
+    },
+    { 
+      "...": "./components/wizard/_wizard.json#/definitions" 
+    }
+  ],
+  "models": [
+    {
+      "id": "form",
+      "fields": [
+        {
+          "component": "container",
+          "name": "basic",
+          "label": "Use the Edit Form Properties extension to configure Adaptive Form properties, including Submit Action, Prefill, and Thank-You options.",
+          "description": "Visit https://www.adobe.com/go/learn_aemforms_cs_properties_ext for more details.",
+          "collapsible": false,
+          "fields": [
+            {
+              "component": "text",
+              "name": "customFunctionsPath",
+              "label": "Form Specific Custom Functions Path",
+              "valueType": "string"
+            },
+            {
+              "component": "text",
+              "name": "style",
+              "label": "Form Specific styles path",
+              "valueType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "...": "./models/form-components/_*.json#/models"
+    },
+    {
+      "...": "./components/*/_*.json#/models"
+    }
+  ],
+  "filters": [
+    {
+      "id": "form",
+      "components": [
+        "captcha",
+        "checkbox",
+        "checkbox-group",
+        "date-input",
+        "drop-down",
+        "email",
+        "file-input",
+        "form-accordion",
+        "form-button",
+        "form-fragment",
+        "form-image",
+        "form-modal",
+        "form-reset-button",
+        "form-submit-button",
+        "number-input",
+        "panel",
+        "password",
+        "plain-text",
+        "radio-group",
+        "rating",
+        "telephone-input",
+        "text-input",
+        "tnc",
+        "wizard",
+        "range"
+      ]
+    }
+  ]
+}

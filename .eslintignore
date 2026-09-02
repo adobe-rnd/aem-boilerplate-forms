@@ -1,0 +1,11 @@
+helix-importer-ui
+rollup/*
+blocks/form/rules/formula/*
+blocks/form/rules/model/*
+blocks/form/rules/functions.js
+scripts/editor-support.js
+scripts/editor-support-rte.js
+tools/forms-scaffolder.js
+tools/update-mappings.js
+/test
+dompurify.min.js
