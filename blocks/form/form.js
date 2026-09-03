@@ -36,6 +36,7 @@ const withFieldWrapper = (element) => (fd) => {
 const createTextArea = withFieldWrapper((fd) => {
   const input = document.createElement('textarea');
   setPlaceholder(input, fd);
+  setConstraints(input, fd);
   return input;
 });
 
