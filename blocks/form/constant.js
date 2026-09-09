@@ -70,6 +70,9 @@ let submitBaseUrl = '';
 
 export const SUBMISSION_SERVICE = 'https://forms.adobe.com/adobe/forms/af/submit/';
 
+// Submit action types routed to the submission service.
+export const SUPPORTED_SUBMISSION_ACTION_TYPES = ['spreadsheet', 'aep'];
+
 export function setSubmitBaseUrl(url) {
   submitBaseUrl = url;
 }
