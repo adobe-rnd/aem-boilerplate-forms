@@ -431,6 +431,15 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
     });
   }
   form.dispatch(new CustomEvent('formViewInitialized'));
+  // Expose the form's WebMCP tool catalog to in-browser AI agents. Optional and lazy:
+  // no-ops unless the form opted in via fd:webMcpEnabled and a browser modelContext exists;
+  // guarded so a missing/failed adapter never blocks form load.
+  try {
+    const { registerFormWebMCP } = await import('./model/afb-webmcp.min.js');
+    registerFormWebMCP(form);
+  } catch (e) {
+    // WebMCP is optional; ignore.
+  }
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
