@@ -22,7 +22,7 @@
  *  Package: @aemforms/af-core
  *  Version: 0.22.167
  */
-import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, ScriptError, Valid, Invalid, SubmitSuccess, CustomEvent, RequestSuccess, RequestFailure, SubmitError, Submit, Save, Reset, SubmitFailure, Focus, RemoveInstance, AddInstance, AddItem, Click } from './afb-events.js';
+import { E as EventSource, C as CustomEvent, p as propertyChange, a as ExecuteRule, B as BaseAction, I as Initialize, R as RemoveItem, b as Change, F as FormLoad, c as FocusOption, d as FieldChanged, V as ValidationComplete, S as ScriptError, e as constraintKeys, g as getConstraintTypeMessages, f as Valid, h as Invalid, i as ValidationError, A as AddInstance, j as RemoveInstance, k as isSelfChange, l as isDependencyChange, m as isUserChange, n as SubmitSuccess, o as RequestSuccess, q as CaptchaDisplayMode, r as SubmitError, s as Submit, t as Save, u as Reset, v as SubmitFailure, w as RequestFailure, x as Focus, y as AddItem, z as Click } from './Events-3e88e4fb-682ebef2.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
@@ -32,96 +32,6 @@ function __decorate(decorators, target, key, desc) {
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 }
-const ConstraintType = Object.freeze({
-    PATTERN_MISMATCH: 'patternMismatch',
-    TOO_SHORT: 'tooShort',
-    TOO_LONG: 'tooLong',
-    RANGE_OVERFLOW: 'rangeOverflow',
-    RANGE_UNDERFLOW: 'rangeUnderflow',
-    TYPE_MISMATCH: 'typeMismatch',
-    VALUE_MISSING: 'valueMissing',
-    STEP_MISMATCH: 'stepMismatch',
-    FORMAT_MISMATCH: 'formatMismatch',
-    ACCEPT_MISMATCH: 'acceptMismatch',
-    FILE_SIZE_MISMATCH: 'fileSizeMismatch',
-    UNIQUE_ITEMS_MISMATCH: 'uniqueItemsMismatch',
-    MIN_ITEMS_MISMATCH: 'minItemsMismatch',
-    MAX_ITEMS_MISMATCH: 'maxItemsMismatch',
-    EXPRESSION_MISMATCH: 'expressionMismatch',
-    EXCLUSIVE_MAXIMUM_MISMATCH: 'exclusiveMaximumMismatch',
-    EXCLUSIVE_MINIMUM_MISMATCH: 'exclusiveMinimumMismatch',
-    ENUM_MISMATCH: 'enumMismatch'
-});
-const constraintKeys = Object.freeze({
-    pattern: ConstraintType.PATTERN_MISMATCH,
-    minLength: ConstraintType.TOO_SHORT,
-    maxLength: ConstraintType.TOO_LONG,
-    maximum: ConstraintType.RANGE_OVERFLOW,
-    minimum: ConstraintType.RANGE_UNDERFLOW,
-    type: ConstraintType.TYPE_MISMATCH,
-    required: ConstraintType.VALUE_MISSING,
-    step: ConstraintType.STEP_MISMATCH,
-    format: ConstraintType.FORMAT_MISMATCH,
-    accept: ConstraintType.ACCEPT_MISMATCH,
-    maxFileSize: ConstraintType.FILE_SIZE_MISMATCH,
-    uniqueItems: ConstraintType.UNIQUE_ITEMS_MISMATCH,
-    minItems: ConstraintType.MIN_ITEMS_MISMATCH,
-    maxItems: ConstraintType.MAX_ITEMS_MISMATCH,
-    validationExpression: ConstraintType.EXPRESSION_MISMATCH,
-    exclusiveMinimum: ConstraintType.EXCLUSIVE_MINIMUM_MISMATCH,
-    exclusiveMaximum: ConstraintType.EXCLUSIVE_MAXIMUM_MISMATCH,
-    enum: ConstraintType.ENUM_MISMATCH
-});
-const defaultConstraintTypeMessages = Object.freeze({
-    [ConstraintType.PATTERN_MISMATCH]: 'Please match the format requested.',
-    [ConstraintType.TOO_SHORT]: 'Please lengthen this text to ${0} characters or more.',
-    [ConstraintType.TOO_LONG]: 'Please shorten this text to ${0} characters or less.',
-    [ConstraintType.RANGE_OVERFLOW]: 'Value must be less than or equal to ${0}.',
-    [ConstraintType.RANGE_UNDERFLOW]: 'Value must be greater than or equal to ${0}.',
-    [ConstraintType.TYPE_MISMATCH]: 'Please enter a valid value.',
-    [ConstraintType.VALUE_MISSING]: 'Please fill in this field.',
-    [ConstraintType.STEP_MISMATCH]: 'Please enter a valid value. The two nearest valid values are ${0} and ${1}.',
-    [ConstraintType.FORMAT_MISMATCH]: 'Specify the value in allowed format : ${0}.',
-    [ConstraintType.ACCEPT_MISMATCH]: 'The specified file type not supported.',
-    [ConstraintType.FILE_SIZE_MISMATCH]: 'File too large. Reduce size and try again.',
-    [ConstraintType.UNIQUE_ITEMS_MISMATCH]: 'All the items must be unique.',
-    [ConstraintType.MIN_ITEMS_MISMATCH]: 'Specify a number of items equal to or greater than ${0}.',
-    [ConstraintType.MAX_ITEMS_MISMATCH]: 'Specify a number of items equal to or less than ${0}.',
-    [ConstraintType.EXPRESSION_MISMATCH]: 'Please enter a valid value.',
-    [ConstraintType.EXCLUSIVE_MINIMUM_MISMATCH]: 'Value must be greater than ${0}.',
-    [ConstraintType.EXCLUSIVE_MAXIMUM_MISMATCH]: 'Value must be less than ${0}.',
-    [ConstraintType.ENUM_MISMATCH]: 'Please select a value from the allowed options.'
-});
-let customConstraintTypeMessages = {};
-const getConstraintTypeMessages = () => {
-    return {
-        ...defaultConstraintTypeMessages,
-        ...customConstraintTypeMessages
-    };
-};
-var EventSource;
-(function (EventSource) {
-    EventSource["CODE"] = "code";
-    EventSource["UI"] = "ui";
-})(EventSource || (EventSource = {}));
-class ValidationError {
-    fieldName;
-    errorMessages;
-    constructor(fieldName = '', errorMessages = []) {
-        this.errorMessages = errorMessages;
-        this.fieldName = fieldName;
-    }
-}
-var FocusOption;
-(function (FocusOption) {
-    FocusOption["NEXT_ITEM"] = "nextItem";
-    FocusOption["PREVIOUS_ITEM"] = "previousItem";
-})(FocusOption || (FocusOption = {}));
-var CaptchaDisplayMode;
-(function (CaptchaDisplayMode) {
-    CaptchaDisplayMode["INVISIBLE"] = "invisible";
-    CaptchaDisplayMode["VISIBLE"] = "visible";
-})(CaptchaDisplayMode || (CaptchaDisplayMode = {}));
 const objToMap = (o) => new Map(Object.entries(o));
 const stringViewTypes = objToMap({ 'date': 'date-input', 'data-url': 'file-input', 'binary': 'file-input' });
 const typeToViewTypes = objToMap({
@@ -149,6 +59,13 @@ const defaultFieldTypes = (schema) => {
     }
     return typeToViewTypes.get(type) || 'text-input';
 };
+const isSameValue = (a, b) => {
+    if (a !== null && b !== null && typeof a === 'object' && typeof b === 'object') {
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
+    return a === b;
+};
+const UNSAFE_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
 const getProperty = (data, key, def) => {
     if (key in data) {
         return data[key];
@@ -200,15 +117,18 @@ function deepClone(obj, idGenerator) {
     }
     let result;
     if (Array.isArray(obj)) {
-        result = new Array(obj.length);
-        for (let i = 0; i < obj.length; i++) {
+        const len = obj.length;
+        result = new Array(len);
+        for (let i = 0; i < len; i++) {
             result[i] = deepClone(obj[i], idGenerator);
         }
     }
     else {
         result = {};
-        for (const key of Object.keys(obj)) {
-            result[key] = deepClone(obj[key], idGenerator);
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                result[key] = deepClone(obj[key], idGenerator);
+            }
         }
     }
     if (idGenerator && result && result.id) {
@@ -232,6 +152,7 @@ class PropertiesManager {
         this.host = host;
         this._definedProperties = new Set();
         this._propertiesWrapper = {};
+        this._proxy = null;
         this._initialized = false;
     }
     get properties() {
@@ -239,7 +160,7 @@ class PropertiesManager {
             this._setupInitialProperties();
             this._initialized = true;
         }
-        return this._propertiesWrapper;
+        return this._getProxy();
     }
     set properties(p) {
         const oldProperties = this.host._jsonModel.properties || {};
@@ -254,6 +175,25 @@ class PropertiesManager {
                 this.host.notifyDependents(changeAction);
             }
         });
+    }
+    _getProxy() {
+        if (!this._proxy) {
+            this._proxy = new Proxy(this._propertiesWrapper, {
+                get: (target, key, receiver) => {
+                    if (typeof key === 'string' && !this._definedProperties.has(key) && !key.startsWith('fd:')) {
+                        this.host.ruleEngine.trackDependency(this.host, `properties.${key}`);
+                    }
+                    return Reflect.get(target, key, receiver);
+                },
+                set: (target, key, value, receiver) => {
+                    if (typeof key === 'string') {
+                        this._ensurePropertyDescriptor(key);
+                    }
+                    return Reflect.set(target, key, value, receiver);
+                }
+            });
+        }
+        return this._proxy;
     }
     ensurePropertyDescriptor(propertyName) {
         this._ensurePropertyDescriptor(propertyName);
@@ -294,13 +234,29 @@ class PropertiesManager {
         });
         this._definedProperties.add(prop);
     }
+    updateProperty(path, value) {
+        const segments = (path || '').split('.');
+        const unsafe = segments.some(s => s === '' || s === '__proto__' || s === 'constructor' || s === 'prototype');
+        if (unsafe) {
+            return false;
+        }
+        if (segments.length === 1) {
+            this.updateSimpleProperty(path, value);
+        } else {
+            this.updateNestedProperty(path, value);
+        }
+        return true;
+    }
     updateNestedProperty(propertyPath, value) {
         const parts = propertyPath.split('.');
         const topLevelProp = parts[0];
         this._ensurePropertyDescriptor(topLevelProp);
         const properties = this.host._jsonModel.properties || {};
         const updatedProperties = JSON.parse(JSON.stringify(properties));
-        const currentObj = updatedProperties[topLevelProp] || {};
+        let currentObj = updatedProperties[topLevelProp];
+        if (typeof currentObj !== 'object' || currentObj === null) {
+            currentObj = {};
+        }
         updatedProperties[topLevelProp] = currentObj;
         let parentObj = currentObj;
         for (let i = 1; i < parts.length - 1; i++) {
@@ -312,10 +268,11 @@ class PropertiesManager {
             parentObj = parentObj[parts[i]];
         }
         const finalProp = parts[parts.length - 1];
-        const oldValue = parentObj[finalProp];
         parentObj[finalProp] = value;
+        const oldTopValue = properties[topLevelProp];
+        const newTopValue = updatedProperties[topLevelProp];
         this.host._jsonModel.properties = updatedProperties;
-        const changeAction = propertyChange(`properties.${propertyPath}`, value, oldValue);
+        const changeAction = propertyChange(`properties.${topLevelProp}`, newTopValue, oldTopValue);
         this.host.notifyDependents(changeAction);
     }
     updateSimpleProperty(propertyName, value) {
@@ -329,6 +286,7 @@ class DataValue {
     $_type;
     $_fields = [];
     parent;
+    _hasFileInput = false;
     constructor($_name, $_value, $_type = typeof $_value, parent) {
         this.$_name = $_name;
         this.$_value = $_value;
@@ -346,19 +304,15 @@ class DataValue {
         return (!enabled && this.$_fields.length);
     }
     get $value() {
-        const formInFileInput = this.$_fields.find(x => {
-            if (isFile(x)) {
-                return x;
-            }
-        });
-        if (formInFileInput && (this.$_fields.every(_ => ['string', 'string[]'].includes(_.type)))) {
-            const attachmentMap = formInFileInput.form._exportDataAttachmentMap;
-            if (attachmentMap && attachmentMap[formInFileInput.id]) {
-                const attachment = attachmentMap[formInFileInput.id];
-                if (Array.isArray(attachment)) {
-                    return attachment.map(item => item.data);
-                }
-                else {
+        if (this._hasFileInput) {
+            const formInFileInput = this.$_fields.find(x => isFile(x));
+            if (formInFileInput && (this.$_fields.every(_ => ['string', 'string[]'].includes(_.type)))) {
+                const attachmentMap = formInFileInput.form._exportDataAttachmentMap;
+                if (attachmentMap && attachmentMap[formInFileInput.id]) {
+                    const attachment = attachmentMap[formInFileInput.id];
+                    if (Array.isArray(attachment)) {
+                        return attachment.map(item => item.data);
+                    }
                     return attachment.data;
                 }
             }
@@ -379,6 +333,9 @@ class DataValue {
     $bindToField(field) {
         if (this.$_fields.indexOf(field) === -1) {
             this.$_fields.push(field);
+            if (!this._hasFileInput && isFile(field)) {
+                this._hasFileInput = true;
+            }
             this._checkForTypeConflicts(field);
         }
     }
@@ -518,6 +475,124 @@ class DataGroup extends DataValue {
     }
     get $isDataGroup() {
         return true;
+    }
+}
+const isUnsafeKey = (key) => typeof key !== 'string' || UNSAFE_KEYS.has(key);
+class DataManager {
+    constructor(host) {
+        this.host = host;
+        this._proxy = null;
+    }
+    get proxy() {
+        if (!this._proxy) {
+            this._proxy = new Proxy({}, {
+                get: (_t, key) => this._get(key),
+                set: (_t, key, value) => { this._set(key, value); return true; },
+                has: (_t, key) => this._has(key),
+                deleteProperty: (_t, key) => this._delete(key)
+            });
+        }
+        return this._proxy;
+    }
+    _group() {
+        const node = this.host.getDataNode();
+        return node && node.$isDataGroup ? node : undefined;
+    }
+    _resolve(key) {
+        const group = this._group();
+        let node = group ? group.$getDataNode(key) : undefined;
+        if (group && group.$type === 'array' && !(node instanceof DataValue)) {
+            node = undefined;
+        }
+        const fields = node && node.$_fields && node.$_fields.length > 0 ? node.$_fields : undefined;
+        return {group, node, fields};
+    }
+    _bailOnContainerBinding(key, node, verb) {
+        if (node.$isDataGroup) {
+            this.host.form.logger.warn(`$data: cannot ${verb} '${key}' — it is bound to a container; operate on the container's fields instead.`);
+            return true;
+        }
+        return false;
+    }
+    _get(key) {
+        if (isUnsafeKey(key)) {
+            return undefined;
+        }
+        const {group, node, fields} = this._resolve(key);
+        if (!group) {
+            return undefined;
+        }
+        if (group.$type === 'array' && !node) {
+            return undefined;
+        }
+        if (fields) {
+            this.host.ruleEngine.trackDependency(fields[0], 'value');
+        } else {
+            this.host.ruleEngine.trackDependency(this.host, `data.${key}`);
+        }
+        return node ? node.$value : undefined;
+    }
+    _set(key, value) {
+        if (isUnsafeKey(key)) {
+            return;
+        }
+        const {group, node, fields} = this._resolve(key);
+        if (!group) {
+            return;
+        }
+        if (group.$type === 'array' && !node) {
+            return;
+        }
+        if (fields) {
+            if (this._bailOnContainerBinding(key, node, 'set')) {
+                return;
+            }
+            fields[0].value = value;
+            return;
+        }
+        const oldValue = node ? node.$value : undefined;
+        if (isSameValue(oldValue, value)) {
+            return;
+        }
+        group.$addDataNode(key, this._createNode(key, value), true);
+        this.host.notifyDependents(propertyChange(`data.${key}`, value, oldValue));
+    }
+    _has(key) {
+        if (isUnsafeKey(key)) {
+            return false;
+        }
+        const {group, node} = this._resolve(key);
+        if (!group) {
+            return false;
+        }
+        return group.$type === 'array' ? !!node : group.$containsDataNode(key);
+    }
+    _delete(key) {
+        if (isUnsafeKey(key)) {
+            return true;
+        }
+        const {group, node, fields} = this._resolve(key);
+        if (!group || (group.$type === 'array' ? !node : !group.$containsDataNode(key))) {
+            return true;
+        }
+        if (fields) {
+            if (this._bailOnContainerBinding(key, node, 'delete')) {
+                return true;
+            }
+            fields[0].value = undefined;
+            return true;
+        }
+        const oldValue = node ? node.$value : undefined;
+        group.$removeDataNode(key);
+        this.host.notifyDependents(propertyChange(`data.${key}`, undefined, oldValue));
+        return true;
+    }
+    _createNode(key, value) {
+        const type = Array.isArray(value) ? 'array' : typeof value;
+        if (typeof value === 'object' && value !== null) {
+            return new DataGroup(key, value, type);
+        }
+        return new DataValue(key, value, type);
     }
 }
 const TOK_DOT = 'DOT';
@@ -1050,34 +1125,6 @@ const replaceTemplatePlaceholders = (str, values = []) => {
         return typeof replacement !== 'undefined' ? replacement : match;
     });
 };
-const sanitizeName = (name) => {
-    const nameRegex = /^[A-Za-z0-9_$][A-Za-z0-9_.[\]]*$/;
-    if (name.includes('.')) {
-        const parts = name.split('.');
-        const sanitizedParts = parts.map((part) => {
-            if (part.includes('[')) {
-                const bracketIndex = part.indexOf('[');
-                const namePart = part.substring(0, bracketIndex);
-                const bracketPart = part.substring(bracketIndex);
-                if (!nameRegex.test(namePart)) {
-                    return `"${namePart}"${bracketPart}`;
-                }
-                return part;
-            }
-            else {
-                if (!nameRegex.test(part)) {
-                    return `"${part}"`;
-                }
-                return part;
-            }
-        });
-        return sanitizedParts.join('.');
-    }
-    if (!nameRegex.test(name)) {
-        return `"${name}"`;
-    }
-    return name;
-};
 const dateRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
 const emailRegex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -1195,6 +1242,7 @@ const ValidConstraints = {
 };
 const validationConstraintsList = ['type', 'format', 'minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'minItems',
     'maxItems', 'uniqueItems', 'minLength', 'maxLength', 'pattern', 'required', 'enum', 'accept', 'maxFileSize'];
+const revalidationTriggerProps = [...validationConstraintsList, 'step', 'enforceEnum'];
 const Constraints = {
     type: (constraint, inputVal) => {
         let value = inputVal;
@@ -1371,14 +1419,23 @@ const editableProperties = [
     'enumNames',
     'required',
     'properties',
+    'enforceEnum',
     'exclusiveMinimum',
     'exclusiveMaximum',
+    'maxLength',
     'maximum',
     'maxItems',
+    'minLength',
     'minimum',
     'minItems',
+    'pattern',
     'checked',
+    'step',
     'placeholder'
+];
+const expressionProperties = [
+    'validationExpression',
+    'displayValueExpression'
 ];
 const dynamicProps = [
     ...editableProperties,
@@ -1386,11 +1443,12 @@ const dynamicProps = [
     'activeChild'
 ];
 const staticFields = ['plain-text', 'image'];
-class ActionImplWithTarget {
+class ActionImplWithTarget extends BaseAction {
     _action;
     _target;
     _currentTarget;
     constructor(_action, _target) {
+        super();
         this._action = _action;
         if (_action.target) {
             this._currentTarget = _target;
@@ -1422,12 +1480,21 @@ class ActionImplWithTarget {
     get originalAction() {
         return this._action.originalAction;
     }
+    get correlationId() {
+        return this._action.correlationId;
+    }
+    _setTrace(originalAction, correlationId) {
+        if (typeof this._action._setTrace === 'function') {
+            this._action._setTrace(originalAction, correlationId);
+        }
+    }
     toString() {
         return this._action.toString();
     }
 }
 const target = Symbol('target');
 const qualifiedName = Symbol('qualifiedName');
+const isKeyedPath = (p) => typeof p === 'string' && (p.startsWith('properties.') || p.startsWith('data.'));
 function dependencyTracked() {
     return function (target, propertyKey, descriptor) {
         const get = descriptor.get;
@@ -1452,9 +1519,6 @@ const addOnly = (includeOrExclude) => (...fieldTypes) => (target, propertyKey, d
     const set = descriptor.set;
     if (set != undefined) {
         descriptor.set = function (value) {
-            if (this === this._ruleNode) {
-                console.error(`Property '${propertyKey}' is being set through a proxy, which is not supported. Please use globals.functions.setProperty instead.`);
-            }
             if (fieldTypes.indexOf(this.fieldType) > -1 === includeOrExclude) {
                 set.call(this, value);
             }
@@ -1468,14 +1532,19 @@ class BaseNode {
     _ruleNode;
     _lang = '';
     _callbacks = {};
+    _pendingWrites;
+    _pendingViewEvents = {};
     _onlyViewNotify;
     _dependents = [];
     _jsonModel;
     _tokens = [];
     _eventSource = EventSource.CODE;
     _fragment = '$form';
+    _fragmentRuleNode;
     _idSet;
     _propertiesManager;
+    _dataManager;
+    _lastRebindDataNode = undefined;
     createIdSet() {
         return new Set();
     }
@@ -1497,17 +1566,61 @@ class BaseNode {
             this._fragment = this.parent.fragment;
         }
         this._propertiesManager = new PropertiesManager(this);
+        this._dataManager = new DataManager(this);
     }
     get fragment() {
         return this._fragment;
+    }
+    getFragmentRuleNode() {
+        if (this.fragment === '$form') {
+            return this.form.getRuleNode();
+        }
+        if (this._fragmentRuleNode !== undefined) {
+            return this._fragmentRuleNode;
+        }
+        const fragmentContainer = this.form.resolveQualifiedName(this.fragment);
+        const node = fragmentContainer?.getRuleNode() ?? this.form.getRuleNode();
+        if (!this.repeatable && !this._isAncestorRepeatable()) {
+            this._fragmentRuleNode = node;
+        }
+        return node;
     }
     setupRuleNode() {
         const self = this;
         this._ruleNode = new Proxy(this.ruleNodeReference(), {
             get: (ruleNodeReference, prop) => {
                 return self.getFromRule(ruleNodeReference, prop);
+            },
+            set: (ruleNodeReference, prop, value) => {
+                return self.setFromRule(ruleNodeReference, prop, value);
             }
         });
+    }
+    static RULE_NODE_METHODS = [
+        'subscribe', 'dispatch', 'validate', 'validateAsync', 'reset', 'focus',
+        'importData', 'exportData', 'getState', 'getChild', 'bind',
+        'getErrorMessage', 'markAsInvalid',
+        'getElement', 'resolveQualifiedName', 'visit', 'request', 'isValid'
+    ];
+    static RULE_NODE_READONLY_BARE_PROPS = ['name', 'id', 'parent', 'qualifiedName'];
+    mapRuleValue(retValue) {
+        if (retValue instanceof BaseNode) {
+            return retValue.getRuleNode();
+        }
+        else if (retValue instanceof Array) {
+            return retValue.map(r => r instanceof BaseNode ? r.getRuleNode() : r);
+        }
+        return retValue;
+    }
+    getExposedMethod(prop) {
+        if (BaseNode.RULE_NODE_METHODS.indexOf(prop) > -1) {
+            const fn = this[prop];
+            if (typeof fn === 'function') {
+                const bound = fn.bind(this);
+                return (...args) => this.mapRuleValue(bound(...args));
+            }
+        }
+        return undefined;
     }
     ruleNodeReference() {
         return this;
@@ -1516,7 +1629,7 @@ class BaseNode {
         return this._ruleNode;
     }
     getFromRule(ruleNodeReference, prop) {
-        if (prop === Symbol.toPrimitive || (prop === 'valueOf' && !ruleNodeReference.hasOwnProperty('valueOf'))) {
+        if (prop === Symbol.toPrimitive || (prop === 'valueOf' && !Object.prototype.hasOwnProperty.call(ruleNodeReference, 'valueOf'))) {
             return this.valueOf;
         }
         else if (prop === target) {
@@ -1525,28 +1638,64 @@ class BaseNode {
         else if (typeof (prop) === 'string') {
             if (prop.startsWith('$')) {
                 prop = prop.substr(1);
-                if (typeof this[prop] !== 'function') {
-                    const retValue = this[prop];
-                    if (retValue instanceof BaseNode) {
-                        return retValue.getRuleNode();
-                    }
-                    else if (retValue instanceof Array) {
-                        return retValue.map(r => r instanceof BaseNode ? r.getRuleNode() : r);
-                    }
-                    else {
-                        return retValue;
-                    }
+                if (UNSAFE_KEYS.has(prop)) {
+                    return undefined;
+                }
+                const method = this.getExposedMethod(prop);
+                if (method) {
+                    return method;
+                }
+                const val = this[prop];
+                if (typeof val !== 'function') {
+                    return this.mapRuleValue(this._pendingWrites && prop in this._pendingWrites ? this._pendingWrites[prop] : val);
                 }
             }
             else {
-                if (ruleNodeReference.hasOwnProperty(prop)) {
+                if (ruleNodeReference !== this && Object.prototype.hasOwnProperty.call(ruleNodeReference, prop)) {
                     return ruleNodeReference[prop];
                 }
-                else if (typeof ruleNodeReference[prop] === 'function') {
+                const method = this.getExposedMethod(prop);
+                if (method) {
+                    return method;
+                }
+                if (dynamicProps.indexOf(prop) > -1 || BaseNode.RULE_NODE_READONLY_BARE_PROPS.indexOf(prop) > -1 || prop === 'data') {
+                    const val = this[prop];
+                    if (typeof val !== 'function') {
+                        return this.mapRuleValue(this._pendingWrites && prop in this._pendingWrites ? this._pendingWrites[prop] : val);
+                    }
+                }
+                if (Array.isArray(ruleNodeReference) && !UNSAFE_KEYS.has(prop) && typeof ruleNodeReference[prop] === 'function') {
                     return ruleNodeReference[prop];
                 }
             }
         }
+    }
+    setFromRule(ruleNodeReference, prop, value) {
+        if (typeof prop === 'string') {
+            const modelProp = prop.startsWith('$') ? prop.substr(1) : prop;
+            if (modelProp === 'data') {
+                this.data = value;
+                return true;
+            }
+            if (editableProperties.indexOf(modelProp) > -1) {
+                this.setProperties({ [modelProp]: value });
+                return true;
+            }
+            if (ruleNodeReference !== this && Object.prototype.hasOwnProperty.call(ruleNodeReference, prop)) {
+                if (Array.isArray(ruleNodeReference)) {
+                    this.form.logger.warn(`Cannot assign to array index '${prop}'. Set the field's value instead (e.g. field.value = [...]).`);
+                }
+                else {
+                    this.form.logger.error(`Cannot assign to child node '${prop}' through its parent. Set the property on the child node instead.`);
+                }
+                return true;
+            }
+            this.form.logger.warn(`'${prop}' is not a valid editable property.`);
+        }
+        return true;
+    }
+    setProperties(payload) {
+        this.dispatch(new CustomEvent('setProperty', payload, false));
     }
     get id() {
         return this._jsonModel.id;
@@ -1597,7 +1746,7 @@ class BaseNode {
     }
     set visible(v) {
         if (v !== this._jsonModel.visible) {
-            const changeAction = propertyChange('visible', v, this._jsonModel.visible);
+            const changeAction = propertyChange('visible', v, this._jsonModel.visible, this._eventSource);
             this._jsonModel.visible = v;
             this.notifyDependents(changeAction);
         }
@@ -1617,7 +1766,7 @@ class BaseNode {
             JSON.stringify(l) === JSON.stringify(this._jsonModel.label) :
             l === this._jsonModel.label;
         if (!isLabelSame) {
-            const changeAction = propertyChange('label', l, this._jsonModel.label);
+            const changeAction = propertyChange('label', l, this._jsonModel.label, this._eventSource);
             this._jsonModel = {
                 ...this._jsonModel,
                 label: l
@@ -1639,7 +1788,7 @@ class BaseNode {
         return this.withDependencyTrackingControl(true, () => {
             return {
                 ...this._jsonModel,
-                properties: this.properties,
+                properties: { ...this.properties },
                 index: this.index,
                 parent: undefined,
                 qualifiedName: this.qualifiedName,
@@ -1650,7 +1799,7 @@ class BaseNode {
                 } : {}),
                 ':type': this[':type'],
                 ...(forRestore ? {
-                    _dependents: this._dependents.length ? this.getDependents() : undefined,
+                    _dependents: this._dependents.length ? this.getDependents() : this._jsonModel._dependents,
                     allowedComponents: undefined,
                     columnClassNames: undefined,
                     columnCount: undefined,
@@ -1660,9 +1809,28 @@ class BaseNode {
         });
     }
     subscribe(callback, eventName = 'change', dependentType = 'view') {
+        if (eventName.startsWith('custom:')) {
+            eventName = eventName.substring('custom:'.length);
+        }
         this._callbacks[eventName] = this._callbacks[eventName] || [];
-        const entry = { callback, dependentType };
+        const resolvedType = (dependentType === 'view' && this.ruleEngine?.isModelDecorating?.())
+            ? 'model'
+            : dependentType;
+        const isViewSubscriber = resolvedType === 'view';
+        const hasExistingViewSubscriber = this._callbacks[eventName].some((x) => x.dependentType === 'view' || x.dependentType == null);
+        const entry = { callback, dependentType: resolvedType };
         this._callbacks[eventName].push(entry);
+        if (isViewSubscriber && !hasExistingViewSubscriber) {
+            const pending = this._pendingViewEvents[eventName];
+            if (pending?.length) {
+                delete this._pendingViewEvents[eventName];
+                pending.forEach((action) => {
+                    this.withDependencyTrackingControl(true, () => {
+                        callback(new ActionImplWithTarget(action, this));
+                    });
+                });
+            }
+        }
         return {
             unsubscribe: () => {
                 this._callbacks[eventName] = this._callbacks[eventName].filter(x => x.callback !== callback);
@@ -1671,11 +1839,16 @@ class BaseNode {
     }
     _addDependent(dependent, propertyName) {
         const existingDependency = this._dependents.find(({ node, propertyName: existingProp }) => {
-            let isExistingDependent = node === dependent;
-            if (isExistingDependent && propertyName && propertyName.startsWith('properties.')) {
-                isExistingDependent = existingProp === propertyName;
+            if (node !== dependent) {
+                return false;
             }
-            return isExistingDependent;
+            if (propertyName && this.form.propDependencyBehaviour === 'strict') {
+                return existingProp === propertyName;
+            }
+            if (isKeyedPath(propertyName)) {
+                return existingProp === propertyName;
+            }
+            return true;
         });
         if (existingDependency === undefined) {
             const subscription = this.subscribe((change) => {
@@ -1683,14 +1856,21 @@ class BaseNode {
                 const propsToLook = [...dynamicProps, 'items'];
                 const isPropChanged = changes.findIndex(x => {
                     const changedPropertyName = x.propertyName;
-                    return propsToLook.includes(changedPropertyName) || (changedPropertyName.startsWith('properties.') && propertyName === changedPropertyName);
+                    if (propertyName && this.form.propDependencyBehaviour === 'strict') {
+                        return changedPropertyName === propertyName;
+                    }
+                    return propsToLook.includes(changedPropertyName) || (isKeyedPath(changedPropertyName) && propertyName === changedPropertyName);
                 }) > -1;
                 if (isPropChanged) {
                     if (this.form.changeEventBehaviour === 'deps') {
                         dependent.dispatch(change);
                     }
                     else {
-                        dependent.dispatch(new ExecuteRule());
+                        const rule = new ExecuteRule();
+                        if (typeof rule._setTrace === 'function') {
+                            rule._setTrace(change, change.correlationId);
+                        }
+                        dependent.dispatch(rule);
                     }
                 }
             }, 'change', 'model');
@@ -1698,17 +1878,21 @@ class BaseNode {
         }
     }
     removeDependent(dependent) {
-        const index = this._dependents.findIndex(({ node }) => node === dependent);
-        if (index > -1) {
-            this._dependents[index].subscription.unsubscribe();
-            this._dependents.splice(index, 1);
-        }
+        const toRemove = this._dependents.filter(({ node }) => node === dependent);
+        toRemove.forEach(dep => dep.subscription.unsubscribe());
+        this._dependents = this._dependents.filter(({ node }) => node !== dependent);
     }
     queueEvent(action) {
         if (this._onlyViewNotify) {
             return;
         }
         const actionWithTarget = new ActionImplWithTarget(action, this);
+        if (!actionWithTarget.correlationId) {
+            const activeCorrelationId = this.form.getEventQueue().activeCorrelationId;
+            if (activeCorrelationId && typeof actionWithTarget._setTrace === 'function') {
+                actionWithTarget._setTrace(actionWithTarget.originalAction, activeCorrelationId);
+            }
+        }
         this.form.getEventQueue().queue(this, actionWithTarget, ['valid', 'invalid'].indexOf(actionWithTarget.type) > -1);
     }
     dispatch(action) {
@@ -1749,6 +1933,11 @@ class BaseNode {
         const toRun = onlyView
             ? entries.filter(e => e.dependentType === 'view' || e.dependentType === undefined)
             : entries;
+        const hasViewSubscriber = entries.some(e => e.dependentType === 'view' || e.dependentType == null);
+        if (!hasViewSubscriber && !onlyView && action.isCustomEvent) {
+            this._pendingViewEvents[action.type] = this._pendingViewEvents[action.type] || [];
+            this._pendingViewEvents[action.type].push(action);
+        }
         toRun.forEach(({ callback }) => {
             this.withDependencyTrackingControl(true, () => {
                 callback(new ActionImplWithTarget(action, this));
@@ -1760,23 +1949,16 @@ class BaseNode {
     }
     _setProperty(prop, newValue, notify = true, notifyChildren = (action) => { }) {
         const oldValue = this._jsonModel[prop];
-        let isValueSame = false;
-        if (newValue !== null && oldValue !== null &&
-            typeof newValue === 'object' && typeof oldValue === 'object') {
-            isValueSame = JSON.stringify(newValue) === JSON.stringify(oldValue);
-        }
-        else {
-            isValueSame = oldValue === newValue;
-        }
+        const isValueSame = isSameValue(newValue, oldValue);
         if (!isValueSame) {
             this._jsonModel[prop] = newValue;
-            const changeAction = propertyChange(prop, newValue, oldValue);
+            const changeAction = propertyChange(prop, newValue, oldValue, this._eventSource);
             if (notify) {
                 this.notifyDependents(changeAction);
             }
             notifyChildren.call(this, changeAction);
-            if (validationConstraintsList.includes(prop)) {
-                if (this.hasValueBeenSet === undefined || this.hasValueBeenSet) {
+            if (revalidationTriggerProps.includes(prop)) {
+                if (this.hasValueBeenSet === undefined || this.hasValueBeenSet || this._jsonModel?.validity?.valid === false) {
                     this.validate();
                 }
             }
@@ -1883,6 +2065,36 @@ class BaseNode {
         }
         return this._lang;
     }
+    get data() {
+        return this._dataManager.proxy;
+    }
+    set data(v) {
+        if (this.isContainer) {
+            this.importData(v);
+        }
+    }
+    _notifyDataDependentsOnRebind() {
+        const dataNode = this.getDataNode();
+        if (!dataNode || !dataNode.$isDataGroup) {
+            return;
+        }
+        if (dataNode === this._lastRebindDataNode) {
+            return;
+        }
+        this._lastRebindDataNode = dataNode;
+        const seen = new Set();
+        const pending = this._jsonModel._dependents || [];
+        [...this._dependents, ...pending].forEach(({ propertyName }) => {
+            if (!propertyName || !propertyName.startsWith('data.') || seen.has(propertyName)) {
+                return;
+            }
+            seen.add(propertyName);
+            const key = propertyName.slice('data.'.length);
+            const node = dataNode.$getDataNode(key);
+            const value = node instanceof DataValue ? node.$value : undefined;
+            this.notifyDependents(propertyChange(propertyName, value, undefined, this._eventSource));
+        });
+    }
     get properties() {
         return this._propertiesManager.properties;
     }
@@ -1981,9 +2193,1158 @@ __decorate([
 __decorate([
     dependencyTracked()
 ], BaseNode.prototype, "label", null);
+const modelAccessorProps = [...new Set([...dynamicProps, 'name', 'id', 'type', 'fieldType', 'items', 'parent', 'data', 'qualifiedName'])];
+const modelDollarWritable = new Set([...editableProperties, 'data']);
+modelAccessorProps.forEach((prop) => {
+    const dollarProp = `$${prop}`;
+    if (Object.prototype.hasOwnProperty.call(BaseNode.prototype, dollarProp)) {
+        return;
+    }
+    const descriptor = {
+        configurable: true,
+        get() {
+            return this.withDependencyTrackingControl(true, () => this[prop]);
+        }
+    };
+    if (modelDollarWritable.has(prop)) {
+        descriptor.set = function (value) {
+            this[prop] = value;
+        };
+    }
+    Object.defineProperty(BaseNode.prototype, dollarProp, descriptor);
+});
+const createDecoratorRegistry = () => {
+    const map = Object.create(null);
+    return {
+        register(key, decorator) {
+            if (typeof key === 'string' && key.length > 0 && typeof decorator === 'function') {
+                map[key] = decorator;
+            }
+        },
+        get(key) {
+            return typeof key === 'string' ? map[key] : undefined;
+        },
+        clear() {
+            Object.keys(map).forEach((k) => delete map[k]);
+        }
+    };
+};
+const modelRegistry = createDecoratorRegistry();
+const fragmentRegistry = createDecoratorRegistry();
+const formRegistry = createDecoratorRegistry();
+function getModelDecorator(viewType) {
+    return modelRegistry.get(viewType);
+}
+function getFragmentDecorator(fragmentPath) {
+    return fragmentRegistry.get(fragmentPath);
+}
+function getFormDecorator(formPath) {
+    return formRegistry.get(formPath);
+}
+const request$1 = (url, data = null, options = {}) => {
+    const opts = { ...defaultRequestOptions, ...options };
+    const updatedUrl = opts.method === 'GET' && data ? convertQueryString(url, data) : url;
+    if (opts.method !== 'GET') {
+        opts.body = data;
+    }
+    return fetch(updatedUrl, {
+        ...opts
+    }).then(async (response) => {
+        let body;
+        if (!response.ok) {
+            console.error(`Error while fetching response from ${url} : ${response.statusText}`);
+        }
+        if (response?.headers?.get('Content-Type')?.includes('application/json')) {
+            body = await response.json();
+        }
+        else {
+            body = await response.text();
+        }
+        const headers = {};
+        response?.headers?.forEach((value, key) => {
+            headers[key] = value;
+        });
+        return {
+            status: response.status,
+            body,
+            headers
+        };
+    }).catch((error) => {
+        console.error(`Network error while fetching from ${url}:`, error);
+        throw error;
+    });
+};
+const defaultRequestOptions = {
+    method: 'GET'
+};
+const convertQueryString = (endpoint, payload) => {
+    if (!payload) {
+        return endpoint;
+    }
+    let updatedPayload = {};
+    try {
+        updatedPayload = JSON.parse(payload);
+    }
+    catch (err) {
+        console.log('Query params invalid');
+    }
+    const params = [];
+    Object.keys(updatedPayload).forEach((key) => {
+        if (Array.isArray(updatedPayload[key])) {
+            params.push(`${encodeURIComponent(key)}=${encodeURIComponent(JSON.stringify(updatedPayload[key]))}`);
+        }
+        else {
+            params.push(`${encodeURIComponent(key)}=${encodeURIComponent(updatedPayload[key])}`);
+        }
+    });
+    if (!params.length) {
+        return endpoint;
+    }
+    return endpoint.includes('?') ? `${endpoint}&${params.join('&')}` : `${endpoint}?${params.join('&')}`;
+};
+function parsePropertyPath(keyStr) {
+    return keyStr
+        .replace(/\[/g, '.')
+        .replace(/\]/g, '')
+        .split('.')
+        .filter(Boolean);
+}
+const getCustomEventName = (name) => {
+    const eName = name;
+    if (eName.length > 0 && eName.startsWith('custom:')) {
+        return eName.substring('custom:'.length);
+    }
+    return eName;
+};
+const request = async (context, uri, httpVerb, payload, success, error, headers) => {
+    const endpoint = uri;
+    const requestOptions = {
+        method: httpVerb
+    };
+    let inputPayload;
+    let encryptOutput = {}, cryptoMetadata = null;
+    try {
+        if (payload instanceof Promise) {
+            payload = await payload;
+        }
+    }
+    catch (error) {
+        console.error('Error resolving payload Promise:', error);
+        throw error;
+    }
+    if (payload.body && payload.headers) {
+        encryptOutput = { ...payload };
+        headers = { ...payload.headers };
+        if (payload.options && typeof payload.options === 'object') {
+            Object.assign(requestOptions, payload.options);
+            requestOptions.method = httpVerb;
+        }
+        cryptoMetadata = payload.cryptoMetadata;
+        payload = payload.body;
+        inputPayload = payload;
+    }
+    if (payload && payload instanceof FileObject && payload.data instanceof File) {
+        const formData = new FormData();
+        formData.append(payload.name, payload.data);
+        inputPayload = formData;
+    }
+    else if (payload instanceof FormData) {
+        inputPayload = payload;
+    }
+    else {
+        const headerNames = Object.keys(headers || {});
+        if (headerNames.length > 0) {
+            requestOptions.headers = {
+                ...headers,
+                ...(headerNames.indexOf('Content-Type') === -1 ? { 'Content-Type': 'application/json' } : {})
+            };
+        }
+        else {
+            requestOptions.headers = { 'Content-Type': 'application/json' };
+        }
+        const contentType = requestOptions?.headers?.['Content-Type'] || 'application/json';
+        if (payload && (typeof payload === 'string' || (typeof payload === 'object' && Object.keys(payload).length > 0))) {
+            if (typeof payload === 'object') {
+                if (contentType === 'application/json') {
+                    inputPayload = JSON.stringify(payload);
+                }
+                else if (contentType.indexOf('multipart/form-data') > -1) {
+                    inputPayload = multipartFormData(payload);
+                }
+                else if (contentType.indexOf('application/x-www-form-urlencoded') > -1) {
+                    inputPayload = urlEncoded(payload);
+                }
+            }
+            if (contentType === 'text/plain') {
+                inputPayload = String(payload);
+            }
+        }
+    }
+    const dispatchErrorEvents = (response, errorType, enhancedPayload) => {
+        if (errorType === 'submitError') {
+            context.form.dispatch(new SubmitError(response, true));
+            context.form.dispatch(new SubmitFailure(response, true));
+        }
+        else if (errorType) {
+            const eName = getCustomEventName(errorType);
+            if (context.field) {
+                context.field.dispatch(new CustomEvent(eName, response, true));
+            }
+            else {
+                context.form.dispatch(new CustomEvent(eName, response, true));
+            }
+        }
+        context.form.dispatch(new RequestFailure(enhancedPayload, false));
+    };
+    const targetField = context.$field || null;
+    const baseEnhancedPayload = {
+        request: { url: endpoint, method: httpVerb, ...encryptOutput },
+        targetField: targetField,
+        targetEvent: context.$event || null
+    };
+    try {
+        const response = await request$1(endpoint, inputPayload, requestOptions);
+        response.originalRequest = {
+            url: endpoint,
+            method: httpVerb,
+            ...(cryptoMetadata && { cryptoMetadata }),
+            ...encryptOutput
+        };
+        response.submitter = targetField;
+        const enhancedPayload = {
+            ...baseEnhancedPayload,
+            response,
+            request: response.originalRequest
+        };
+        if (response?.status >= 200 && response?.status <= 299) {
+            if (success === 'submitSuccess') {
+                context.form.dispatch(new SubmitSuccess(response, true));
+            }
+            else if (success) {
+                const eName = getCustomEventName(success);
+                if (context.field) {
+                    context.field.dispatch(new CustomEvent(eName, response, true));
+                }
+                else {
+                    context.form.dispatch(new CustomEvent(eName, response, true));
+                }
+            }
+            context.form.dispatch(new RequestSuccess(enhancedPayload, false));
+        }
+        else {
+            context.form.logger.error('Error invoking a rest API');
+            dispatchErrorEvents(response, error, enhancedPayload);
+        }
+        return response;
+    }
+    catch (networkError) {
+        context.form.logger.error('Network error while invoking a rest API:', networkError);
+        const networkErrorResponse = {
+            body: null,
+            headers: {},
+            error: networkError instanceof Error ? networkError.message : String(networkError)
+        };
+        const enhancedPayload = {
+            ...baseEnhancedPayload,
+            response: networkErrorResponse
+        };
+        dispatchErrorEvents(networkErrorResponse, error, enhancedPayload);
+    }
+};
+const urlEncoded = (data) => {
+    const formData = new URLSearchParams();
+    Object.entries(data).forEach(([key, value]) => {
+        if (value != null && typeof value === 'object') {
+            formData.append(key, jsonString(value));
+        }
+        else {
+            formData.append(key, value);
+        }
+    });
+    return formData;
+};
+const submit = async (context, success, error, submitAs = 'multipart/form-data', input_data = null, action = '', metadata = null) => {
+    const endpoint = action || context.form.action;
+    let data = input_data;
+    const attachments = await readAttachments(context.form, true);
+    if (typeof data != 'object' || data == null) {
+        data = context.form.exportData(attachments);
+    }
+    let submitContentType = submitAs;
+    const submitDataAndMetaData = { 'data': data, ...metadata };
+    let formData = submitDataAndMetaData;
+    if (Object.keys(attachments).length > 0 || submitAs === 'multipart/form-data') {
+        formData = multipartFormData(submitDataAndMetaData, attachments);
+        submitContentType = 'multipart/form-data';
+    }
+    await request(context, endpoint, 'POST', formData, success, error, {
+        'Content-Type': submitContentType
+    });
+};
+const runRequestPipeline = async (options, interpreter, expressionScope = undefined) => {
+    const { url, method = 'GET', body: requestBody = {}, headers = { 'Content-Type': 'application/json' }, options: fetchOptions, publicKey, cryptoMetadata } = options;
+    const funcs = FunctionRuntimeImpl.getInstance().getFunctions();
+    const externalizedUrl = await funcs.externalize._func.call(undefined, [url], expressionScope, interpreter);
+    const encryptPayload = { body: requestBody, headers };
+    if (fetchOptions != null) {
+        encryptPayload.options = fetchOptions;
+    }
+    if (cryptoMetadata != null) {
+        encryptPayload.cryptoMetadata = cryptoMetadata;
+    }
+    const encryptArgs = publicKey !== undefined ? [encryptPayload, publicKey] : [encryptPayload];
+    const payload = await funcs.encrypt._func.call(undefined, encryptArgs, expressionScope, interpreter);
+    const requestArgs = [externalizedUrl, method, payload, '', ''];
+    const requestFn = await funcs.requestWithRetry._func.call(undefined, requestArgs, expressionScope, interpreter);
+    const response = await funcs.retryHandler._func.call(undefined, [requestFn], expressionScope, interpreter);
+    const isSuccess = response?.status >= 200 && response?.status <= 299;
+    if (isSuccess && response?.body) {
+        const decryptedBody = await funcs.decrypt._func.call(undefined, [response.body, response.originalRequest], expressionScope, interpreter);
+        return {
+            ok: true,
+            status: response.status,
+            body: decryptedBody,
+            headers: response.headers
+        };
+    }
+    return {
+        ok: isSuccess,
+        status: response?.status,
+        body: response?.body,
+        headers: response?.headers
+    };
+};
+const multipartFormData = (data, attachments) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+        if (value != null && typeof value === 'object') {
+            formData.append(key, jsonString(value));
+        }
+        else {
+            formData.append(key, value);
+        }
+    });
+    const addAttachmentToFormData = (objValue, formData) => {
+        if (objValue?.data instanceof File) {
+            let attIdentifier = `${objValue?.dataRef}/${objValue?.name}`;
+            if (!attIdentifier.startsWith('/')) {
+                attIdentifier = `/${attIdentifier}`;
+            }
+            formData.append(attIdentifier, objValue.data);
+        }
+    };
+    if (attachments) {
+        Object.keys(attachments).reduce((acc, curr) => {
+            const objValue = attachments[curr];
+            if (objValue && objValue instanceof Array) {
+                return [...acc, ...objValue.map((x) => addAttachmentToFormData(x, formData))];
+            }
+            else {
+                return [...acc, addAttachmentToFormData(objValue, formData)];
+            }
+        }, []);
+    }
+    return formData;
+};
+const createAction = (name, payload = {}, dispatch = false) => {
+    switch (name) {
+        case 'change':
+            return new Change(payload);
+        case 'submit':
+            return new Submit(payload);
+        case 'save':
+            return new Save(payload);
+        case 'click':
+            return new Click(payload);
+        case 'addItem':
+            return new AddItem(payload);
+        case 'removeItem':
+            return new RemoveItem(payload);
+        case 'reset':
+            return new Reset(payload);
+        case 'addInstance':
+            return new AddInstance(payload);
+        case 'removeInstance':
+            return new RemoveInstance(payload);
+        case 'invalid':
+            return new Invalid(payload);
+        case 'valid':
+            return new Valid(payload);
+        case 'initialize':
+            return new Initialize(payload);
+        case 'focus':
+            return new Focus(payload);
+        default:
+            return undefined;
+    }
+};
+class FunctionRuntimeImpl {
+    static instance = null;
+    customFunctions = {};
+    _defaultFunctions = undefined;
+    constructor() {
+    }
+    static getInstance() {
+        if (!FunctionRuntimeImpl.instance) {
+            FunctionRuntimeImpl.instance = new FunctionRuntimeImpl();
+        }
+        return FunctionRuntimeImpl.instance;
+    }
+    registerFunctions(functions) {
+        Object.entries(functions).forEach(([name, funcDef]) => {
+            let finalFunction = funcDef;
+            if (typeof funcDef === 'function') {
+                finalFunction = {
+                    _func: (args, expressionScope, interpreter) => {
+                        const globals = FunctionRuntimeImpl.getInstance().buildGlobals(expressionScope, interpreter);
+                        return funcDef(...args, globals);
+                    },
+                    _signature: []
+                };
+            }
+            if (!finalFunction.hasOwnProperty('_func')) {
+                console.warn(`Unable to register function with name ${name}.`);
+                return;
+            }
+            FunctionRuntimeImpl.getInstance().customFunctions[name] = finalFunction;
+        });
+    }
+    buildGlobals(expressionScope, interpreter) {
+        return {
+            form: interpreter.globals.$form,
+            field: interpreter.globals.$field,
+            event: interpreter.globals.$event,
+            fragment: interpreter.globals.$fragment ?? interpreter.globals.$form,
+            functions: {
+                setProperty: (target$1, payload) => {
+                    const node = target$1 != null ? target$1[target] : undefined;
+                    if (node && typeof node.setProperties === 'function') {
+                        node.setProperties(payload);
+                        return {};
+                    }
+                    const eventName = 'custom:setProperty';
+                    const args = [target$1, eventName, payload];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().dispatchEvent._func.call(undefined, args, expressionScope, interpreter);
+                },
+                reset: (target) => {
+                    const eventName = 'reset';
+                    target = target || 'reset';
+                    const args = [target, eventName];
+                    interpreter.globals.form.logger.warn('This usage of reset is deprecated. Please see the documentation and update.');
+                    return FunctionRuntimeImpl.getInstance().getFunctions().dispatchEvent._func.call(undefined, args, expressionScope, interpreter);
+                },
+                validate: (target) => {
+                    const args = [target];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().validate._func.call(undefined, args, expressionScope, interpreter);
+                },
+                importData: (inputData, qualifiedName) => {
+                    const args = [inputData, qualifiedName];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().importData._func.call(undefined, args, expressionScope, interpreter);
+                },
+                exportData: () => {
+                    return FunctionRuntimeImpl.getInstance().getFunctions().exportData._func.call(undefined, [], expressionScope, interpreter);
+                },
+                submitForm: (payload, validateForm, contentType) => {
+                    const submitAs = contentType || 'multipart/form-data';
+                    const args = [payload, validateForm, submitAs];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().submitForm._func.call(undefined, args, expressionScope, interpreter);
+                },
+                markFieldAsInvalid: (fieldIdentifier, validationMessage, option) => {
+                    if (!option || option.useId) {
+                        interpreter.globals.form.getElement(fieldIdentifier)?.markAsInvalid(validationMessage);
+                    }
+                    else if (option && option.useDataRef) {
+                        interpreter.globals.form.visit(function callback(f) {
+                            if (f.dataRef === fieldIdentifier) {
+                                f.markAsInvalid(validationMessage);
+                            }
+                        });
+                    }
+                    else if (option && option.useQualifiedName) {
+                        interpreter.globals.form.resolveQualifiedName(fieldIdentifier)?.markAsInvalid(validationMessage);
+                    }
+                },
+                setFocus: (target, flag) => {
+                    const args = [target, flag];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().setFocus._func.call(undefined, args, expressionScope, interpreter);
+                },
+                dispatchEvent: (target, eventName, payload, dispatch) => {
+                    const args = [target, eventName, payload, dispatch];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().dispatchEvent._func.call(undefined, args, expressionScope, interpreter);
+                },
+                getFiles: (qualifiedName) => {
+                    const filesMap = {};
+                    if (!qualifiedName) {
+                        interpreter.globals.form.visit(function callback(f) {
+                            if (f.fieldType === 'file-input' && f.value) {
+                                filesMap[f.qualifiedName] = f.serialize();
+                            }
+                        });
+                    }
+                    const field = interpreter.globals.form.resolveQualifiedName(qualifiedName);
+                    if (field?.fieldType === 'file-input' && field?.value) {
+                        filesMap[qualifiedName] = field.serialize();
+                    }
+                    return filesMap;
+                },
+                setVariable: (variableName, variableValue, target) => {
+                    const args = [variableName, variableValue, target];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().setVariable._func.call(undefined, args, expressionScope, interpreter);
+                },
+                getVariable: (variableName, target) => {
+                    const args = [variableName, target];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().getVariable._func.call(undefined, args, expressionScope, interpreter);
+                },
+                request: async (options) => {
+                    return runRequestPipeline(options, interpreter, expressionScope);
+                },
+                addInstance: (element, index) => {
+                    const args = index !== undefined ? [element, index] : [element];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().addInstance._func.call(undefined, args, expressionScope, interpreter);
+                },
+                removeInstance: (element, index) => {
+                    const args = index !== undefined ? [element, index] : [element];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().removeInstance._func.call(undefined, args, expressionScope, interpreter);
+                },
+                getQueryParameter: (param) => {
+                    const args = [param];
+                    return FunctionRuntimeImpl.getInstance().getFunctions().getQueryParameter._func.call(undefined, args, expressionScope, interpreter);
+                }
+            }
+        };
+    }
+    unregisterFunctions(...names) {
+        names.forEach(name => {
+            if (name in FunctionRuntimeImpl.getInstance().customFunctions) {
+                delete FunctionRuntimeImpl?.getInstance().customFunctions[name];
+            }
+        });
+    }
+    getFunctions() {
+        if (this._defaultFunctions !== undefined) {
+            return { ...this._defaultFunctions, ...FunctionRuntimeImpl.getInstance().customFunctions };
+        }
+        function isArray(obj) {
+            if (obj !== null) {
+                return Object.prototype.toString.call(obj) === '[object Array]';
+            }
+            return false;
+        }
+        function valueOf(a) {
+            if (a === null || a === undefined) {
+                return a;
+            }
+            if (isArray(a)) {
+                return a.map(i => valueOf(i));
+            }
+            return a.valueOf();
+        }
+        function toString(a) {
+            if (a === null || a === undefined) {
+                return '';
+            }
+            return a.toString();
+        }
+        const defaultFunctions = {
+            validate: {
+                _func: (args, expressionScope, interpreter) => {
+                    const element = args[0];
+                    let validation;
+                    if (typeof element === 'string' || typeof element === 'undefined') {
+                        validation = interpreter.globals.form.validate();
+                    }
+                    else {
+                        validation = interpreter.globals.form.getElement(element.$id).validate();
+                    }
+                    if (Array.isArray(validation) && validation.length) {
+                        interpreter.globals.form.logger.warn('Form Validation Error');
+                    }
+                    return validation;
+                },
+                _signature: []
+            },
+            setFocus: {
+                _func: (args, expressionScope, interpreter) => {
+                    const element = args[0];
+                    const flag = args[1];
+                    try {
+                        const field = interpreter.globals.form.getElement(element?.$id) || interpreter.globals.field;
+                        interpreter.globals.form.setFocus(field, flag);
+                    }
+                    catch (e) {
+                        interpreter.globals.form.logger.error('An error has occurred within the setFocus API.');
+                    }
+                },
+                _signature: []
+            },
+            getData: {
+                _func: (args, expressionScope, interpreter) => {
+                    interpreter.globals.form.logger.warn('The `getData` function is depricated. Use `exportData` instead.');
+                    return interpreter.globals.form.withDependencyTrackingControl(true, () => {
+                        return interpreter.globals.form.exportData();
+                    });
+                },
+                _signature: []
+            },
+            exportData: {
+                _func: (args, expressionScope, interpreter) => {
+                    return interpreter.globals.form.withDependencyTrackingControl(true, () => {
+                        return interpreter.globals.form.exportData();
+                    });
+                },
+                _signature: []
+            },
+            importData: {
+                _func: (args, expressionScope, interpreter) => {
+                    return interpreter.globals.form.withDependencyTrackingControl(true, () => {
+                        const inputData = args[0];
+                        const qualifiedName = args[1];
+                        if (typeof inputData === 'object' && inputData !== null && !qualifiedName) {
+                            interpreter.globals.form.importData(inputData);
+                        }
+                        else {
+                            const field = interpreter.globals.form.resolveQualifiedName(qualifiedName);
+                            if (field?.isContainer) {
+                                field.importData(inputData, qualifiedName);
+                            }
+                            else {
+                                interpreter.globals.form.logger.error('Invalid argument passed in importData. A container is expected');
+                            }
+                        }
+                        return {};
+                    });
+                },
+                _signature: []
+            },
+            submitForm: {
+                _func: async (args, expressionScope, interpreter) => {
+                    let success = null;
+                    let error = null;
+                    let submit_data;
+                    let validate_form;
+                    let submit_as;
+                    if (args.length > 0 && typeof valueOf(args[0]) === 'object') {
+                        submit_data = args.length > 0 ? valueOf(args[0]) : null;
+                        validate_form = args.length > 1 ? valueOf(args[1]) : true;
+                        submit_as = args.length > 2 ? toString(args[2]) : 'multipart/form-data';
+                    }
+                    else {
+                        interpreter.globals.form.logger.warn('This usage of submitForm is deprecated. Please see the documentation and update');
+                        success = toString(args[0]);
+                        error = toString(args[1]);
+                        submit_as = args.length > 2 ? toString(args[2]) : 'multipart/form-data';
+                        submit_data = args.length > 3 ? valueOf(args[3]) : null;
+                        validate_form = args.length > 4 ? valueOf(args[4]) : true;
+                    }
+                    const form = interpreter.globals.form;
+                    if (form.captcha && (form.captcha.captchaDisplayMode === CaptchaDisplayMode.INVISIBLE ||
+                        (form.captcha.properties['fd:captcha']?.config?.version === 'enterprise' && form.captcha.properties['fd:captcha']?.config?.keyType === 'score'))) {
+                        if (typeof interpreter.runtime.functionTable.fetchCaptchaToken?._func !== 'function') {
+                            interpreter.globals.form.logger.error('fetchCaptchaToken is not defined');
+                            interpreter.globals.form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenNotDefined' }));
+                            return {};
+                        }
+                        try {
+                            const token = await interpreter.runtime.functionTable.fetchCaptchaToken._func([], expressionScope, interpreter);
+                            form.captcha.value = token;
+                        }
+                        catch (e) {
+                            interpreter.globals.form.logger.error('Error while fetching captcha token');
+                            interpreter.globals.form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenFailed' }));
+                            return {};
+                        }
+                    }
+                    interpreter.globals.form.dispatch(new Submit({
+                        success,
+                        error,
+                        submit_as,
+                        validate_form: validate_form,
+                        data: submit_data
+                    }));
+                    return {};
+                },
+                _signature: []
+            },
+            saveForm: {
+                _func: (args, expressionScope, interpreter) => {
+                    const action = toString(args[0]);
+                    const validate_form = args[2] || false;
+                    interpreter.globals.form.dispatch(new Save({
+                        action,
+                        validate_form
+                    }));
+                    return {};
+                },
+                _signature: []
+            },
+            setVariable: {
+                _func: (args, expressionScope, interpreter) => {
+                    const variableName = toString(args[0]);
+                    let variableValue = args[1];
+                    const normalFieldOrPanel = args[2] || interpreter.globals.form;
+                    if (variableValue && typeof variableValue === 'object' && variableValue.$qualifiedName) {
+                        const variableValueElement = interpreter.globals.form.getElement(variableValue.$id);
+                        variableValue = variableValueElement._jsonModel.value;
+                    }
+                    const target = normalFieldOrPanel.$id ? interpreter.globals.form.getElement(normalFieldOrPanel.$id) : interpreter.globals.form;
+                    const propertiesManager = target.getPropertiesManager();
+                    if (!propertiesManager.updateProperty(variableName, variableValue)) {
+                        interpreter.globals.form.logger?.warn(`setVariable: '${variableName}' is not a valid variable path.`);
+                    }
+                    return {};
+                },
+                _signature: []
+            },
+            getVariable: {
+                _func: (args, expressionScope, interpreter) => {
+                    const variableName = toString(args[0]);
+                    const normalFieldOrPanel = args[1] || interpreter.globals.form;
+                    if (!variableName) {
+                        return undefined;
+                    }
+                    const target = normalFieldOrPanel.$id ? interpreter.globals.form.getElement(normalFieldOrPanel.$id) : interpreter.globals.form;
+                    const propertiesManager = target.getPropertiesManager();
+                    if (variableName.includes('.')) {
+                        const properties = parsePropertyPath(variableName);
+                        let value = propertiesManager.properties;
+                        for (const prop of properties) {
+                            if (value === undefined || value === null) {
+                                return undefined;
+                            }
+                            value = value[prop];
+                        }
+                        return value;
+                    }
+                    else {
+                        propertiesManager.ensurePropertyDescriptor(variableName);
+                        return propertiesManager.properties[variableName];
+                    }
+                },
+                _signature: []
+            },
+            request: {
+                _func: (args, expressionScope, interpreter) => {
+                    const uri = toString(args[0]);
+                    const httpVerb = toString(args[1]);
+                    let payload;
+                    let success;
+                    let error;
+                    let headers = {};
+                    if (args[2] && typeof args[2] === 'object' && !args[2].then && ('data' in args[2] || 'headers' in args[2])) {
+                        const payloadObj = valueOf(args[2]);
+                        payload = payloadObj.data;
+                        headers = payloadObj.headers || {};
+                        success = valueOf(args[3]);
+                        error = valueOf(args[4]);
+                    }
+                    else {
+                        payload = valueOf(args[2]);
+                        if (typeof (args[3]) === 'string') {
+                            interpreter.globals.form.logger.warn('This usage of request is deprecated. Please see the documentation and update');
+                            success = valueOf(args[3]);
+                            error = valueOf(args[4]);
+                        }
+                        else {
+                            headers = valueOf(args[3]);
+                            success = valueOf(args[4]);
+                            error = valueOf(args[5]);
+                        }
+                    }
+                    return request(interpreter.globals, uri, httpVerb, payload, success, error, headers);
+                },
+                _signature: []
+            },
+            requestWithRetry: {
+                _func: (args, expressionScope, interpreter) => {
+                    const uri = toString(args[0]);
+                    const httpVerb = toString(args[1]);
+                    let success;
+                    let errorFn;
+                    let payload = valueOf(args[2]);
+                    if (typeof (args[3]) === 'string' && args.length === 5) {
+                        success = valueOf(args[3]);
+                        errorFn = valueOf(args[4]);
+                    }
+                    else if (typeof (args[4]) === 'string' && args.length === 6) {
+                        success = valueOf(args[4]);
+                        errorFn = valueOf(args[5]);
+                    }
+                    return async (retryOptions) => {
+                        try {
+                            if (payload instanceof Promise) {
+                                payload = await payload;
+                            }
+                        }
+                        catch (error) {
+                            console.error('Error resolving payload Promise:', error);
+                            throw error;
+                        }
+                        let finalHeaders = {};
+                        let finalBody = {}, finalCryptoMetadata = null, finalOptions = null;
+                        if (args.length === 5) {
+                            finalBody = payload.body || {};
+                            finalHeaders = payload.headers || {};
+                            finalCryptoMetadata = payload.cryptoMetadata;
+                            finalOptions = payload.options;
+                        }
+                        else {
+                            finalBody = payload || {};
+                            finalHeaders = args[3] || {};
+                        }
+                        if (retryOptions) {
+                            if (retryOptions.body) {
+                                finalBody = {
+                                    ...finalBody,
+                                    ...retryOptions.body
+                                };
+                            }
+                            if (retryOptions.headers) {
+                                finalHeaders = {
+                                    ...finalHeaders,
+                                    ...retryOptions.headers
+                                };
+                            }
+                        }
+                        const finalPayload = { 'body': finalBody, 'headers': finalHeaders, ...(finalCryptoMetadata != null && { cryptoMetadata: finalCryptoMetadata }), ...(finalOptions != null && { options: finalOptions }) };
+                        try {
+                            const response = await request(interpreter.globals, uri, httpVerb, finalPayload, success, errorFn, finalHeaders);
+                            return response;
+                        }
+                        catch (error) {
+                            if (error && typeof error === 'object' && 'status' in error && error.status >= 400) {
+                                throw error;
+                            }
+                            throw new Error('Request failed');
+                        }
+                    };
+                },
+                _signature: []
+            },
+            retryHandler: {
+                _func: (args, expressionScope, interpreter) => {
+                    const requestFn = valueOf(args[0]);
+                    return requestFn();
+                },
+                _signature: []
+            },
+            externalize: {
+                _func: (args, expressionScope, interpreter) => {
+                    const url = toString(args[0]);
+                    return url;
+                },
+                _signature: []
+            },
+            awaitFn: {
+                _func: async (args, expressionScope, interpreter) => {
+                    const success = args[1];
+                    const currentField = interpreter.globals.$field;
+                    try {
+                        const result = await args[0];
+                        defaultFunctions.dispatchEvent._func([currentField, success, result], expressionScope, interpreter);
+                    }
+                    catch (err) {
+                        const error = args[2];
+                        if (error) {
+                            defaultFunctions.dispatchEvent._func([currentField, error, err], expressionScope, interpreter);
+                        }
+                    }
+                    return {};
+                },
+                _signature: []
+            },
+            addInstance: {
+                _func: (args, expressionScope, interpreter) => {
+                    const element = args[0];
+                    const payload = args.length > 1 ? valueOf(args[1]) : undefined;
+                    try {
+                        const formElement = interpreter.globals.form.getElement(element.$id);
+                        const action = createAction('addInstance', payload);
+                        formElement.addItem(action);
+                    }
+                    catch (e) {
+                        interpreter.globals.form.logger.error('Invalid argument passed in addInstance. An element is expected');
+                    }
+                },
+                _signature: []
+            },
+            removeInstance: {
+                _func: (args, expressionScope, interpreter) => {
+                    const element = args[0];
+                    const payload = args.length > 1 ? valueOf(args[1]) : undefined;
+                    try {
+                        const formElement = interpreter.globals.form.getElement(element.$id);
+                        const action = createAction('removeInstance', payload);
+                        formElement.removeItem(action);
+                    }
+                    catch (e) {
+                        interpreter.globals.form.logger.error('Invalid argument passed in removeInstance. An element is expected');
+                    }
+                },
+                _signature: []
+            },
+            dispatchEvent: {
+                _func: (args, expressionScope, interpreter) => {
+                    const element = args[0];
+                    if (element == null && typeof interpreter !== 'string') {
+                        interpreter.globals.form.logger.error(`dispatchEvent: target element is null or undefined. Event "${valueOf(args[1])}" was skipped.`);
+                        return {};
+                    }
+                    let eventName = valueOf(args[1]);
+                    let payload = args.length > 2 ? valueOf(args[2]) : undefined;
+                    let dispatch = args.length > 3 ? valueOf(args[3]) : false;
+                    if (typeof element === 'string') {
+                        payload = eventName;
+                        eventName = element;
+                        dispatch = true;
+                    }
+                    let event;
+                    if (eventName.startsWith('custom:')) {
+                        event = new CustomEvent(eventName.substring('custom:'.length), payload, dispatch);
+                    }
+                    else {
+                        event = createAction(eventName, payload, dispatch) ?? new CustomEvent(eventName, payload, dispatch);
+                    }
+                    if (event != null) {
+                        const form = interpreter.globals.form;
+                        const inFlight = interpreter.globals.$event;
+                        const causingAction = (inFlight && inFlight.__action) || inFlight;
+                        const correlationId = (inFlight && inFlight.correlationId)
+                            || (form && typeof form.nextCorrelationId === 'function' ? form.nextCorrelationId() : undefined);
+                        if (typeof event._setTrace === 'function') {
+                            event._setTrace(causingAction, correlationId);
+                        }
+                    }
+                    if (event != null) {
+                        if (typeof element === 'string') {
+                            interpreter.globals.form.dispatch(event);
+                        }
+                        else {
+                            const dispatchEventOnElement = (element, event, interpreter) => {
+                                interpreter.globals.form.getElement(element.$id).dispatch(event);
+                            };
+                            if (Array.isArray(element) && element.length > 0 && typeof element.$id === 'undefined') {
+                                element.forEach(el => {
+                                    dispatchEventOnElement(el, event, interpreter);
+                                });
+                            }
+                            else {
+                                dispatchEventOnElement(element, event, interpreter);
+                            }
+                        }
+                    }
+                    return {};
+                },
+                _signature: []
+            },
+            encrypt: {
+                _func: async (args, expressionScope, interpreter) => {
+                    const payload = valueOf(args[0]);
+                    return payload;
+                },
+                _signature: []
+            },
+            decrypt: {
+                _func: async (args, expressionScope, interpreter) => {
+                    const encData = valueOf(args[0]);
+                    return encData;
+                },
+                _signature: []
+            },
+            getQueryParameter: {
+                _func: (args, expressionScope, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getQueryParameter. A parameter is expected');
+                        return '';
+                    }
+                    const queryParams = interpreter.globals.form?.properties?.queryParams;
+                    if (queryParams) {
+                        if (queryParams[param] !== undefined) {
+                            return queryParams[param];
+                        }
+                        const lowerParam = param.toLowerCase();
+                        for (const [key, value] of Object.entries(queryParams)) {
+                            if (key.toLowerCase() === lowerParam) {
+                                return value;
+                            }
+                        }
+                    }
+                    try {
+                        const urlParams = new URLSearchParams(window?.location?.search || '');
+                        const urlValue = urlParams.get(param) ||
+                            Array.from(urlParams.entries())
+                                .find(([key]) => key.toLowerCase() === param.toLowerCase())?.[1];
+                        if (urlValue !== null && urlValue !== undefined) {
+                            return urlValue;
+                        }
+                    }
+                    catch (e) {
+                        interpreter.globals.form.logger.warn('Error reading URL parameters:', e);
+                    }
+                    return '';
+                },
+                _signature: []
+            },
+            getBrowserDetail: {
+                _func: (args, expressionScope, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getBrowserDetail. A parameter is expected');
+                        return '';
+                    }
+                    if (interpreter.globals.form?.properties?.browserDetails?.[param]) {
+                        return interpreter.globals.form.properties.browserDetails[param];
+                    }
+                    if (typeof navigator !== 'undefined' && param in navigator) {
+                        return navigator[param] || '';
+                    }
+                    else {
+                        interpreter.globals.form.logger.warn(`Invalid or unsupported browser detail requested: "${param}"`);
+                        return '';
+                    }
+                },
+                _signature: []
+            },
+            getURLDetail: {
+                _func: (args, expressionScope, interpreter) => {
+                    const param = toString(args[0]);
+                    if (!param) {
+                        interpreter.globals.form.logger.error('Argument is missing in getURLDetail. A parameter is expected');
+                        return '';
+                    }
+                    if (interpreter.globals.form?.properties?.urlDetails?.[param]) {
+                        return interpreter.globals.form.properties.urlDetails[param];
+                    }
+                    if (typeof window !== 'undefined' && typeof window.location !== 'undefined' && param in window.location) {
+                        return window.location[param] || '';
+                    }
+                    else {
+                        interpreter.globals.form.logger.warn(`Invalid or unsupported url parameter requested: "${param}"`);
+                        return '';
+                    }
+                },
+                _signature: []
+            },
+            getRelativeInstanceIndex: {
+                _func: (args, expressionScope, interpreter) => {
+                    if (!Array.isArray(args[0]) || args[0].length === 0) {
+                        return -1;
+                    }
+                    const instanceManager = valueOf(args[0])[0].$parent;
+                    const field = interpreter.globals.$field;
+                    const baseName = instanceManager.$qualifiedName;
+                    const qn = field.$qualifiedName;
+                    if (qn.startsWith(baseName + '[')) {
+                        const startBracket = baseName.length + 1;
+                        const endBracket = qn.indexOf(']', startBracket);
+                        if (endBracket !== -1) {
+                            const idx = Number(qn.slice(startBracket, endBracket));
+                            if (!Number.isNaN(idx)) {
+                                return idx;
+                            }
+                        }
+                    }
+                    return instanceManager.length - 1;
+                },
+                _signature: []
+            },
+            today: {
+                _func: () => {
+                    const MS_IN_DAY = 24 * 60 * 60 * 1000;
+                    const now = new Date(Date.now());
+                    const _today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    return _today / MS_IN_DAY;
+                },
+                _signature: []
+            },
+            formatInput: {
+                _func: (args) => {
+                    const input = args[0];
+                    const format = args[1];
+                    if (!input || !format) {
+                        return input;
+                    }
+                    const inputStr = String(input).replace(/\D/g, '');
+                    switch (String(format).toLowerCase()) {
+                        case 'phonenumber': {
+                            if (inputStr.length >= 10) {
+                                const areaCode = inputStr.substring(0, 3);
+                                const firstThree = inputStr.substring(3, 6);
+                                const lastFour = inputStr.substring(6, 10);
+                                return `(${areaCode}) ${firstThree}-${lastFour}`;
+                            }
+                            else if (inputStr.length >= 7) {
+                                const firstThree = inputStr.substring(0, 3);
+                                const lastFour = inputStr.substring(3, 7);
+                                return `(${firstThree}) ${lastFour}`;
+                            }
+                            return inputStr;
+                        }
+                        case 'socialsecuritynumber': {
+                            if (inputStr.length >= 9) {
+                                const firstThree = inputStr.substring(0, 3);
+                                const middleTwo = inputStr.substring(3, 5);
+                                const lastFour = inputStr.substring(5, 9);
+                                return `${firstThree}-${middleTwo}-${lastFour}`;
+                            }
+                            return inputStr;
+                        }
+                        case 'email-alphanumeric': {
+                            const alphanumeric = String(input).replace(/[^a-zA-Z0-9]/g, '');
+                            if (alphanumeric.length > 0) {
+                                return `${alphanumeric}@example.com`;
+                            }
+                            return input;
+                        }
+                        case 'zipcode': {
+                            if (inputStr.length >= 5) {
+                                return inputStr.substring(0, 5);
+                            }
+                            return inputStr;
+                        }
+                        default:
+                            return input;
+                    }
+                },
+                _signature: []
+            },
+            isSelfChange: {
+                _func: (args, data, interpreter) => isSelfChange(interpreter.globals.$event),
+                _signature: []
+            },
+            isDependencyChange: {
+                _func: (args, data, interpreter) => isDependencyChange(interpreter.globals.$event),
+                _signature: []
+            },
+            isUserChange: {
+                _func: (args, data, interpreter) => isUserChange(interpreter.globals.$event),
+                _signature: []
+            }
+        };
+        this._defaultFunctions = defaultFunctions;
+        return { ...this._defaultFunctions, ...FunctionRuntimeImpl.getInstance().customFunctions };
+    }
+}
+const FunctionRuntime = FunctionRuntimeImpl.getInstance();
+const buildRuleGlobals = (interpreter, expressionScope = undefined) => FunctionRuntimeImpl.getInstance().buildGlobals(expressionScope, interpreter);
+const projectActionToRuleNodes = (action, selfRuleNode) => {
+    if (action == null) {
+        return undefined;
+    }
+    return {
+        type: action.type,
+        payload: action.payload,
+        target: action.target ? action.target.getRuleNode() : selfRuleNode,
+        currentTarget: action.currentTarget ? action.currentTarget.getRuleNode() : selfRuleNode,
+        originalAction: projectActionToRuleNodes(action.originalAction, selfRuleNode),
+        correlationId: action.correlationId
+    };
+};
 class Scriptable extends BaseNode {
     _events = {};
     _rules = {};
+    _fnExpressions = {};
+    _modelDecorated = false;
     getRules() {
         return typeof this._jsonModel.rules !== 'object' ? {} : this._jsonModel.rules;
     }
@@ -1994,8 +3355,7 @@ class Scriptable extends BaseNode {
                 let updatedRule = eString;
                 try {
                     if (this.fragment !== '$form') {
-                        const sanitizedFragment = sanitizeName(this.fragment);
-                        updatedRule = eString.replaceAll('$form', sanitizedFragment);
+                        updatedRule = eString.replaceAll('$form', '$fragment');
                     }
                     this._rules[eName] = this.ruleEngine.compileRule(updatedRule, this.lang);
                 }
@@ -2032,8 +3392,7 @@ class Scriptable extends BaseNode {
                     let updatedExpr = x;
                     try {
                         if (this.fragment !== '$form') {
-                            const sanitizedFragment = sanitizeName(this.fragment);
-                            updatedExpr = x.replaceAll('$form', sanitizedFragment);
+                            updatedExpr = x.replaceAll('$form', '$fragment');
                         }
                         return this.ruleEngine.compileRule(updatedExpr, this.lang);
                     }
@@ -2055,10 +3414,25 @@ class Scriptable extends BaseNode {
         }
         return this._events[eName] || [];
     }
+    getState(forRestore = false) {
+        const state = super.getState(forRestore);
+        state.events = state.events || {};
+        return state;
+    }
     applyUpdates(updates) {
+        if (updates != null && typeof updates === 'object' && updates[target] instanceof BaseNode) {
+            return;
+        }
         if (typeof updates === 'object') {
             if (updates !== null) {
                 Object.entries(updates).forEach(([key, value]) => {
+                    if (this._pendingWrites) {
+                        delete this._pendingWrites[key];
+                    }
+                    if (key.startsWith('properties.')) {
+                        this.applyPropertiesTarget(key, value);
+                        return;
+                    }
                     if (key in editableProperties || (key in this && typeof this[key] !== 'function')) {
                         try {
                             this[key] = value;
@@ -2074,23 +3448,81 @@ class Scriptable extends BaseNode {
             this.value = updates;
         }
     }
+    stageEagerSetPropertyOverlay(payload) {
+        const handlesSetProperty = this._jsonModel.events?.['custom:setProperty'] !== undefined
+            || typeof this.custom_setProperty === 'function';
+        if (!handlesSetProperty && this.form.setPropertyBehaviour === 'eager'
+            && payload !== null && typeof payload === 'object' && !Array.isArray(payload)) {
+            const overlay = this._pendingWrites || (this._pendingWrites = Object.create(null));
+            Object.assign(overlay, payload);
+        }
+    }
+    queueEvent(action) {
+        if (!this._onlyViewNotify && action.isCustomEvent && action.type === 'setProperty') {
+            this.stageEagerSetPropertyOverlay(action.payload);
+        }
+        super.queueEvent(action);
+    }
+    applyPropertiesTarget(prop, value) {
+        const path = prop.slice('properties.'.length);
+        if (!this.getPropertiesManager().updateProperty(path, value)) {
+            this.form.logger.warn(`${prop} is not a valid properties path.`);
+        }
+    }
+    bind(propertyName, exprOrFn) {
+        if (typeof exprOrFn === 'function') {
+            this._fnExpressions[propertyName] = exprOrFn;
+            if (expressionProperties.indexOf(propertyName) === -1) {
+                this.queueEvent(new ExecuteRule());
+            }
+            return;
+        }
+        delete this._fnExpressions[propertyName];
+        if (expressionProperties.indexOf(propertyName) > -1) {
+            this._jsonModel[propertyName] = exprOrFn;
+            return;
+        }
+        this._jsonModel.rules = this._jsonModel.rules || {};
+        this._jsonModel.rules[propertyName] = exprOrFn;
+        delete this._rules[propertyName];
+        this.queueEvent(new ExecuteRule());
+    }
+    getFnExpression(propertyName) {
+        return this._fnExpressions[propertyName];
+    }
     executeAllRules(context) {
-        const entries = Object.entries(this.getRules());
+        const fnRules = {};
+        Object.entries(this._fnExpressions).forEach(([k, fn]) => {
+            if (fn && expressionProperties.indexOf(k) === -1) {
+                fnRules[k] = fn;
+            }
+        });
+        const entries = Object.entries({ ...this.getRules(), ...fnRules });
         if (entries.length > 0) {
             const scope = this.getExpressionScope();
             entries.forEach(([prop, rule]) => {
-                const node = this.getCompiledRule(prop, rule);
-                if (node) {
-                    const newVal = this.ruleEngine.execute(node, scope, context, true, rule);
-                    if (editableProperties.indexOf(prop) > -1) {
-                        const oldAndNewValueAreEmpty = this.isEmpty() && this.isEmpty(newVal) && prop === 'value';
-                        if (!oldAndNewValueAreEmpty) {
-                            this[prop] = newVal;
-                        }
+                let newVal;
+                if (typeof rule === 'function') {
+                    newVal = this.ruleEngine.executeFunction(rule, context, true, `<rule:${prop}>`);
+                }
+                else {
+                    const node = this.getCompiledRule(prop, rule);
+                    if (!node) {
+                        return;
                     }
-                    else {
-                        this.form.logger.warn(`${prop} is not a valid editable property.`);
+                    newVal = this.ruleEngine.execute(node, scope, context, true, rule);
+                }
+                if (prop.startsWith('properties.')) {
+                    this.applyPropertiesTarget(prop, newVal);
+                }
+                else if (editableProperties.indexOf(prop) > -1) {
+                    const oldAndNewValueAreEmpty = this.isEmpty() && this.isEmpty(newVal) && prop === 'value';
+                    if (!oldAndNewValueAreEmpty) {
+                        this[prop] = newVal;
                     }
+                }
+                else {
+                    this.form.logger.warn(`${prop} is not a valid editable property.`);
                 }
             });
         }
@@ -2141,7 +3573,22 @@ class Scriptable extends BaseNode {
         if (node) {
             updates = this.ruleEngine.execute(node, this.getExpressionScope(), context, false, eString);
             if (updates instanceof Promise) {
-                this.form.addPromises(updates);
+                this.form.addPromises(updates.then((resolved) => {
+                    if (typeof resolved !== 'undefined' && resolved != null) {
+                        this.applyUpdates(resolved);
+                    }
+                }).catch((e) => {
+                    const errorMsg = `Async handler \`${eString}\` on "${this.name}" failed: ${e}`;
+                    this.form.logger.error(errorMsg);
+                    this.form.dispatch(new ScriptError({
+                        name: this.name,
+                        error: errorMsg,
+                        event: context?.$event?.type,
+                        rule: eString,
+                        stack: e instanceof Error ? e.stack : undefined
+                    }, false));
+                }));
+                return;
             }
         }
         if (typeof updates !== 'undefined' && updates != null) {
@@ -2153,13 +3600,66 @@ class Scriptable extends BaseNode {
             this.executeAllRules(context);
         }
     }
-    executeExpression(expr) {
-        const ruleContext = {
+    runModelDecorator() {
+        if (this._modelDecorated) {
+            return;
+        }
+        const viewType = this[':type'];
+        const jsonModel = this._jsonModel;
+        const isFormRoot = this.fieldType === 'form' || this.id === '$form';
+        const formPath = isFormRoot ? jsonModel?.properties?.['fd:path'] : undefined;
+        const fragmentPath = this.isFragment ? jsonModel?.fragmentPath : undefined;
+        let decorator;
+        let keyLabel = '';
+        if (formPath) {
+            decorator = getFormDecorator(formPath) || getFragmentDecorator(formPath);
+            if (decorator) {
+                keyLabel = `fd:path="${formPath}"`;
+            }
+        }
+        if (!decorator && fragmentPath) {
+            decorator = getFragmentDecorator(fragmentPath);
+            if (decorator) {
+                keyLabel = `fragmentPath="${fragmentPath}"`;
+            }
+        }
+        if (!decorator) {
+            decorator = getModelDecorator(viewType);
+            if (decorator) {
+                keyLabel = `':type'="${viewType}"`;
+            }
+        }
+        if (decorator) {
+            const resolved = decorator;
+            this._modelDecorated = true;
+            this.ruleEngine.setModelDecorating(true);
+            try {
+                this.withDependencyTrackingControl(true, () => {
+                    resolved(buildRuleGlobals({ globals: this.buildRuleContext() }));
+                });
+            }
+            catch (e) {
+                this.form.logger.error(`Model decorator for ${keyLabel} on "${this.name}" failed: ${e}`);
+            }
+            finally {
+                this.ruleEngine.setModelDecorating(false);
+            }
+        }
+    }
+    buildRuleContext() {
+        return {
             'form': this.form,
             '$form': this.form.getRuleNode(),
             '$field': this.getRuleNode(),
-            'field': this
+            'field': this,
+            '$fragment': this.getFragmentRuleNode()
         };
+    }
+    executeExpression(expr) {
+        const ruleContext = this.buildRuleContext();
+        if (typeof expr === 'function') {
+            return this.ruleEngine.executeFunction(expr, ruleContext, false, `<fn:${this.name}>`);
+        }
         const node = this.ruleEngine.compileRule(expr, this.lang);
         return this.ruleEngine.execute(node, this.getExpressionScope(), ruleContext, false, expr);
     }
@@ -2169,40 +3669,56 @@ class Scriptable extends BaseNode {
         }
     }
     executeAction(action) {
-        const context = {
-            'form': this.form,
-            '$form': this.form.getRuleNode(),
-            '$field': this.getRuleNode(),
-            'field': this,
-            '$event': {
-                type: action.type,
-                payload: action.payload,
-                target: this.getRuleNode()
-            }
-        };
+        if (!action.correlationId
+            && typeof action._setTrace === 'function'
+            && typeof this.form.nextCorrelationId === 'function') {
+            action._setTrace(action.originalAction, this.form.nextCorrelationId());
+        }
+        const context = this.buildRuleContext();
+        context.$event = projectActionToRuleNodes(action, this.getRuleNode());
+        context.$event.isSelfChange = isSelfChange(action);
+        context.$event.isDependencyChange = isDependencyChange(action);
+        context.$event.isUserChange = isUserChange(action);
+        Object.defineProperty(context.$event, '__action', { value: action, enumerable: false });
         this.ruleEngine.setDependencyTracking(['change', 'executeRule'].includes(action.type));
         const eventName = action.isCustomEvent ? `custom:${action.type}` : action.type;
         const funcName = action.isCustomEvent ? `custom_${action.type}` : action.type;
         const node = this.getCompiledEvent(eventName);
         const events = this._jsonModel.events?.[eventName];
-        if (funcName in this && typeof this[funcName] === 'function') {
-            this[funcName](action, context);
+        const prevCorrelationId = this.form.getEventQueue().setActiveCorrelationId(action.correlationId);
+        try {
+            if (funcName in this && typeof this[funcName] === 'function') {
+                this[funcName](action, context);
+            }
+            node.forEach((n, index) => {
+                let eString = '';
+                if (Array.isArray(events)) {
+                    eString = events[index];
+                }
+                else if (typeof events === 'string') {
+                    eString = events;
+                }
+                this.executeEvent(context, n, eString);
+            });
+            if (action.target === this) {
+                this.notifyDependents(action);
+            }
         }
-        node.forEach((n, index) => {
-            let eString = '';
-            if (Array.isArray(events)) {
-                eString = events[index];
-            }
-            else if (typeof events === 'string') {
-                eString = events;
-            }
-            this.executeEvent(context, n, eString);
-        });
-        if (action.target === this) {
-            this.notifyDependents(action);
+        finally {
+            this.form.getEventQueue().setActiveCorrelationId(prevCorrelationId);
         }
     }
 }
+const decorateSubtree = (node) => {
+    const decorate = (n) => { if (typeof n.runModelDecorator === 'function') {
+        n.runModelDecorator();
+    } };
+    decorate(node);
+    if (typeof node.visit === 'function') {
+        node.visit(decorate);
+    }
+    node.form?.getEventQueue?.().runPendingQueue();
+};
 const notifyChildrenAttributes = [
     'readOnly', 'enabled'
 ];
@@ -2231,6 +3747,9 @@ class Container extends Scriptable {
     get items() {
         return this._children;
     }
+    getChild(name) {
+        return this._children.find((c) => c.name === name);
+    }
     get maxItems() {
         return this._jsonModel.maxItems;
     }
@@ -2245,7 +3764,7 @@ class Container extends Scriptable {
                 this._childrenReference.pop();
             }
             const elems = this._children.splice(m, items2Remove);
-            this.notifyDependents(propertyChange('items', elems, null));
+            this.notifyDependents(propertyChange('items', elems, null, this._eventSource));
         }
     }
     get minItems() {
@@ -2261,7 +3780,7 @@ class Container extends Scriptable {
             for (let i = 0; i < items2Add; i++) {
                 elems.push(this._addChild(this._itemTemplate, null, true));
             }
-            this.notifyDependents(propertyChange('items', elems, null));
+            this.notifyDependents(propertyChange('items', elems, null, this._eventSource));
         }
     }
     hasDynamicItems() {
@@ -2387,10 +3906,8 @@ class Container extends Scriptable {
             index = this._children.length;
         }
         const form = this.form;
-        const itemTemplate = {
-            index,
-            ...deepClone(itemJson, cloneIds ? () => { return form.getUniqueId(); } : undefined)
-        };
+        const itemTemplate = deepClone(itemJson, cloneIds ? () => { return form.getUniqueId(); } : undefined);
+        itemTemplate.index = index;
         const retVal = this._createChild(itemTemplate, { parent: this, form: this.form, mode });
         itemJson.id = retVal.id;
         this.form.fieldAdded(retVal);
@@ -2405,6 +3922,17 @@ class Container extends Scriptable {
     }
     indexOf(f) {
         return this._children.indexOf(f);
+    }
+    visit(callBack) {
+        this.traverseChild(this, callBack);
+    }
+    traverseChild(container, callBack) {
+        container.items.forEach((field) => {
+            if (field.isContainer) {
+                this.traverseChild(field, callBack);
+            }
+            callBack(field);
+        });
     }
     defaultDataModel(name) {
         const type = this._jsonModel.type || undefined;
@@ -2510,9 +4038,10 @@ class Container extends Scriptable {
                     dataNode.$addDataNode(instanceIndex, _data, false, this);
                 }
                 retVal._initialize('create');
-                this.notifyDependents(propertyChange('items', retVal.getState(), null));
+                this.notifyDependents(propertyChange('items', retVal.getState(), null, this._eventSource));
                 retVal.dispatch(new Initialize());
                 retVal.dispatch(new ExecuteRule());
+                decorateSubtree(retVal);
                 for (let i = instanceIndex + 1; i < this._children.length; i++) {
                     this._children[i].dispatch(new ExecuteRule());
                 }
@@ -2536,15 +4065,16 @@ class Container extends Scriptable {
                 for (let i = instanceIndex; i < this._children.length; i++) {
                     this._children[i].dispatch(new ExecuteRule());
                 }
-                this.notifyDependents(propertyChange('items', null, state));
+                this.notifyDependents(propertyChange('items', null, state, this._eventSource));
             }
         }
     }
     queueEvent(action) {
         super.queueEvent(action);
         if (action.metadata?.dispatch) {
+            const fromOrigin = action.target ? action : new ActionImplWithTarget(action, this);
             this.items.forEach(x => {
-                x.queueEvent(action);
+                x.queueEvent(fromOrigin);
             });
         }
     }
@@ -2619,11 +4149,11 @@ class Container extends Scriptable {
                 }
             }
             result.added.forEach((item) => {
-                this.notifyDependents(propertyChange('items', item.getState(), null));
+                this.notifyDependents(propertyChange('items', item.getState(), null, this._eventSource));
                 item.dispatch(new Initialize());
             });
             result.removed.forEach((item) => {
-                this.notifyDependents(propertyChange('items', null, item.getState()));
+                this.notifyDependents(propertyChange('items', null, item.getState(), this._eventSource));
             });
         }
         this._children.forEach(x => {
@@ -2633,6 +4163,7 @@ class Container extends Scriptable {
             }
             x.syncDataAndFormModel(dataModel);
         });
+        this._notifyDataDependentsOnRebind();
         return result;
     }
     get activeChild() {
@@ -2646,7 +4177,7 @@ class Container extends Scriptable {
                 activeChild.activeChild = null;
                 activeChild = temp;
             }
-            const change = propertyChange('activeChild', c?.getState(), this._activeChild?.getState());
+            const change = propertyChange('activeChild', c?.getState(), this._activeChild?.getState(), this._eventSource);
             this._activeChild = c;
             if (this.parent && c !== null) {
                 this.parent.activeChild = this;
@@ -2683,7 +4214,7 @@ class Container extends Scriptable {
                     this.items.forEach((child) => {
                         if (change.currentValue !== child._jsonModel[change.propertyName]) {
                             child._jsonModel[change.propertyName] = change.currentValue;
-                            this.notifyDependents.call(child, propertyChange(change.propertyName, child.getState()[change.propertyName], null));
+                            this.notifyDependents.call(child, propertyChange(change.propertyName, child.getState()[change.propertyName], null, this._eventSource));
                         }
                         if (child.fieldType === 'panel') {
                             this.notifyChildren.call(child, action);
@@ -2811,9 +4342,18 @@ class EventQueue {
     _runningEventCount;
     _isProcessing = false;
     _pendingEvents = [];
+    _activeCorrelationId;
     constructor(logger = new Logger('off')) {
         this.logger = logger;
         this._runningEventCount = {};
+    }
+    get activeCorrelationId() {
+        return this._activeCorrelationId;
+    }
+    setActiveCorrelationId(id) {
+        const prev = this._activeCorrelationId;
+        this._activeCorrelationId = id;
+        return prev;
     }
     get length() {
         return this._pendingEvents.length;
@@ -2880,1035 +4420,6 @@ class EventQueue {
         this._isProcessing = false;
     }
 }
-const request$1 = (url, data = null, options = {}) => {
-    const opts = { ...defaultRequestOptions, ...options };
-    const updatedUrl = opts.method === 'GET' && data ? convertQueryString(url, data) : url;
-    if (opts.method !== 'GET') {
-        opts.body = data;
-    }
-    return fetch(updatedUrl, {
-        ...opts
-    }).then(async (response) => {
-        let body;
-        if (!response.ok) {
-            console.error(`Error while fetching response from ${url} : ${response.statusText}`);
-        }
-        if (response?.headers?.get('Content-Type')?.includes('application/json')) {
-            body = await response.json();
-        }
-        else {
-            body = await response.text();
-        }
-        const headers = {};
-        response?.headers?.forEach((value, key) => {
-            headers[key] = value;
-        });
-        return {
-            status: response.status,
-            body,
-            headers
-        };
-    }).catch((error) => {
-        console.error(`Network error while fetching from ${url}:`, error);
-        throw error;
-    });
-};
-const defaultRequestOptions = {
-    method: 'GET'
-};
-const convertQueryString = (endpoint, payload) => {
-    if (!payload) {
-        return endpoint;
-    }
-    let updatedPayload = {};
-    try {
-        updatedPayload = JSON.parse(payload);
-    }
-    catch (err) {
-        console.log('Query params invalid');
-    }
-    const params = [];
-    Object.keys(updatedPayload).forEach((key) => {
-        if (Array.isArray(updatedPayload[key])) {
-            params.push(`${encodeURIComponent(key)}=${encodeURIComponent(JSON.stringify(updatedPayload[key]))}`);
-        }
-        else {
-            params.push(`${encodeURIComponent(key)}=${encodeURIComponent(updatedPayload[key])}`);
-        }
-    });
-    if (!params.length) {
-        return endpoint;
-    }
-    return endpoint.includes('?') ? `${endpoint}&${params.join('&')}` : `${endpoint}?${params.join('&')}`;
-};
-function parsePropertyPath(keyStr) {
-    return keyStr
-        .replace(/\[/g, '.')
-        .replace(/\]/g, '')
-        .split('.')
-        .filter(Boolean);
-}
-const getCustomEventName = (name) => {
-    const eName = name;
-    if (eName.length > 0 && eName.startsWith('custom:')) {
-        return eName.substring('custom:'.length);
-    }
-    return eName;
-};
-const request = async (context, uri, httpVerb, payload, success, error, headers) => {
-    const endpoint = uri;
-    const requestOptions = {
-        method: httpVerb
-    };
-    let inputPayload;
-    let encryptOutput = {}, cryptoMetadata = null;
-    try {
-        if (payload instanceof Promise) {
-            payload = await payload;
-        }
-    }
-    catch (error) {
-        console.error('Error resolving payload Promise:', error);
-        throw error;
-    }
-    if (payload.body && payload.headers) {
-        encryptOutput = { ...payload };
-        headers = { ...payload.headers };
-        if (payload.options && typeof payload.options === 'object') {
-            Object.assign(requestOptions, payload.options);
-        }
-        payload = payload.body;
-        cryptoMetadata = payload.cryptoMetadata;
-        inputPayload = payload;
-    }
-    if (payload && payload instanceof FileObject && payload.data instanceof File) {
-        const formData = new FormData();
-        formData.append(payload.name, payload.data);
-        inputPayload = formData;
-    }
-    else if (payload instanceof FormData) {
-        inputPayload = payload;
-    }
-    else if (payload && (typeof payload === 'string' || (typeof payload === 'object' && Object.keys(payload).length > 0))) {
-        const headerNames = Object.keys(headers);
-        if (headerNames.length > 0) {
-            requestOptions.headers = {
-                ...headers,
-                ...(headerNames.indexOf('Content-Type') === -1 ? { 'Content-Type': 'application/json' } : {})
-            };
-        }
-        else {
-            requestOptions.headers = { 'Content-Type': 'application/json' };
-        }
-        const contentType = requestOptions?.headers?.['Content-Type'] || 'application/json';
-        if (typeof payload === 'object') {
-            if (contentType === 'application/json') {
-                inputPayload = JSON.stringify(payload);
-            }
-            else if (contentType.indexOf('multipart/form-data') > -1) {
-                inputPayload = multipartFormData(payload);
-            }
-            else if (contentType.indexOf('application/x-www-form-urlencoded') > -1) {
-                inputPayload = urlEncoded(payload);
-            }
-        }
-        if (contentType === 'text/plain') {
-            inputPayload = String(payload);
-        }
-    }
-    const dispatchErrorEvents = (response, errorType, enhancedPayload) => {
-        const eName = getCustomEventName(errorType);
-        if (errorType === 'submitError') {
-            context.form.dispatch(new SubmitError(response, true));
-            context.form.dispatch(new SubmitFailure(response, true));
-        }
-        else {
-            if (context.field) {
-                context.field.dispatch(new CustomEvent(eName, response, true));
-            }
-            else {
-                context.form.dispatch(new CustomEvent(eName, response, true));
-            }
-        }
-        context.form.dispatch(new RequestFailure(enhancedPayload, false));
-    };
-    const targetField = context.$field || null;
-    const baseEnhancedPayload = {
-        request: { url: endpoint, method: httpVerb, ...encryptOutput },
-        targetField: targetField,
-        targetEvent: context.$event || null
-    };
-    try {
-        const response = await request$1(endpoint, inputPayload, requestOptions);
-        response.originalRequest = {
-            url: endpoint,
-            method: httpVerb,
-            ...(cryptoMetadata && { cryptoMetadata }),
-            ...encryptOutput
-        };
-        response.submitter = targetField;
-        const enhancedPayload = {
-            ...baseEnhancedPayload,
-            response,
-            request: response.originalRequest
-        };
-        if (response?.status >= 200 && response?.status <= 299) {
-            const eName = getCustomEventName(success);
-            if (success === 'submitSuccess') {
-                context.form.dispatch(new SubmitSuccess(response, true));
-            }
-            else {
-                if (context.field) {
-                    context.field.dispatch(new CustomEvent(eName, response, true));
-                }
-                else {
-                    context.form.dispatch(new CustomEvent(eName, response, true));
-                }
-            }
-            context.form.dispatch(new RequestSuccess(enhancedPayload, false));
-        }
-        else {
-            context.form.logger.error('Error invoking a rest API');
-            dispatchErrorEvents(response, error, enhancedPayload);
-        }
-        return response;
-    }
-    catch (networkError) {
-        context.form.logger.error('Network error while invoking a rest API:', networkError);
-        const networkErrorResponse = {
-            body: null,
-            headers: {},
-            error: networkError instanceof Error ? networkError.message : String(networkError)
-        };
-        const enhancedPayload = {
-            ...baseEnhancedPayload,
-            response: networkErrorResponse
-        };
-        dispatchErrorEvents(networkErrorResponse, error, enhancedPayload);
-        context.form.dispatch(new RequestFailure(enhancedPayload, false));
-    }
-};
-const urlEncoded = (data) => {
-    const formData = new URLSearchParams();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value != null && typeof value === 'object') {
-            formData.append(key, jsonString(value));
-        }
-        else {
-            formData.append(key, value);
-        }
-    });
-    return formData;
-};
-const submit = async (context, success, error, submitAs = 'multipart/form-data', input_data = null, action = '', metadata = null) => {
-    const endpoint = action || context.form.action;
-    let data = input_data;
-    const attachments = await readAttachments(context.form, true);
-    if (typeof data != 'object' || data == null) {
-        data = context.form.exportData(attachments);
-    }
-    let submitContentType = submitAs;
-    const submitDataAndMetaData = { 'data': data, ...metadata };
-    let formData = submitDataAndMetaData;
-    if (Object.keys(attachments).length > 0 || submitAs === 'multipart/form-data') {
-        formData = multipartFormData(submitDataAndMetaData, attachments);
-        submitContentType = 'multipart/form-data';
-    }
-    await request(context, endpoint, 'POST', formData, success, error, {
-        'Content-Type': submitContentType
-    });
-};
-const multipartFormData = (data, attachments) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-        if (value != null && typeof value === 'object') {
-            formData.append(key, jsonString(value));
-        }
-        else {
-            formData.append(key, value);
-        }
-    });
-    const addAttachmentToFormData = (objValue, formData) => {
-        if (objValue?.data instanceof File) {
-            let attIdentifier = `${objValue?.dataRef}/${objValue?.name}`;
-            if (!attIdentifier.startsWith('/')) {
-                attIdentifier = `/${attIdentifier}`;
-            }
-            formData.append(attIdentifier, objValue.data);
-        }
-    };
-    if (attachments) {
-        Object.keys(attachments).reduce((acc, curr) => {
-            const objValue = attachments[curr];
-            if (objValue && objValue instanceof Array) {
-                return [...acc, ...objValue.map((x) => addAttachmentToFormData(x, formData))];
-            }
-            else {
-                return [...acc, addAttachmentToFormData(objValue, formData)];
-            }
-        }, []);
-    }
-    return formData;
-};
-const createAction = (name, payload = {}, dispatch = false) => {
-    switch (name) {
-        case 'change':
-            return new Change(payload);
-        case 'submit':
-            return new Submit(payload);
-        case 'save':
-            return new Save(payload);
-        case 'click':
-            return new Click(payload);
-        case 'addItem':
-            return new AddItem(payload);
-        case 'removeItem':
-            return new RemoveItem(payload);
-        case 'reset':
-            return new Reset(payload);
-        case 'addInstance':
-            return new AddInstance(payload);
-        case 'removeInstance':
-            return new RemoveInstance(payload);
-        case 'invalid':
-            return new Invalid(payload);
-        case 'valid':
-            return new Valid(payload);
-        case 'initialize':
-            return new Initialize(payload);
-        case 'focus':
-            return new Focus(payload);
-        default:
-            console.error('invalid action');
-    }
-};
-class FunctionRuntimeImpl {
-    static instance = null;
-    customFunctions = {};
-    constructor() {
-    }
-    static getInstance() {
-        if (!FunctionRuntimeImpl.instance) {
-            FunctionRuntimeImpl.instance = new FunctionRuntimeImpl();
-        }
-        return FunctionRuntimeImpl.instance;
-    }
-    registerFunctions(functions) {
-        Object.entries(functions).forEach(([name, funcDef]) => {
-            let finalFunction = funcDef;
-            if (typeof funcDef === 'function') {
-                finalFunction = {
-                    _func: (args, data, interpreter) => {
-                        const globals = {
-                            form: interpreter.globals.$form,
-                            field: interpreter.globals.$field,
-                            event: interpreter.globals.$event,
-                            functions: {
-                                setProperty: (target, payload) => {
-                                    const eventName = 'custom:setProperty';
-                                    const args = [target, eventName, payload];
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().dispatchEvent._func.call(undefined, args, data, interpreter);
-                                },
-                                reset: (target) => {
-                                    const eventName = 'reset';
-                                    target = target || 'reset';
-                                    const args = [target, eventName];
-                                    interpreter.globals.form.logger.warn('This usage of reset is deprecated. Please see the documentation and update.');
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().dispatchEvent._func.call(undefined, args, data, interpreter);
-                                },
-                                validate: (target) => {
-                                    const args = [target];
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().validate._func.call(undefined, args, data, interpreter);
-                                },
-                                importData: (inputData, qualifiedName) => {
-                                    const args = [inputData, qualifiedName];
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().importData._func.call(undefined, args, data, interpreter);
-                                },
-                                exportData: () => {
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().exportData._func.call(undefined, args, data, interpreter);
-                                },
-                                submitForm: (payload, validateForm, contentType) => {
-                                    const submitAs = contentType || 'multipart/form-data';
-                                    const args = [payload, validateForm, submitAs];
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().submitForm._func.call(undefined, args, data, interpreter);
-                                },
-                                markFieldAsInvalid: (fieldIdentifier, validationMessage, option) => {
-                                    if (!option || option.useId) {
-                                        interpreter.globals.form.getElement(fieldIdentifier)?.markAsInvalid(validationMessage);
-                                    }
-                                    else if (option && option.useDataRef) {
-                                        interpreter.globals.form.visit(function callback(f) {
-                                            if (f.dataRef === fieldIdentifier) {
-                                                f.markAsInvalid(validationMessage);
-                                            }
-                                        });
-                                    }
-                                    else if (option && option.useQualifiedName) {
-                                        interpreter.globals.form.resolveQualifiedName(fieldIdentifier)?.markAsInvalid(validationMessage);
-                                    }
-                                },
-                                setFocus: (target, flag) => {
-                                    const args = [target, flag];
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().setFocus._func.call(undefined, args, data, interpreter);
-                                },
-                                dispatchEvent: (target, eventName, payload, dispatch) => {
-                                    const args = [target, eventName, payload, dispatch];
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().dispatchEvent._func.call(undefined, args, data, interpreter);
-                                },
-                                getFiles: (qualifiedName) => {
-                                    const filesMap = {};
-                                    if (!qualifiedName) {
-                                        interpreter.globals.form.visit(function callback(f) {
-                                            if (f.fieldType === 'file-input' && f.value) {
-                                                filesMap[f.qualifiedName] = f.serialize();
-                                            }
-                                        });
-                                    }
-                                    const field = interpreter.globals.form.resolveQualifiedName(qualifiedName);
-                                    if (field?.fieldType === 'file-input' && field?.value) {
-                                        filesMap[qualifiedName] = field.serialize();
-                                    }
-                                    return filesMap;
-                                },
-                                setVariable: (variableName, variableValue, target) => {
-                                    const args = [variableName, variableValue, target];
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().setVariable._func.call(undefined, args, data, interpreter);
-                                },
-                                getVariable: (variableName, target) => {
-                                    const args = [variableName, target];
-                                    return FunctionRuntimeImpl.getInstance().getFunctions().getVariable._func.call(undefined, args, data, interpreter);
-                                },
-                                request: async (options) => {
-                                    const { url, method = 'GET', body: requestBody = {}, headers = { 'Content-Type': 'application/json' }, options: fetchOptions } = options;
-                                    const funcs = FunctionRuntimeImpl.getInstance().getFunctions();
-                                    const externalizedUrl = funcs.externalize._func.call(undefined, [url], data, interpreter);
-                                    const random = Math.floor(Math.random() * 1000000);
-                                    const now = Date.now();
-                                    const internalSuccess = `custom:__internalSuccess_${random}_${now}`;
-                                    const internalError = `custom:__internalError_${random}_${now}`;
-                                    const encryptPayload = { body: requestBody, headers };
-                                    if (fetchOptions) {
-                                        encryptPayload.options = fetchOptions;
-                                    }
-                                    const payload = await funcs.encrypt._func.call(undefined, [encryptPayload], data, interpreter);
-                                    const requestArgs = [externalizedUrl, method, payload, internalSuccess, internalError];
-                                    const requestFn = funcs.requestWithRetry._func.call(undefined, requestArgs, data, interpreter);
-                                    const response = await funcs.retryHandler._func.call(undefined, [requestFn], data, interpreter);
-                                    const isSuccess = response?.status >= 200 && response?.status <= 299;
-                                    if (isSuccess && response?.body) {
-                                        const decryptedBody = await funcs.decrypt._func.call(undefined, [response.body, response.originalRequest], data, interpreter);
-                                        return {
-                                            ok: true,
-                                            status: response.status,
-                                            body: decryptedBody,
-                                            headers: response.headers
-                                        };
-                                    }
-                                    return {
-                                        ok: isSuccess,
-                                        status: response?.status,
-                                        body: response?.body,
-                                        headers: response?.headers
-                                    };
-                                }
-                            }
-                        };
-                        return funcDef(...args, globals);
-                    },
-                    _signature: []
-                };
-            }
-            if (!finalFunction.hasOwnProperty('_func')) {
-                console.warn(`Unable to register function with name ${name}.`);
-                return;
-            }
-            FunctionRuntimeImpl.getInstance().customFunctions[name] = finalFunction;
-        });
-    }
-    unregisterFunctions(...names) {
-        names.forEach(name => {
-            if (name in FunctionRuntimeImpl.getInstance().customFunctions) {
-                delete FunctionRuntimeImpl?.getInstance().customFunctions[name];
-            }
-        });
-    }
-    getFunctions() {
-        function isArray(obj) {
-            if (obj !== null) {
-                return Object.prototype.toString.call(obj) === '[object Array]';
-            }
-            return false;
-        }
-        function valueOf(a) {
-            if (a === null || a === undefined) {
-                return a;
-            }
-            if (isArray(a)) {
-                return a.map(i => valueOf(i));
-            }
-            return a.valueOf();
-        }
-        function toString(a) {
-            if (a === null || a === undefined) {
-                return '';
-            }
-            return a.toString();
-        }
-        const defaultFunctions = {
-            validate: {
-                _func: (args, data, interpreter) => {
-                    const element = args[0];
-                    let validation;
-                    if (typeof element === 'string' || typeof element === 'undefined') {
-                        validation = interpreter.globals.form.validate();
-                    }
-                    else {
-                        validation = interpreter.globals.form.getElement(element.$id).validate();
-                    }
-                    if (Array.isArray(validation) && validation.length) {
-                        interpreter.globals.form.logger.warn('Form Validation Error');
-                    }
-                    return validation;
-                },
-                _signature: []
-            },
-            setFocus: {
-                _func: (args, data, interpreter) => {
-                    const element = args[0];
-                    const flag = args[1];
-                    try {
-                        const field = interpreter.globals.form.getElement(element?.$id) || interpreter.globals.field;
-                        interpreter.globals.form.setFocus(field, flag);
-                    }
-                    catch (e) {
-                        interpreter.globals.form.logger.error('An error has occurred within the setFocus API.');
-                    }
-                },
-                _signature: []
-            },
-            getData: {
-                _func: (args, data, interpreter) => {
-                    interpreter.globals.form.logger.warn('The `getData` function is depricated. Use `exportData` instead.');
-                    return interpreter.globals.form.withDependencyTrackingControl(true, () => {
-                        return interpreter.globals.form.exportData();
-                    });
-                },
-                _signature: []
-            },
-            exportData: {
-                _func: (args, data, interpreter) => {
-                    return interpreter.globals.form.withDependencyTrackingControl(true, () => {
-                        return interpreter.globals.form.exportData();
-                    });
-                },
-                _signature: []
-            },
-            importData: {
-                _func: (args, data, interpreter) => {
-                    return interpreter.globals.form.withDependencyTrackingControl(true, () => {
-                        const inputData = args[0];
-                        const qualifiedName = args[1];
-                        if (typeof inputData === 'object' && inputData !== null && !qualifiedName) {
-                            interpreter.globals.form.importData(inputData);
-                        }
-                        else {
-                            const field = interpreter.globals.form.resolveQualifiedName(qualifiedName);
-                            if (field?.isContainer) {
-                                field.importData(inputData, qualifiedName);
-                            }
-                            else {
-                                interpreter.globals.form.logger.error('Invalid argument passed in importData. A container is expected');
-                            }
-                        }
-                        return {};
-                    });
-                },
-                _signature: []
-            },
-            submitForm: {
-                _func: async (args, data, interpreter) => {
-                    let success = null;
-                    let error = null;
-                    let submit_data;
-                    let validate_form;
-                    let submit_as;
-                    if (args.length > 0 && typeof valueOf(args[0]) === 'object') {
-                        submit_data = args.length > 0 ? valueOf(args[0]) : null;
-                        validate_form = args.length > 1 ? valueOf(args[1]) : true;
-                        submit_as = args.length > 2 ? toString(args[2]) : 'multipart/form-data';
-                    }
-                    else {
-                        interpreter.globals.form.logger.warn('This usage of submitForm is deprecated. Please see the documentation and update');
-                        success = toString(args[0]);
-                        error = toString(args[1]);
-                        submit_as = args.length > 2 ? toString(args[2]) : 'multipart/form-data';
-                        submit_data = args.length > 3 ? valueOf(args[3]) : null;
-                        validate_form = args.length > 4 ? valueOf(args[4]) : true;
-                    }
-                    const form = interpreter.globals.form;
-                    if (form.captcha && (form.captcha.captchaDisplayMode === CaptchaDisplayMode.INVISIBLE ||
-                        (form.captcha.properties['fd:captcha']?.config?.version === 'enterprise' && form.captcha.properties['fd:captcha']?.config?.keyType === 'score'))) {
-                        if (typeof interpreter.runtime.functionTable.fetchCaptchaToken?._func !== 'function') {
-                            interpreter.globals.form.logger.error('fetchCaptchaToken is not defined');
-                            interpreter.globals.form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenNotDefined' }));
-                            return {};
-                        }
-                        try {
-                            const token = await interpreter.runtime.functionTable.fetchCaptchaToken._func([], data, interpreter);
-                            form.captcha.value = token;
-                        }
-                        catch (e) {
-                            interpreter.globals.form.logger.error('Error while fetching captcha token');
-                            interpreter.globals.form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenFailed' }));
-                            return {};
-                        }
-                    }
-                    interpreter.globals.form.dispatch(new Submit({
-                        success,
-                        error,
-                        submit_as,
-                        validate_form: validate_form,
-                        data: submit_data
-                    }));
-                    return {};
-                },
-                _signature: []
-            },
-            saveForm: {
-                _func: (args, data, interpreter) => {
-                    const action = toString(args[0]);
-                    const validate_form = args[2] || false;
-                    interpreter.globals.form.dispatch(new Save({
-                        action,
-                        validate_form
-                    }));
-                    return {};
-                },
-                _signature: []
-            },
-            setVariable: {
-                _func: (args, data, interpreter) => {
-                    const variableName = toString(args[0]);
-                    let variableValue = args[1];
-                    const normalFieldOrPanel = args[2] || interpreter.globals.form;
-                    if (variableValue && typeof variableValue === 'object' && variableValue.$qualifiedName) {
-                        const variableValueElement = interpreter.globals.form.getElement(variableValue.$id);
-                        variableValue = variableValueElement._jsonModel.value;
-                    }
-                    const target = normalFieldOrPanel.$id ? interpreter.globals.form.getElement(normalFieldOrPanel.$id) : interpreter.globals.form;
-                    const propertiesManager = target.getPropertiesManager();
-                    propertiesManager.updateSimpleProperty(variableName, variableValue);
-                    return {};
-                },
-                _signature: []
-            },
-            getVariable: {
-                _func: (args, data, interpreter) => {
-                    const variableName = toString(args[0]);
-                    const normalFieldOrPanel = args[1] || interpreter.globals.form;
-                    if (!variableName) {
-                        return undefined;
-                    }
-                    const target = normalFieldOrPanel.$id ? interpreter.globals.form.getElement(normalFieldOrPanel.$id) : interpreter.globals.form;
-                    const propertiesManager = target.getPropertiesManager();
-                    if (variableName.includes('.')) {
-                        const properties = parsePropertyPath(variableName);
-                        let value = propertiesManager.properties;
-                        for (const prop of properties) {
-                            if (value === undefined || value === null) {
-                                return undefined;
-                            }
-                            value = value[prop];
-                        }
-                        return value;
-                    }
-                    else {
-                        propertiesManager.ensurePropertyDescriptor(variableName);
-                        return propertiesManager.properties[variableName];
-                    }
-                },
-                _signature: []
-            },
-            request: {
-                _func: (args, data, interpreter) => {
-                    const uri = toString(args[0]);
-                    const httpVerb = toString(args[1]);
-                    let payload;
-                    let success;
-                    let error;
-                    let headers = {};
-                    if (args[2] && typeof args[2] === 'object' && !args[2].then && ('data' in args[2] || 'headers' in args[2])) {
-                        const payloadObj = valueOf(args[2]);
-                        payload = payloadObj.data;
-                        headers = payloadObj.headers || {};
-                        success = valueOf(args[3]);
-                        error = valueOf(args[4]);
-                    }
-                    else {
-                        payload = valueOf(args[2]);
-                        if (typeof (args[3]) === 'string') {
-                            interpreter.globals.form.logger.warn('This usage of request is deprecated. Please see the documentation and update');
-                            success = valueOf(args[3]);
-                            error = valueOf(args[4]);
-                        }
-                        else {
-                            headers = valueOf(args[3]);
-                            success = valueOf(args[4]);
-                            error = valueOf(args[5]);
-                        }
-                    }
-                    return request(interpreter.globals, uri, httpVerb, payload, success, error, headers);
-                },
-                _signature: []
-            },
-            requestWithRetry: {
-                _func: (args, data, interpreter) => {
-                    const uri = toString(args[0]);
-                    const httpVerb = toString(args[1]);
-                    let success;
-                    let errorFn;
-                    let payload = valueOf(args[2]);
-                    if (typeof (args[3]) === 'string' && args.length === 5) {
-                        success = valueOf(args[3]);
-                        errorFn = valueOf(args[4]);
-                    }
-                    else if (typeof (args[4]) === 'string' && args.length === 6) {
-                        success = valueOf(args[4]);
-                        errorFn = valueOf(args[5]);
-                    }
-                    return async (retryOptions) => {
-                        try {
-                            if (payload instanceof Promise) {
-                                payload = await payload;
-                            }
-                        }
-                        catch (error) {
-                            console.error('Error resolving payload Promise:', error);
-                            throw error;
-                        }
-                        let finalHeaders = {};
-                        let finalBody = {}, finalCryptoMetadata = null;
-                        if (args.length === 5) {
-                            finalBody = payload.body || {};
-                            finalHeaders = payload.headers || {};
-                            finalCryptoMetadata = payload.cryptoMetadata;
-                        }
-                        else {
-                            finalBody = payload || {};
-                            finalHeaders = args[3] || {};
-                        }
-                        if (retryOptions) {
-                            if (retryOptions.body) {
-                                finalBody = {
-                                    ...finalBody,
-                                    ...retryOptions.body
-                                };
-                            }
-                            if (retryOptions.headers) {
-                                finalHeaders = {
-                                    ...finalHeaders,
-                                    ...retryOptions.headers
-                                };
-                            }
-                        }
-                        const finalPayload = { 'body': finalBody, 'headers': finalHeaders, ...(finalCryptoMetadata && { cryptoMetadata: finalCryptoMetadata }) };
-                        try {
-                            const response = await request(interpreter.globals, uri, httpVerb, finalPayload, success, errorFn, finalHeaders);
-                            return response;
-                        }
-                        catch (error) {
-                            if (error && typeof error === 'object' && 'status' in error && error.status >= 400) {
-                                throw error;
-                            }
-                            throw new Error('Request failed');
-                        }
-                    };
-                },
-                _signature: []
-            },
-            retryHandler: {
-                _func: (args, data, interpreter) => {
-                    const requestFn = valueOf(args[0]);
-                    return requestFn();
-                },
-                _signature: []
-            },
-            externalize: {
-                _func: (args, data, interpreter) => {
-                    const url = toString(args[0]);
-                    return url;
-                },
-                _signature: []
-            },
-            awaitFn: {
-                _func: async (args, data, interpreter) => {
-                    const success = args[1];
-                    const currentField = interpreter.globals.$field;
-                    try {
-                        const result = await args[0];
-                        defaultFunctions.dispatchEvent._func([currentField, success, result], data, interpreter);
-                    }
-                    catch (err) {
-                        const error = args[2];
-                        if (error) {
-                            defaultFunctions.dispatchEvent._func([currentField, error, err], data, interpreter);
-                        }
-                    }
-                    return {};
-                },
-                _signature: []
-            },
-            addInstance: {
-                _func: (args, data, interpreter) => {
-                    const element = args[0];
-                    const payload = args.length > 1 ? valueOf(args[1]) : undefined;
-                    try {
-                        const formElement = interpreter.globals.form.getElement(element.$id);
-                        const action = createAction('addInstance', payload);
-                        formElement.addItem(action);
-                    }
-                    catch (e) {
-                        interpreter.globals.form.logger.error('Invalid argument passed in addInstance. An element is expected');
-                    }
-                },
-                _signature: []
-            },
-            removeInstance: {
-                _func: (args, data, interpreter) => {
-                    const element = args[0];
-                    const payload = args.length > 1 ? valueOf(args[1]) : undefined;
-                    try {
-                        const formElement = interpreter.globals.form.getElement(element.$id);
-                        const action = createAction('removeInstance', payload);
-                        formElement.removeItem(action);
-                    }
-                    catch (e) {
-                        interpreter.globals.form.logger.error('Invalid argument passed in removeInstance. An element is expected');
-                    }
-                },
-                _signature: []
-            },
-            dispatchEvent: {
-                _func: (args, data, interpreter) => {
-                    const element = args[0];
-                    if (element === null && typeof interpreter !== 'string') {
-                        interpreter.debug.push('Invalid argument passed in dispatchEvent. An element is expected');
-                        return {};
-                    }
-                    let eventName = valueOf(args[1]);
-                    let payload = args.length > 2 ? valueOf(args[2]) : undefined;
-                    let dispatch = args.length > 3 ? valueOf(args[3]) : false;
-                    if (typeof element === 'string') {
-                        payload = eventName;
-                        eventName = element;
-                        dispatch = true;
-                    }
-                    let event;
-                    if (eventName.startsWith('custom:')) {
-                        event = new CustomEvent(eventName.substring('custom:'.length), payload, dispatch);
-                    }
-                    else {
-                        event = createAction(eventName, payload, dispatch);
-                    }
-                    if (event != null) {
-                        if (typeof element === 'string') {
-                            interpreter.globals.form.dispatch(event);
-                        }
-                        else {
-                            const dispatchEventOnElement = (element, event, interpreter) => {
-                                interpreter.globals.form.getElement(element.$id).dispatch(event);
-                            };
-                            if (Array.isArray(element) && element.length > 0 && typeof element.$id === 'undefined') {
-                                element.forEach(el => {
-                                    dispatchEventOnElement(el, event, interpreter);
-                                });
-                            }
-                            else {
-                                dispatchEventOnElement(element, event, interpreter);
-                            }
-                        }
-                    }
-                    return {};
-                },
-                _signature: []
-            },
-            encrypt: {
-                _func: async (args, data, interpreter) => {
-                    const payload = valueOf(args[0]);
-                    return payload;
-                },
-                _signature: []
-            },
-            decrypt: {
-                _func: async (args, data, interpreter) => {
-                    const encData = valueOf(args[0]);
-                    return encData;
-                },
-                _signature: []
-            },
-            getQueryParameter: {
-                _func: (args, data, interpreter) => {
-                    const param = toString(args[0]);
-                    if (!param) {
-                        interpreter.globals.form.logger.error('Argument is missing in getQueryParameter. A parameter is expected');
-                        return '';
-                    }
-                    const queryParams = interpreter.globals.form?.properties?.queryParams;
-                    if (queryParams) {
-                        if (queryParams[param] !== undefined) {
-                            return queryParams[param];
-                        }
-                        const lowerParam = param.toLowerCase();
-                        for (const [key, value] of Object.entries(queryParams)) {
-                            if (key.toLowerCase() === lowerParam) {
-                                return value;
-                            }
-                        }
-                    }
-                    try {
-                        const urlParams = new URLSearchParams(window?.location?.search || '');
-                        const urlValue = urlParams.get(param) ||
-                            Array.from(urlParams.entries())
-                                .find(([key]) => key.toLowerCase() === param.toLowerCase())?.[1];
-                        if (urlValue !== null && urlValue !== undefined) {
-                            return urlValue;
-                        }
-                    }
-                    catch (e) {
-                        interpreter.globals.form.logger.warn('Error reading URL parameters:', e);
-                    }
-                    return '';
-                },
-                _signature: []
-            },
-            getBrowserDetail: {
-                _func: (args, data, interpreter) => {
-                    const param = toString(args[0]);
-                    if (!param) {
-                        interpreter.globals.form.logger.error('Argument is missing in getBrowserDetail. A parameter is expected');
-                        return '';
-                    }
-                    if (interpreter.globals.form?.properties?.browserDetails?.[param]) {
-                        return interpreter.globals.form.properties.browserDetails[param];
-                    }
-                    if (typeof navigator !== 'undefined' && param in navigator) {
-                        return navigator[param] || '';
-                    }
-                    else {
-                        interpreter.globals.form.logger.warn(`Invalid or unsupported browser detail requested: "${param}"`);
-                        return '';
-                    }
-                },
-                _signature: []
-            },
-            getURLDetail: {
-                _func: (args, data, interpreter) => {
-                    const param = toString(args[0]);
-                    if (!param) {
-                        interpreter.globals.form.logger.error('Argument is missing in getURLDetail. A parameter is expected');
-                        return '';
-                    }
-                    if (interpreter.globals.form?.properties?.urlDetails?.[param]) {
-                        return interpreter.globals.form.properties.urlDetails[param];
-                    }
-                    if (typeof window !== 'undefined' && typeof window.location !== 'undefined' && param in window.location) {
-                        return window.location[param] || '';
-                    }
-                    else {
-                        interpreter.globals.form.logger.warn(`Invalid or unsupported url parameter requested: "${param}"`);
-                        return '';
-                    }
-                },
-                _signature: []
-            },
-            getRelativeInstanceIndex: {
-                _func: (args, data, interpreter) => {
-                    if (!Array.isArray(args[0]) || args[0].length === 0) {
-                        return -1;
-                    }
-                    const instanceManager = valueOf(args[0])[0].$parent;
-                    const field = interpreter.globals.$field;
-                    const baseName = instanceManager.$qualifiedName;
-                    const qn = field.$qualifiedName;
-                    if (qn.startsWith(baseName + '[')) {
-                        const startBracket = baseName.length + 1;
-                        const endBracket = qn.indexOf(']', startBracket);
-                        if (endBracket !== -1) {
-                            const idx = Number(qn.slice(startBracket, endBracket));
-                            if (!Number.isNaN(idx)) {
-                                return idx;
-                            }
-                        }
-                    }
-                    return instanceManager.length - 1;
-                },
-                _signature: []
-            },
-            today: {
-                _func: () => {
-                    const MS_IN_DAY = 24 * 60 * 60 * 1000;
-                    const now = new Date(Date.now());
-                    const _today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    return _today / MS_IN_DAY;
-                },
-                _signature: []
-            },
-            formatInput: {
-                _func: (args) => {
-                    const input = args[0];
-                    const format = args[1];
-                    if (!input || !format) {
-                        return input;
-                    }
-                    const inputStr = String(input).replace(/\D/g, '');
-                    switch (String(format).toLowerCase()) {
-                        case 'phonenumber': {
-                            if (inputStr.length >= 10) {
-                                const areaCode = inputStr.substring(0, 3);
-                                const firstThree = inputStr.substring(3, 6);
-                                const lastFour = inputStr.substring(6, 10);
-                                return `(${areaCode}) ${firstThree}-${lastFour}`;
-                            }
-                            else if (inputStr.length >= 7) {
-                                const firstThree = inputStr.substring(0, 3);
-                                const lastFour = inputStr.substring(3, 7);
-                                return `(${firstThree}) ${lastFour}`;
-                            }
-                            return inputStr;
-                        }
-                        case 'socialsecuritynumber': {
-                            if (inputStr.length >= 9) {
-                                const firstThree = inputStr.substring(0, 3);
-                                const middleTwo = inputStr.substring(3, 5);
-                                const lastFour = inputStr.substring(5, 9);
-                                return `${firstThree}-${middleTwo}-${lastFour}`;
-                            }
-                            return inputStr;
-                        }
-                        case 'email-alphanumeric': {
-                            const alphanumeric = String(input).replace(/[^a-zA-Z0-9]/g, '');
-                            if (alphanumeric.length > 0) {
-                                return `${alphanumeric}@example.com`;
-                            }
-                            return input;
-                        }
-                        case 'zipcode': {
-                            if (inputStr.length >= 5) {
-                                return inputStr.substring(0, 5);
-                            }
-                            return inputStr;
-                        }
-                        default:
-                            return input;
-                    }
-                },
-                _signature: []
-            }
-        };
-        return { ...defaultFunctions, ...FunctionRuntimeImpl.getInstance().customFunctions };
-    }
-}
-const FunctionRuntime = FunctionRuntimeImpl.getInstance();
 const transformFieldName = (fieldName) => {
     return fieldName.split('.').slice(1).map(p => p.match(/\[\d+\]$/) ? p : p !== '' ? `${p}[0]` : p).join('.');
 };
@@ -4025,6 +4536,15 @@ class Form extends Container {
     get changeEventBehaviour() {
         return this.properties['fd:changeEventBehaviour'] === 'deps' ? 'deps' : 'self';
     }
+    get propDependencyBehaviour() {
+        return this.properties['fd:propDependencyBehaviour'] === 'strict' ? 'strict' : 'any';
+    }
+    get setPropertyBehaviour() {
+        return this.properties['fd:setPropertyBehaviour'] === 'eager' ? 'eager' : 'async';
+    }
+    get webMcpEnabled() {
+        return this.properties['fd:webMcpEnabled'] === true || this.properties['fd:webMcpEnabled'] === 'true';
+    }
     dataRefRegex = /("[^"]+?"|[^.]+?)(?:\.|$)/g;
     get metaData() {
         const metaData = this._jsonModel.metadata || {};
@@ -4046,6 +4566,10 @@ class Form extends Container {
         const finalData = this.getDataNode()?.$value;
         this._exportDataAttachmentMap = {};
         return finalData;
+    }
+    request(options) {
+        const context = this.buildRuleContext();
+        return runRequestPipeline(options, { globals: context });
     }
     setAdditionalSubmitMetadata(metadata) {
         this.additionalSubmitMetadata = { ...this.additionalSubmitMetadata, ...metadata };
@@ -4069,13 +4593,23 @@ class Form extends Container {
         if (this.qualifiedName === qualifiedName) {
             return this;
         }
-        let foundFormElement = null;
-        this.visit(formElement => {
-            if (formElement.qualifiedName === qualifiedName) {
-                foundFormElement = formElement;
+        return this.findQualifiedName(this, qualifiedName);
+    }
+    findQualifiedName(container, qualifiedName) {
+        const items = container.items;
+        for (let i = items.length - 1; i >= 0; i--) {
+            const field = items[i];
+            if (field.qualifiedName === qualifiedName) {
+                return field;
             }
-        });
-        return foundFormElement;
+            if (field.isContainer) {
+                const found = this.findQualifiedName(field, qualifiedName);
+                if (found !== null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
     exportSubmitMetaData() {
         return this.withDependencyTrackingControl(true, () => {
@@ -4228,6 +4762,11 @@ class Form extends Container {
     clearIdRegistry() {
         this._idSet?.clear();
     }
+    _correlationCounter = 0;
+    nextCorrelationId() {
+        this._correlationCounter += 1;
+        return `c${this._correlationCounter}`;
+    }
     fieldAdded(field) {
         if (field.fieldType === 'captcha' && !this._captcha) {
             this._captcha = field;
@@ -4269,17 +4808,6 @@ class Form extends Container {
                 this.notifyDependents(fieldChangedAction);
             }
         }, 'change', 'model');
-    }
-    visit(callBack) {
-        this.traverseChild(this, callBack);
-    }
-    traverseChild(container, callBack) {
-        container.items.forEach((field) => {
-            if (field.isContainer) {
-                this.traverseChild(field, callBack);
-            }
-            callBack(field);
-        });
     }
     validate() {
         const validationErrors = super.validate();
@@ -4395,11 +4923,13 @@ class RuleEngine {
     _globalNames = [
         '$form',
         '$field',
-        '$event'
+        '$event',
+        '$fragment'
     ];
     customFunctions;
     debugInfo = [];
     dependencyTracking = true;
+    modelDecorating = false;
     constructor() {
         this.customFunctions = FunctionRuntime.getFunctions();
     }
@@ -4409,10 +4939,7 @@ class RuleEngine {
     }
     execute(node, data, globals, useValueOf = false, eString) {
         const { formula, ast } = node;
-        const oldContext = this._context;
-        this._context = globals;
-        let res = undefined;
-        try {
+        return this.evaluateInRuleContext(globals, useValueOf, eString, () => {
             this._context?.form?.logger?.info({
                 message: 'Executing rule',
                 expression: eString,
@@ -4420,7 +4947,18 @@ class RuleEngine {
                 fieldId: this._context.field?.id,
                 eventType: this._context?.$event?.type
             });
-            res = formula.run(ast, data, 'en-US', globals);
+            return formula.run(ast, data, 'en-US', globals);
+        });
+    }
+    executeFunction(fn, globals, useValueOf = false, label = 'function expression') {
+        return this.evaluateInRuleContext(globals, useValueOf, label, () => fn(globals));
+    }
+    evaluateInRuleContext(globals, useValueOf, label, evaluate) {
+        const oldContext = this._context;
+        this._context = globals;
+        let res = undefined;
+        try {
+            res = evaluate();
         }
         catch (err) {
             this._context?.form?.logger?.error(err);
@@ -4429,29 +4967,27 @@ class RuleEngine {
                 const fieldName = field?.name;
                 const errorMsg = err instanceof Error ? err.message : String(err);
                 const fullError = fieldName
-                    ? `Script execution error in field "${fieldName}": ${errorMsg}. Expression: ${eString}`
-                    : `Script execution error: ${errorMsg}. Expression: ${eString}`;
+                    ? `Script execution error in field "${fieldName}": ${errorMsg}. Expression: ${label}`
+                    : `Script execution error: ${errorMsg}. Expression: ${label}`;
                 const errorPayload = {
                     name: fieldName,
                     error: fullError,
                     event: this._context?.$event?.type,
-                    rule: eString,
+                    rule: label,
                     stack: err instanceof Error ? err.stack : undefined
                 };
                 this._context.form.dispatch(new ScriptError(errorPayload, false));
             }
         }
         if (this.debugInfo.length) {
-            this._context?.form?.logger?.warn(`Form rule expression string: ${eString}`);
+            this._context?.form?.logger?.warn(`Form rule expression string: ${label}`);
             while (this.debugInfo.length > 0) {
                 this._context?.form?.logger?.warn(this.debugInfo.pop());
             }
         }
         let finalRes = res;
-        if (useValueOf) {
-            if (typeof res === 'object' && res !== null) {
-                finalRes = Object.getPrototypeOf(res).valueOf.call(res);
-            }
+        if (useValueOf && typeof res === 'object' && res !== null && !(res instanceof Promise)) {
+            finalRes = Object.getPrototypeOf(res).valueOf.call(res);
         }
         this._context = oldContext;
         return finalRes;
@@ -4460,6 +4996,12 @@ class RuleEngine {
         if (this.dependencyTracking && this._context && this._context.field !== undefined && this._context.field !== subscriber) {
             subscriber._addDependent(this._context.field, propertyName);
         }
+    }
+    setModelDecorating(decorating) {
+        this.modelDecorating = decorating;
+    }
+    isModelDecorating() {
+        return this.modelDecorating;
     }
     setDependencyTracking(track) {
         this.dependencyTracking = track;
@@ -4623,10 +5165,10 @@ class Field extends Scriptable {
         if (['plain-text', 'image'].indexOf(this.fieldType) === -1) {
             this._jsonModel.value = undefined;
         }
-        else if (this.fieldType === 'image') {
-            this._jsonModel.value = this._jsonModel?.properties?.['fd:repoPath'] ?? this._jsonModel.value;
-        }
         else {
+            if (this.fieldType === 'image') {
+                this._jsonModel.value = this._jsonModel?.properties?.['fd:repoPath'] ?? this._jsonModel.value;
+            }
             this._jsonModel.default = this._jsonModel.default || this._jsonModel.value;
         }
         const value = this._jsonModel.value;
@@ -4835,7 +5377,11 @@ class Field extends Scriptable {
         }
     }
     get displayValue() {
-        if (this.displayValueExpression && typeof this.displayValueExpression === 'string' && this.displayValueExpression.length !== 0) {
+        const fn = this.getFnExpression('displayValueExpression');
+        if (fn) {
+            return this.executeExpression(fn);
+        }
+        if (typeof this.displayValueExpression === 'string' && this.displayValueExpression.length !== 0) {
             return this.executeExpression(this.displayValueExpression);
         }
         const df = this.displayFormat;
@@ -4946,7 +5492,7 @@ class Field extends Scriptable {
             }
         };
         const updates = this._applyUpdates(['valid', 'errorMessage', 'validationMessage', 'validity'], validationStateChanges);
-        const changeAction = new Change({ changes: changes.concat(Object.values(updates)) });
+        const changeAction = new Change({ changes: changes.concat(Object.values(updates)), eventSource: this._eventSource });
         this.dispatch(changeAction);
     }
     _updateRuleNodeReference(value) {
@@ -5036,6 +5582,9 @@ class Field extends Scriptable {
             this._setProperty('constraintMessages', updatedConstraintMessages);
         }
     }
+    get constraintMessages() {
+        return this._jsonModel.constraintMessages;
+    }
     _getConstraintObject() {
         return Constraints;
     }
@@ -5082,6 +5631,10 @@ class Field extends Scriptable {
         };
     }
     checkValidationExpression() {
+        const fn = this.getFnExpression('validationExpression');
+        if (fn) {
+            return this.executeExpression(fn);
+        }
         const validationExp = this._jsonModel.validationExpression;
         if (typeof validationExp === 'string' && validationExp.length !== 0) {
             return this.executeExpression(validationExp);
@@ -5134,21 +5687,39 @@ class Field extends Scriptable {
     get enforceEnum() {
         return this._jsonModel.enforceEnum;
     }
+    set enforceEnum(e) {
+        const coerced = e === 'true' ? true : e === 'false' ? false : e;
+        this._setProperty('enforceEnum', coerced);
+    }
     get tooltip() {
         return this._jsonModel.tooltip;
     }
     get maxLength() {
         return this._jsonModel.maxLength;
     }
+    set maxLength(m) {
+        this._setProperty('maxLength', m);
+    }
     get minLength() {
         return this._jsonModel.minLength;
+    }
+    set minLength(m) {
+        this._setProperty('minLength', m);
     }
     get pattern() {
         return this._jsonModel.pattern;
     }
+    set pattern(p) {
+        this._setProperty('pattern', p);
+    }
     get step() {
-        if (this.type === 'number' || this.format === 'date') {
+        if (this.type === 'number' || this.type === 'integer' || this.format === 'date') {
             return this._jsonModel.step;
+        }
+    }
+    set step(s) {
+        if (this.type === 'number' || this.type === 'integer' || this.format === 'date') {
+            this._setProperty('step', s);
         }
     }
     get exclusiveMinimum() {
@@ -5269,15 +5840,16 @@ class Field extends Scriptable {
         const changes = this.evaluateConstraints();
         this.#triggerValidationEvent();
         if (changes.validity) {
-            this.notifyDependents(new Change({ changes: Object.values(changes) }));
+            this.notifyDependents(new Change({ changes: Object.values(changes), eventSource: this._eventSource }));
         }
         return this.valid ? [] : [new ValidationError(this.id, [this._jsonModel.errorMessage])];
     }
     syncDataAndFormModel(dataNode) {
         if (dataNode !== undefined && dataNode !== NullDataValue && dataNode.$value !== this._jsonModel.value) {
-            const changeAction = propertyChange('value', dataNode.$value, this._jsonModel.value);
+            const changeAction = propertyChange('value', dataNode.$value, this._jsonModel.value, this._eventSource);
             this._jsonModel.value = dataNode.$value;
             this.queueEvent(changeAction);
+            this.evaluateConstraints();
         }
     }
     defaultDataModel(name) {
@@ -5306,7 +5878,7 @@ class Field extends Scriptable {
             }
         };
         const updates = this._applyUpdates(['valid', 'errorMessage', 'validationMessage', 'validity'], changes);
-        const changeAction = new Change({ changes: [].concat(Object.values(updates)) });
+        const changeAction = new Change({ changes: [].concat(Object.values(updates)), eventSource: this._eventSource });
         if (changeAction.payload.changes.length !== 0) {
             this.triggerValidationEvent(updates);
             this.dispatch(changeAction);
@@ -5348,6 +5920,9 @@ __decorate([
 __decorate([
     include('text-input', 'date-input', 'file-input', 'email', 'datetime-input')
 ], Field.prototype, "format", null);
+__decorate([
+    dependencyTracked()
+], Field.prototype, "enforceEnum", null);
 __decorate([
     include('text-input')
 ], Field.prototype, "maxLength", null);
@@ -5454,7 +6029,7 @@ class FileUpload extends Field {
                 if (!res.valid) {
                     this.form.logger.debug(`unable to bind ${this.name} to data`);
                 }
-                this.form.getEventQueue().queue(this, propertyChange('value', res.value, this._jsonModel.value));
+                this.form.getEventQueue().queue(this, propertyChange('value', res.value, this._jsonModel.value, this._eventSource));
                 this._jsonModel.value = res.value;
             }
             else {
@@ -5790,6 +6365,300 @@ class FormFieldFactoryImpl {
     }
 }
 const FormFieldFactory = new FormFieldFactoryImpl();
+const isBlank = (value) => value == null || value === '' || (Array.isArray(value) && value.length === 0);
+const CONSTRAINTS_SURFACED_ELSEWHERE = new Set(['type', 'required', 'enum']);
+const constraintsOf = (state) => {
+    const out = {};
+    validationConstraintsList.forEach((key) => {
+        if (!CONSTRAINTS_SURFACED_ELSEWHERE.has(key) && state[key] !== undefined) {
+            out[key] = state[key];
+        }
+    });
+    return out;
+};
+const stateOf = (field) => field.getState();
+const normalizeRef = (value) => String(value).toLowerCase().replace(/[^a-z0-9]/g, '');
+const findField = (form, ref) => {
+    const items = [];
+    form.visit((field) => {
+        const s = stateOf(field);
+        items.push({ node: field, name: s.name, id: s.id, qualifiedName: s.qualifiedName, norm: normalizeRef(s.name) });
+    });
+    const refNorm = normalizeRef(ref);
+    const exact = items.find((i) => i.id === ref || i.qualifiedName === ref || i.name === ref);
+    if (exact) {
+        return exact.node;
+    }
+    const normed = items.find((i) => i.norm === refNorm);
+    if (normed) {
+        return normed.node;
+    }
+    const prefix = items.filter((i) => i.norm.startsWith(refNorm) || refNorm.startsWith(i.norm));
+    return prefix.length === 1 ? prefix[0].node : undefined;
+};
+const getFormSummary = (form) => ({
+    name: 'get_form_summary',
+    description: 'Return the form title and the list of fields with their label, type, whether they are required, and their current value. Read-only; call this first to understand the form before reading or setting values.',
+    annotations: { readOnlyHint: true },
+    inputSchema: { type: 'object', properties: {} },
+    async execute() {
+        const fields = [];
+        form.visit((field) => {
+            const state = stateOf(field);
+            if (state.items !== undefined) {
+                return;
+            }
+            fields.push(state);
+        });
+        return { success: true, title: form.title, fields };
+    }
+});
+const explainField = (form) => ({
+    name: 'explain_field',
+    description: 'Explain one field in plain language: its purpose, help text, whether it is required, the allowed options, and what a valid value looks like. Read-only.',
+    annotations: { readOnlyHint: true },
+    inputSchema: {
+        type: 'object',
+        properties: { field: { type: 'string', description: 'field name or id' } },
+        required: ['field']
+    },
+    async execute(args) {
+        const target = args?.field ? findField(form, args.field) : undefined;
+        if (!target) {
+            return { success: false, error: `field not found: ${args?.field}` };
+        }
+        const s = stateOf(target);
+        return {
+            success: true,
+            field: s.name,
+            ...s,
+            options: s.enumNames || s.enum,
+            constraints: constraintsOf(s)
+        };
+    }
+});
+const getFieldValue = (form) => ({
+    name: 'get_field_value',
+    description: 'Read the current value of one field, plus whether it is currently valid. Read-only.',
+    annotations: { readOnlyHint: true },
+    inputSchema: {
+        type: 'object',
+        properties: { field: { type: 'string', description: 'field name or id' } },
+        required: ['field']
+    },
+    async execute(args) {
+        const target = args?.field ? findField(form, args.field) : undefined;
+        if (!target) {
+            return { success: false, error: `field not found: ${args?.field}` };
+        }
+        const s = stateOf(target);
+        return { success: true, field: s.name, value: s.value, valid: s.validity?.valid, displayValue: s.displayValue };
+    }
+});
+const setFieldValue = (form) => ({
+    name: 'set_field_value',
+    description: 'Set the value of exactly ONE field. If the user gives values for two or more fields, use apply_prefill instead. Requires user confirmation before running.',
+    annotations: { readOnlyHint: false, destructiveHint: false },
+    requireUserConsent: true,
+    inputSchema: {
+        type: 'object',
+        properties: {
+            field: { type: 'string', description: 'field name or id' },
+            value: { description: 'value to set' }
+        },
+        required: ['field', 'value']
+    },
+    async execute(args) {
+        const target = args?.field ? findField(form, args.field) : undefined;
+        if (!target) {
+            return { success: false, error: `field not found: ${args?.field}` };
+        }
+        target.value = args.value;
+        return { success: true, field: args.field, value: target.value };
+    }
+});
+const validateFormCompleteness = (form) => ({
+    name: 'validate_form_completeness',
+    description: 'List the fields the user still needs to fix before submitting: required fields left empty and fields with invalid values. Read-only — it inspects current state and does not flag fields in the UI.',
+    annotations: { readOnlyHint: true },
+    inputSchema: { type: 'object', properties: {} },
+    async execute() {
+        const issues = [];
+        form.visit((field) => {
+            const s = stateOf(field);
+            if (!s.fieldType || s.visible === false || s.enabled === false) {
+                return;
+            }
+            const value = s.value;
+            if (s.required && isBlank(value)) {
+                issues.push({ field: s.name, reason: 'required' });
+            }
+            else if (!isBlank(value) && s.validity?.valid === false) {
+                issues.push({ field: s.name, reason: 'invalid', message: s.errorMessage });
+            }
+        });
+        return { success: true, complete: issues.length === 0, issues };
+    }
+});
+const applyPrefill = (form) => ({
+    name: 'apply_prefill',
+    description: 'Fill TWO OR MORE fields at once from a list of {field, value} pairs. Use this whenever the user provides values for multiple fields in one request (e.g. read from a document). Returns a per-field result. Requires user confirmation before running.',
+    annotations: { readOnlyHint: false, destructiveHint: false },
+    requireUserConsent: true,
+    inputSchema: {
+        type: 'object',
+        properties: {
+            values: {
+                type: 'array',
+                description: 'Field values to apply.',
+                items: {
+                    type: 'object',
+                    properties: {
+                        field: { type: 'string', description: 'field name or id' },
+                        value: { description: 'value to set' }
+                    },
+                    required: ['field', 'value']
+                }
+            }
+        },
+        required: ['values']
+    },
+    async execute(args) {
+        const values = args?.values ?? [];
+        const results = values.map(({ field, value }) => {
+            const target = findField(form, field);
+            if (!target) {
+                return { field, applied: false, error: 'field not found' };
+            }
+            target.value = value;
+            return { field, applied: true, value: target.value };
+        });
+        return { success: true, results };
+    }
+});
+const instanceCountOf = (node) => (Array.isArray(node?.items) ? node.items.length : 0);
+const listRepeatableInstances = (form) => ({
+    name: 'list_repeatable_instances',
+    description: 'List how many instances a repeatable section currently has, and its minimum/maximum allowed. Read-only.',
+    annotations: { readOnlyHint: true },
+    inputSchema: {
+        type: 'object',
+        properties: { panel: { type: 'string', description: 'repeatable panel name or id' } },
+        required: ['panel']
+    },
+    async execute(args) {
+        const target = args?.panel ? findField(form, args.panel) : undefined;
+        if (!target) {
+            return { success: false, error: `panel not found: ${args?.panel}` };
+        }
+        return { success: true, panel: args.panel, instanceCount: instanceCountOf(target), min: target.minOccur, max: target.maxOccur };
+    }
+});
+const addRepeatableInstance = (form) => ({
+    name: 'add_repeatable_instance',
+    description: 'Add a new instance to a repeatable section (e.g. add another dependent or address). Requires user confirmation.',
+    annotations: { readOnlyHint: false, destructiveHint: false },
+    requireUserConsent: true,
+    inputSchema: {
+        type: 'object',
+        properties: { panel: { type: 'string', description: 'repeatable panel name or id' } },
+        required: ['panel']
+    },
+    async execute(args) {
+        const target = args?.panel ? findField(form, args.panel) : undefined;
+        if (!target) {
+            return { success: false, error: `panel not found: ${args?.panel}` };
+        }
+        const before = instanceCountOf(target);
+        target.dispatch(new AddInstance());
+        const after = instanceCountOf(target);
+        if (after <= before) {
+            return { success: false, error: `panel is not repeatable: ${args.panel}`, instanceCount: after };
+        }
+        return { success: true, panel: args.panel, added: true, instanceCount: after };
+    }
+});
+const removeRepeatableInstance = (form) => ({
+    name: 'remove_repeatable_instance',
+    description: 'Remove one instance from a repeatable section by its 0-based index. Requires user confirmation.',
+    annotations: { readOnlyHint: false, destructiveHint: true },
+    requireUserConsent: true,
+    inputSchema: {
+        type: 'object',
+        properties: {
+            panel: { type: 'string', description: 'repeatable panel name or id' },
+            index: { type: 'integer', minimum: 0, description: '0-based instance index to remove' }
+        },
+        required: ['panel', 'index']
+    },
+    async execute(args) {
+        const target = args?.panel ? findField(form, args.panel) : undefined;
+        if (!target) {
+            return { success: false, error: `panel not found: ${args?.panel}` };
+        }
+        const before = instanceCountOf(target);
+        const index = args?.index;
+        if (!Number.isInteger(index) || index < 0 || index >= before) {
+            return { success: false, error: `index out of range: ${index}`, instanceCount: before };
+        }
+        target.dispatch(new RemoveInstance(index));
+        const after = instanceCountOf(target);
+        if (after >= before) {
+            return { success: false, error: `nothing removed (not a repeatable panel?): ${args.panel}`, instanceCount: after };
+        }
+        return { success: true, panel: args.panel, instanceCount: after };
+    }
+});
+const focusField = (form) => ({
+    name: 'focus_field',
+    description: 'Move focus to a field so the user sees it (scrolls it into view). Reference the field by name, id, or qualifiedName. For a field inside a repeatable section, use the qualifiedName (e.g. "$form.dependents[1].depName") or the instance id to target a specific instance.',
+    annotations: { readOnlyHint: false },
+    inputSchema: {
+        type: 'object',
+        properties: { field: { type: 'string', description: 'field name, id, or qualifiedName' } },
+        required: ['field']
+    },
+    async execute(args) {
+        const target = args?.field ? findField(form, args.field) : undefined;
+        if (!target) {
+            return { success: false, error: `field not found: ${args?.field}` };
+        }
+        target.focus();
+        return { success: true, field: args.field, qualifiedName: stateOf(target).qualifiedName };
+    }
+});
+const navigateToPanel = (form) => ({
+    name: 'navigate_to_panel',
+    description: 'Navigate the form to a panel or wizard step (make it the active step) so its fields become visible. Reference the panel by name, id, or qualifiedName.',
+    annotations: { readOnlyHint: false },
+    inputSchema: {
+        type: 'object',
+        properties: { panel: { type: 'string', description: 'panel/step name, id, or qualifiedName' } },
+        required: ['panel']
+    },
+    async execute(args) {
+        const target = args?.panel ? findField(form, args.panel) : undefined;
+        if (!target) {
+            return { success: false, error: `panel not found: ${args?.panel}` };
+        }
+        target.focus();
+        return { success: true, panel: args.panel, active: target.parent?.activeChild?.name };
+    }
+});
+const buildFormTools = (form) => [
+    getFormSummary(form),
+    getFieldValue(form),
+    setFieldValue(form),
+    explainField(form),
+    validateFormCompleteness(form),
+    applyPrefill(form),
+    focusField(form),
+    navigateToPanel(form),
+    listRepeatableInstances(form),
+    addRepeatableInstance(form),
+    removeRepeatableInstance(form)
+];
+const decorateFormModels = (form) => decorateSubtree(form);
 const createFormInstanceHelper = (formModel, logLevel, fModel) => {
     let f = fModel;
     if (f == null) {
@@ -5809,6 +6678,7 @@ const createFormInstance = (formModel, callback, logLevel = 'error', fModel = un
             callback(f);
         }
         f.getEventQueue().runPendingQueue();
+        decorateFormModels(f);
         return f;
     }
     catch (e) {
@@ -5823,6 +6693,7 @@ const createFormInstanceSync = async (formModel, callback, logLevel = 'error', f
             callback(f);
         }
         f.getEventQueue().runPendingQueue();
+        decorateFormModels(f);
         await f.waitForPromises();
         return f;
     }
@@ -5843,6 +6714,7 @@ const restoreFormInstance = (formModel, data = null, { logLevel } = defaultOptio
             form.syncDataAndFormModel(form.getDataNode());
         }
         form.getEventQueue().empty();
+        decorateFormModels(form);
         return form;
     }
     catch (e) {
@@ -5905,4 +6777,4 @@ const registerFunctions = (functions) => {
     FunctionRuntime.registerFunctions(functions);
 };
 
-export { createFormInstance, createFormInstanceSync, fetchForm, registerFunctions, restoreFormInstance, validateFormData, validateFormInstance };
+export { buildFormTools, createFormInstance, createFormInstanceSync, fetchForm, registerFunctions, restoreFormInstance, validateFormData, validateFormInstance };
