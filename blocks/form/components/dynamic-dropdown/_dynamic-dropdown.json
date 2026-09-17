@@ -1,0 +1,128 @@
+{
+  "definitions": [
+    {
+      "title": "Dynamic Dropdown List",
+      "id": "dynamic-dropdown",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/dropdown/v1/dropdown",
+            "template": {
+              "jcr:title": "Dynamic Dropdown List",
+              "fieldType": "drop-down",
+              "enum": [
+                "0",
+                "1"
+              ],
+              "enumNames": [
+                "Item 1",
+                "Item 2"
+              ],
+              "type": "string",
+              "fd:viewType": "dynamic-dropdown"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "dynamic-dropdown",
+      "fields": [
+        {
+          "component": "container",
+          "name": "basic",
+          "label": "Basic",
+          "collapsible": false,
+          "fields": [
+            {
+              "...": "../../models/form-common/_basic-select-fields.json#/fields"
+            },
+            {
+              "component": "select",
+              "label": "Data type of submitted value",
+              "name": "type",
+              "valueType": "string",
+              "value": "number",
+              "options": [
+                {
+                  "name": "String",
+                  "value": "string"
+                },
+                {
+                  "name": "Boolean",
+                  "value": "boolean"
+                },
+                {
+                  "name": "Number",
+                  "value": "number"
+                }
+              ]
+            },
+            {
+              "component": "text",
+              "name": "placeholder",
+              "label": "Placeholder text",
+              "valueType": "string"
+            }
+          ]
+        },
+        {
+          "component": "container",
+          "name": "typeahead",
+          "label": "Async Typeahead (optional)",
+          "collapsible": true,
+          "fields": [
+            {
+              "component": "text",
+              "name": "searchEndpoint",
+              "label": "Search Endpoint",
+              "valueType": "string",
+              "description": "Optional — this is the type-ahead toggle. SET a URL template → the field searches the API on type (≥ minLength), repopulating its enum from results ({term} = typed value, {varName} = a form variable). LEAVE BLANK → no API type-ahead: the field client-side-filters the enum it already has (e.g. options set by a listener rule)."
+            },
+            {
+              "component": "text",
+              "name": "optionLabelKey",
+              "label": "Option Label Key",
+              "valueType": "string",
+              "description": "The result-row field used as each option's label (e.g. CITY, NAME)."
+            },
+            {
+              "component": "number",
+              "name": "searchMinLength",
+              "label": "Search Min Length",
+              "valueType": "number",
+              "description": "Min characters typed before the type-ahead searches / the option list opens. A searchable dropdown can't use the OOTB minLength (the dropdown model strips it), so this custom property carries the threshold. Below it: no API call, value kept."
+            },
+            {
+              "component": "number",
+              "name": "searchMaxLength",
+              "label": "Search Max Length",
+              "valueType": "number",
+              "description": "Max characters accepted in the search input (cap). A searchable dropdown can't use the OOTB maxLength, so this custom property carries the cap."
+            },
+            {
+              "component": "text",
+              "name": "noResultMessage",
+              "label": "No-results text",
+              "valueType": "string",
+              "value": "No results found",
+              "description": "Text shown when the search/filter returns no matching options."
+            }
+          ]
+        },
+        {
+          "...": "../../models/form-common/_help-container.json"
+        },
+        {
+          "component": "container",
+          "name": "validation",
+          "label": "Validation",
+          "collapsible": true,
+          "...": "../../models/form-common/_basic-validation-fields.json"
+        }
+      ]
+    }
+  ]
+}
