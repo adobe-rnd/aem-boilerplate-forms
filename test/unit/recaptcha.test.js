@@ -102,4 +102,84 @@ describe('Google recaptcha Integeration', () => {
     const token = await recaptcha.getToken();
     assert.equal(token, testToken, 'Expected token to be not null');
   });
+
+  describe('submit button detection', () => {
+    it('should observe the submit button when exactly one is present', () => {
+      const recaptcha = new GoogleReCaptcha(configv3, 123, 'cap123', 'site123');
+      recaptcha.loadCaptcha(form);
+
+      const observerInstance = global.IntersectionObserver.getCall(0).returnValue;
+      assert.equal(observerInstance.observe.callCount, 1, 'Expected observe to be called once');
+      assert.equal(
+        observerInstance.observe.getCall(0).args[0],
+        form.querySelector('button[type="submit"]'),
+        'Expected the single submit button to be observed',
+      );
+    });
+
+    it('should observe every submit button when multiple are present', () => {
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(`<!DOCTYPE html><form>
+        <button type="submit" id="panel1-submit"></button>
+        <button type="submit" id="panel2-submit"></button>
+      </form>`);
+      const multiButtonForm = dom.window.document.querySelector('form');
+      const submitButtons = multiButtonForm.querySelectorAll('button[type="submit"]');
+
+      const recaptcha = new GoogleReCaptcha(configv3, 123, 'cap123', 'site123');
+      recaptcha.loadCaptcha(multiButtonForm);
+
+      const observerInstance = global.IntersectionObserver.getCall(0).returnValue;
+      assert.equal(observerInstance.observe.callCount, 2, 'Expected observe to be called once per submit button');
+      assert.deepEqual(
+        [...observerInstance.observe.getCalls()].map((call) => call.args[0]),
+        [...submitButtons],
+        'Expected each submit button to be observed',
+      );
+    });
+
+    it('should load the captcha when a non-first submit button becomes intersecting', () => {
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(`<!DOCTYPE html><form>
+        <button type="submit" id="panel1-submit"></button>
+        <button type="submit" id="panel2-submit"></button>
+      </form>`);
+      const multiButtonForm = dom.window.document.querySelector('form');
+      document.head.querySelector('script')?.remove();
+
+      const recaptcha = new GoogleReCaptcha(configv3, 123, 'cap123', 'site123');
+      recaptcha.loadCaptcha(multiButtonForm);
+
+      // Simulate only the second (non-first) submit button becoming visible
+      const callback = global.IntersectionObserver.getCall(0).args[0];
+      callback([{ isIntersecting: true }]);
+
+      const script = document.head.querySelector('script');
+      assert.equal(
+        script.src,
+        `https://www.google.com/recaptcha/api.js?render=${siteKey}`,
+        'Expected the script to be loaded when any submit button intersects',
+      );
+    });
+
+    it('should warn and alert without observing when no submit button is present', () => {
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM('<!DOCTYPE html><form></form>');
+      const noButtonForm = dom.window.document.querySelector('form');
+      const warnStub = sinon.stub(console, 'warn');
+      const originalAlert = global.alert;
+      global.alert = sinon.stub();
+
+      const recaptcha = new GoogleReCaptcha(configv3, 123, 'cap123', 'site123');
+      recaptcha.loadCaptcha(noButtonForm);
+
+      const observerInstance = global.IntersectionObserver.getCall(0).returnValue;
+      assert.equal(observerInstance.observe.callCount, 0, 'Expected observe to never be called');
+      assert.ok(warnStub.calledWith('Captcha can not be loaded. Submit button is missing.'));
+      assert.ok(global.alert.calledWith('Captcha can not be loaded. Add Submit button.'));
+
+      warnStub.restore();
+      global.alert = originalAlert;
+    });
+  });
 });
