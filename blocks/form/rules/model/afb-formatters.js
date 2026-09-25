@@ -459,6 +459,12 @@ function parseDate(dateString, language, skeleton, timeZone, bUseUTC = false) {
         const [element, func] = lookups[index];
         dateObj[element] = func(m, dateObj);
     });
+    const isValidDate = (date, expectedDateObj, calendar) => {
+        if (calendar !== 'gregory') return true;
+        return  date.getMonth() === expectedDateObj.month &&
+               date.getDate() === expectedDateObj.day &&
+               date.getFullYear() === expectedDateObj.year;
+    };
     if (hourCycle === 'h24' && dateObj.hour === 24) dateObj.hour = 0;
     if (hourCycle === 'h12' && dateObj.hour === 12) dateObj.hour = 0;
     if (_bUseUTC) {
@@ -487,6 +493,9 @@ function parseDate(dateString, language, skeleton, timeZone, bUseUTC = false) {
     );
     if (_setFullYear) {
         jsDate.setFullYear(dateObj.year);
+    }
+    if (!isValidDate(jsDate, dateObj, calendar)) {
+        return null;
     }
     return timeZone == null ? jsDate : adjustTimeZone(jsDate, timeZone);
 }
