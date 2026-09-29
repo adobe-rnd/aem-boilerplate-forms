@@ -35,6 +35,27 @@ import { createOptimizedPicture } from '../../../scripts/aem.js';
 const formSubscriptions = {};
 const formModels = {};
 const renderPromises = {};
+const webMcpUnregisters = new WeakMap();
+const activeWebMcpUnregisters = new Set();
+
+function setWebMcpUnregister(htmlForm, unregister) {
+  const previous = webMcpUnregisters.get(htmlForm);
+  if (previous) {
+    activeWebMcpUnregisters.delete(previous);
+    previous();
+  }
+  if (typeof unregister === 'function') {
+    webMcpUnregisters.set(htmlForm, unregister);
+    activeWebMcpUnregisters.add(unregister);
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', () => {
+    activeWebMcpUnregisters.forEach((unregister) => unregister());
+    activeWebMcpUnregisters.clear();
+  });
+}
 
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
@@ -436,9 +457,13 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   // guarded so a missing/failed adapter never blocks form load.
   try {
     const { registerFormWebMCP } = await import('./model/afb-webmcp.min.js');
-    registerFormWebMCP(form);
+    const additionalTools = window.adaptiveFormsWebMcpAdditionalTools;
+    const unregister = typeof additionalTools === 'function'
+      ? registerFormWebMCP(form, { additionalTools })
+      : registerFormWebMCP(form);
+    setWebMcpUnregister(htmlForm, unregister);
   } catch (e) {
-    // WebMCP is optional; ignore.
+    console.error('Unable to register Adaptive Forms WebMCP tools:', e);
   }
 }
 
