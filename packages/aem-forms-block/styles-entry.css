@@ -1,0 +1,6 @@
+/* This bundle stubs out all component decorators (see stubMappingsPlugin in
+   build.js) - componentDecorator always returns null, so no OOTB/custom
+   component ever renders. Do not add component CSS here without also
+   wiring up real component JS (e.g. via mappingsAliasPlugin), or the CSS
+   ships dead. */
+@import "../../blocks/form/form.css";

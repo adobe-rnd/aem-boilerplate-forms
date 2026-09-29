@@ -17,7 +17,7 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import { registerFunctions } from './model/afb-runtime.js';
+import { registerFunctions } from './model/afb-runtime.min.js';
 
 const preloadedUrls = new Set();
 
