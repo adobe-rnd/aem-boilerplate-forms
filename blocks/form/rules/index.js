@@ -447,7 +447,13 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       // Wire DOM events to the model, same as the worker path does after restoreState.
       // dataset.id must be set before loadRuleEngine keys into formModels.
       response.form.dataset.id = formDef.id;
-      await loadRuleEngine(formState, response.form, response.captcha, response.generateFormRendition, data);
+      await loadRuleEngine(
+        formState,
+        response.form,
+        response.captcha,
+        response.generateFormRendition,
+        data,
+      );
     }
     return { ...response, afbForm: formModels[formDef.id] ?? afbForm };
   }

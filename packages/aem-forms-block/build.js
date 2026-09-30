@@ -63,6 +63,7 @@ const stubDocFormsPlugin = {
 // The form renders with its initial/default field values but rules (show/hide,
 // computed values, validation expressions) do not execute.
 // Eliminates ~170KB from the minified bundle.
+// eslint-disable-next-line no-unused-vars
 const stubRulesPlugin = {
   name: 'stub-rules',
   setup(build) {
