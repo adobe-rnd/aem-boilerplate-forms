@@ -387,7 +387,8 @@
                 "resourceType": "core/fd/components/form/recaptcha/v1/recaptcha",
                 "template": {
                   "jcr:title": "Captcha (Invisible)",
-                  "fieldType": "captcha"
+                  "fieldType": "captcha",
+                  "required": true
                 }
               }
             }
