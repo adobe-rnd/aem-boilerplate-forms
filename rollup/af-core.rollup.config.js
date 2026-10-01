@@ -3,7 +3,7 @@ import { terser } from 'rollup-plugin-terser';
 import {plugins} from './common.js';
 
 const packageName = '@aemforms/af-core'
-const directory = `node_modules/${packageName}`;
+const directory = process.env.AF_CORE_PACKAGE_DIR || `node_modules/${packageName}`;
 
 export default {
   external: ['@adobe/json-formula', '@aemforms/af-formatters'],
