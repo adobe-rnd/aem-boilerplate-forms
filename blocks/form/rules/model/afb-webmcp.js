@@ -345,7 +345,7 @@ const registerFormWebMCP = (form, options = {}) => {
         console.error(`[af-webmcp] additionalTools failed for form '${formId}'`, err);
         return () => { };
     }
-    const formTools = [...buildFormTools(form), ...additionalTools];
+    const formTools = [...buildFormTools(form, options.onFocusRequest), ...additionalTools];
     const validationError = validateTools(formTools);
     if (validationError) {
         console.error(`[af-webmcp] ${validationError}`);
@@ -372,6 +372,10 @@ const registerFormWebMCP = (form, options = {}) => {
             console.error(`[af-webmcp] duplicate form id '${formId}' on the same modelContext`);
             return () => { };
         }
+        if (existing.onFocusRequest !== options.onFocusRequest) {
+            console.error(`[af-webmcp] form '${formId}' is already registered with a different renderer focus bridge`);
+            return () => { };
+        }
         existing.owners += 1;
         let cleaned = false;
         return () => {
@@ -393,6 +397,7 @@ const registerFormWebMCP = (form, options = {}) => {
         form,
         tools: toolsByName,
         onRequestApproval: options.onRequestApproval,
+        onFocusRequest: options.onFocusRequest,
         owners: 1
     };
     registry.forms.set(formId, registration);

@@ -6651,7 +6651,7 @@ const removeRepeatableInstance = (form) => ({
         return { success: true, panel: args.panel, instanceCount: after };
     }
 });
-const focusField = (form) => ({
+const focusField = (form, onFocusRequest) => ({
     name: 'focus_field',
     description: 'Use when the user asks to focus, go to, jump to, or highlight a specific field (scrolls it into view). Reference by name, id, or qualifiedName; for a field inside a repeatable section use the qualifiedName (e.g. "$form.dependents[1].depName") or the instance id to target a specific instance.',
     annotations: { readOnlyHint: false },
@@ -6666,7 +6666,8 @@ const focusField = (form) => ({
             return { success: false, error: `field not found: ${args?.field}` };
         }
         const changed = focusTarget(target);
-        return { success: true, changed, field: args.field, qualifiedName: stateOf(target).qualifiedName };
+        const viewChanged = onFocusRequest?.(target.id) === true;
+        return { success: true, changed: changed || viewChanged, field: args.field, qualifiedName: stateOf(target).qualifiedName };
     }
 });
 const navigateToPanel = (form) => ({
@@ -6755,14 +6756,14 @@ const submitForm = (form) => ({
         });
     }
 });
-const buildFormTools = (form) => [
+const buildFormTools = (form, onFocusRequest) => [
     getFormSummary(form),
     getFieldValue(form),
     setFieldValue(form),
     explainField(form),
     validateFormCompleteness(form),
     applyPrefill(form),
-    focusField(form),
+    focusField(form, onFocusRequest),
     navigateToPanel(form),
     listRepeatableInstances(form),
     addRepeatableInstance(form),

@@ -473,9 +473,14 @@ export async function loadRuleEngine(
   // guarded so a missing/failed adapter never blocks form load.
   try {
     const { registerFormWebMCP } = await import('./model/afb-webmcp.min.js');
-    const unregister = typeof additionalTools === 'function'
-      ? registerFormWebMCP(form, { additionalTools })
-      : registerFormWebMCP(form);
+    const unregister = registerFormWebMCP(form, {
+      ...(typeof additionalTools === 'function' ? { additionalTools } : {}),
+      onFocusRequest: (fieldId) => {
+        const previous = htmlForm.ownerDocument.activeElement;
+        handleActiveChild(fieldId, htmlForm);
+        return htmlForm.ownerDocument.activeElement !== previous;
+      },
+    });
     setWebMcpUnregister(htmlForm, unregister);
   } catch (e) {
     console.error('Unable to register Adaptive Forms WebMCP tools:', e);

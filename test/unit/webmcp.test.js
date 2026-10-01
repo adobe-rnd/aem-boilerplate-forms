@@ -72,6 +72,51 @@ describe('WebMCP registration', () => {
     );
   });
 
+  it('restores DOM focus for an already-active field without tracking an already-focused no-op', async () => {
+    const registered = new Map();
+    global.navigator.modelContext = {
+      registerTool: (tool) => {
+        registered.set(tool.name, tool);
+        return { unregister: () => registered.delete(tool.name) };
+      },
+    };
+    const sampleRUM = Sinon.spy();
+    const previousHlx = window.hlx;
+    window.hlx = { sampleRUM };
+    const htmlForm = document.createElement('form');
+    htmlForm.dataset.id = 'focus-form';
+    htmlForm.innerHTML = '<div class="field-wrapper"><input id="city-id" name="city"></div>';
+    const outside = document.createElement('button');
+    document.body.append(htmlForm, outside);
+    const model = createFormInstance({
+      id: 'focus-form',
+      properties: { 'fd:webMcpEnabled': true },
+      items: [{ id: 'city-id', name: 'city', fieldType: 'text-input', type: 'string' }],
+    });
+    try {
+      await loadRuleEngine({ ...model.getState(true), id: 'focus-form' }, htmlForm, null, Sinon.stub(), null);
+      const input = htmlForm.querySelector('input');
+      const focus = registered.get('focus_field');
+      assert.ok(focus);
+      assert.strictEqual((await focus.execute({ field: 'city' })).changed, true);
+      assert.strictEqual(document.activeElement, input);
+      outside.focus();
+      assert.strictEqual(document.activeElement, outside);
+      assert.strictEqual((await focus.execute({ field: 'city' })).changed, true);
+      assert.strictEqual(document.activeElement, input);
+      assert.strictEqual((await focus.execute({ field: 'city' })).changed, false);
+      assert.deepStrictEqual(sampleRUM.args, [
+        ['click', { source: 'af-webmcp', target: 'focus_field' }],
+        ['click', { source: 'af-webmcp', target: 'focus_field' }],
+      ]);
+    } finally {
+      window.dispatchEvent(new Event('pagehide'));
+      htmlForm.remove();
+      outside.remove();
+      window.hlx = previousHlx;
+    }
+  });
+
   it('does not expose one form\'s additional tools on another form', async () => {
     const registered = new Map();
     global.navigator.modelContext = {
