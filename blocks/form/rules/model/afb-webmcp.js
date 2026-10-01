@@ -374,7 +374,7 @@ const registerFormWebMCP = (form, options = {}) => {
         }
         if (existing.onFocusRequest !== options.onFocusRequest) {
             console.error(`[af-webmcp] form '${formId}' is already registered with a different renderer focus bridge`);
-            return () => { };
+            return () => undefined;
         }
         existing.owners += 1;
         let cleaned = false;
