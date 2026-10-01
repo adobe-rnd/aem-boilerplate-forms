@@ -1,7 +1,59 @@
+/*************************************************************************
+* ADOBE CONFIDENTIAL
+* ___________________
+*
+* Copyright 2022 Adobe
+* All Rights Reserved.
+*
+* NOTICE: All information contained herein is, and remains
+* the property of Adobe and its suppliers, if any. The intellectual
+* and technical concepts contained herein are proprietary to Adobe
+* and its suppliers and are protected by all applicable intellectual
+* property laws, including trade secret and copyright laws.
+* Dissemination of this information or reproduction of this material
+* is strictly forbidden unless prior written permission is obtained
+* from Adobe.
+
+* Adobe permits you to use and modify this file solely in accordance with
+* the terms of the Adobe license agreement accompanying it.
+*************************************************************************/
+
+/*
+ *  Package: @aemforms/af-webmcp
+ *  Version: 1.0.4
+ */
 import { buildFormTools } from './afb-runtime.js';
 
 const registries = new WeakMap();
 const FORM_ID_PROPERTY = 'form_id';
+const interactionCheckpoints = {
+    set_field_value: 'fill',
+    apply_prefill: 'fill',
+    add_repeatable_instance: 'fill',
+    remove_repeatable_instance: 'fill',
+    focus_field: 'click',
+    navigate_to_panel: 'click',
+    submit_form: 'formsubmit'
+};
+const trackInteraction = (name, result) => {
+    const checkpoint = Object.prototype.hasOwnProperty.call(interactionCheckpoints, name)
+        ? interactionCheckpoints[name] : undefined;
+    const partialPrefill = name === 'apply_prefill' && Array.isArray(result.results)
+        && result.results.some((entry) => entry.applied && entry.changed !== false);
+    if (!checkpoint || result.changed === false || (!result.success && !partialPrefill) || result.pending) {
+        return;
+    }
+    const host = typeof window === 'undefined' ? undefined : window;
+    const sampleRUM = host?.hlx?.sampleRUM || host?.hlx?.rum?.sampleRUM;
+    if (typeof sampleRUM === 'function') {
+        try {
+            sampleRUM(checkpoint, { source: 'af-webmcp', target: name });
+        }
+        catch (err) {
+            console.error(`[af-webmcp] failed to track tool '${name}'`, err);
+        }
+    }
+};
 const usable = (mc) => (mc && typeof mc.registerTool === 'function') ? mc : undefined;
 const resolveModelContext = (options) => {
     const explicit = usable(options.modelContext);
@@ -136,13 +188,24 @@ const unregisterRegistry = (registry) => {
         registries.delete(registry.modelContext);
     }
 };
-const failRegistry = (registry, name, error) => {
-    if (registry.failed) {
+const failRegistration = (registry, name, registration, error) => {
+    if (registration.cleaned || registry.registrations.get(name) !== registration) {
         return;
     }
-    registry.failed = true;
-    console.error(`[af-webmcp] failed to register tool '${name}'; rolling back WebMCP catalog`, error);
-    unregisterRegistry(registry);
+    console.error(`[af-webmcp] failed to register tool '${name}'; rolling back affected forms`, error);
+    for (const [id, formRegistration] of registry.forms) {
+        if (name === 'list_forms' || formRegistration.tools.has(name)) {
+            registry.forms.delete(id);
+        }
+    }
+    Array.from(registry.registrations.keys()).forEach((toolName) => {
+        if (toolName === name || !toolStillProvided(registry, toolName)) {
+            unregisterSharedTool(registry, toolName);
+        }
+    });
+    if (registry.forms.size === 0) {
+        unregisterRegistry(registry);
+    }
 };
 const executeRoutedTool = async (registry, name, args) => {
     const resolved = resolveForm(registry, args);
@@ -167,7 +230,12 @@ const executeRoutedTool = async (registry, name, args) => {
                 return { success: false, error: 'user consent required' };
             }
         }
-        return await tool.execute(resolved.args);
+        if (registry.forms.get(String(registration.form.id).trim()) !== registration) {
+            return { success: false, error: 'form tools have been unregistered' };
+        }
+        const result = await tool.execute(resolved.args);
+        trackInteraction(name, result);
+        return result;
     }
     catch (err) {
         return { success: false, error: err instanceof Error ? err.message : String(err) };
@@ -191,7 +259,7 @@ const registerSharedTool = (registry, tool) => {
         if (handle && typeof handle.then === 'function') {
             Promise.resolve(handle).then((resolvedHandle) => {
                 registration.handle = resolvedHandle || undefined;
-                registration.unregisterByName = !resolvedHandle;
+                registration.unregisterByName = typeof resolvedHandle?.unregister !== 'function';
                 if (registration.cleaned && resolvedHandle?.unregister) {
                     try {
                         resolvedHandle.unregister();
@@ -200,11 +268,21 @@ const registerSharedTool = (registry, tool) => {
                         console.error(`[af-webmcp] failed to unregister tool '${tool.name}'`, err);
                     }
                 }
-            }, (err) => failRegistry(registry, tool.name, err));
+                else if (registration.cleaned && registration.unregisterByName
+                    && typeof registry.modelContext.unregisterTool === 'function'
+                    && !registries.get(registry.modelContext)?.registrations.has(tool.name)) {
+                    try {
+                        registry.modelContext.unregisterTool(tool.name);
+                    }
+                    catch (err) {
+                        console.error(`[af-webmcp] failed to unregister tool '${tool.name}'`, err);
+                    }
+                }
+            }, (err) => failRegistration(registry, tool.name, registration, err));
         }
         else {
             registration.handle = handle;
-            registration.unregisterByName = !registration.handle;
+            registration.unregisterByName = typeof registration.handle?.unregister !== 'function';
         }
     }
     catch (err) {
@@ -280,8 +358,7 @@ const registerFormWebMCP = (form, options = {}) => {
             forms: new Map(),
             tools: new Map(),
             registrations: new Map(),
-            exposedTo: options.exposedTo ? [...options.exposedTo] : undefined,
-            failed: false
+            exposedTo: options.exposedTo ? [...options.exposedTo] : undefined
         };
         registries.set(modelContext, registry);
     }

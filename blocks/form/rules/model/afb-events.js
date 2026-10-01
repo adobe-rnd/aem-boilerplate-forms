@@ -20,6 +20,6 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.167
+ *  Version: 1.0.4
  */
-export { A as AddInstance, y as AddItem, B as BaseAction, D as Blur, b as Change, z as Click, C as CustomEvent, a as ExecuteRule, d as FieldChanged, x as Focus, F as FormLoad, I as Initialize, h as Invalid, j as RemoveInstance, R as RemoveItem, w as RequestFailure, o as RequestSuccess, u as Reset, t as Save, S as ScriptError, s as Submit, r as SubmitError, v as SubmitFailure, n as SubmitSuccess, U as UIChange, f as Valid, V as ValidationComplete, l as isDependencyChange, k as isSelfChange, m as isUserChange, p as propertyChange } from './Events-3e88e4fb-682ebef2.js';
+export { A as AddInstance, y as AddItem, B as BaseAction, D as Blur, b as Change, z as Click, C as CustomEvent, a as ExecuteRule, d as FieldChanged, x as Focus, F as FormLoad, I as Initialize, h as Invalid, j as RemoveInstance, R as RemoveItem, w as RequestFailure, q as RequestSuccess, u as Reset, t as Save, S as ScriptError, k as Submit, s as SubmitError, v as SubmitFailure, o as SubmitSuccess, U as UIChange, f as Valid, V as ValidationComplete, m as isDependencyChange, l as isSelfChange, n as isUserChange, p as propertyChange } from './Events-3e88e4fb-bd56f7cd.js';

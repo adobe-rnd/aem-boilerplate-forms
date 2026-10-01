@@ -410,7 +410,23 @@ function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false) {
   }
 }
 
-export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
+/**
+ * Binds the main-thread model to its form and optional form-bound WebMCP tool factory.
+ * @param {object} formDef Form state.
+ * @param {HTMLFormElement} htmlForm Form view.
+ * @param {object} captcha Captcha configuration.
+ * @param {Function} genFormRendition Form rendition callback.
+ * @param {object} data Prefill data.
+ * @param {Function} [additionalTools] Experimental factory bound to this form model.
+ */
+export async function loadRuleEngine(
+  formDef,
+  htmlForm,
+  captcha,
+  genFormRendition,
+  data,
+  additionalTools,
+) {
   const ruleEngine = await import('./model/afb-runtime.min.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
@@ -457,7 +473,6 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   // guarded so a missing/failed adapter never blocks form load.
   try {
     const { registerFormWebMCP } = await import('./model/afb-webmcp.min.js');
-    const additionalTools = window.adaptiveFormsWebMcpAdditionalTools;
     const unregister = typeof additionalTools === 'function'
       ? registerFormWebMCP(form, { additionalTools })
       : registerFormWebMCP(form);

@@ -9,6 +9,8 @@
 import assert from 'assert';
 import Sinon from 'sinon';
 import { loadRuleEngine } from '../../blocks/form/rules/index.js';
+import { createFormInstance } from '../../blocks/form/rules/model/afb-runtime.min.js';
+import { registerFormWebMCP } from '../../blocks/form/rules/model/afb-webmcp.min.js';
 
 describe('WebMCP registration', () => {
   const formId = 'webmcp-form-id';
@@ -27,7 +29,6 @@ describe('WebMCP registration', () => {
 
   afterEach(() => {
     global.window.dispatchEvent(new Event('pagehide'));
-    delete global.window.adaptiveFormsWebMcpAdditionalTools;
     delete global.navigator.modelContext;
   });
 
@@ -46,12 +47,12 @@ describe('WebMCP registration', () => {
     assert.ok(registered.includes('set_field_value'));
   });
 
-  it('adds domain-specific tools from the page additionalTools factory', async () => {
+  it('adds domain-specific tools from the form-bound additionalTools factory', async () => {
     const registered = [];
     global.navigator.modelContext = {
       registerTool: (tool) => { registered.push(tool); return { unregister() {} }; },
     };
-    global.window.adaptiveFormsWebMcpAdditionalTools = (form) => [{
+    const additionalTools = (form) => [{
       name: 'prepare_travel',
       description: 'Prepare this travel form.',
       inputSchema: { type: 'object', properties: {} },
@@ -61,13 +62,49 @@ describe('WebMCP registration', () => {
     htmlForm.dataset.id = formId;
     const optedIn = { ...minimalFormState, properties: { 'fd:webMcpEnabled': true } };
 
-    await loadRuleEngine(optedIn, htmlForm, null, Sinon.stub(), null);
+    await loadRuleEngine(optedIn, htmlForm, null, Sinon.stub(), null, additionalTools);
 
     const customTool = registered.find((tool) => tool.name === 'prepare_travel');
     assert.ok(customTool, 'domain-specific tool should be registered');
     assert.deepStrictEqual(
       await customTool.execute({}),
       { success: true, form: formId },
+    );
+  });
+
+  it('does not expose one form\'s additional tools on another form', async () => {
+    const registered = new Map();
+    global.navigator.modelContext = {
+      registerTool: (tool) => {
+        registered.set(tool.name, tool);
+        return { unregister: () => registered.delete(tool.name) };
+      },
+    };
+    const additionalTools = (form) => [{
+      name: 'prepare_travel',
+      description: 'Prepare this travel form.',
+      inputSchema: { type: 'object', properties: {} },
+      execute: async () => ({ success: true, form: form.id }),
+    }];
+    for (const id of ['travel', 'other']) {
+      const element = document.createElement('form');
+      element.dataset.id = id;
+      await loadRuleEngine(
+        { ...minimalFormState, id, properties: { 'fd:webMcpEnabled': true } },
+        element,
+        null,
+        Sinon.stub(),
+        null,
+        id === 'travel' ? additionalTools : undefined,
+      );
+    }
+    assert.strictEqual(
+      (await registered.get('prepare_travel').execute({ form_id: 'travel' })).success,
+      true,
+    );
+    assert.match(
+      (await registered.get('prepare_travel').execute({ form_id: 'other' })).error,
+      /unavailable/,
     );
   });
 
@@ -120,5 +157,35 @@ describe('WebMCP registration', () => {
 
     assert.strictEqual(registered.length, 0);
     assert.ok(global.window.myForm, 'window.myForm should still be set');
+  });
+
+  it('the vendored adapter attributes mutations to WebMCP without values or no-ops', async () => {
+    const registered = new Map();
+    const sampleRUM = Sinon.spy();
+    const previousHlx = window.hlx;
+    window.hlx = { rum: { sampleRUM } };
+    global.navigator.modelContext = {
+      registerTool: (tool) => {
+        registered.set(tool.name, tool);
+        return { unregister: () => registered.delete(tool.name) };
+      },
+    };
+    const form = createFormInstance({
+      id: 'rum-form',
+      properties: { 'fd:webMcpEnabled': true },
+      items: [{ name: 'city', fieldType: 'text-input', type: 'string' }],
+    });
+    const unregister = registerFormWebMCP(form);
+    try {
+      await registered.get('get_form_summary').execute();
+      await registered.get('set_field_value').execute({ field: 'city', value: 'private' });
+      await registered.get('set_field_value').execute({ field: 'city', value: 'private' });
+      assert.deepStrictEqual(sampleRUM.args, [
+        ['fill', { source: 'af-webmcp', target: 'set_field_value' }],
+      ]);
+    } finally {
+      unregister();
+      window.hlx = previousHlx;
+    }
   });
 });

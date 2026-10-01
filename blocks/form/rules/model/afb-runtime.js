@@ -20,9 +20,9 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 0.22.167
+ *  Version: 1.0.4
  */
-import { E as EventSource, C as CustomEvent, p as propertyChange, a as ExecuteRule, B as BaseAction, I as Initialize, R as RemoveItem, b as Change, F as FormLoad, c as FocusOption, d as FieldChanged, V as ValidationComplete, S as ScriptError, e as constraintKeys, g as getConstraintTypeMessages, f as Valid, h as Invalid, i as ValidationError, A as AddInstance, j as RemoveInstance, k as isSelfChange, l as isDependencyChange, m as isUserChange, n as SubmitSuccess, o as RequestSuccess, q as CaptchaDisplayMode, r as SubmitError, s as Submit, t as Save, u as Reset, v as SubmitFailure, w as RequestFailure, x as Focus, y as AddItem, z as Click } from './Events-3e88e4fb-682ebef2.js';
+import { E as EventSource, C as CustomEvent, p as propertyChange, a as ExecuteRule, B as BaseAction, I as Initialize, R as RemoveItem, b as Change, F as FormLoad, c as FocusOption, d as FieldChanged, V as ValidationComplete, S as ScriptError, e as constraintKeys, g as getConstraintTypeMessages, f as Valid, h as Invalid, i as ValidationError, A as AddInstance, j as RemoveInstance, k as Submit, l as isSelfChange, m as isDependencyChange, n as isUserChange, o as SubmitSuccess, q as RequestSuccess, r as CaptchaDisplayMode, s as SubmitError, t as Save, u as Reset, v as SubmitFailure, w as RequestFailure, x as Focus, y as AddItem, z as Click } from './Events-3e88e4fb-bd56f7cd.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
@@ -139,7 +139,7 @@ function deepClone(obj, idGenerator) {
 const jsonString = (obj) => {
     return JSON.stringify(obj, null, 2);
 };
-const isRepeatable$1 = (obj) => {
+const isRepeatable$2 = (obj) => {
     return ((obj.repeatable &&
         ((obj.minOccur === undefined && obj.maxOccur === undefined) ||
             (obj.minOccur !== undefined && obj.maxOccur !== undefined && obj.maxOccur !== 0) ||
@@ -640,7 +640,7 @@ const isAlphaNum = function (ch) {
 const isGlobal = (prev, stream, pos) => {
     return prev === null && stream[pos] === globalStartToken;
 };
-const isRepeatable = (prev, stream, pos) => {
+const isRepeatable$1 = (prev, stream, pos) => {
     return prev === null && stream[pos] === repeatableStartToken;
 };
 const isIdentifier = (stream, pos) => {
@@ -734,7 +734,7 @@ class Tokenizer {
                 this._tokens.push(token);
                 this._result_tokens.push(token);
             }
-            else if (isRepeatable(prev, stream, this._current)) {
+            else if (isRepeatable$1(prev, stream, this._current)) {
                 const token = this._consumeRepeatable();
                 this._tokens.push(token);
                 this._result_tokens.push(token);
@@ -3817,7 +3817,7 @@ class Container extends Scriptable {
         }) : [];
     }
     getItemsState(isRepeatableChild = false, forRestore = false) {
-        const isThisContainerRepeatable = this._jsonModel.type === 'array' || isRepeatable$1(this._jsonModel);
+        const isThisContainerRepeatable = this._jsonModel.type === 'array' || isRepeatable$2(this._jsonModel);
         if (isThisContainerRepeatable) {
             return this._children.map(x => {
                 return { ...x.getState(true, forRestore) };
@@ -3836,7 +3836,7 @@ class Container extends Scriptable {
                     ':itemsOrder': undefined
                 } : {}),
                 items: this.getItemsState(isRepeatableChild, forRestore),
-                ...((this._jsonModel.type === 'array' || isRepeatable$1(this._jsonModel)) && this._itemTemplate ? {
+                ...((this._jsonModel.type === 'array' || isRepeatable$2(this._jsonModel)) && this._itemTemplate ? {
                     _itemTemplate: { ...this._itemTemplate }
                 } : {}),
                 enabled: this.enabled,
@@ -4079,7 +4079,7 @@ class Container extends Scriptable {
         }
     }
     reset() {
-        if (this.type === 'array' || isRepeatable$1(this._jsonModel)) {
+        if (this.type === 'array' || isRepeatable$2(this._jsonModel)) {
             if (this.items.length > this._jsonModel.initialItems) {
                 const itemsToBeRemoved = this.items.length - this._jsonModel.initialItems;
                 for (let i = 0; i < itemsToBeRemoved; i++) {
@@ -5831,7 +5831,7 @@ class Field extends Scriptable {
         }
     }
     validate() {
-        if (this.visible === false) {
+        if (this.visible === false || this.enabled === false) {
             return [];
         }
         if (this.valid === false && this.errorMessage && this?.validity?.customConstraint) {
@@ -6302,7 +6302,7 @@ class FormFieldFactoryImpl {
         child.fieldType = child.fieldType ? (child.fieldType in alternateFieldTypeMapping ?
             alternateFieldTypeMapping[child.fieldType] : child.fieldType)
             : 'text-input';
-        if (isRepeatable$1(child)) {
+        if (isRepeatable$2(child)) {
             const newChild = {
                 ...child,
                 ...('items' in child && { 'type': 'object' }),
@@ -6378,6 +6378,25 @@ const constraintsOf = (state) => {
 };
 const stateOf = (field) => field.getState();
 const normalizeRef = (value) => String(value).toLowerCase().replace(/[^a-z0-9]/g, '');
+const sameValue = (a, b) => Object.is(a, b) || (Array.isArray(a) && Array.isArray(b) &&
+    a.length === b.length && a.every((value, index) => sameValue(value, b[index])));
+const writeValue = (target, value) => {
+    const before = target.value;
+    if (!sameValue(before, value)) {
+        target.value = value;
+    }
+    return !sameValue(before, target.value);
+};
+const focusTarget = (target) => {
+    const ancestors = [];
+    let parent = target.parent;
+    while (parent) {
+        ancestors.push({ node: parent, activeChild: parent.activeChild });
+        parent = parent.parent;
+    }
+    target.focus();
+    return ancestors.some(({ node, activeChild }) => node.activeChild !== activeChild);
+};
 const findField = (form, ref) => {
     const items = [];
     form.visit((field) => {
@@ -6385,21 +6404,25 @@ const findField = (form, ref) => {
         items.push({ node: field, name: s.name, id: s.id, qualifiedName: s.qualifiedName, norm: normalizeRef(s.name) });
     });
     const refNorm = normalizeRef(ref);
-    const exact = items.find((i) => i.id === ref || i.qualifiedName === ref || i.name === ref);
-    if (exact) {
-        return exact.node;
+    const byId = items.find((i) => i.id === ref || i.qualifiedName === ref);
+    if (byId) {
+        return byId.node;
     }
-    const normed = items.find((i) => i.norm === refNorm);
-    if (normed) {
-        return normed.node;
+    const uniqueOrUndefined = (matches) => (matches.length === 1 ? matches[0].node : undefined);
+    const byName = items.filter((i) => i.name === ref);
+    if (byName.length) {
+        return uniqueOrUndefined(byName);
     }
-    const prefix = items.filter((i) => i.norm.startsWith(refNorm) || refNorm.startsWith(i.norm));
-    return prefix.length === 1 ? prefix[0].node : undefined;
+    const byNorm = items.filter((i) => i.norm === refNorm);
+    if (byNorm.length) {
+        return uniqueOrUndefined(byNorm);
+    }
+    return uniqueOrUndefined(items.filter((i) => i.norm.startsWith(refNorm) || refNorm.startsWith(i.norm)));
 };
 const getFormSummary = (form) => ({
     name: 'get_form_summary',
-    description: 'Return the form title and the list of fields with their label, type, whether they are required, and their current value. Read-only; call this first to understand the form before reading or setting values.',
-    annotations: { readOnlyHint: true },
+    description: 'Use when the user asks to see, review, summarize, or "what is on/in" this form - returns the form title and every field with its label, type, required flag and current value. Read-only; call this first to understand the form before reading or setting values.',
+    annotations: { readOnlyHint: true, untrustedContentHint: true },
     inputSchema: { type: 'object', properties: {} },
     async execute() {
         const fields = [];
@@ -6415,8 +6438,8 @@ const getFormSummary = (form) => ({
 });
 const explainField = (form) => ({
     name: 'explain_field',
-    description: 'Explain one field in plain language: its purpose, help text, whether it is required, the allowed options, and what a valid value looks like. Read-only.',
-    annotations: { readOnlyHint: true },
+    description: 'Use when the user asks what a field means, how to fill it, or what values are allowed - returns that field\'s purpose, help text, required flag, options and valid-value constraints. Read-only.',
+    annotations: { readOnlyHint: true, untrustedContentHint: true },
     inputSchema: {
         type: 'object',
         properties: { field: { type: 'string', description: 'field name or id' } },
@@ -6439,8 +6462,8 @@ const explainField = (form) => ({
 });
 const getFieldValue = (form) => ({
     name: 'get_field_value',
-    description: 'Read the current value of one field, plus whether it is currently valid. Read-only.',
-    annotations: { readOnlyHint: true },
+    description: 'Use when the user asks for the current value of a single field (e.g. "what is my email?") - returns its value and whether it is valid. Read-only.',
+    annotations: { readOnlyHint: true, untrustedContentHint: true },
     inputSchema: {
         type: 'object',
         properties: { field: { type: 'string', description: 'field name or id' } },
@@ -6451,20 +6474,22 @@ const getFieldValue = (form) => ({
         if (!target) {
             return { success: false, error: `field not found: ${args?.field}` };
         }
+        if (target.isContainer) {
+            return { success: false, error: `not a field (it is a container): ${args?.field}` };
+        }
         const s = stateOf(target);
         return { success: true, field: s.name, value: s.value, valid: s.validity?.valid, displayValue: s.displayValue };
     }
 });
 const setFieldValue = (form) => ({
     name: 'set_field_value',
-    description: 'Set the value of exactly ONE field. If the user gives values for two or more fields, use apply_prefill instead. Requires user confirmation before running.',
-    annotations: { readOnlyHint: false, destructiveHint: false },
-    requireUserConsent: true,
+    description: 'Use whenever the user asks to set, change, fill, enter, update, or correct a SINGLE field (e.g. "set my first name to Grace"). For two or more fields in one request, use apply_prefill instead. Requires user confirmation before running.',
+    annotations: { readOnlyHint: false, consequentialHint: true },
     inputSchema: {
         type: 'object',
         properties: {
             field: { type: 'string', description: 'field name or id' },
-            value: { description: 'value to set' }
+            value: { type: ['string', 'number', 'boolean', 'array', 'null'], description: 'value to set' }
         },
         required: ['field', 'value']
     },
@@ -6473,38 +6498,44 @@ const setFieldValue = (form) => ({
         if (!target) {
             return { success: false, error: `field not found: ${args?.field}` };
         }
-        target.value = args.value;
-        return { success: true, field: args.field, value: target.value };
+        if (target.isContainer) {
+            return { success: false, error: `cannot set a container as a field: ${args?.field}` };
+        }
+        const changed = writeValue(target, args.value);
+        return { success: true, changed, field: args.field, value: target.value };
     }
 });
+const collectCompletenessIssues = (form) => {
+    const issues = [];
+    form.visit((field) => {
+        const s = stateOf(field);
+        if (field.isContainer || !s.fieldType || s.visible === false || s.enabled === false) {
+            return;
+        }
+        const value = s.value;
+        if (s.required && isBlank(value)) {
+            issues.push({ field: s.name, qualifiedName: s.qualifiedName, reason: 'required' });
+        }
+        else if (!isBlank(value) && s.validity?.valid === false) {
+            issues.push({ field: s.name, qualifiedName: s.qualifiedName, reason: 'invalid', message: s.errorMessage });
+        }
+    });
+    return issues;
+};
 const validateFormCompleteness = (form) => ({
     name: 'validate_form_completeness',
-    description: 'List the fields the user still needs to fix before submitting: required fields left empty and fields with invalid values. Read-only — it inspects current state and does not flag fields in the UI.',
+    description: 'Use when the user asks what is still needed, what is missing, whether the form is complete, or "can I submit?" - lists required-but-empty and invalid fields. Read-only; inspects current state and does not flag fields in the UI.',
     annotations: { readOnlyHint: true },
     inputSchema: { type: 'object', properties: {} },
     async execute() {
-        const issues = [];
-        form.visit((field) => {
-            const s = stateOf(field);
-            if (!s.fieldType || s.visible === false || s.enabled === false) {
-                return;
-            }
-            const value = s.value;
-            if (s.required && isBlank(value)) {
-                issues.push({ field: s.name, reason: 'required' });
-            }
-            else if (!isBlank(value) && s.validity?.valid === false) {
-                issues.push({ field: s.name, reason: 'invalid', message: s.errorMessage });
-            }
-        });
+        const issues = collectCompletenessIssues(form);
         return { success: true, complete: issues.length === 0, issues };
     }
 });
 const applyPrefill = (form) => ({
     name: 'apply_prefill',
-    description: 'Fill TWO OR MORE fields at once from a list of {field, value} pairs. Use this whenever the user provides values for multiple fields in one request (e.g. read from a document). Returns a per-field result. Requires user confirmation before running.',
-    annotations: { readOnlyHint: false, destructiveHint: false },
-    requireUserConsent: true,
+    description: 'Use whenever the user asks to set, fill, or prefill TWO OR MORE fields in one request (e.g. values read from a document) - takes a list of {field, value} pairs and returns a per-field result. Requires user confirmation before running.',
+    annotations: { readOnlyHint: false, consequentialHint: true },
     inputSchema: {
         type: 'object',
         properties: {
@@ -6515,7 +6546,7 @@ const applyPrefill = (form) => ({
                     type: 'object',
                     properties: {
                         field: { type: 'string', description: 'field name or id' },
-                        value: { description: 'value to set' }
+                        value: { type: ['string', 'number', 'boolean', 'array', 'null'], description: 'value to set' }
                     },
                     required: ['field', 'value']
                 }
@@ -6530,16 +6561,20 @@ const applyPrefill = (form) => ({
             if (!target) {
                 return { field, applied: false, error: 'field not found' };
             }
-            target.value = value;
-            return { field, applied: true, value: target.value };
+            if (target.isContainer) {
+                return { field, applied: false, error: 'not a field (it is a container)' };
+            }
+            const changed = writeValue(target, value);
+            return { field, applied: true, changed, value: target.value };
         });
-        return { success: true, results };
+        return { success: true, changed: results.some((result) => result.changed === true), results };
     }
 });
 const instanceCountOf = (node) => (Array.isArray(node?.items) ? node.items.length : 0);
+const isRepeatable = (node) => !!node?.isContainer && stateOf(node).type === 'array';
 const listRepeatableInstances = (form) => ({
     name: 'list_repeatable_instances',
-    description: 'List how many instances a repeatable section currently has, and its minimum/maximum allowed. Read-only.',
+    description: 'Use when the user asks how many instances a repeatable section has (e.g. "how many dependents do I have?") - returns the current count and the min/max allowed. Read-only.',
     annotations: { readOnlyHint: true },
     inputSchema: {
         type: 'object',
@@ -6551,14 +6586,16 @@ const listRepeatableInstances = (form) => ({
         if (!target) {
             return { success: false, error: `panel not found: ${args?.panel}` };
         }
+        if (!isRepeatable(target)) {
+            return { success: false, error: `not a repeatable section: ${args?.panel}` };
+        }
         return { success: true, panel: args.panel, instanceCount: instanceCountOf(target), min: target.minOccur, max: target.maxOccur };
     }
 });
 const addRepeatableInstance = (form) => ({
     name: 'add_repeatable_instance',
-    description: 'Add a new instance to a repeatable section (e.g. add another dependent or address). Requires user confirmation.',
-    annotations: { readOnlyHint: false, destructiveHint: false },
-    requireUserConsent: true,
+    description: 'Use when the user asks to add another instance to a repeatable section (e.g. "add another dependent/address"). Requires user confirmation.',
+    annotations: { readOnlyHint: false, consequentialHint: true },
     inputSchema: {
         type: 'object',
         properties: { panel: { type: 'string', description: 'repeatable panel name or id' } },
@@ -6569,20 +6606,22 @@ const addRepeatableInstance = (form) => ({
         if (!target) {
             return { success: false, error: `panel not found: ${args?.panel}` };
         }
+        if (!isRepeatable(target)) {
+            return { success: false, error: `panel is not repeatable: ${args.panel}` };
+        }
         const before = instanceCountOf(target);
         target.dispatch(new AddInstance());
         const after = instanceCountOf(target);
         if (after <= before) {
-            return { success: false, error: `panel is not repeatable: ${args.panel}`, instanceCount: after };
+            return { success: false, error: `cannot add: at maximum instances (maxOccur ${target.maxOccur})`, instanceCount: after };
         }
         return { success: true, panel: args.panel, added: true, instanceCount: after };
     }
 });
 const removeRepeatableInstance = (form) => ({
     name: 'remove_repeatable_instance',
-    description: 'Remove one instance from a repeatable section by its 0-based index. Requires user confirmation.',
-    annotations: { readOnlyHint: false, destructiveHint: true },
-    requireUserConsent: true,
+    description: 'Use when the user asks to remove or delete an instance from a repeatable section, by its 0-based index (e.g. "remove the second dependent"). Requires user confirmation; destructive.',
+    annotations: { readOnlyHint: false, consequentialHint: true },
     inputSchema: {
         type: 'object',
         properties: {
@@ -6596,6 +6635,9 @@ const removeRepeatableInstance = (form) => ({
         if (!target) {
             return { success: false, error: `panel not found: ${args?.panel}` };
         }
+        if (!isRepeatable(target)) {
+            return { success: false, error: `not a repeatable section: ${args.panel}` };
+        }
         const before = instanceCountOf(target);
         const index = args?.index;
         if (!Number.isInteger(index) || index < 0 || index >= before) {
@@ -6604,14 +6646,14 @@ const removeRepeatableInstance = (form) => ({
         target.dispatch(new RemoveInstance(index));
         const after = instanceCountOf(target);
         if (after >= before) {
-            return { success: false, error: `nothing removed (not a repeatable panel?): ${args.panel}`, instanceCount: after };
+            return { success: false, error: `cannot remove: at minimum instances (minOccur ${target.minOccur})`, instanceCount: after };
         }
         return { success: true, panel: args.panel, instanceCount: after };
     }
 });
 const focusField = (form) => ({
     name: 'focus_field',
-    description: 'Move focus to a field so the user sees it (scrolls it into view). Reference the field by name, id, or qualifiedName. For a field inside a repeatable section, use the qualifiedName (e.g. "$form.dependents[1].depName") or the instance id to target a specific instance.',
+    description: 'Use when the user asks to focus, go to, jump to, or highlight a specific field (scrolls it into view). Reference by name, id, or qualifiedName; for a field inside a repeatable section use the qualifiedName (e.g. "$form.dependents[1].depName") or the instance id to target a specific instance.',
     annotations: { readOnlyHint: false },
     inputSchema: {
         type: 'object',
@@ -6623,13 +6665,13 @@ const focusField = (form) => ({
         if (!target) {
             return { success: false, error: `field not found: ${args?.field}` };
         }
-        target.focus();
-        return { success: true, field: args.field, qualifiedName: stateOf(target).qualifiedName };
+        const changed = focusTarget(target);
+        return { success: true, changed, field: args.field, qualifiedName: stateOf(target).qualifiedName };
     }
 });
 const navigateToPanel = (form) => ({
     name: 'navigate_to_panel',
-    description: 'Navigate the form to a panel or wizard step (make it the active step) so its fields become visible. Reference the panel by name, id, or qualifiedName.',
+    description: 'Use when the user asks to go to, open, or move to a step, section, tab, or panel (makes it the active wizard step so its fields become visible). Reference the panel by name, id, or qualifiedName.',
     annotations: { readOnlyHint: false },
     inputSchema: {
         type: 'object',
@@ -6641,8 +6683,76 @@ const navigateToPanel = (form) => ({
         if (!target) {
             return { success: false, error: `panel not found: ${args?.panel}` };
         }
-        target.focus();
-        return { success: true, panel: args.panel, active: target.parent?.activeChild?.name };
+        const changed = focusTarget(target);
+        return { success: true, changed, panel: args.panel, active: target.parent?.activeChild?.name };
+    }
+});
+const submitOutcome = (e) => {
+    const body = e?.payload?.body;
+    const result = { success: true, submitted: true };
+    if (body && typeof body === 'object') {
+        if (body.thankYouMessage != null) {
+            result.thankYouMessage = body.thankYouMessage;
+        }
+        if (body.redirectUrl != null) {
+            result.redirectUrl = body.redirectUrl;
+        }
+    }
+    return result;
+};
+const submitErrorMessage = (e) => {
+    const p = e?.payload;
+    if (p == null) {
+        return 'submit failed';
+    }
+    if (typeof p === 'string') {
+        return p;
+    }
+    const msg = p.title ?? p.message ?? p?.body?.title ?? p?.body?.message ?? p?.body?.errorMessage;
+    if (typeof msg === 'string') {
+        return msg;
+    }
+    const status = p.status ?? p?.response?.status;
+    return typeof status === 'number' ? `submit failed (status ${status})` : 'submit failed';
+};
+const submitForm = (form) => ({
+    name: 'submit_form',
+    description: 'Use when the user asks to submit, send, file, or finish the form - the final step that files it. Consequential and irreversible: submits the form and triggers its configured submit action. Requires user confirmation; refuses to submit while required or invalid fields remain (call validate_form_completeness to see them).',
+    annotations: { readOnlyHint: false, consequentialHint: true },
+    inputSchema: { type: 'object', properties: {} },
+    execute() {
+        if (form.validate().length > 0) {
+            return Promise.resolve({ success: false, complete: false, issues: collectCompletenessIssues(form), error: 'form has required-empty or invalid fields; fix them before submitting' });
+        }
+        return new Promise((resolve) => {
+            let settled = false;
+            const subs = [];
+            const settle = (result) => {
+                if (settled) {
+                    return;
+                }
+                settled = true;
+                clearTimeout(timer);
+                subs.forEach((s) => s.unsubscribe());
+                resolve(result);
+            };
+            const timer = setTimeout(() => settle({
+                success: false,
+                pending: true,
+                submitted: false,
+                error: 'submission outcome unknown after 30 seconds; check submission status before retrying'
+            }), 30000);
+            try {
+                subs.push(form.subscribe((e) => settle(submitOutcome(e)), 'submitSuccess'));
+                subs.push(form.subscribe((e) => settle({ success: false, submitted: false, error: submitErrorMessage(e) }), 'submitError'));
+                subs.push(form.subscribe((e) => settle({ success: false, submitted: false, error: submitErrorMessage(e) }), 'submitFailure'));
+                form.dispatch(new Submit({ validate_form: false, submit_as: 'multipart/form-data' }));
+            }
+            catch (error) {
+                form.logger.warn(`WebMCP submission dispatch failed: ${String(error)}`);
+                settle({ success: false, submitted: false, error: error instanceof Error ? error.message : 'submission dispatch failed' });
+            }
+        });
     }
 });
 const buildFormTools = (form) => [
@@ -6656,7 +6766,8 @@ const buildFormTools = (form) => [
     navigateToPanel(form),
     listRepeatableInstances(form),
     addRepeatableInstance(form),
-    removeRepeatableInstance(form)
+    removeRepeatableInstance(form),
+    submitForm(form)
 ];
 const decorateFormModels = (form) => decorateSubtree(form);
 const createFormInstanceHelper = (formModel, logLevel, fModel) => {
