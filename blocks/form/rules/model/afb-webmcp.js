@@ -20,11 +20,27 @@
 
 /*
  *  Package: @aemforms/af-webmcp
- *  Version: 1.0.4
+ *  Version: 1.0.6
  */
 import { buildFormTools } from './afb-runtime.js';
 
 const registries = new WeakMap();
+const generatedFormIds = new WeakMap();
+let nextGeneratedFormId = 0;
+const formRegistrationId = (form, registry) => {
+    const authoredId = String(form.id || '').trim();
+    if (authoredId !== '$form') {
+        return authoredId;
+    }
+    let id = generatedFormIds.get(form);
+    if (!id) {
+        do {
+            id = `$form-${++nextGeneratedFormId}`;
+        } while (registry?.forms.has(id));
+        generatedFormIds.set(form, id);
+    }
+    return id;
+};
 const FORM_ID_PROPERTY = 'form_id';
 const interactionCheckpoints = {
     set_field_value: 'fill',
@@ -114,7 +130,7 @@ const schemaWithFormId = (schema) => ({
     properties: {
         [FORM_ID_PROPERTY]: {
             type: 'string',
-            description: 'Adaptive Form id. Optional when only one form is available; required to disambiguate multiple forms.'
+            description: 'Form registration id from list_forms. Optional for one form; required to disambiguate multiple forms.'
         },
         ...(schema.properties || {})
     }
@@ -139,7 +155,9 @@ const resolveForm = (registry, args) => {
     const toolArgs = args ? { ...args } : {};
     delete toolArgs[FORM_ID_PROPERTY];
     if (formId != null) {
-        const registration = registry.forms.get(String(formId));
+        const onlyForm = registry.forms.size === 1 ? registry.forms.values().next().value : undefined;
+        const registration = registry.forms.get(String(formId))
+            || (onlyForm?.form.id === String(formId) ? onlyForm : undefined);
         return registration
             ? { registration, args: toolArgs }
             : { error: { success: false, error: `form not found: ${formId}` } };
@@ -215,7 +233,7 @@ const executeRoutedTool = async (registry, name, args) => {
     const registration = resolved.registration;
     const tool = registration.tools.get(name);
     if (!tool) {
-        return { success: false, error: `tool '${name}' is unavailable for form: ${registration.form.id}` };
+        return { success: false, error: `tool '${name}' is unavailable for form: ${registration.id}` };
     }
     try {
         if (tool.annotations?.consequentialHint && registration.onRequestApproval) {
@@ -230,7 +248,7 @@ const executeRoutedTool = async (registry, name, args) => {
                 return { success: false, error: 'user consent required' };
             }
         }
-        if (registry.forms.get(String(registration.form.id).trim()) !== registration) {
+        if (registry.forms.get(registration.id) !== registration) {
             return { success: false, error: 'form tools have been unregistered' };
         }
         const result = await tool.execute(resolved.args);
@@ -327,7 +345,7 @@ const registerFormWebMCP = (form, options = {}) => {
     if (!modelContext) {
         return () => { };
     }
-    const formId = String(form.id || '').trim();
+    const formId = formRegistrationId(form, registries.get(modelContext));
     if (!formId) {
         console.error('[af-webmcp] cannot register a form without an id');
         return () => { };
@@ -376,6 +394,21 @@ const registerFormWebMCP = (form, options = {}) => {
             console.error(`[af-webmcp] form '${formId}' is already registered with a different renderer focus bridge`);
             return () => undefined;
         }
+        if (existing.onRequestApproval !== options.onRequestApproval) {
+            console.error(`[af-webmcp] form '${formId}' is already registered with a different approval callback`);
+            return () => { };
+        }
+        if (existing.additionalTools !== options.additionalTools) {
+            console.error(`[af-webmcp] form '${formId}' is already registered with a different additional-tools factory`);
+            return () => { };
+        }
+        if (existing.tools.size !== formTools.length || formTools.some((tool) => {
+            const activeTool = existing.tools.get(tool.name);
+            return !activeTool || toolDescriptor(activeTool) !== toolDescriptor(tool);
+        })) {
+            console.error(`[af-webmcp] form '${formId}' is already registered with different tool definitions`);
+            return () => { };
+        }
         existing.owners += 1;
         let cleaned = false;
         return () => {
@@ -394,10 +427,12 @@ const registerFormWebMCP = (form, options = {}) => {
         }
     }
     const registration = {
+        id: formId,
         form,
         tools: toolsByName,
         onRequestApproval: options.onRequestApproval,
         onFocusRequest: options.onFocusRequest,
+        additionalTools: options.additionalTools,
         owners: 1
     };
     registry.forms.set(formId, registration);

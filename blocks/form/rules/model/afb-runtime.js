@@ -20,9 +20,9 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 1.0.4
+ *  Version: 1.0.6
  */
-import { E as EventSource, C as CustomEvent, p as propertyChange, a as ExecuteRule, B as BaseAction, I as Initialize, R as RemoveItem, b as Change, F as FormLoad, c as FocusOption, d as FieldChanged, V as ValidationComplete, S as ScriptError, e as constraintKeys, g as getConstraintTypeMessages, f as Valid, h as Invalid, i as ValidationError, A as AddInstance, j as RemoveInstance, k as Submit, l as isSelfChange, m as isDependencyChange, n as isUserChange, o as SubmitSuccess, q as RequestSuccess, r as CaptchaDisplayMode, s as SubmitError, t as Save, u as Reset, v as SubmitFailure, w as RequestFailure, x as Focus, y as AddItem, z as Click } from './Events-3e88e4fb-bd56f7cd.js';
+import { E as EventSource, C as CustomEvent, p as propertyChange, a as ExecuteRule, B as BaseAction, I as Initialize, R as RemoveItem, b as Change, F as FormLoad, c as FocusOption, d as FieldChanged, V as ValidationComplete, S as ScriptError, e as constraintKeys, g as getConstraintTypeMessages, f as Valid, h as Invalid, i as ValidationError, A as AddInstance, j as RemoveInstance, k as CaptchaDisplayMode, l as SubmitError, m as isSelfChange, n as isDependencyChange, o as isUserChange, q as Submit, r as SubmitSuccess, s as RequestSuccess, t as Save, u as Reset, v as SubmitFailure, w as RequestFailure, x as Focus, y as AddItem, z as Click } from './Events-cb169ab6-cd60fc58.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
 
@@ -881,6 +881,9 @@ const randomWord = (l) => {
         ret.push(chars[randIndex]);
     }
     return ret.join('');
+};
+const isEmpty = (value) => {
+    return value === '' || value === null || value === undefined;
 };
 const processItem = (item, excludeUnbound, isAsync) => {
     if (excludeUnbound && item.dataRef === null) {
@@ -2302,6 +2305,69 @@ const convertQueryString = (endpoint, payload) => {
     }
     return endpoint.includes('?') ? `${endpoint}&${params.join('&')}` : `${endpoint}?${params.join('&')}`;
 };
+const createRuleContext = (field, form, fragment) => ({
+    form,
+    $form: form.getRuleNode(),
+    field,
+    $field: field.getRuleNode(),
+    $fragment: fragment
+});
+const dispatchPreparedSubmit = (form, payload, options = {}) => {
+    const { interpreter, expressionScope, beforeDispatch } = options;
+    const isActive = () => {
+        const active = options.isActive?.() ?? true;
+        if (!active) {
+            form.logger.debug('Ignoring submission preparation for an inactive operation');
+        }
+        return active;
+    };
+    const dispatch = () => {
+        if (isActive() && (!beforeDispatch || beforeDispatch())) {
+            form.dispatch(new Submit(payload));
+        }
+    };
+    if (!isActive()) {
+        return;
+    }
+    const captcha = form.captcha;
+    const state = captcha?.getState();
+    const requiresToken = state?.captchaDisplayMode === CaptchaDisplayMode.INVISIBLE
+        || (state?.properties?.['fd:captcha']?.config?.version === 'enterprise'
+            && state?.properties?.['fd:captcha']?.config?.keyType === 'score');
+    if (!captcha || !requiresToken) {
+        dispatch();
+        return;
+    }
+    const functions = interpreter?.runtime.functionTable || FunctionRuntimeImpl.getInstance().getFunctions();
+    const frame = interpreter || {
+        globals: createRuleContext(form, form, form.getRuleNode()),
+        runtime: { functionTable: functions }
+    };
+    const fetchToken = functions.fetchCaptchaToken;
+    if (typeof fetchToken?._func !== 'function') {
+        form.logger.error('fetchCaptchaToken is not defined');
+        form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenNotDefined' }));
+        return;
+    }
+    return (async () => {
+        try {
+            const token = await fetchToken._func([], expressionScope, frame);
+            if (!isActive()) {
+                return;
+            }
+            captcha.value = token;
+        }
+        catch (error) {
+            if (!isActive()) {
+                return;
+            }
+            form.logger.error('Error while fetching captcha token');
+            form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenFailed' }));
+            return;
+        }
+        dispatch();
+    })();
+};
 function parsePropertyPath(keyStr) {
     return keyStr
         .replace(/\[/g, '.')
@@ -2836,31 +2902,13 @@ class FunctionRuntimeImpl {
                         submit_data = args.length > 3 ? valueOf(args[3]) : null;
                         validate_form = args.length > 4 ? valueOf(args[4]) : true;
                     }
-                    const form = interpreter.globals.form;
-                    if (form.captcha && (form.captcha.captchaDisplayMode === CaptchaDisplayMode.INVISIBLE ||
-                        (form.captcha.properties['fd:captcha']?.config?.version === 'enterprise' && form.captcha.properties['fd:captcha']?.config?.keyType === 'score'))) {
-                        if (typeof interpreter.runtime.functionTable.fetchCaptchaToken?._func !== 'function') {
-                            interpreter.globals.form.logger.error('fetchCaptchaToken is not defined');
-                            interpreter.globals.form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenNotDefined' }));
-                            return {};
-                        }
-                        try {
-                            const token = await interpreter.runtime.functionTable.fetchCaptchaToken._func([], expressionScope, interpreter);
-                            form.captcha.value = token;
-                        }
-                        catch (e) {
-                            interpreter.globals.form.logger.error('Error while fetching captcha token');
-                            interpreter.globals.form.dispatch(new SubmitError({ type: 'FetchCaptchaTokenFailed' }));
-                            return {};
-                        }
-                    }
-                    interpreter.globals.form.dispatch(new Submit({
+                    await dispatchPreparedSubmit(interpreter.globals.form, {
                         success,
                         error,
                         submit_as,
                         validate_form: validate_form,
                         data: submit_data
-                    }));
+                    }, { interpreter, expressionScope });
                     return {};
                 },
                 _signature: []
@@ -3647,13 +3695,7 @@ class Scriptable extends BaseNode {
         }
     }
     buildRuleContext() {
-        return {
-            'form': this.form,
-            '$form': this.form.getRuleNode(),
-            '$field': this.getRuleNode(),
-            'field': this,
-            '$fragment': this.getFragmentRuleNode()
-        };
+        return createRuleContext(this, this.form, this.getFragmentRuleNode());
     }
     executeExpression(expr) {
         const ruleContext = this.buildRuleContext();
@@ -4466,6 +4508,27 @@ class Version {
         return this.toString();
     }
 }
+const findInChildren = (items, reference, order, includeId = false) => {
+    for (let offset = 0; offset < items.length; offset++) {
+        const field = items[order === 'first' ? offset : items.length - offset - 1];
+        const matches = field.qualifiedName === reference || (includeId && field.id === reference);
+        if (order === 'last' && matches) {
+            return field;
+        }
+        if (field.isContainer && field.items) {
+            const found = findInChildren(field.items, reference, order, includeId);
+            if (found) {
+                return found;
+            }
+        }
+        if (order === 'first' && matches) {
+            return field;
+        }
+    }
+    return null;
+};
+const findQualifiedName = (container, qualifiedName, order = 'last') => findInChildren(container.items, qualifiedName, order);
+const findModelByRef = (container, reference) => findInChildren(container.items, reference, 'first', true);
 const currentVersion = new Version('0.13');
 const changeEventVersion = new Version('0.13');
 class Form extends Container {
@@ -4593,23 +4656,7 @@ class Form extends Container {
         if (this.qualifiedName === qualifiedName) {
             return this;
         }
-        return this.findQualifiedName(this, qualifiedName);
-    }
-    findQualifiedName(container, qualifiedName) {
-        const items = container.items;
-        for (let i = items.length - 1; i >= 0; i--) {
-            const field = items[i];
-            if (field.qualifiedName === qualifiedName) {
-                return field;
-            }
-            if (field.isContainer) {
-                const found = this.findQualifiedName(field, qualifiedName);
-                if (found !== null) {
-                    return found;
-                }
-            }
-        }
-        return null;
+        return findQualifiedName(this, qualifiedName);
     }
     exportSubmitMetaData() {
         return this.withDependencyTrackingControl(true, () => {
@@ -6365,7 +6412,36 @@ class FormFieldFactoryImpl {
     }
 }
 const FormFieldFactory = new FormFieldFactoryImpl();
-const isBlank = (value) => value == null || value === '' || (Array.isArray(value) && value.length === 0);
+const requiredEmpty = (field) => field.required === true && (isEmpty(field.value) || (Array.isArray(field.value) && field.value.length === 0));
+const issueFor = (field, messages) => {
+    const state = field.getState();
+    return requiredEmpty(field)
+        ? { field: field.name, qualifiedName: field.qualifiedName, reason: 'required' }
+        : {
+            field: field.name,
+            qualifiedName: field.qualifiedName,
+            reason: 'invalid',
+            message: messages ? messages.join('; ') : state.errorMessage
+        };
+};
+const inspectFormValidation = (form) => {
+    const issues = [];
+    form.visit((field) => {
+        if (!field.isContainer && field.fieldType && field.visible !== false && field.enabled !== false
+            && (requiredEmpty(field) || field.valid === false)) {
+            issues.push(issueFor(field));
+        }
+    });
+    return issues;
+};
+const validationIssuesFromErrors = (form, errors) => errors.map((error) => {
+    const field = form.getElement(error.fieldName);
+    if (!field || field === form) {
+        form.logger.warn(`Validation error refers to an unknown field: ${error.fieldName}`);
+        return { field: error.fieldName, reason: 'invalid', message: error.errorMessages.join('; ') };
+    }
+    return issueFor(field, error.errorMessages);
+});
 const CONSTRAINTS_SURFACED_ELSEWHERE = new Set(['type', 'required', 'enum']);
 const constraintsOf = (state) => {
     const out = {};
@@ -6378,14 +6454,12 @@ const constraintsOf = (state) => {
 };
 const stateOf = (field) => field.getState();
 const normalizeRef = (value) => String(value).toLowerCase().replace(/[^a-z0-9]/g, '');
-const sameValue = (a, b) => Object.is(a, b) || (Array.isArray(a) && Array.isArray(b) &&
-    a.length === b.length && a.every((value, index) => sameValue(value, b[index])));
 const writeValue = (target, value) => {
     const before = target.value;
-    if (!sameValue(before, value)) {
+    if (!isSameValue(before, value)) {
         target.value = value;
     }
-    return !sameValue(before, target.value);
+    return !isSameValue(before, target.value);
 };
 const focusTarget = (target) => {
     const ancestors = [];
@@ -6398,16 +6472,16 @@ const focusTarget = (target) => {
     return ancestors.some(({ node, activeChild }) => node.activeChild !== activeChild);
 };
 const findField = (form, ref) => {
+    const exact = findModelByRef(form, ref);
+    if (exact) {
+        return exact;
+    }
     const items = [];
     form.visit((field) => {
         const s = stateOf(field);
-        items.push({ node: field, name: s.name, id: s.id, qualifiedName: s.qualifiedName, norm: normalizeRef(s.name) });
+        items.push({ node: field, name: s.name, norm: normalizeRef(s.name) });
     });
     const refNorm = normalizeRef(ref);
-    const byId = items.find((i) => i.id === ref || i.qualifiedName === ref);
-    if (byId) {
-        return byId.node;
-    }
     const uniqueOrUndefined = (matches) => (matches.length === 1 ? matches[0].node : undefined);
     const byName = items.filter((i) => i.name === ref);
     if (byName.length) {
@@ -6505,30 +6579,13 @@ const setFieldValue = (form) => ({
         return { success: true, changed, field: args.field, value: target.value };
     }
 });
-const collectCompletenessIssues = (form) => {
-    const issues = [];
-    form.visit((field) => {
-        const s = stateOf(field);
-        if (field.isContainer || !s.fieldType || s.visible === false || s.enabled === false) {
-            return;
-        }
-        const value = s.value;
-        if (s.required && isBlank(value)) {
-            issues.push({ field: s.name, qualifiedName: s.qualifiedName, reason: 'required' });
-        }
-        else if (!isBlank(value) && s.validity?.valid === false) {
-            issues.push({ field: s.name, qualifiedName: s.qualifiedName, reason: 'invalid', message: s.errorMessage });
-        }
-    });
-    return issues;
-};
 const validateFormCompleteness = (form) => ({
     name: 'validate_form_completeness',
     description: 'Use when the user asks what is still needed, what is missing, whether the form is complete, or "can I submit?" - lists required-but-empty and invalid fields. Read-only; inspects current state and does not flag fields in the UI.',
-    annotations: { readOnlyHint: true },
+    annotations: { readOnlyHint: true, untrustedContentHint: true },
     inputSchema: { type: 'object', properties: {} },
     async execute() {
-        const issues = collectCompletenessIssues(form);
+        const issues = inspectFormValidation(form);
         return { success: true, complete: issues.length === 0, issues };
     }
 });
@@ -6722,9 +6779,6 @@ const submitForm = (form) => ({
     annotations: { readOnlyHint: false, consequentialHint: true },
     inputSchema: { type: 'object', properties: {} },
     execute() {
-        if (form.validate().length > 0) {
-            return Promise.resolve({ success: false, complete: false, issues: collectCompletenessIssues(form), error: 'form has required-empty or invalid fields; fix them before submitting' });
-        }
         return new Promise((resolve) => {
             let settled = false;
             const subs = [];
@@ -6747,7 +6801,29 @@ const submitForm = (form) => ({
                 subs.push(form.subscribe((e) => settle(submitOutcome(e)), 'submitSuccess'));
                 subs.push(form.subscribe((e) => settle({ success: false, submitted: false, error: submitErrorMessage(e) }), 'submitError'));
                 subs.push(form.subscribe((e) => settle({ success: false, submitted: false, error: submitErrorMessage(e) }), 'submitFailure'));
-                form.dispatch(new Submit({ validate_form: false, submit_as: 'multipart/form-data' }));
+                const preparation = dispatchPreparedSubmit(form, { validate_form: false, submit_as: 'multipart/form-data' }, {
+                    isActive: () => !settled,
+                    beforeDispatch: () => {
+                        if (settled) {
+                            return false;
+                        }
+                        const errors = form.validate();
+                        if (errors.length > 0) {
+                            settle({
+                                success: false, complete: false, issues: validationIssuesFromErrors(form, errors),
+                                error: 'form has required-empty or invalid fields; fix them before submitting'
+                            });
+                            return false;
+                        }
+                        return true;
+                    }
+                });
+                if (preparation) {
+                    preparation.catch((error) => {
+                        form.logger.warn(`WebMCP submission dispatch failed: ${String(error)}`);
+                        settle({ success: false, submitted: false, error: error instanceof Error ? error.message : 'submission dispatch failed' });
+                    });
+                }
             }
             catch (error) {
                 form.logger.warn(`WebMCP submission dispatch failed: ${String(error)}`);
