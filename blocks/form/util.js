@@ -285,6 +285,80 @@ export function setPlaceholder(element, fd) {
   }
 }
 
+// Matches Dynamic Media with OpenAPI delivery URLs, e.g.
+// https://delivery-p12345-e67890.adobeaemcloud.com/adobe/assets/urn:aaid:aem:<id>/as/name.avif
+const DM_OPENAPI_URL_PATTERN = /^https?:\/\/[^/]+\/(?:.*\/)?assets\/urn:(?:aaid|avid):aem:/;
+
+export function isDynamicMediaUrl(src) {
+  return typeof src === 'string' && DM_OPENAPI_URL_PATTERN.test(src);
+}
+
+function appendQueryParams(url, params) {
+  const { searchParams } = url;
+  params.forEach((value, key) => {
+    searchParams.set(key, value);
+  });
+  url.search = searchParams.toString();
+  return url.toString();
+}
+
+// Converts a DM OpenAPI "original" rendition URL (…/original/as/name.ext) to the
+// web-optimized "…/as/name.avif?assetname=name.ext" form. Leaves other DM URLs untouched.
+function toWebOptimizedDMUrl(url) {
+  const { pathname } = url;
+  if (!pathname.includes('/original/as/')) return url;
+  const filename = pathname.split('/').pop();
+  const newPathname = pathname
+    .replace(/(?:\/renditions)?\/original\/as\//, '/as/')
+    .replace(/\.[^.]+$/, '.avif');
+  const optimizedUrl = new URL(url.toString());
+  optimizedUrl.pathname = newPathname;
+  optimizedUrl.searchParams.set('assetname', filename);
+  return optimizedUrl;
+}
+
+/**
+ * Builds a <picture> element for a Dynamic Media with OpenAPI delivery URL.
+ * Unlike the project's local createOptimizedPicture (which forwards only the
+ * pathname, assuming the asset is hosted on the same origin as the site), this
+ * preserves the full external origin so the browser fetches renditions from
+ * the Dynamic Media delivery host instead of the current site's origin.
+ */
+export function createDMOptimizedPicture(
+  src,
+  alt = '',
+  eager = false,
+  breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
+) {
+  const picture = document.createElement('picture');
+  const url = toWebOptimizedDMUrl(new URL(src));
+
+  breakpoints.forEach((br) => {
+    const source = document.createElement('source');
+    if (br.media) source.setAttribute('media', br.media);
+    source.setAttribute('type', 'image/avif');
+    source.setAttribute('srcset', appendQueryParams(new URL(url), new URLSearchParams({ width: br.width })));
+    picture.appendChild(source);
+  });
+
+  breakpoints.forEach((br, i) => {
+    if (i < breakpoints.length - 1) {
+      const source = document.createElement('source');
+      if (br.media) source.setAttribute('media', br.media);
+      source.setAttribute('srcset', appendQueryParams(new URL(url), new URLSearchParams({ width: br.width })));
+      picture.appendChild(source);
+    } else {
+      const img = document.createElement('img');
+      img.setAttribute('loading', eager ? 'eager' : 'lazy');
+      img.setAttribute('alt', alt);
+      img.setAttribute('src', appendQueryParams(new URL(url), new URLSearchParams({ width: br.width })));
+      picture.appendChild(img);
+    }
+  });
+
+  return picture;
+}
+
 export function createInput(fd) {
   const input = document.createElement('input');
   input.type = getHTMLRenderType(fd);
