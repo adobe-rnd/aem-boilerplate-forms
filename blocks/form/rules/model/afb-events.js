@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 1.0.8
+ *  Version: 1.0.9
  */
 const ConstraintType = Object.freeze({
     PATTERN_MISMATCH: 'patternMismatch',

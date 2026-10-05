@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 1.0.8
+ *  Version: 1.0.9
  */
 import { E as EventSource, CustomEvent, propertyChange, ExecuteRule, BaseAction, Initialize, RemoveItem, Change, FormLoad, F as FocusOption, FieldChanged, ValidationComplete, ScriptError, c as constraintKeys, g as getConstraintTypeMessages, Valid, Invalid, V as ValidationError, AddInstance, RemoveInstance, C as CaptchaDisplayMode, SubmitError, isSelfChange, isDependencyChange, isUserChange, Submit, SubmitSuccess, RequestSuccess, Save, Reset, SubmitFailure, RequestFailure, Focus, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
@@ -1604,7 +1604,7 @@ class BaseNode {
     }
     static RULE_NODE_METHODS = [
         'subscribe', 'dispatch', 'validate', 'validateAsync', 'reset', 'focus',
-        'importData', 'exportData', 'getState', 'getChild', 'bind',
+        'importData', 'exportData', 'getState', 'getChild', 'bind', 'toString',
         'getErrorMessage', 'markAsInvalid',
         'getElement', 'resolveQualifiedName', 'visit', 'request', 'isValid'
     ];
@@ -1621,7 +1621,7 @@ class BaseNode {
     getExposedMethod(prop) {
         if (BaseNode.RULE_NODE_METHODS.indexOf(prop) > -1) {
             const fn = this[prop];
-            if (typeof fn === 'function') {
+            if (typeof fn === 'function' && fn !== Object.prototype.toString) {
                 const bound = fn.bind(this);
                 return (...args) => this.mapRuleValue(bound(...args));
             }
