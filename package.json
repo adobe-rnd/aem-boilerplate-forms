@@ -60,9 +60,9 @@
   "homepage": "https://github.com/adobe/aem-boilerplate#readme",
   "devDependencies": {
     "@adobe/json-formula": "0.1.50",
-    "@aemforms/af-core": "1.0.6",
-    "@aemforms/af-webmcp": "1.0.6",
-    "@aemforms/af-formatters": "1.0.6",
+    "@aemforms/af-core": "1.0.7",
+    "@aemforms/af-webmcp": "1.0.7",
+    "@aemforms/af-formatters": "1.0.7",
     "@aemforms/af-custom-functions": "1.0.14",
     "@babel/eslint-parser": "7.28.0",
     "@playwright/test": "^1.43.1",

@@ -35,26 +35,62 @@ import { createOptimizedPicture } from '../../../scripts/aem.js';
 const formSubscriptions = {};
 const formModels = {};
 const renderPromises = {};
-const webMcpUnregisters = new WeakMap();
-const activeWebMcpUnregisters = new Set();
+const webMcpRegistrations = new Map();
+const webMcpLifecycleWindows = new WeakSet();
 
-function setWebMcpUnregister(htmlForm, unregister) {
-  const previous = webMcpUnregisters.get(htmlForm);
-  if (previous) {
-    activeWebMcpUnregisters.delete(previous);
-    previous();
-  }
-  if (typeof unregister === 'function') {
-    webMcpUnregisters.set(htmlForm, unregister);
-    activeWebMcpUnregisters.add(unregister);
+function clearWebMcpRegistration(htmlForm) {
+  const registration = webMcpRegistrations.get(htmlForm);
+  registration?.unregister?.();
+  webMcpRegistrations.delete(htmlForm);
+}
+
+async function registerWebMcp(htmlForm, registration) {
+  try {
+    const { registerFormWebMCP } = await import('./model/afb-webmcp.min.js');
+    // A replacement, removal or navigation can finish while the adapter loads.
+    if (webMcpRegistrations.get(htmlForm) !== registration
+      || registration.suspended || registration.unregister) return;
+    registration.unregister = registerFormWebMCP(registration.form, registration.options);
+  } catch (e) {
+    console.error('Unable to register Adaptive Forms WebMCP tools:', e);
   }
 }
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('pagehide', () => {
-    activeWebMcpUnregisters.forEach((unregister) => unregister());
-    activeWebMcpUnregisters.clear();
+function observeWebMcpLifecycle() {
+  if (webMcpLifecycleWindows.has(window)) return;
+  webMcpLifecycleWindows.add(window);
+  window.addEventListener('pagehide', (event) => {
+    webMcpRegistrations.forEach((registration, htmlForm) => {
+      registration.unregister?.();
+      registration.unregister = undefined;
+      registration.suspended = true;
+      if (!event.persisted) webMcpRegistrations.delete(htmlForm);
+    });
   });
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return;
+    webMcpRegistrations.forEach((registration, htmlForm) => {
+      if (!registration.suspended) return;
+      if (!htmlForm.isConnected) {
+        clearWebMcpRegistration(htmlForm);
+        return;
+      }
+      registration.suspended = false;
+      registerWebMcp(htmlForm, registration);
+    });
+  });
+  if (typeof window.MutationObserver === 'function') {
+    const observer = new window.MutationObserver((mutations) => {
+      webMcpRegistrations.forEach((registration, htmlForm) => {
+        if (!htmlForm.isConnected && mutations.some((mutation) => (
+          Array.from(mutation.removedNodes).some((node) => node.contains(htmlForm))
+        ))) {
+          clearWebMcpRegistration(htmlForm);
+        }
+      });
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  }
 }
 
 function disableElement(el, value) {
@@ -427,6 +463,7 @@ export async function loadRuleEngine(
   data,
   additionalTools,
 ) {
+  htmlForm.dataset.rules = true;
   const ruleEngine = await import('./model/afb-runtime.min.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
@@ -468,23 +505,23 @@ export async function loadRuleEngine(
     });
   }
   form.dispatch(new CustomEvent('formViewInitialized'));
-  // Expose the form's WebMCP tool catalog to in-browser AI agents. Optional and lazy:
-  // no-ops unless the form opted in via fd:webMcpEnabled and a browser modelContext exists;
-  // guarded so a missing/failed adapter never blocks form load.
-  try {
-    const { registerFormWebMCP } = await import('./model/afb-webmcp.min.js');
-    const unregister = registerFormWebMCP(form, {
+  clearWebMcpRegistration(htmlForm);
+  if (!form.webMcpEnabled) return;
+  observeWebMcpLifecycle();
+  const registration = {
+    form,
+    options: {
       ...(typeof additionalTools === 'function' ? { additionalTools } : {}),
       onFocusRequest: (fieldId) => {
         const previous = htmlForm.ownerDocument.activeElement;
         handleActiveChild(fieldId, htmlForm);
         return htmlForm.ownerDocument.activeElement !== previous;
       },
-    });
-    setWebMcpUnregister(htmlForm, unregister);
-  } catch (e) {
-    console.error('Unable to register Adaptive Forms WebMCP tools:', e);
-  }
+    },
+    suspended: false,
+  };
+  webMcpRegistrations.set(htmlForm, registration);
+  await registerWebMcp(htmlForm, registration);
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {

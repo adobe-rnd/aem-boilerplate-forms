@@ -16,6 +16,12 @@ This is an **MVC** architecture with a **dual-model pattern**: the **Model** run
 
 For detailed architecture, see [`docs/context/architecture.md`](./docs/context/architecture.md).
 
+WebMCP is opt-in through `fd:webMcpEnabled` and registers against the restored
+main-thread model. Each HTML form owns its registration; replacement, removal and
+page navigation revoke it, and persisted back-forward navigation restores it.
+No-worker rule binding reserves initialization before asynchronous imports to
+prevent duplicate DOM listeners.
+
 ## File Map
 
 ```
@@ -37,7 +43,9 @@ blocks/form/
 │   │   ├── afb-runtime.min.js        — Minified runtime
 │   │   ├── afb-events.js             — Event system
 │   │   ├── afb-formatters.js         — Display formatters (date, number, etc.)
-│   │   └── afb-formatters.min.js     — Minified formatters
+│   │   ├── afb-formatters.min.js     — Minified formatters
+│   │   ├── afb-webmcp.js             — [DO NOT EDIT] Browser WebMCP adapter
+│   │   └── afb-webmcp.min.js         — Minified WebMCP adapter
 │   └── formula/
 │       ├── index.js                  — [DO NOT EDIT] Formula engine from Adobe
 │       └── index.min.js              — Minified formula engine

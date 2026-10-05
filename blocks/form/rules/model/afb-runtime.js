@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 1.0.6
+ *  Version: 1.0.7
  */
 import { E as EventSource, C as CustomEvent, p as propertyChange, a as ExecuteRule, B as BaseAction, I as Initialize, R as RemoveItem, b as Change, F as FormLoad, c as FocusOption, d as FieldChanged, V as ValidationComplete, S as ScriptError, e as constraintKeys, g as getConstraintTypeMessages, f as Valid, h as Invalid, i as ValidationError, A as AddInstance, j as RemoveInstance, k as CaptchaDisplayMode, l as SubmitError, m as isSelfChange, n as isDependencyChange, o as isUserChange, q as Submit, r as SubmitSuccess, s as RequestSuccess, t as Save, u as Reset, v as SubmitFailure, w as RequestFailure, x as Focus, y as AddItem, z as Click } from './Events-cb169ab6-cd60fc58.js';
 import Formula from '../formula/index.js';
@@ -1130,6 +1130,9 @@ const replaceTemplatePlaceholders = (str, values = []) => {
 };
 const dateRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
 const emailRegex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+const isValidationApplicable = (field) => {
+    return field.visible !== false;
+};
 const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const daysInMonth = (leapYear, month) => {
     if (leapYear && month == 2) {
@@ -5878,7 +5881,7 @@ class Field extends Scriptable {
         }
     }
     validate() {
-        if (this.visible === false || this.enabled === false) {
+        if (!isValidationApplicable(this)) {
             return [];
         }
         if (this.valid === false && this.errorMessage && this?.validity?.customConstraint) {
@@ -6427,7 +6430,7 @@ const issueFor = (field, messages) => {
 const inspectFormValidation = (form) => {
     const issues = [];
     form.visit((field) => {
-        if (!field.isContainer && field.fieldType && field.visible !== false && field.enabled !== false
+        if (!field.isContainer && field.fieldType && isValidationApplicable(field)
             && (requiredEmpty(field) || field.valid === false)) {
             issues.push(issueFor(field));
         }
@@ -6581,7 +6584,7 @@ const setFieldValue = (form) => ({
 });
 const validateFormCompleteness = (form) => ({
     name: 'validate_form_completeness',
-    description: 'Use when the user asks what is still needed, what is missing, whether the form is complete, or "can I submit?" - lists required-but-empty and invalid fields. Read-only; inspects current state and does not flag fields in the UI.',
+    description: 'Use when the user asks what is still needed, what is missing, or whether the form is complete - lists applicable required-but-empty and known-invalid fields. Read-only; does not run validation or flag fields in the UI. A complete result does not guarantee submission will pass validation.',
     annotations: { readOnlyHint: true, untrustedContentHint: true },
     inputSchema: { type: 'object', properties: {} },
     async execute() {
@@ -6775,7 +6778,7 @@ const submitErrorMessage = (e) => {
 };
 const submitForm = (form) => ({
     name: 'submit_form',
-    description: 'Use when the user asks to submit, send, file, or finish the form - the final step that files it. Consequential and irreversible: submits the form and triggers its configured submit action. Requires user confirmation; refuses to submit while required or invalid fields remain (call validate_form_completeness to see them).',
+    description: 'Use when the user asks to submit, send, file, or finish the form - the final step that files it. Consequential and irreversible: submits the form and triggers its configured submit action. Requires user confirmation; runs validation and refuses to submit while validation errors remain. validate_form_completeness is a read-only preliminary check, not full validation.',
     annotations: { readOnlyHint: false, consequentialHint: true },
     inputSchema: { type: 'object', properties: {} },
     execute() {

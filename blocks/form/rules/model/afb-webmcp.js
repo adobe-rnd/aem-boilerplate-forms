@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-webmcp
- *  Version: 1.0.6
+ *  Version: 1.0.7
  */
 import { buildFormTools } from './afb-runtime.js';
 

@@ -3,7 +3,7 @@ import { terser } from 'rollup-plugin-terser';
 import {plugins} from './common.js';
 
 const packageName = '@aemforms/af-webmcp'
-const directory = process.env.AF_WEBMCP_PACKAGE_DIR || `node_modules/${packageName}`;
+const directory = `node_modules/${packageName}`;
 
 // af-webmcp is a thin browser adapter; its only runtime dependency is buildFormTools
 // from af-core, which is already vendored next to it. Externalize af-core and remap the
