@@ -22,9 +22,9 @@
  *  Package: @aemforms/af-core
  *  Version: 1.0.7
  */
-import { E as EventSource, C as CustomEvent, p as propertyChange, a as ExecuteRule, B as BaseAction, I as Initialize, R as RemoveItem, b as Change, F as FormLoad, c as FocusOption, d as FieldChanged, V as ValidationComplete, S as ScriptError, e as constraintKeys, g as getConstraintTypeMessages, f as Valid, h as Invalid, i as ValidationError, A as AddInstance, j as RemoveInstance, k as CaptchaDisplayMode, l as SubmitError, m as isSelfChange, n as isDependencyChange, o as isUserChange, q as Submit, r as SubmitSuccess, s as RequestSuccess, t as Save, u as Reset, v as SubmitFailure, w as RequestFailure, x as Focus, y as AddItem, z as Click } from './Events-cb169ab6-cd60fc58.js';
+import { E as EventSource, CustomEvent, propertyChange, ExecuteRule, BaseAction, Initialize, RemoveItem, Change, FormLoad, F as FocusOption, FieldChanged, ValidationComplete, ScriptError, c as constraintKeys, g as getConstraintTypeMessages, Valid, Invalid, V as ValidationError, AddInstance, RemoveInstance, C as CaptchaDisplayMode, SubmitError, isSelfChange, isDependencyChange, isUserChange, Submit, SubmitSuccess, RequestSuccess, Save, Reset, SubmitFailure, RequestFailure, Focus, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
-import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.min.js';
+import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, numberToDatetime, formatDate, parseDate } from './afb-formatters.js';
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
