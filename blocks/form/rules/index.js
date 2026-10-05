@@ -35,6 +35,63 @@ import { createOptimizedPicture } from '../../../scripts/aem.js';
 const formSubscriptions = {};
 const formModels = {};
 const renderPromises = {};
+const webMcpRegistrations = new Map();
+const webMcpLifecycleWindows = new WeakSet();
+
+function clearWebMcpRegistration(htmlForm) {
+  const registration = webMcpRegistrations.get(htmlForm);
+  registration?.unregister?.();
+  webMcpRegistrations.delete(htmlForm);
+}
+
+async function registerWebMcp(htmlForm, registration) {
+  try {
+    const { registerFormWebMCP } = await import('./model/afb-webmcp.min.js');
+    // A replacement, removal or navigation can finish while the adapter loads.
+    if (webMcpRegistrations.get(htmlForm) !== registration
+      || registration.suspended || registration.unregister) return;
+    registration.unregister = registerFormWebMCP(registration.form, registration.options);
+  } catch (e) {
+    console.error('Unable to register Adaptive Forms WebMCP tools:', e);
+  }
+}
+
+function observeWebMcpLifecycle() {
+  if (webMcpLifecycleWindows.has(window)) return;
+  webMcpLifecycleWindows.add(window);
+  window.addEventListener('pagehide', (event) => {
+    webMcpRegistrations.forEach((registration, htmlForm) => {
+      registration.unregister?.();
+      registration.unregister = undefined;
+      registration.suspended = true;
+      if (!event.persisted) webMcpRegistrations.delete(htmlForm);
+    });
+  });
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return;
+    webMcpRegistrations.forEach((registration, htmlForm) => {
+      if (!registration.suspended) return;
+      if (!htmlForm.isConnected) {
+        clearWebMcpRegistration(htmlForm);
+        return;
+      }
+      registration.suspended = false;
+      registerWebMcp(htmlForm, registration);
+    });
+  });
+  if (typeof window.MutationObserver === 'function') {
+    const observer = new window.MutationObserver((mutations) => {
+      webMcpRegistrations.forEach((registration, htmlForm) => {
+        if (!htmlForm.isConnected && mutations.some((mutation) => (
+          Array.from(mutation.removedNodes).some((node) => node.contains(htmlForm))
+        ))) {
+          clearWebMcpRegistration(htmlForm);
+        }
+      });
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  }
+}
 
 function disableElement(el, value) {
   el.toggleAttribute('disabled', value === true);
@@ -389,7 +446,24 @@ function applyFieldChangeToFormModel(form, payload, onlyNotifyView = false) {
   }
 }
 
-export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRendition, data) {
+/**
+ * Binds the main-thread model to its form and optional form-bound WebMCP tool factory.
+ * @param {object} formDef Form state.
+ * @param {HTMLFormElement} htmlForm Form view.
+ * @param {object} captcha Captcha configuration.
+ * @param {Function} genFormRendition Form rendition callback.
+ * @param {object} data Prefill data.
+ * @param {Function} [additionalTools] Experimental factory bound to this form model.
+ */
+export async function loadRuleEngine(
+  formDef,
+  htmlForm,
+  captcha,
+  genFormRendition,
+  data,
+  additionalTools,
+) {
+  htmlForm.dataset.rules = true;
   const ruleEngine = await import('./model/afb-runtime.min.js');
   const form = ruleEngine.restoreFormInstance(formDef, data, { logLevel: LOG_LEVEL });
   window.myForm = form;
@@ -431,6 +505,23 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
     });
   }
   form.dispatch(new CustomEvent('formViewInitialized'));
+  clearWebMcpRegistration(htmlForm);
+  if (!form.webMcpEnabled) return;
+  observeWebMcpLifecycle();
+  const registration = {
+    form,
+    options: {
+      ...(typeof additionalTools === 'function' ? { additionalTools } : {}),
+      onFocusRequest: (fieldId) => {
+        const previous = htmlForm.ownerDocument.activeElement;
+        handleActiveChild(fieldId, htmlForm);
+        return htmlForm.ownerDocument.activeElement !== previous;
+      },
+    },
+    suspended: false,
+  };
+  webMcpRegistrations.set(htmlForm, registration);
+  await registerWebMcp(htmlForm, registration);
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {

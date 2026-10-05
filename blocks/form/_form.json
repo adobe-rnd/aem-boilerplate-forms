@@ -59,6 +59,14 @@
               "name": "style",
               "label": "Form Specific styles path",
               "valueType": "string"
+            },
+            {
+              "component": "boolean",
+              "name": "fd:webMcpEnabled",
+              "label": "Enable AI assistant access (WebMCP)",
+              "description": "Allows supported browser AI assistants to understand and help users complete this form through WebMCP tools. When enabled, assistants can read form fields and request updates or submission.",
+              "valueType": "boolean",
+              "value": false
             }
           ]
         }
