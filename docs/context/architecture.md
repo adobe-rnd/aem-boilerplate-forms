@@ -216,6 +216,17 @@ model after rule binding. The authored `properties["fd:webMcpEnabled"]` flag is
 default-off; opted-out forms do not load the adapter. Spreadsheet forms use their
 separate rules engine and do not register this catalog.
 
+In Universal Editor, select the Adaptive Form and enable **Enable AI assistant
+access (WebMCP)** in its properties. The default-off Boolean control in
+`blocks/form/_form.json` saves `fd:webMcpEnabled` on the form resource, without
+an FT gate. The AEM form exporter must include that saved Boolean under
+`properties["fd:webMcpEnabled"]` in the exported definition. Turning the control
+off saves `false`; loading that definition revokes any previous registration.
+Existing forms with an absent property remain opted out. Regenerate
+`component-models.json` with `npm run build:json:models` after changing this model.
+Tool results may contain entered data, so enable access only for forms intended
+to expose their data and supported actions to the configured AI host.
+
 The adapter owns one shared catalog per host: `list_forms` plus twelve form-bound
 tools for inspection, completeness, focus, panel navigation, field updates,
 prefill, repeatable instances and submission. Multi-form calls use `form_id`.

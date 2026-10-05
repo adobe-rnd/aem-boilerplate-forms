@@ -21,6 +21,9 @@ main-thread model. Each HTML form owns its registration; replacement, removal an
 page navigation revoke it, and persisted back-forward navigation restores it.
 No-worker rule binding reserves initialization before asynchronous imports to
 prevent duplicate DOM listeners.
+The form's Universal Editor properties expose **Enable AI assistant access
+(WebMCP)**, a default-off Boolean stored as `fd:webMcpEnabled`, with no FT gate.
+The exported form definition carries it in `properties["fd:webMcpEnabled"]`.
 
 ## File Map
 

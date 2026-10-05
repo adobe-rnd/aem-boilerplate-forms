@@ -219,6 +219,49 @@ describe('WebMCP registration', () => {
     assert.ok(global.window.myForm, 'window.myForm should still be set');
   });
 
+  [false, true].forEach((enabled) => {
+    it(`preserves the authored Boolean ${enabled} through state serialization and restoration`, async () => {
+      const { tools } = installHost();
+      const model = createFormInstance({
+        ...minimalFormState,
+        properties: { 'fd:webMcpEnabled': enabled },
+      });
+      const savedState = JSON.parse(JSON.stringify(model.getState(true)));
+      const htmlForm = document.createElement('form');
+      htmlForm.dataset.id = formId;
+
+      await loadRuleEngine(savedState, htmlForm, null, Sinon.stub(), null);
+
+      assert.strictEqual(window.myForm.getState().properties['fd:webMcpEnabled'], enabled);
+      assert.strictEqual(tools.size, enabled ? 13 : 0);
+    });
+  });
+
+  it('revokes tools when the saved authoring property is explicitly unchecked', async () => {
+    const { tools } = installHost();
+    const htmlForm = document.createElement('form');
+    htmlForm.dataset.id = formId;
+    await loadRuleEngine(
+      { ...minimalFormState, properties: { 'fd:webMcpEnabled': true } },
+      htmlForm,
+      null,
+      Sinon.stub(),
+      null,
+    );
+    assert.strictEqual(tools.size, 13);
+
+    await loadRuleEngine(
+      { ...minimalFormState, properties: { 'fd:webMcpEnabled': false } },
+      htmlForm,
+      null,
+      Sinon.stub(),
+      null,
+    );
+
+    assert.strictEqual(tools.size, 0);
+    assert.strictEqual(window.myForm.webMcpEnabled, false);
+  });
+
   it('replaces an existing form registration without losing the catalog', async () => {
     const { tools } = installHost();
     const htmlForm = document.createElement('form');
