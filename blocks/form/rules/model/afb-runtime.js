@@ -20,7 +20,7 @@
 
 /*
  *  Package: @aemforms/af-core
- *  Version: 1.0.7
+ *  Version: 1.0.8
  */
 import { E as EventSource, CustomEvent, propertyChange, ExecuteRule, BaseAction, Initialize, RemoveItem, Change, FormLoad, F as FocusOption, FieldChanged, ValidationComplete, ScriptError, c as constraintKeys, g as getConstraintTypeMessages, Valid, Invalid, V as ValidationError, AddInstance, RemoveInstance, C as CaptchaDisplayMode, SubmitError, isSelfChange, isDependencyChange, isUserChange, Submit, SubmitSuccess, RequestSuccess, Save, Reset, SubmitFailure, RequestFailure, Focus, AddItem, Click } from './afb-events.js';
 import Formula from '../formula/index.js';
@@ -3992,7 +3992,8 @@ class Container extends Scriptable {
     _canHaveRepeatingChildren(mode = 'create') {
         const items = this._jsonModel.items;
         return this._jsonModel.type == 'array' && this.getDataNode() != null &&
-            (items.length === 1 || (items.length > 0 && items[0].repeatable == true && mode === 'restore'));
+            (items.length === 1 || (mode === 'restore' &&
+                (this._jsonModel._itemTemplate != null || (items.length > 0 && items[0].repeatable == true))));
     }
     get isFragment() {
         return this._isFragment || this._jsonModel?.properties?.['fd:fragment'];
@@ -4002,9 +4003,10 @@ class Container extends Scriptable {
         const items = this._jsonModel.items || [];
         this._childrenReference = this._jsonModel.type == 'array' ? [] : {};
         if (this._canHaveRepeatingChildren(mode)) {
-            this._itemTemplate = this._jsonModel._itemTemplate || deepClone(items[0]);
+            const serializedTemplate = this._jsonModel._itemTemplate;
+            this._itemTemplate = serializedTemplate || deepClone(items[0]);
             this._jsonModel._itemTemplate = undefined;
-            if (mode === 'restore') {
+            if (mode === 'restore' && serializedTemplate == null) {
                 this._itemTemplate.repeatable = undefined;
             }
             if (typeof (this._jsonModel.minItems) !== 'number') {
@@ -4068,6 +4070,12 @@ class Container extends Scriptable {
                 return this._initializeSiteContainer(value);
             }
         });
+    }
+    addInstance(action) {
+        return this.addItem(action);
+    }
+    removeInstance(action) {
+        return this.removeItem(action);
     }
     addItem(action) {
         if ((action.type === 'addItem' || action.type == 'addInstance') && this._itemTemplate != null) {
@@ -5112,12 +5120,6 @@ class InstanceManager extends Fieldset {
     }
     get minOccur() {
         return this.minItems;
-    }
-    addInstance(action) {
-        return this.addItem(action);
-    }
-    removeInstance(action) {
-        return this.removeItem(action);
     }
 }
 __decorate([
@@ -6649,7 +6651,8 @@ const listRepeatableInstances = (form) => ({
         if (!isRepeatable(target)) {
             return { success: false, error: `not a repeatable section: ${args?.panel}` };
         }
-        return { success: true, panel: args.panel, instanceCount: instanceCountOf(target), min: target.minOccur, max: target.maxOccur };
+        return { success: true, panel: args.panel, instanceCount: instanceCountOf(target),
+            min: target.minOccur ?? target.minItems, max: target.maxOccur ?? target.maxItems };
     }
 });
 const addRepeatableInstance = (form) => ({
@@ -6673,7 +6676,7 @@ const addRepeatableInstance = (form) => ({
         target.dispatch(new AddInstance());
         const after = instanceCountOf(target);
         if (after <= before) {
-            return { success: false, error: `cannot add: at maximum instances (maxOccur ${target.maxOccur})`, instanceCount: after };
+            return { success: false, error: `cannot add: at maximum instances (maxOccur ${target.maxOccur ?? target.maxItems})`, instanceCount: after };
         }
         return { success: true, panel: args.panel, added: true, instanceCount: after };
     }
@@ -6706,7 +6709,7 @@ const removeRepeatableInstance = (form) => ({
         target.dispatch(new RemoveInstance(index));
         const after = instanceCountOf(target);
         if (after >= before) {
-            return { success: false, error: `cannot remove: at minimum instances (minOccur ${target.minOccur})`, instanceCount: after };
+            return { success: false, error: `cannot remove: at minimum instances (minOccur ${target.minOccur ?? target.minItems})`, instanceCount: after };
         }
         return { success: true, panel: args.panel, instanceCount: after };
     }
