@@ -9,7 +9,6 @@
     "coverage:unit": "c8 --reporter=json --reporter=text --lines 85 --functions 88 --branches 85 --no-check-coverage mocha",
     "coverage:e2e": "c8 --reporter=json --reporter=text --lines 80 --functions 80 --branches 70 --no-check-coverage playwright test --project='chromium'",
     "coverage": "node ./test/merge-coverage.js",
-    "prelint:js": "npm run build:pkg",
     "lint:js": "eslint . --ext .json,.js,.mjs",
     "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",

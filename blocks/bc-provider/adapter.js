@@ -5,46 +5,55 @@
  * Framework-free JS port of the web agent's `sdk/adaptive-form/adapter.ts`.
  *
  * Migration notes:
- * - `@aemforms/af-forms-block` → the in-repo built bundle at
- *   `../../packages/aem-forms-block/dist/form.js` (same renderer the npm package wraps).
- * - `@aemforms/af-forms-block/form.css?inline` → fetched at runtime via
- *   `loadScopedAdaptiveFormStyles`.
+ * - `@aemforms/af-forms-block` → the in-repo `../form/form.js` renderer directly, so customer
+ *   customizations to the block/components are picked up (not a prebuilt package copy).
+ * - `@aemforms/af-forms-block/form.css?inline` → the block's own `form.css` (and component CSS,
+ *   loaded lazily by the block's component decorators), scoped with an `.af-embedded` selector
+ *   alongside each `main`-scoped rule so styling applies outside the page's `<main>` landmark.
  * - `../forms/contract` and `../forms/registry` → the sibling `forms-contract.js` /
  *   `forms-registry.js` copies that travel with the provider.
  */
 
-import { renderForm } from '../../packages/aem-forms-block/dist/form.js';
+import { loadCSS } from '../../scripts/aem.js';
+import { renderForm } from '../form/form.js';
 
 import { isTerminalEvent } from './forms-contract.js';
 import { ensureFormProviderRegistry } from './forms-registry.js';
 
-import { loadScopedAdaptiveFormStyles } from './styles.js';
 import { createAdaptiveFormSubmissionObserver } from './submission.js';
 
 export const ADAPTIVE_FORM_PROVIDER_ID = 'adaptive-form';
 const PROVIDER_CLASS = 'bc-adaptive-form-provider';
-const PROVIDER_SCOPE = `.${PROVIDER_CLASS}`;
+const EMBEDDED_CLASS = 'af-embedded';
 const UNAVAILABLE_MESSAGE = 'This form is currently unavailable. Please try again later.';
+
+/**
+ * The host chat page may not run EDS's `scripts/aem.js`, which normally sets
+ * `window.hlx.codeBasePath`. The form block, its components, and the rule engine worker all
+ * resolve their own asset URLs through that global, so derive and provide it here from this
+ * module's own URL — without clobbering a value an actual EDS page may have already set.
+ */
+function ensureCodeBasePath() {
+  globalThis.hlx ??= {};
+  globalThis.hlx.codeBasePath ??= new URL('../..', import.meta.url).href.replace(/\/$/, '');
+  return globalThis.hlx.codeBasePath;
+}
 
 export function createAdaptiveFormProvider() {
   return {
     name: ADAPTIVE_FORM_PROVIDER_ID,
     render(mount, context) {
       const root = document.createElement('div');
-      root.className = PROVIDER_CLASS;
+      root.className = `${PROVIDER_CLASS} ${EMBEDDED_CLASS}`;
       if (context.theme) {
         Object.entries(context.theme)
           .forEach(([name, value]) => root.style.setProperty(name, value));
       }
       mount.appendChild(root);
-      // The package stylesheet is scoped under `main .form …`; inject the provider-scoped
-      // copy and recreate the `.form` wrapper so the vendor CSS applies to the rendered form.
-      const style = document.createElement('style');
-      root.appendChild(style);
       const formHost = document.createElement('div');
       formHost.className = 'form';
       root.appendChild(formHost);
-      // Async package rendering stays detached until this instance is still live.
+      // Async rendering stays detached until this instance is still live.
       const staging = document.createElement('div');
       const listeners = new Set();
       const subscriptions = [];
@@ -126,8 +135,9 @@ export function createAdaptiveFormProvider() {
       const initialize = async () => {
         try {
           const { input } = context;
-          const [scopedStyles, result] = await Promise.all([
-            loadScopedAdaptiveFormStyles(PROVIDER_SCOPE),
+          const codeBasePath = ensureCodeBasePath();
+          const [, result] = await Promise.all([
+            loadCSS(`${codeBasePath}/blocks/form/form.css`),
             renderForm(structuredClone(input), staging),
           ]);
           if (destroyed) {
@@ -146,7 +156,6 @@ export function createAdaptiveFormProvider() {
             if (destroyed || settled) subscription.unsubscribe();
             else subscriptions.push(subscription);
           };
-          style.textContent = scopedStyles;
           result.form.lang = context.locale ?? input.lang ?? '';
           if (input.title && !result.form.hasAttribute('aria-label') && !result.form.hasAttribute('aria-labelledby')) {
             result.form.setAttribute('aria-label', input.title);
