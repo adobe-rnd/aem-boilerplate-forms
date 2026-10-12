@@ -5,22 +5,31 @@
  * Framework-free JS port of the web agent's `sdk/adaptive-form/adapter.ts`.
  *
  * Migration notes:
- * - `@aemforms/af-forms-block` → the in-repo `../form/form.js` renderer directly, so customer
+ * - `@aemforms/af-forms-block` → the in-repo `../form.js` renderer directly, so customer
  *   customizations to the block/components are picked up (not a prebuilt package copy).
  * - `@aemforms/af-forms-block/form.css?inline` → the block's own `form.css` (and component CSS,
  *   loaded lazily by the block's component decorators), scoped with an `.af-embedded` selector
  *   alongside each `main`-scoped rule so styling applies outside the page's `<main>` landmark.
- * - `../forms/contract` and `../forms/registry` → the sibling `forms-contract.js` /
- *   `forms-registry.js` copies that travel with the provider.
+ * - `../forms/contract` (web agent PR 602's `sdk/forms/contract.ts`, spec on the wiki) is the
+ *   source of truth for the `FormProviderEvent`/`FormProviderContext`/`FormProviderInstance`
+ *   shapes this file implements; it is not copied here. The only runtime value from it this
+ *   file needs — which terminal event types settle an instance — is inlined in `TERMINAL_EVENTS`
+ *   below instead of keeping a separate hand-copy of the contract module.
+ * - `../forms/registry` → not installed by this provider. The Web Client owns the shared
+ *   `window.adobe.concierge.formsProviders` registry; this provider only pushes itself onto
+ *   `window.adobe.concierge.formsProviderQueue`, which the Web Client drains (in any load order)
+ *   at startup. This avoids shipping a second copy of the registry implementation that could
+ *   silently drift from the Web Client's.
  */
 
-import { loadCSS } from '../../scripts/aem.js';
-import { renderForm } from '../form/form.js';
+import { loadCSS } from '../../../scripts/aem.js';
+import { renderForm } from '../form.js';
 
-import { isTerminalEvent } from './forms-contract.js';
-import { ensureFormProviderRegistry } from './forms-registry.js';
+import { createAdaptiveFormSubmissionObserver } from './brand-concierge-submission.js';
 
-import { createAdaptiveFormSubmissionObserver } from './submission.js';
+// Mirrors web agent PR 602's `sdk/forms/contract.ts` TERMINAL_EVENT_TYPES: each of these fires
+// at most once, and nothing follows it.
+const TERMINAL_EVENTS = ['completed', 'cancelled', 'error'];
 
 export const ADAPTIVE_FORM_PROVIDER_ID = 'adaptive-form';
 const PROVIDER_CLASS = 'bc-adaptive-form-provider';
@@ -35,7 +44,7 @@ const UNAVAILABLE_MESSAGE = 'This form is currently unavailable. Please try agai
  */
 function ensureCodeBasePath() {
   globalThis.hlx ??= {};
-  globalThis.hlx.codeBasePath ??= new URL('../..', import.meta.url).href.replace(/\/$/, '');
+  globalThis.hlx.codeBasePath ??= new URL('../../..', import.meta.url).href.replace(/\/$/, '');
   return globalThis.hlx.codeBasePath;
 }
 
@@ -84,7 +93,7 @@ export function createAdaptiveFormProvider() {
       const emit = (event) => {
         if (destroyed || settled) return;
         latest = event;
-        if (isTerminalEvent(event)) {
+        if (TERMINAL_EVENTS.includes(event.type)) {
           settled = true;
           root.removeEventListener('input', progress);
           submission?.destroy();
@@ -187,6 +196,19 @@ export function createAdaptiveFormProvider() {
   };
 }
 
+/**
+ * Queues the provider for the Web Client to register, instead of installing a shared registry
+ * here. The Web Client owns `window.adobe.concierge.formsProviders`; this adapter is an
+ * externally-loaded, deferred script, so registration order with the Web Client bundle isn't
+ * guaranteed. Pushing onto a shared queue (drained by the Web Client at startup, in any order)
+ * avoids this provider ever installing — and risking the Web Client running — its own copy of
+ * the registry.
+ */
 export function installAdaptiveFormProvider() {
-  return ensureFormProviderRegistry(globalThis).register(createAdaptiveFormProvider());
+  const provider = createAdaptiveFormProvider();
+  globalThis.adobe ??= {};
+  globalThis.adobe.concierge ??= {};
+  globalThis.adobe.concierge.formsProviderQueue ??= [];
+  globalThis.adobe.concierge.formsProviderQueue.push(provider);
+  return provider;
 }

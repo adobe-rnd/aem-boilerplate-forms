@@ -4,7 +4,8 @@
  * Observes native submit outcomes without intercepting submission or owning its request.
  * Framework-free JS port of the web agent's `sdk/adaptive-form/submission.ts`.
  *
- * @typedef {import("./forms-contract.js").FormProviderEvent} FormProviderEvent
+ * @typedef {Object} FormProviderEvent Lifecycle event shape defined by the web agent's
+ *   `sdk/forms/contract.ts` (PR 602); see `adapter.js`'s header for how this provider treats it.
  *
  * @typedef {Object} AdaptiveFormSubmissionObserver
  * @property {(event: object) => void} success
