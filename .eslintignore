@@ -9,3 +9,4 @@ tools/forms-scaffolder.js
 tools/update-mappings.js
 /test
 dompurify.min.js
+packages/aem-forms-block/dist/*
