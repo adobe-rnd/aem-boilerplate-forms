@@ -1,3 +1,9 @@
+/* stylelint-disable no-descending-specificity -- `.af-embedded` selectors are added
+   alongside each `main`-scoped rule so the form also renders correctly when embedded
+   outside <main> (e.g. Brand Concierge chat). The two selector sets are mutually
+   exclusive per page (a page matches either `main` or `.af-embedded`, never both), so
+   the apparent specificity-ordering issue across rules is not a real cascade bug. */
+
 /* Accordion styling */
 :root {
     --color-accordion-legend-background: #F3F6FD;
@@ -5,20 +11,23 @@
     --color-accordion-border: #ecedf3;
 }
 
-main .form fieldset.accordion legend.accordion-legend {
+main .form fieldset.accordion legend.accordion-legend,
+.af-embedded .form fieldset.accordion legend.accordion-legend {
     padding: 24px 32px;
     background-color: var(--color-accordion-legend-background);
     position: relative;
     margin-bottom: 0;
 }
 
-main .form .accordion > fieldset > legend.accordion-legend[data-visible='false'] {
+main .form .accordion > fieldset > legend.accordion-legend[data-visible='false'],
+.af-embedded .form .accordion > fieldset > legend.accordion-legend[data-visible='false'] {
     display:block !important;
     color:var(--color-accordion-legend-background);
     user-select: none;
 }
 
-main .form .accordion > fieldset > legend::after {
+main .form .accordion > fieldset > legend::after,
+.af-embedded .form .accordion > fieldset > legend::after {
     content: '\221F';
     color: var(--color-accordion-collapse-icon);
     font-size: 19px;
@@ -31,30 +40,36 @@ main .form .accordion > fieldset > legend::after {
     cursor: pointer;
 }
 
-main .form .accordion > fieldset.accordion-collapse > legend::after {
+main .form .accordion > fieldset.accordion-collapse > legend::after,
+.af-embedded .form .accordion > fieldset.accordion-collapse > legend::after {
     transform: rotate(-225deg);
     margin-top: 0;
 }
 
-main .form fieldset.accordion-collapse > :not(legend) {
+main .form fieldset.accordion-collapse > :not(legend),
+.af-embedded .form fieldset.accordion-collapse > :not(legend) {
     display: none !important;
 }
 
 
-main .form fieldset.accordion fieldset > :not(legend) {
+main .form fieldset.accordion fieldset > :not(legend),
+.af-embedded .form fieldset.accordion fieldset > :not(legend) {
     padding-left: 0.8rem;
     padding-right: 0.8rem;
 }
 
-main .form fieldset.accordion > fieldset:not(.checkbox-group-wrapper, .radio-group-wrapper) {
+main .form fieldset.accordion > fieldset:not(.checkbox-group-wrapper, .radio-group-wrapper),
+.af-embedded .form fieldset.accordion > fieldset:not(.checkbox-group-wrapper, .radio-group-wrapper) {
     border: 1px solid var(--color-accordion-border);
     margin: 0;
 }
 
-main .form fieldset.accordion  fieldset.accordion-collapse {
+main .form fieldset.accordion  fieldset.accordion-collapse,
+.af-embedded .form fieldset.accordion  fieldset.accordion-collapse {
     border: unset;
 }
 
-main .form fieldset.accordion {
+main .form fieldset.accordion,
+.af-embedded .form fieldset.accordion {
     row-gap: 0;
 }

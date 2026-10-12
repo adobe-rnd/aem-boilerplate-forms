@@ -1,5 +1,12 @@
+/* stylelint-disable no-descending-specificity -- `.af-embedded` selectors are added
+   alongside each `main`-scoped rule so the form also renders correctly when embedded
+   outside <main> (e.g. Brand Concierge chat). The two selector sets are mutually
+   exclusive per page (a page matches either `main` or `.af-embedded`, never both), so
+   the apparent specificity-ordering issue across rules is not a real cascade bug. */
+
 /** styling for range */
-main .form .range-widget-wrapper.decorated input[type="range"] {
+main .form .range-widget-wrapper.decorated input[type="range"],
+.af-embedded .form .range-widget-wrapper.decorated input[type="range"] {
     margin: unset;
     padding: unset;
     appearance: none;
@@ -9,7 +16,8 @@ main .form .range-widget-wrapper.decorated input[type="range"] {
     background-image: linear-gradient(to right, var(--button-primary-color) calc(100% * var(--current-steps)/var(--total-steps)), #C5C5C5 calc(100% * var(--current-steps)/var(--total-steps)));
 }
  
-main .form .range-widget-wrapper.decorated input[type="range"]:focus {
+main .form .range-widget-wrapper.decorated input[type="range"]:focus,
+.af-embedded .form .range-widget-wrapper.decorated input[type="range"]:focus {
     outline: none;
 }
  
