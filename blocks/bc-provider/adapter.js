@@ -18,8 +18,6 @@ import { renderForm } from '../../packages/aem-forms-block/dist/form.js';
 import { isTerminalEvent } from './forms-contract.js';
 import { ensureFormProviderRegistry } from './forms-registry.js';
 
-import { observeAdaptiveFormValidation, observeAdaptiveFormVisibility } from './accessibility.js';
-import { AdaptiveFormInputError, validateAdaptiveFormInput } from './input.js';
 import { loadScopedAdaptiveFormStyles } from './styles.js';
 import { createAdaptiveFormSubmissionObserver } from './submission.js';
 
@@ -34,6 +32,10 @@ export function createAdaptiveFormProvider() {
     render(mount, context) {
       const root = document.createElement('div');
       root.className = PROVIDER_CLASS;
+      if (context.theme) {
+        Object.entries(context.theme)
+          .forEach(([name, value]) => root.style.setProperty(name, value));
+      }
       mount.appendChild(root);
       // The package stylesheet is scoped under `main .form …`; inject the provider-scoped
       // copy and recreate the `.form` wrapper so the vendor CSS applies to the rendered form.
@@ -49,7 +51,6 @@ export function createAdaptiveFormProvider() {
       let latest = { type: 'in-progress', phase: 'initializing' };
       let destroyed = false;
       let settled = false;
-      let stopObserving = () => undefined;
       let submission;
 
       const report = (code) => {
@@ -77,7 +78,6 @@ export function createAdaptiveFormProvider() {
         if (isTerminalEvent(event)) {
           settled = true;
           root.removeEventListener('input', progress);
-          stopObserving();
           submission?.destroy();
           releaseSubscriptions();
         }
@@ -89,7 +89,9 @@ export function createAdaptiveFormProvider() {
         if (settled) listeners.clear();
       };
       const progress = () => {
-        if (latest.type !== 'submitted') emit({ type: 'in-progress', phase: 'form' });
+        // Only report a state change, not every keystroke.
+        if (latest.type === 'submitted' || (latest.type === 'in-progress' && latest.phase === 'form')) return;
+        emit({ type: 'in-progress', phase: 'form' });
       };
       const fail = (code) => {
         if (destroyed || settled) return;
@@ -114,7 +116,6 @@ export function createAdaptiveFormProvider() {
           destroyed = true;
           listeners.clear();
           root.removeEventListener('input', progress);
-          stopObserving();
           submission?.destroy();
           releaseSubscriptions();
           root.remove();
@@ -124,7 +125,7 @@ export function createAdaptiveFormProvider() {
 
       const initialize = async () => {
         try {
-          const input = validateAdaptiveFormInput(context.input);
+          const { input } = context;
           const [scopedStyles, result] = await Promise.all([
             loadScopedAdaptiveFormStyles(PROVIDER_SCOPE),
             renderForm(structuredClone(input), staging),
@@ -151,12 +152,6 @@ export function createAdaptiveFormProvider() {
             result.form.setAttribute('aria-label', input.title);
           }
           formHost.append(...staging.childNodes);
-          const stopVisibility = observeAdaptiveFormVisibility(root);
-          const stopValidation = observeAdaptiveFormValidation(formHost, result.form);
-          stopObserving = () => {
-            stopVisibility();
-            stopValidation();
-          };
           root.addEventListener('input', progress);
           submission = createAdaptiveFormSubmissionObserver(formHost, input, { emit, report });
           subscribe('scriptError', () => fail('ADAPTIVE_FORM_RULE_EXECUTION_FAILED'));
@@ -168,13 +163,13 @@ export function createAdaptiveFormProvider() {
             return;
           }
           emit({ type: 'activated' });
-        } catch (error) {
+        } catch {
           if (destroyed) {
             staging.replaceChildren();
             return;
           }
           staging.replaceChildren();
-          fail(error instanceof AdaptiveFormInputError ? error.code : 'ADAPTIVE_FORM_INITIALIZATION_FAILED');
+          fail('ADAPTIVE_FORM_INITIALIZATION_FAILED');
         }
       };
       initialize();
