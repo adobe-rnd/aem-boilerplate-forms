@@ -1,0 +1,8 @@
+/* Form block styles, loaded into the aem-embed shadow root next to this block. */
+@import url('../form/form.css');
+
+.form-widget {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 8px 0;
+}
