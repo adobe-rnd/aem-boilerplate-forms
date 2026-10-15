@@ -68,7 +68,10 @@
       "text-input",
       "tnc",
       "wizard",
-      "range"
+      "range",
+      "custom-date-picker",
+      "dynamic-dropdown",
+      "regex-text-input"
     ]
   }
 ]

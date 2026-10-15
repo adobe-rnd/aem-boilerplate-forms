@@ -1,0 +1,302 @@
+/* Custom Date Picker Component Styles */
+
+.custom-date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  border: 1px solid var(--color-interface-border-secondary);
+  border-radius: 4px;
+  padding: 2px 12px;
+  background-color: white;
+  transition: var(--color-interface-border-secondary) border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  /* For absolute positioning of native input */
+}
+
+/* Unified input appearance - all inputs together */
+.custom-date-inputs:focus-within {
+  border-color: #0d66d0;
+  border-color: var(--color-action-border-primary-default);
+
+  .calendar-icon-btn {
+    background: url('../../styles/icons/date_picker_cal_icon_select.svg') no-repeat 98% center;
+  }
+}
+
+.custom-date-inputs .date-input {
+  flex: 0 0 auto;
+  padding: 10px 4px;
+  border: none;
+  font-size: var(--body-lg-font-size);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  font-family: inherit;
+  background-color: transparent;
+  outline: none;
+  letter-spacing: normal;
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.2s;
+}
+
+/* The legacy `.date-wrapper input` calendar background (date_input.css) is meant
+   for the native single date input; it must not leak onto the three custom
+   inputs. The `background-color: transparent` above can't suppress it (wrong
+   property + lower specificity than `.date-wrapper[data-empty="false"] input`).
+   Remove the background-image with the correct property and enough specificity
+   ((0,3,0) > (0,2,1)). */
+.date-wrapper .custom-date-inputs .date-input {
+  background-image: none;
+}
+
+/* Individual input widths */
+.custom-date-inputs .day-input,
+.custom-date-inputs .month-input {
+  width: 40px;
+}
+
+.custom-date-inputs .year-input {
+  width: 70px;
+}
+
+/* Disabled state - apply to container when all inputs are disabled */
+.custom-date-inputs:has(.date-input:disabled) {
+  background-color: #f5f5f5;
+  border-color: var(--color-interface-border-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.custom-date-inputs .date-input:disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Read-only state - apply to container */
+.custom-date-inputs:has(.date-input:read-only) {
+  background-color: #f9f9f9;
+  cursor: default;
+}
+
+.custom-date-inputs .date-input:read-only {
+  cursor: default;
+}
+
+/* Separator styles */
+.custom-date-inputs .date-separator {
+  color: #999;
+  font-size: 16px;
+  font-weight: 400;
+  user-select: none;
+  flex-shrink: 0;
+  padding: 0 4px;
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.2s;
+}
+
+/* Calendar icon button */
+.custom-date-inputs .calendar-icon-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 4px 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.2s ease, transform 0.1s ease;
+  flex-shrink: 0;
+  margin-left: auto;
+  background: url('../../styles/icons/date_picker_cal_icon_default.svg') no-repeat 98% center;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.custom-date-inputs .calendar-icon-btn:hover {
+  color: var(--color-action-border-primary-default);
+}
+
+.custom-date-inputs .calendar-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.custom-date-inputs .calendar-icon-btn:focus {
+  outline: none;
+  color: var(--color-action-border-primary-default);
+}
+
+.custom-date-inputs .calendar-icon-btn svg {
+  display: none;
+}
+
+/* Disabled state for calendar button */
+.custom-date-inputs .calendar-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.custom-date-inputs .calendar-icon-btn:disabled:hover {
+  color: #999;
+  transform: none;
+}
+
+/* Error state - apply to container when parent has field-invalid class */
+.field-invalid .custom-date-inputs {
+  border-color: var(--color-input-border-error);
+}
+
+.field-invalid .custom-date-inputs:focus-within {
+  border-color: var(--color-input-border-error);
+  box-shadow: 0 0 0 2px rgba(209, 58, 47, 0.1);
+}
+
+/* Placeholder styling */
+.custom-date-inputs .date-input::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .custom-date-inputs {
+    padding: 4px 12px;
+  }
+
+  .custom-date-inputs .date-input {
+    padding: 12px 2px;
+    font-size: 16px;
+    /* Prevents zoom on iOS */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .custom-date-inputs .day-input,
+  .custom-date-inputs .month-input {
+    width: 40px;
+  }
+
+  .custom-date-inputs .year-input {
+    width: 60px;
+  }
+
+  .custom-date-inputs .date-separator {
+    font-size: 14px;
+    padding: 0 4px;
+  }
+}
+
+/* Position picker input over calendar button (invisible but clickable) */
+.custom-date-inputs .date-picker-input {
+  /* Positioned via inline styles in JS for precise control */
+  pointer-events: auto;
+  z-index: 3;
+}
+
+/* Make the picker input's calendar indicator cover the entire input area */
+.custom-date-inputs .date-picker-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  color: transparent;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.custom-date-inputs .date-picker-input::-webkit-inner-spin-button,
+.custom-date-inputs .date-picker-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .custom-date-inputs {
+    /* Larger tap targets on touch devices */
+    min-height: 44px;
+  }
+}
+
+.date-wrapper:has(.custom-date-inputs:focus-within) .field-label {
+  color: var(--color-action-border-primary-default);
+}
+
+.date-wrapper[data-active="true"] .custom-date-inputs {
+  border-color: var(--color-action-border-primary-default);
+}
+
+/* Placeholder overlay */
+.custom-date-inputs .date-placeholder {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-interface-text-secondary);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  transition: opacity 0.2s;
+  font-size: 16px;
+  line-height: normal;
+  letter-spacing: normal;
+  font-weight: normal;
+  padding-left: 8px;
+}
+
+/* Floating label support for custom date picker */
+/* Label is hidden by default in date-wrapper (opacity: 0), make it visible when active or has value */
+
+/* Ensure the wrapper has position relative for absolute label positioning */
+.date-wrapper:has(.custom-date-inputs) {
+  position: relative;
+  /* padding-top: 10px; */
+}
+
+/* Ensure label has position absolute for floating effect */
+.date-wrapper:has(.custom-date-inputs)>label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: all 0.2s ease;
+  z-index: 10;
+  transform: translateY(0) !important;
+  opacity: 0;
+}
+
+/* Show floating label when focused (using class) */
+.date-wrapper.floating-label-active:has(.custom-date-inputs)>label,
+.date-wrapper[data-empty="false"]:has(.custom-date-inputs)>label {
+  opacity: 1 !important;
+  font-size: var(--body-fd-sm-font-size, 12px);
+  color: var(--color-interface-text-secondary);
+  transform: translateY(-28px) !important;
+}
+
+/* Show floating label when has value (data-empty=false) */
+/* .date-wrapper:has(.custom-date-inputs)[data-empty="false"]>label {
+  opacity: 1 !important;
+  font-size: var(--body-fd-sm-font-size, 12px);
+  color: var(--color-interface-text-secondary);
+} */
+
+
+.date-wrapper:has(.custom-date-inputs:focus-within) label {
+  color: var(--color-action-text-secondary-default) !important;
+}
+
+.date-wrapper:has(.custom-date-inputs:focus-within) .custom-date-inputs .calendar-icon-btn {
+  background: url("../../styles/icons/date_picker_cal_icon_select.svg") no-repeat 98% center;
+}
+
+.date-wrapper:has(.field-description) .custom-date-inputs .calendar-icon-btn {
+  background: url("../../styles/icons/date_picker_cal_icon_red.svg") no-repeat 98% center !important;
+}
