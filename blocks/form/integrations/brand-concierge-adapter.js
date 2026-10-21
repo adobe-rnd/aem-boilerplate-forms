@@ -1,8 +1,10 @@
 /**
  * Adaptive Form provider adapter.
  *
- * Implements the generic Form Provider contract on top of the AEM Adaptive Forms block renderer.
- * Framework-free JS port of the web agent's `sdk/adaptive-form/adapter.ts`.
+ * Implements the Form Provider contract shipped in web agent PR 607
+ * (`src/types/FormProvider.ts` / `src/services/formProviderRegistry.ts`) on top of the AEM
+ * Adaptive Forms block renderer. Framework-free JS port of the web agent's
+ * `sdk/adaptive-form/adapter.ts`.
  *
  * Migration notes:
  * - `@aemforms/af-forms-block` → the in-repo `../form.js` renderer directly, so customer
@@ -10,16 +12,16 @@
  * - `@aemforms/af-forms-block/form.css?inline` → the block's own `form.css` (and component CSS,
  *   loaded lazily by the block's component decorators), scoped with an `.af-embedded` selector
  *   alongside each `main`-scoped rule so styling applies outside the page's `<main>` landmark.
- * - `../forms/contract` (web agent PR 602's `sdk/forms/contract.ts`, spec on the wiki) is the
- *   source of truth for the `FormProviderEvent`/`FormProviderContext`/`FormProviderInstance`
- *   shapes this file implements; it is not copied here. The only runtime value from it this
- *   file needs — which terminal event types settle an instance — is inlined in `TERMINAL_EVENTS`
- *   below instead of keeping a separate hand-copy of the contract module.
- * - `../forms/registry` → not installed by this provider. The Web Client owns the shared
- *   `window.adobe.concierge.formsProviders` registry; this provider only pushes itself onto
- *   `window.adobe.concierge.formsProviderQueue`, which the Web Client drains (in any load order)
- *   at startup. This avoids shipping a second copy of the registry implementation that could
- *   silently drift from the Web Client's.
+ * - PR 607's `src/types/FormProvider.ts` is the source of truth for the
+ *   `FormProviderEvent`/`FormProviderContext`/`FormProviderInstance` shapes this file
+ *   implements; it is not copied here. The only runtime value from it this file needs — which
+ *   terminal event types settle an instance — is inlined in `TERMINAL_EVENTS` below instead of
+ *   keeping a separate hand-copy of the type module. (PR 602's earlier, separate
+ *   `sdk/forms/contract.ts`/`sdk/forms/registry.ts` design is superseded by PR 607 and is no
+ *   longer relevant here.)
+ * - `../forms/registry` → not installed by this provider. PR 607 has the Web Client itself
+ *   install `window.adobe.concierge.registerFormProvider`, a single function the provider calls
+ *   directly; there is no registry object or queue for this provider to install or duplicate.
  */
 
 import { loadCSS } from '../../../scripts/aem.js';
@@ -27,11 +29,12 @@ import { renderForm } from '../form.js';
 
 import { createAdaptiveFormSubmissionObserver } from './brand-concierge-submission.js';
 
-// Mirrors web agent PR 602's `sdk/forms/contract.ts` TERMINAL_EVENT_TYPES: each of these fires
-// at most once, and nothing follows it.
+// Mirrors web agent PR 607's `src/types/FormProvider.ts` `FormProviderEvent` union: each of
+// these fires at most once, and nothing follows it.
 const TERMINAL_EVENTS = ['completed', 'cancelled', 'error'];
 
 export const ADAPTIVE_FORM_PROVIDER_ID = 'adaptive-form';
+const ADAPTIVE_FORM_PROVIDER_DESCRIPTION = 'Renders AEM Adaptive Forms inside the Brand Concierge chat.';
 const PROVIDER_CLASS = 'bc-adaptive-form-provider';
 const EMBEDDED_CLASS = 'af-embedded';
 const UNAVAILABLE_MESSAGE = 'This form is currently unavailable. Please try again later.';
@@ -50,7 +53,8 @@ function ensureCodeBasePath() {
 
 export function createAdaptiveFormProvider() {
   return {
-    name: ADAPTIVE_FORM_PROVIDER_ID,
+    id: ADAPTIVE_FORM_PROVIDER_ID,
+    description: ADAPTIVE_FORM_PROVIDER_DESCRIPTION,
     render(mount, context) {
       const root = document.createElement('div');
       root.className = `${PROVIDER_CLASS} ${EMBEDDED_CLASS}`;
@@ -121,13 +125,12 @@ export function createAdaptiveFormProvider() {
         emit({ type: 'error', error: { code, message: UNAVAILABLE_MESSAGE, retryable: false } });
       };
       const instance = {
+        // PR 607's `FormProviderInstance.onEvent` returns `void` (no per-listener unsubscribe
+        // handle, unlike PR 602's earlier shape) — cleanup instead happens via `destroy()`.
         onEvent(listener) {
-          if (destroyed) return () => undefined;
+          if (destroyed) return;
           if (!settled) listeners.add(listener);
           notify(listener, latest);
-          return () => {
-            listeners.delete(listener);
-          };
         },
         destroy() {
           if (destroyed) return;
@@ -197,18 +200,23 @@ export function createAdaptiveFormProvider() {
 }
 
 /**
- * Queues the provider for the Web Client to register, instead of installing a shared registry
- * here. The Web Client owns `window.adobe.concierge.formsProviders`; this adapter is an
- * externally-loaded, deferred script, so registration order with the Web Client bundle isn't
- * guaranteed. Pushing onto a shared queue (drained by the Web Client at startup, in any order)
- * avoids this provider ever installing — and risking the Web Client running — its own copy of
- * the registry.
+ * Registers the provider with the Web Client via PR 607's `window.adobe.concierge
+ * .registerFormProvider` function, which the Web Client itself installs (see `main.js` /
+ * `BrandConciergeClient.ts`) — there is no registry object or queue for this provider to touch.
+ *
+ * Unlike the earlier queue-based design, registration here requires `registerFormProvider` to
+ * already exist on `window.adobe.concierge`, i.e. this script must be loaded *after* the web
+ * agent's `main.js` (see this module's header comment and PR 607's README). Registration is a
+ * no-op (and logged) if that function isn't present yet.
  */
 export function installAdaptiveFormProvider() {
   const provider = createAdaptiveFormProvider();
-  globalThis.adobe ??= {};
-  globalThis.adobe.concierge ??= {};
-  globalThis.adobe.concierge.formsProviderQueue ??= [];
-  globalThis.adobe.concierge.formsProviderQueue.push(provider);
+  const registerFormProvider = globalThis.adobe?.concierge?.registerFormProvider;
+  if (typeof registerFormProvider !== 'function') {
+    console.error('[bc-forms] window.adobe.concierge.registerFormProvider is unavailable; '
+      + 'load this script after the web agent\'s main.js');
+    return provider;
+  }
+  registerFormProvider(provider);
   return provider;
 }

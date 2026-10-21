@@ -5,7 +5,8 @@
  * Framework-free JS port of the web agent's `sdk/adaptive-form/submission.ts`.
  *
  * @typedef {Object} FormProviderEvent Lifecycle event shape defined by the web agent's
- *   `sdk/forms/contract.ts` (PR 602); see `adapter.js`'s header for how this provider treats it.
+ *   `src/types/FormProvider.ts` (PR 607); see `adapter.js`'s header for how this provider
+ *   treats it.
  *
  * @typedef {Object} AdaptiveFormSubmissionObserver
  * @property {(event: object) => void} success
@@ -36,7 +37,11 @@ export function createAdaptiveFormSubmissionObserver(root, input, callbacks) {
     outcome.setAttribute('role', 'status');
     outcome.textContent = message;
     root.replaceChildren(outcome);
-    callbacks.emit({ type });
+    // Pass the user-facing outcome as the event `transcript` (web agent PR 610): with
+    // transcript storage enabled and an active chat session, the Web Client saves nonblank
+    // text verbatim as a concierge message and restores it after reload. The provider still
+    // owns the visible UI above; this only persists the outcome into the chat history.
+    callbacks.emit(message?.trim() ? { type, transcript: message } : { type });
   };
   const onCancel = () => finish('cancelled', 'Form closed. Any submission already sent may still complete.');
   cancel.addEventListener('click', onCancel);
