@@ -222,4 +222,54 @@ describe('Native form lifecycle', () => {
       else global.Worker = previousWorker;
     }
   });
+
+  it('boots a same-origin blob shim worker when assets are cross-origin', async () => {
+    const input = definition('xorigin');
+    const { afbForm } = await renderForm(input, container);
+    const state = afbForm.getState(true);
+    const previousWorker = global.Worker;
+    const hadCreate = typeof URL.createObjectURL === 'function';
+    const previousCreate = URL.createObjectURL;
+    const previousRevoke = URL.revokeObjectURL;
+    let workerUrlArg;
+    let capturedBlobParts;
+    const previousBlob = global.Blob;
+    global.Blob = class {
+      constructor(parts) {
+        capturedBlobParts = parts;
+      }
+    };
+    global.Worker = class {
+      constructor(url) {
+        workerUrlArg = url;
+        this.postMessage = Sinon.spy();
+      }
+
+      // eslint-disable-next-line class-methods-use-this
+      addEventListener() {}
+    };
+    URL.createObjectURL = Sinon.stub().returns('blob:mock-shim');
+    URL.revokeObjectURL = Sinon.spy();
+    window.hlx = { codeBasePath: 'https://assets.example' };
+    try {
+      const form = document.createElement('form');
+      form.dataset.id = state.id;
+      initAdaptiveForm(input, Sinon.stub().resolves({ form }));
+      await settle();
+      assert.ok(URL.createObjectURL.called, 'uses a blob shim for cross-origin assets');
+      assert.strictEqual(workerUrlArg, 'blob:mock-shim', 'worker boots from the blob URL');
+      const blobSource = (capturedBlobParts || []).join('');
+      assert.ok(
+        blobSource.includes('https://assets.example/blocks/form/rules/RuleEngineWorker.js'),
+        'shim imports the absolute cross-origin worker script',
+      );
+    } finally {
+      if (previousWorker === undefined) delete global.Worker;
+      else global.Worker = previousWorker;
+      global.Blob = previousBlob;
+      if (hadCreate) URL.createObjectURL = previousCreate;
+      else delete URL.createObjectURL;
+      URL.revokeObjectURL = previousRevoke;
+    }
+  });
 });
