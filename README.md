@@ -41,6 +41,16 @@ npm run lint
 1. Start AEM Proxy: `aem up` (opens your browser at `http://localhost:3000`)
 1. Open the `{repo}` directory in your favorite IDE and start coding :)
 
+## Embedded Adaptive Forms lifecycle
+
+`renderForm(definition, element)` returns the installed `afbForm` model in no-worker
+environments, including the npm bundle. Initialization does not install a second
+model on a timer. Standalone `createForm` and reset retain their rule initialization.
+Reset replaces only the form that was reset, even when several forms share an action.
+Late submission success on a removed form skips thank-you insertion and reset so
+external model subscribers can still receive the outcome. Native redirects and
+attached-form thank-you/reset behavior remain unchanged.
+
 ## Custom Form Components
 
 Create custom form components using the interactive scaffolder:

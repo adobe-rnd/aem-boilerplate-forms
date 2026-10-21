@@ -431,6 +431,45 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
     });
   }
   form.dispatch(new CustomEvent('formViewInitialized'));
+  // Surface the fully-wired main-thread model to embedders (e.g. the Brand Concierge adapter).
+  // On the Web Worker path `renderForm` resolves with `afbForm: null`, so this DOM event (plus
+  // `getFormModel`) is the only way for an external host to reach the model once it is ready.
+  htmlForm.dispatchEvent(new CustomEvent('formModelReady', { detail: { model: form } }));
+}
+
+/**
+ * Creates the rule-engine Web Worker.
+ *
+ * `new Worker(url)` requires the worker's top-level script to be same-origin as
+ * the page — a hard spec rule that CORS does NOT relax. When the form assets are
+ * served from a different origin (e.g. when the form is embedded in a host app),
+ * constructing the worker directly throws a SecurityError. To support that case
+ * we boot a same-origin `blob:` shim worker whose only job is to import the real
+ * worker script; the cross-origin import is then governed by CORS on the asset
+ * origin. Same-origin loads keep the direct, zero-overhead path.
+ *
+ * @param {string} workerUrl Absolute URL to RuleEngineWorker.js
+ * @returns {Worker}
+ */
+function createRuleEngineWorker(workerUrl) {
+  let isCrossOrigin = false;
+  try {
+    isCrossOrigin = new URL(workerUrl, window.location.href).origin !== window.location.origin;
+  } catch {
+    // Origin could not be determined (e.g. opaque/relative base); assume same-origin.
+    isCrossOrigin = false;
+  }
+  if (!isCrossOrigin || typeof URL.createObjectURL !== 'function') {
+    return new Worker(workerUrl, { type: 'module' });
+  }
+  const shim = `import ${JSON.stringify(workerUrl)};`;
+  const blobUrl = URL.createObjectURL(new Blob([shim], { type: 'text/javascript' }));
+  try {
+    return new Worker(blobUrl, { type: 'module' });
+  } finally {
+    // The worker captures the script synchronously; revoke next tick to avoid leaking the blob URL.
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
+  }
 }
 
 async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
@@ -457,7 +496,8 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
     }
     return { ...response, afbForm: formModels[formDef.id] ?? afbForm };
   }
-  const myWorker = new Worker(`${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`, { type: 'module' });
+  const workerUrl = `${window.hlx.codeBasePath}/blocks/form/rules/RuleEngineWorker.js`;
+  const myWorker = createRuleEngineWorker(workerUrl);
   // Pass the current URL to the worker for log level determination
   const currentUrl = window.location.href;
   // Trigger the worker to start form initialization
@@ -593,6 +633,16 @@ export async function initAdaptiveForm(formDef, createForm) {
  *   }
  * }, { listenChanges: true });
  */
+/**
+ * Returns the fully-wired main-thread form model for a given form id, or `undefined` if the
+ * rule engine has not finished initialising it yet. On the Web Worker path this becomes
+ * available only after `loadRuleEngine` runs; embedders can await the `formModelReady` DOM
+ * event dispatched on the form element to be notified when it is ready.
+ */
+export function getFormModel(formId) {
+  return formModels[formId];
+}
+
 export function subscribe(fieldDiv, formId, callback, options) {
   if (callback) {
     // Check if a subscription map already exists for this form
