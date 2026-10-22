@@ -47,6 +47,21 @@ This document describes the architecture of AEM Forms, which supports two distin
 - No rules engine
 - Preview-only display
 
+### Authoring recovery
+
+Universal Editor edit mode can render a repair view when the complete form
+definition fails. `authoring-recovery.js` retrieves the affected resource's
+infinity JSON and individual child models. Failed components become
+selectable diagnostic placeholders; healthy components keep their exported
+definitions and resource paths.
+
+This partial snapshot is only for authoring. It never initializes a runtime
+model or enables submission. A warning explains the repair requirement.
+Editing a component retries the complete model and replaces the repair view
+once that model is valid. Published forms do not use this fallback.
+See [Authoring repair view](form-block-components.md#authoring-repair-view)
+for the rendering and instrumentation details.
+
 ## Initialization Sequence
 
 ```
