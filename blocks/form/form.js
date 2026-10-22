@@ -7,6 +7,7 @@ import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
 import { handleSubmit } from './submit.js';
 import DocBasedFormToAF from './transform.js';
+import { authoringDefinitions, fetchComponentModel, recoverFormDefinition } from './authoring-recovery.js';
 import {
   checkValidation,
   createButton,
@@ -289,7 +290,20 @@ export async function generateFormRendition(panel, container, formId, getItems =
       element.textContent = 'CAPTCHA';
       return element;
     }
-    const element = renderField(field);
+    const authoringError = field.properties?.['fd:authoringError'];
+    const errorTag = fieldType === 'panel' ? 'fieldset' : 'div';
+    const labelFn = fieldType === 'panel' ? createLegend : createLabel;
+    const element = authoringError
+      ? createFieldWrapper(field, errorTag, labelFn) : renderField(field);
+    if (authoringError) {
+      element.classList.add('form-authoring-error');
+      element.tabIndex = 0;
+      const message = document.createElement('p');
+      message.textContent = field.fieldType === 'panel'
+        ? 'Review the highlighted child components, then check the container properties.'
+        : 'Unable to load this component. Select it to correct its properties.';
+      element.append(message);
+    }
     if (field.appliedCssClassNames) {
       element.className += ` ${field.appliedCssClassNames}`;
     }
@@ -298,14 +312,18 @@ export async function generateFormRendition(panel, container, formId, getItems =
       await generateFormRendition(field, element, formId, getItems);
       return element;
     }
-    await componentDecorator(element, field, container, formId);
+    if (!authoringError) {
+      await componentDecorator(element, field, container, formId);
+    }
     return element;
   });
 
   const children = await Promise.all(promises);
   container.append(...children.filter((_) => _ != null));
   decoratePanelContainer(panel, container);
-  await componentDecorator(container, panel, null, formId);
+  if (!panel.properties?.['fd:authoringError']) {
+    await componentDecorator(container, panel, null, formId);
+  }
 }
 
 function enableValidation(form) {
@@ -332,6 +350,29 @@ async function createFormForAuthoring(formDef) {
     }
     return [];
   });
+  if (formDef.properties?.['fd:authoringRecovery']) {
+    form.dataset.authoringRecovery = 'true';
+    const warning = document.createElement('div');
+    warning.className = 'form-authoring-warning';
+    warning.setAttribute('role', 'alert');
+    const icon = document.createElement('span');
+    icon.className = 'form-authoring-warning-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = '!';
+    const message = document.createElement('p');
+    message.textContent = formDef.properties['fd:recoveryMessage']
+      || (form.querySelector('.form-authoring-error')
+        ? 'Fix the marked components before editing other fields.'
+        : 'Review the form settings before editing other fields.');
+    message.append(' Preview and submission are unavailable.');
+    warning.append(icon, message);
+    form.prepend(warning);
+    form.noValidate = true;
+    form.addEventListener('submit', (event) => event.preventDefault());
+    form.querySelectorAll('input, select, textarea, button').forEach((input) => {
+      input.disabled = true;
+    });
+  }
   return form;
 }
 
@@ -551,7 +592,7 @@ async function setupForm(formDef, { pathname, block, editMode = false } = {}) {
       form = await createFormForAuthoring(formDef);
     }
     form.dataset.source = 'aem';
-    form.dataset.rules = true;
+    form.dataset.rules = !formDef.properties?.['fd:authoringRecovery'];
     if (def.properties && def.properties['fd:path']) {
       form.dataset.formpath = def.properties['fd:path'];
     }
@@ -570,15 +611,57 @@ export async function renderForm(formDef, element) {
   return { form, afbForm };
 }
 
+export async function recoverFormForAuthoring(block, retryModel = true) {
+  if (!document.documentElement.classList.contains('adobe-ue-edit') && window.currentMode !== 'edit') {
+    return null;
+  }
+  const resource = block.dataset.aueResource;
+  if (!resource?.startsWith('urn:aemconnection:/content/')) {
+    console.error('Cannot recover a form without its authoring resource path', resource);
+    return null;
+  }
+  const path = resource.substring('urn:aemconnection:'.length);
+  let formDef;
+  if (retryModel) {
+    try {
+      formDef = await fetchComponentModel(path);
+    } catch (error) {
+      console.warn('Unable to load the complete form model for authoring', path, error);
+    }
+  }
+  if (!formDef) {
+    formDef = await recoverFormDefinition(path);
+  }
+  const { form } = await setupForm(formDef, { block, editMode: true });
+  authoringDefinitions.set(form, formDef);
+  const container = block.querySelector('form, pre, a[href]');
+  block.classList.add('edit-mode');
+  if (container) {
+    container.replaceWith(form);
+  } else {
+    block.append(form);
+  }
+  return { form, formEl: form, formDef };
+}
+
 export default async function decorate(block) {
   let container = block.querySelector('a[href]');
   let formDef;
   let pathname;
-  if (container) {
-    ({ pathname } = new URL(container.href));
-    formDef = await fetchForm(container.href);
-  } else {
-    ({ container, formDef } = extractFormDefinition(block));
+  try {
+    if (container) {
+      ({ pathname } = new URL(container.href));
+      formDef = await fetchForm(container.href);
+    } else {
+      ({ container, formDef } = extractFormDefinition(block));
+    }
+  } catch (error) {
+    if (!document.documentElement.classList.contains('adobe-ue-edit')) throw error;
+    console.warn('Unable to read the embedded form definition; opening the authoring repair view', error);
+    return recoverFormForAuthoring(block);
+  }
+  if (!formDef && document.documentElement.classList.contains('adobe-ue-edit')) {
+    return recoverFormForAuthoring(block);
   }
   let form;
   let afbForm;
