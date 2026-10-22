@@ -13,6 +13,36 @@ const __dirname = path.dirname(__filename);
  * If someone alters/removes/changes the structure, tests will fail to alert devs
  */
 describe('Forms Scaffolder - Repository Structure', () => {
+  describe('Generated selection authoring models', () => {
+    let models;
+
+    before(() => {
+      const modelsPath = path.join(__dirname, '../../component-models.json');
+      models = JSON.parse(fs.readFileSync(modelsPath, 'utf-8'));
+    });
+
+    it('should expose the validated radio editor without duplicate native option controls', () => {
+      const { fields } = models.find((model) => model.id === 'radio-group');
+      const names = fields.map((field) => field.name);
+
+      expect(fields.find((field) => field.name === 'radioOptions').component)
+        .to.equal('radio-group-options');
+      expect(names).not.to.include.members(['enum', 'enumNames', 'type']);
+      expect(names).to.include.members(['default', 'variant', 'orientation']);
+      expect(new Set(names).size).to.equal(names.length);
+    });
+
+    ['drop-down', 'checkbox-group'].forEach((id) => {
+      it(`should preserve native option editing for ${id}`, () => {
+        const { fields } = models.find((model) => model.id === id);
+        const names = fields.map((field) => field.name);
+
+        expect(names).to.include.members(['enum', 'enumNames', 'type', 'default']);
+        expect(names).not.to.include('radioOptions');
+      });
+    });
+  });
+
   describe('Required Directories', () => {
     it('should have blocks/form/models/form-components directory', () => {
       const modelsDir = path.join(__dirname, '../../blocks/form/models/form-components');

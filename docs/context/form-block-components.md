@@ -2,6 +2,24 @@
 
 This document describes the rendering pipeline, component decorator system, and view update mechanisms for form components in the AEM Boilerplate Forms project.
 
+## Radio group authoring
+
+The Radio Group model uses the `radio-group-options` renderer from the
+standalone `af-extensions` Radio Options extension. Deploy and enable the
+matching extension version before deploying this model.
+**Options (Validated Editor)** replaces the native **Options (Data Value)**,
+**Options (Display Value)**, and **Save value as** controls. It validates
+values against the selected type and saves `enum`, `enumNames`, and `type`
+together when you leave a field or the editor. Type changes, removal, and
+reordering also trigger a save. Invalid drafts remain local with errors.
+The `radioOptions` model field mounts the editor; it does not persist a new
+content property. **Default option** remains a separate native control.
+Dropdown and checkbox group models keep their existing controls.
+
+This authoring validation does not repair invalid persisted content or add
+server-side failure isolation. The EDS server must supply a valid form
+definition before field rendering can begin.
+
 ## Section 1: Rendering Pipeline
 
 **One-line flow:**

@@ -2858,19 +2858,10 @@
         ]
       },
       {
-        "component": "text",
-        "name": "enum",
-        "label": "Options (Data Value)",
-        "valueType": "string",
-        "multi": true,
-        "required": true
-      },
-      {
-        "component": "text",
-        "name": "enumNames",
-        "label": "Options (Display Value)",
-        "valueType": "string",
-        "multi": true
+        "component": "radio-group-options",
+        "name": "radioOptions",
+        "label": "Options (Validated Editor)",
+        "valueType": "string"
       },
       {
         "component": "text",
@@ -2893,26 +2884,6 @@
           }
         ],
         "value": "default"
-      },
-      {
-        "component": "select",
-        "label": "Save value as",
-        "name": "type",
-        "valueType": "string",
-        "options": [
-          {
-            "name": "String",
-            "value": "string"
-          },
-          {
-            "name": "Boolean",
-            "value": "boolean"
-          },
-          {
-            "name": "Number",
-            "value": "number"
-          }
-        ]
       },
       {
         "component": "radio-group",
