@@ -1,7 +1,7 @@
 import { updateOrCreateInvalidMsg, stripTags } from '../../util.js';
 import { fileAttachmentText, dragDropText, defaultErrorMessages } from '../../constant.js';
 
-const fileSizeRegex = /^(\d*\.?\d+)\s*(B|[KMGT](?:i?B)?)?$/i;
+const fileSizeRegex = /^(\d*\.?\d+)(\\?(?=[KMGT])([KMGT])(?:i?B)?|B?)$/i;
 
 /**
  * converts a string of the form "10MB" to bytes. If the string is malformed 0 is returned
@@ -10,14 +10,14 @@ const fileSizeRegex = /^(\d*\.?\d+)\s*(B|[KMGT](?:i?B)?)?$/i;
  */
 function getSizeInBytes(str) {
   const sizes = {
-    B: 0, K: 1, M: 2, G: 3, T: 4,
+    KB: 1, MB: 2, GB: 3, TB: 4,
   };
   let sizeLimit = 0;
   const matches = fileSizeRegex.exec(str.trim());
   if (matches != null) {
-    const symbol = (matches[2] || 'K')[0].toUpperCase();
+    const symbol = matches[2] || 'kb';
     const size = parseFloat(matches[1]);
-    const i = 1024 ** sizes[symbol];
+    const i = 1024 ** sizes[symbol.toUpperCase()];
     sizeLimit = Math.round(size * i);
   }
   return sizeLimit;
