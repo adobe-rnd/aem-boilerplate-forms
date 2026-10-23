@@ -246,6 +246,9 @@ export async function fieldChanged(payload, form, generateFormRendition) {
       case 'activeChild': handleActiveChild(activeChild, form);
         break;
       case 'valid':
+        if (field.type === 'file' && field.dataset.fileValidationMessage) {
+          break;
+        }
         if (currentValue === true) {
           updateOrCreateInvalidMsg(field, '');
           if (field.validity?.customError) {

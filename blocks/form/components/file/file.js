@@ -89,37 +89,43 @@ function fileValidation(input, files) {
   const maxItems = (parseInt(input.dataset.maxItems, 10) || -1);
   const fileSize = `${input.dataset.maxFileSize || '2MB'}`;
   const isRequired = input.hasAttribute('required') || input.closest('.field-wrapper')?.dataset?.required !== undefined;
-  let constraint = '';
-  let errorMessage = '';
   const wrapper = input.closest('.field-wrapper');
+  const errors = [];
+  const addError = (constraint, invalidFiles, limit) => {
+    let message = wrapper.dataset[`${constraint}ErrorMessage`]
+      || wrapper.dataset[constraint]
+      || defaultErrorMessages[constraint];
+    if (limit !== undefined) {
+      message = message.replace(/\$0/, limit);
+    }
+    if (multiple && invalidFiles?.length) {
+      message = `${message} ${invalidFiles.map((file) => file.name).join(', ')}`;
+    }
+    errors.push(message);
+  };
 
   // Check required first (valueMissing)
   if (isRequired && files.length === 0) {
-    constraint = 'required';
-  } else if (!checkAccept(acceptedFile, files)) {
-    constraint = 'accept';
-  } else if (!checkMaxFileSize(fileSize, files)) {
-    constraint = 'maxFileSize';
-  } else if (multiple && maxItems !== -1 && files.length > maxItems) {
-    constraint = 'maxItems';
-    errorMessage = defaultErrorMessages.maxItems.replace(/\$0/, maxItems);
-  } else if (multiple && minItems !== 1 && files.length < minItems) {
-    constraint = 'minItems';
-    errorMessage = defaultErrorMessages.minItems.replace(/\$0/, minItems);
-  }
-  if (constraint.length) {
-    const finalMessage = wrapper.dataset[constraint]
-    || errorMessage
-    || defaultErrorMessages[constraint];
-    input.setCustomValidity(finalMessage);
-    updateOrCreateInvalidMsg(
-      input,
-      finalMessage,
-    );
+    addError('required');
   } else {
-    input.setCustomValidity('');
-    updateOrCreateInvalidMsg(input, '');
+    const invalidTypes = files.filter((file) => !checkAccept(acceptedFile, [file]));
+    const oversizedFiles = files.filter((file) => !checkMaxFileSize(fileSize, [file]));
+    if (invalidTypes.length) {
+      addError('accept', invalidTypes);
+    }
+    if (oversizedFiles.length && (multiple || !errors.length)) {
+      addError('maxFileSize', oversizedFiles, fileSize);
+    }
+    if (multiple && maxItems !== -1 && files.length > maxItems) {
+      addError('maxItems', [], maxItems);
+    } else if (multiple && files.length < minItems) {
+      addError('minItems', [], minItems);
+    }
   }
+  const message = errors.join(' ');
+  input.dataset.fileValidationMessage = message;
+  input.setCustomValidity(message);
+  updateOrCreateInvalidMsg(input, message);
 }
 
 function formatBytes(bytes) {
@@ -140,7 +146,13 @@ function dispatchChangeEvent(input, files) {
   if (!files.length) {
     input.value = null;
   }
-  const options = { bubbles: true, detail: { files, deletion: true } };
+  const dataTransfer = new DataTransfer();
+  files.forEach((file) => {
+    dataTransfer.items.add(file instanceof File
+      ? file : new File([file.data], file.name, { type: file.type || file.mediaType }));
+  });
+  input.files = dataTransfer.files;
+  const options = { bubbles: true, detail: { files: [...files], deletion: true } };
   const changeEvent = new CustomEvent('change', options);
   input.dispatchEvent(changeEvent);
 }
@@ -279,8 +291,10 @@ export default async function decorate(fieldDiv, field, htmlForm) {
   if (field.value) {
     const preFillFiles = Array.isArray(field.value) ? field.value : [field.value];
     const dataTransfer = new DataTransfer();
-    const file = new File([preFillFiles[0].data], preFillFiles[0].name, { ...preFillFiles[0] });
-    dataTransfer.items.add(file);
+    preFillFiles.forEach((preFillFile) => {
+      const file = new File([preFillFile.data], preFillFile.name, { ...preFillFile });
+      dataTransfer.items.add(file);
+    });
     // Pre-fill input field to mark it as a valid field.
     input.files = dataTransfer.files;
     fileHandler.attachFiles(input, preFillFiles);

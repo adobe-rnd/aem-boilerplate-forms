@@ -75,6 +75,7 @@ blocks/form/
 - **Linebreaks**: Unix (`\n`), not Windows (`\r\n`)
 - **Pre-commit Hook**: Runs lint + unit tests automatically
 - **Keep docs in sync**: When changing architecture, message protocols, rendering pipeline, or component systems in `blocks/form/`, update the corresponding files in `docs/context/` and this file. Do not use line numbers in documentation — they go stale.
+- **File attachments**: `multiSelection` enables `file[]` fields and conditional count settings. The file decorator synchronizes `input.files` and `detail.files`; inline validation groups failing filenames and takes precedence over model validity updates. See `docs/context/form-block-components.md`.
 - **CLAUDE.md length limit**: This file MUST NOT exceed 200 lines. If it reaches 200 lines, split content into topic-specific files in `docs/` and reference them from CLAUDE.md.
 
 ### Pre-Commit Checklist
