@@ -96,6 +96,30 @@ All 11 registered field renderers:
     - :type ends with 'wizard' → wizard component
     - :type in OOTB or custom list → that component
 
+### File attachments
+
+The File Attachment model exposes **Allow multiple attachments** through the
+Core Component's `multiSelection` property. The minimum and maximum file counts
+and their error messages appear only when this option is enabled. AEM exports
+the enabled field as `type: "file[]"`; single attachments use `type: "file"`.
+
+The file decorator retains attachments across picker, drop, and paste events.
+It synchronizes the native input's `files` and dispatches a change event with
+a snapshot in `detail.files` after additions and removals. Prefill includes all
+attachments, and single-file fields replace their previous attachment.
+The controller passes an array to a multiple-attachment model and a file or
+`null` to a single-attachment model.
+
+File validation uses the existing inline `.field-description` area. Multiple
+attachments report each failing type and size constraint with comma-separated
+filenames. Count constraints use the authored messages or the default messages.
+Invalid files remain listed so you can remove them; they block submission until
+you correct the errors. The controller uses the existing submit handler to block
+submit-button actions while an attachment has an inline validation error.
+The decorator marks its current error with
+`data-file-validation-message` so model validity updates don't replace or clear
+the aggregated message.
+
 ## Section 7: Subscription System
 
 **subscribe(fieldDiv, formId, callback)**

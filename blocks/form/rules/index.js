@@ -18,7 +18,7 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import { submitSuccess, submitFailure } from '../submit.js';
+import { handleSubmit, submitSuccess, submitFailure } from '../submit.js';
 import {
   createHelpText,
   createLabel,
@@ -98,6 +98,9 @@ export async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'validationMessage':
         {
+          if (field.type === 'file' && field.dataset.fileValidationMessage) {
+            break;
+          }
           const { validity } = payload.field;
 
           // TODO: File inputs use DOM-based validation for file-specific constraints
@@ -246,6 +249,10 @@ export async function fieldChanged(payload, form, generateFormRendition) {
       case 'activeChild': handleActiveChild(activeChild, form);
         break;
       case 'valid':
+        // Preserve the file component's aggregated errors during model synchronization.
+        if (field.type === 'file' && field.dataset.fileValidationMessage) {
+          break;
+        }
         if (currentValue === true) {
           updateOrCreateInvalidMsg(field, '');
           if (field.validity?.customError) {
@@ -315,7 +322,8 @@ function applyRuleEngine(htmlForm, form, captcha) {
     } else if (field.type === 'checkbox') {
       form.getElement(id).value = checked ? value : field.dataset.uncheckedValue;
     } else if (field.type === 'file') {
-      form.getElement(id).value = Array.from(e?.detail?.files || field.files || []);
+      const files = Array.from(e?.detail?.files || field.files || []);
+      form.getElement(id).value = field.multiple ? files : files[0] ?? null;
     } else {
       form.getElement(id).value = value;
     }
@@ -333,6 +341,11 @@ function applyRuleEngine(htmlForm, form, captcha) {
 
   htmlForm.addEventListener('click', async (e) => {
     if (e.target.tagName === 'BUTTON') {
+      if (e.target.type === 'submit'
+        && htmlForm.querySelector('input[type="file"][data-file-validation-message]:invalid')) {
+        await handleSubmit(e, htmlForm, captcha);
+        return;
+      }
       const element = form.getElement(e.target.id);
       if (e.target.type === 'submit' && captcha) {
         const token = await captcha.getToken();

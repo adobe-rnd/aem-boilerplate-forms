@@ -1,7 +1,7 @@
 import { updateOrCreateInvalidMsg, stripTags } from '../../util.js';
 import { fileAttachmentText, dragDropText, defaultErrorMessages } from '../../constant.js';
 
-const fileSizeRegex = /^(\d*\.?\d+)(\\?(?=[KMGT])([KMGT])(?:i?B)?|B?)$/i;
+const fileSizeRegex = /^(\d*\.?\d+)\s*(B|[KMGT](?:i?B)?)?$/i;
 
 /**
  * converts a string of the form "10MB" to bytes. If the string is malformed 0 is returned
@@ -10,60 +10,35 @@ const fileSizeRegex = /^(\d*\.?\d+)(\\?(?=[KMGT])([KMGT])(?:i?B)?|B?)$/i;
  */
 function getSizeInBytes(str) {
   const sizes = {
-    KB: 1, MB: 2, GB: 3, TB: 4,
+    B: 0, K: 1, M: 2, G: 3, T: 4,
   };
   let sizeLimit = 0;
   const matches = fileSizeRegex.exec(str.trim());
   if (matches != null) {
-    const symbol = matches[2] || 'kb';
+    const symbol = (matches[2] || 'K')[0].toUpperCase();
     const size = parseFloat(matches[1]);
-    const i = 1024 ** sizes[symbol.toUpperCase()];
+    const i = 1024 ** sizes[symbol];
     sizeLimit = Math.round(size * i);
   }
   return sizeLimit;
 }
 
 /**
- * matches the given mediaType with the accepted mediaTypes
- * @param {*} mediaType mediaType of the file to match
+ * matches a file's media type or filename extension with the accepted types
+ * @param {File} file file to match
  * @param {[]} accepts accepted mediaTypes
  * @returns false if the mediaType is not accepted
  */
-function matchMediaType(mediaType, accepts) {
-  return !mediaType || accepts.some((accept) => {
-    const trimmedAccept = accept.trim();
-    const prefixAccept = trimmedAccept.split('/')[0];
-    const suffixAccept = trimmedAccept.split('.')[1];
-    return ((trimmedAccept.includes('*') && mediaType.startsWith(prefixAccept))
-      || (trimmedAccept.includes('.') && mediaType.endsWith(suffixAccept))
-      || (trimmedAccept === mediaType));
+function matchMediaType(file, accepts) {
+  return accepts.some((accept) => {
+    if (accept.startsWith('.')) {
+      return file.name.toLowerCase().endsWith(accept);
+    }
+    const mediaType = (file.type || file.mediaType || '').toLowerCase();
+    return accept.endsWith('/*')
+      ? mediaType.startsWith(accept.slice(0, -1))
+      : accept === mediaType;
   });
-}
-
-/**
- * checks whether the size of the files in the array is withing the maxFileSize or not
- * @param {string|number} maxFileSize maxFileSize in bytes or string with the unit
- * @param {File[]} files array of File objects
- * @returns false if any file is larger than the maxFileSize
- */
-function checkMaxFileSize(maxFileSize, files) {
-  const sizeLimit = typeof maxFileSize === 'string' ? getSizeInBytes(maxFileSize) : maxFileSize;
-  return Array.from(files).find((file) => file.size > sizeLimit) === undefined;
-}
-
-/**
- * checks whether the mediaType of the files in the array are accepted or not
- * @param {[]} acceptedMediaTypes
- * @param {File[]} files
- * @returns false if the mediaType of any file is not accepted
- */
-function checkAccept(acceptedMediaTypes, files) {
-  if (!acceptedMediaTypes || acceptedMediaTypes.length === 0 || !files.length) {
-    return true;
-  }
-  const invalidFile = Array.from(files)
-    .some((file) => !matchMediaType(file.type, acceptedMediaTypes));
-  return !invalidFile;
 }
 
 /**
@@ -84,42 +59,49 @@ function checkAccept(acceptedMediaTypes, files) {
  */
 function fileValidation(input, files) {
   const multiple = input.hasAttribute('multiple');
-  const acceptedFile = (input.getAttribute('accept') || '').split(',');
-  const minItems = (parseInt(input.dataset.minItems, 10) || 1);
-  const maxItems = (parseInt(input.dataset.maxItems, 10) || -1);
+  const acceptedFile = (input.getAttribute('accept') || '').toLowerCase().split(',')
+    .map((accept) => accept.trim()).filter(Boolean);
+  const minItems = parseInt(input.dataset.minItems, 10) || 0;
+  const maxItems = parseInt(input.dataset.maxItems ?? '-1', 10);
   const fileSize = `${input.dataset.maxFileSize || '2MB'}`;
-  const isRequired = input.hasAttribute('required') || input.closest('.field-wrapper')?.dataset?.required !== undefined;
-  let constraint = '';
-  let errorMessage = '';
   const wrapper = input.closest('.field-wrapper');
+  const isRequired = input.required || wrapper.dataset.required === 'true';
+  const errors = [];
+  const addError = (constraint, invalidFiles, limit) => {
+    let message = wrapper.dataset[`${constraint}ErrorMessage`]
+      || wrapper.dataset[constraint]
+      || defaultErrorMessages[constraint];
+    if (limit !== undefined) {
+      message = message.replace(/\$0/g, limit);
+    }
+    if (multiple && invalidFiles?.length) {
+      message = `${message} ${invalidFiles.map((file) => file.name).join(', ')}`;
+    }
+    errors.push(message);
+  };
 
-  // Check required first (valueMissing)
   if (isRequired && files.length === 0) {
-    constraint = 'required';
-  } else if (!checkAccept(acceptedFile, files)) {
-    constraint = 'accept';
-  } else if (!checkMaxFileSize(fileSize, files)) {
-    constraint = 'maxFileSize';
-  } else if (multiple && maxItems !== -1 && files.length > maxItems) {
-    constraint = 'maxItems';
-    errorMessage = defaultErrorMessages.maxItems.replace(/\$0/, maxItems);
-  } else if (multiple && minItems !== 1 && files.length < minItems) {
-    constraint = 'minItems';
-    errorMessage = defaultErrorMessages.minItems.replace(/\$0/, minItems);
-  }
-  if (constraint.length) {
-    const finalMessage = wrapper.dataset[constraint]
-    || errorMessage
-    || defaultErrorMessages[constraint];
-    input.setCustomValidity(finalMessage);
-    updateOrCreateInvalidMsg(
-      input,
-      finalMessage,
-    );
+    addError('required');
   } else {
-    input.setCustomValidity('');
-    updateOrCreateInvalidMsg(input, '');
+    const invalidTypes = acceptedFile.length
+      ? files.filter((file) => !matchMediaType(file, acceptedFile)) : [];
+    const oversizedFiles = files.filter((file) => file.size > getSizeInBytes(fileSize));
+    if (invalidTypes.length) {
+      addError('accept', invalidTypes);
+    }
+    if (oversizedFiles.length && (multiple || !errors.length)) {
+      addError('maxFileSize', oversizedFiles, fileSize);
+    }
+    if (multiple && maxItems !== -1 && files.length > maxItems) {
+      addError('maxItems', [], maxItems);
+    } else if (multiple && files.length < minItems) {
+      addError('minItems', [], minItems);
+    }
   }
+  const message = errors.join(' ');
+  input.dataset.fileValidationMessage = message;
+  input.setCustomValidity(message);
+  updateOrCreateInvalidMsg(input, message);
 }
 
 function formatBytes(bytes) {
@@ -137,10 +119,13 @@ function updateButtonIndex(elements = []) {
 }
 
 function dispatchChangeEvent(input, files) {
-  if (!files.length) {
-    input.value = null;
-  }
-  const options = { bubbles: true, detail: { files, deletion: true } };
+  const dataTransfer = new DataTransfer();
+  files.forEach((file) => {
+    dataTransfer.items.add(file instanceof File
+      ? file : new File([file.data], file.name, { type: file.type || file.mediaType }));
+  });
+  input.files = dataTransfer.files;
+  const options = { bubbles: true, detail: { files: [...files], deletion: true } };
   const changeEvent = new CustomEvent('change', options);
   input.dispatchEvent(changeEvent);
 }
@@ -154,9 +139,10 @@ function fileElement(file, index) {
   const el = document.createElement('div');
   el.dataset.index = index;
   el.classList.add('file-description');
-  el.innerHTML = `<span class="file-description-name">${file.name}</span>
+  el.innerHTML = `<span class="file-description-name"></span>
   <span class="file-description-size">${formatBytes(file.size)}</span>
   <button class="file-description-remove" type="button"></button>`;
+  el.querySelector('.file-description-name').textContent = file.name;
   return el;
 }
 
@@ -198,6 +184,9 @@ function createFileHandler(allFiles, input) {
     attachFiles: (inputEl, files) => {
       const multiple = inputEl.hasAttribute('multiple');
       let newFiles = Array.from(files || []);
+      if (!newFiles.length) {
+        return;
+      }
       if (!multiple) {
         allFiles.splice(0, allFiles.length);
         newFiles = [newFiles[0]];
@@ -278,11 +267,6 @@ export default async function decorate(fieldDiv, field, htmlForm) {
   // pre-fill file attachment
   if (field.value) {
     const preFillFiles = Array.isArray(field.value) ? field.value : [field.value];
-    const dataTransfer = new DataTransfer();
-    const file = new File([preFillFiles[0].data], preFillFiles[0].name, { ...preFillFiles[0] });
-    dataTransfer.items.add(file);
-    // Pre-fill input field to mark it as a valid field.
-    input.files = dataTransfer.files;
     fileHandler.attachFiles(input, preFillFiles);
   }
   return fieldDiv;
