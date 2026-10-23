@@ -24,21 +24,46 @@ function getSizeInBytes(str) {
 }
 
 /**
- * matches a file's media type or filename extension with the accepted types
- * @param {File} file file to match
+ * matches the given mediaType with the accepted mediaTypes
+ * @param {*} mediaType mediaType of the file to match
  * @param {[]} accepts accepted mediaTypes
  * @returns false if the mediaType is not accepted
  */
-function matchMediaType(file, accepts) {
-  return accepts.some((accept) => {
-    if (accept.startsWith('.')) {
-      return file.name.toLowerCase().endsWith(accept);
-    }
-    const mediaType = (file.type || file.mediaType || '').toLowerCase();
-    return accept.endsWith('/*')
-      ? mediaType.startsWith(accept.slice(0, -1))
-      : accept === mediaType;
+function matchMediaType(mediaType, accepts) {
+  return !mediaType || accepts.some((accept) => {
+    const trimmedAccept = accept.trim();
+    const prefixAccept = trimmedAccept.split('/')[0];
+    const suffixAccept = trimmedAccept.split('.')[1];
+    return ((trimmedAccept.includes('*') && mediaType.startsWith(prefixAccept))
+      || (trimmedAccept.includes('.') && mediaType.endsWith(suffixAccept))
+      || (trimmedAccept === mediaType));
   });
+}
+
+/**
+ * checks whether the size of the files in the array is withing the maxFileSize or not
+ * @param {string|number} maxFileSize maxFileSize in bytes or string with the unit
+ * @param {File[]} files array of File objects
+ * @returns false if any file is larger than the maxFileSize
+ */
+function checkMaxFileSize(maxFileSize, files) {
+  const sizeLimit = typeof maxFileSize === 'string' ? getSizeInBytes(maxFileSize) : maxFileSize;
+  return Array.from(files).find((file) => file.size > sizeLimit) === undefined;
+}
+
+/**
+ * checks whether the mediaType of the files in the array are accepted or not
+ * @param {[]} acceptedMediaTypes
+ * @param {File[]} files
+ * @returns false if the mediaType of any file is not accepted
+ */
+function checkAccept(acceptedMediaTypes, files) {
+  if (!acceptedMediaTypes || acceptedMediaTypes.length === 0 || !files.length) {
+    return true;
+  }
+  const invalidFile = Array.from(files)
+    .some((file) => !matchMediaType(file.type, acceptedMediaTypes));
+  return !invalidFile;
 }
 
 /**
@@ -59,7 +84,7 @@ function matchMediaType(file, accepts) {
  */
 function fileValidation(input, files) {
   const multiple = input.hasAttribute('multiple');
-  const acceptedFile = (input.getAttribute('accept') || '').toLowerCase().split(',')
+  const acceptedFile = (input.getAttribute('accept') || '').split(',')
     .map((accept) => accept.trim()).filter(Boolean);
   const minItems = parseInt(input.dataset.minItems, 10) || 0;
   const maxItems = parseInt(input.dataset.maxItems ?? '-1', 10);
@@ -83,9 +108,8 @@ function fileValidation(input, files) {
   if (isRequired && files.length === 0) {
     addError('required');
   } else {
-    const invalidTypes = acceptedFile.length
-      ? files.filter((file) => !matchMediaType(file, acceptedFile)) : [];
-    const oversizedFiles = files.filter((file) => file.size > getSizeInBytes(fileSize));
+    const invalidTypes = files.filter((file) => !checkAccept(acceptedFile, [file]));
+    const oversizedFiles = files.filter((file) => !checkMaxFileSize(fileSize, [file]));
     if (invalidTypes.length) {
       addError('accept', invalidTypes);
     }

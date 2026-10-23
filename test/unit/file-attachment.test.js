@@ -116,9 +116,21 @@ describe('File attachments', () => {
     assert.strictEqual(input.validationMessage, '');
   });
 
-  it('uses filename extensions case-insensitively and accepts unrestricted files', async () => {
-    await render({ accept: [' .PDF ', 'image/*'] });
-    attach([file('document.PDF', 10, ''), file('photo.png', 10, 'image/png')]);
+  it('preserves media-type matching without using filenames to accept files', async () => {
+    await render({ accept: ['application/pdf', 'image/*'] });
+    attach([
+      file('document.txt', 10, 'application/pdf'),
+      file('photo.bin', 10, 'image/png'),
+      file('unknown.bin', 10, ''),
+    ]);
+    assert.strictEqual(input.validationMessage, '');
+    attach([file('misleading.pdf', 10, 'text/plain')]);
+    assert.strictEqual(
+      input.validationMessage,
+      'The specified file type not supported. misleading.pdf',
+    );
+    await render({ accept: ['.pdf'] });
+    attach([file('document.bin', 10, 'application/pdf')]);
     assert.strictEqual(input.validationMessage, '');
     await render();
     attach([file('unknown.custom', 10, '')]);
