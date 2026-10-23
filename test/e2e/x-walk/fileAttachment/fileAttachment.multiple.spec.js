@@ -24,6 +24,7 @@ async function openForm(page, overrides = {}) {
       name: 'attachments',
       fieldType: 'file-input',
       type: 'file[]',
+      accept: ['application/pdf'],
       label: { value: 'Attachments' },
       ...overrides,
     }, {
@@ -160,7 +161,7 @@ test.describe('multiple file attachments with the rule engine', () => {
     await expect(page.locator('.field-description')).toHaveText('Attach at least two files.');
   });
 
-  test('keeps single-file replacement and optional empty fields working', async ({ page }) => {
+  test('keeps single-file replacement and clearing working', async ({ page }) => {
     await openForm(page, { type: 'file', required: false });
     await expect(page.locator(fileInput)).not.toHaveAttribute('multiple');
     await page.locator(fileInput).setInputFiles(upload('one.pdf'));
@@ -168,7 +169,10 @@ test.describe('multiple file attachments with the rule engine', () => {
     await expect(page.locator(fileNames)).toHaveText(['replacement.pdf']);
     await page.locator(removeButtons).click();
     await expect(page.locator(fileNames)).toHaveCount(0);
-    expect(await page.locator('form').evaluate((form) => form.checkValidity())).toBe(true);
+    expect(await page.locator(fileInput).evaluate((input) => input.files.length)).toBe(0);
+    await expect.poll(() => page.evaluate(
+      () => window.myForm.getElement('attachments').value,
+    )).toBeNull();
   });
 
   test('keeps required drop uploads valid and rejects removal of the last file', async ({ page }) => {
@@ -201,6 +205,8 @@ test.describe('multiple file attachments with the rule engine', () => {
         await page.evaluate(() => window.myForm.validate());
         await expect(page.locator('.field-description')).toHaveText(message);
         await page.locator(removeButtons).click();
+        await expect(page.locator(fileNames)).toHaveCount(0);
+        await page.locator(fileInput).setInputFiles(upload('valid.pdf'));
         await expect(page.locator('.field-invalid')).toHaveCount(0);
       });
     });

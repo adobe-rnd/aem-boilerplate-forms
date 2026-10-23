@@ -84,11 +84,11 @@ function checkAccept(acceptedMediaTypes, files) {
  */
 function fileValidation(input, files) {
   const multiple = input.hasAttribute('multiple');
-  const acceptedFile = (input.getAttribute('accept') || '').split(',').filter(Boolean);
-  const minItems = (parseInt(input.dataset.minItems, 10) || 0);
+  const acceptedFile = (input.getAttribute('accept') || '').split(',');
+  const minItems = (parseInt(input.dataset.minItems, 10) || 1);
   const maxItems = (parseInt(input.dataset.maxItems, 10) || -1);
   const fileSize = `${input.dataset.maxFileSize || '2MB'}`;
-  const isRequired = input.hasAttribute('required') || input.closest('.field-wrapper')?.dataset?.required === 'true';
+  const isRequired = input.hasAttribute('required') || input.closest('.field-wrapper')?.dataset?.required !== undefined;
   const wrapper = input.closest('.field-wrapper');
   const errors = [];
   const addError = (constraint, invalidFiles, limit) => {
@@ -210,9 +210,6 @@ function createFileHandler(allFiles, input) {
     attachFiles: (inputEl, files) => {
       const multiple = inputEl.hasAttribute('multiple');
       let newFiles = Array.from(files || []);
-      if (!newFiles.length) {
-        return;
-      }
       if (!multiple) {
         allFiles.splice(0, allFiles.length);
         newFiles = [newFiles[0]];
@@ -293,6 +290,13 @@ export default async function decorate(fieldDiv, field, htmlForm) {
   // pre-fill file attachment
   if (field.value) {
     const preFillFiles = Array.isArray(field.value) ? field.value : [field.value];
+    const dataTransfer = new DataTransfer();
+    preFillFiles.forEach((preFillFile) => {
+      const file = new File([preFillFile.data], preFillFile.name, { ...preFillFile });
+      dataTransfer.items.add(file);
+    });
+    // Pre-fill input field to mark it as a valid field.
+    input.files = dataTransfer.files;
     fileHandler.attachFiles(input, preFillFiles);
   }
   return fieldDiv;

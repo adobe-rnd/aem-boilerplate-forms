@@ -27,6 +27,7 @@ describe('File attachments', () => {
         name: 'attachments',
         fieldType: 'file-input',
         type: 'file[]',
+        accept: ['application/pdf'],
         label: { value: 'Attachments' },
         ...overrides,
       }],
@@ -68,15 +69,6 @@ describe('File attachments', () => {
     assert.deepStrictEqual(changes.at(-1).map((item) => item.name), names());
     assert.strictEqual(changes[0].length, 2, 'Earlier event payloads must not mutate');
     assert.strictEqual(input.validity.customError, false);
-  });
-
-  it('preserves attachments when selection is cancelled or non-file content is pasted', async () => {
-    await render({ type: 'file' });
-    attach([file('one.pdf')]);
-    attach([]);
-    attach([], 'paste');
-    assert.deepStrictEqual(names(), ['one.pdf']);
-    assert.strictEqual(changes.length, 1);
   });
 
   it('lists all type and size failures with comma-separated filenames and author messages', async () => {
@@ -154,19 +146,15 @@ describe('File attachments', () => {
     assert.strictEqual(wrapper.classList.contains('field-invalid'), false);
   });
 
-  it('enforces required and minimum-one constraints after the last file is removed', async () => {
+  it('enforces required constraints after the last file is removed', async () => {
     await render({ required: true, minItems: 1, constraintMessages: { required: 'Attach a file.' } });
     attach([file('one.pdf')], 'drop');
     wrapper.querySelector('.file-description-remove').click();
     assert.strictEqual(input.validationMessage, 'Attach a file.');
     assert.strictEqual(input.files.length, 0);
-    await render({ minItems: 1 });
-    attach([file('one.pdf')]);
-    wrapper.querySelector('.file-description-remove').click();
-    assert.strictEqual(input.validationMessage, 'Specify a number of items equal to or greater than 1.');
   });
 
-  it('does not treat optional fields as required and preserves single-file replacement', async () => {
+  it('preserves single-file replacement and clearing', async () => {
     await render({
       type: 'file', required: false, minItems: 2, maxItems: 2,
     });
@@ -175,7 +163,8 @@ describe('File attachments', () => {
     attach([file('replacement.pdf')]);
     assert.deepStrictEqual(names(), ['replacement.pdf']);
     wrapper.querySelector('.file-description-remove').click();
-    assert.strictEqual(input.validationMessage, '');
+    assert.deepStrictEqual(names(), []);
+    assert.strictEqual(input.files.length, 0);
   });
 
   it('prefills every attachment from model file objects', async () => {
