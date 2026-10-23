@@ -84,20 +84,19 @@ function checkAccept(acceptedMediaTypes, files) {
  */
 function fileValidation(input, files) {
   const multiple = input.hasAttribute('multiple');
-  const acceptedFile = (input.getAttribute('accept') || '').split(',')
-    .map((accept) => accept.trim()).filter(Boolean);
-  const minItems = parseInt(input.dataset.minItems, 10) || 0;
-  const maxItems = parseInt(input.dataset.maxItems ?? '-1', 10);
+  const acceptedFile = (input.getAttribute('accept') || '').split(',').filter(Boolean);
+  const minItems = (parseInt(input.dataset.minItems, 10) || 0);
+  const maxItems = (parseInt(input.dataset.maxItems, 10) || -1);
   const fileSize = `${input.dataset.maxFileSize || '2MB'}`;
+  const isRequired = input.hasAttribute('required') || input.closest('.field-wrapper')?.dataset?.required === 'true';
   const wrapper = input.closest('.field-wrapper');
-  const isRequired = input.required || wrapper.dataset.required === 'true';
   const errors = [];
   const addError = (constraint, invalidFiles, limit) => {
     let message = wrapper.dataset[`${constraint}ErrorMessage`]
       || wrapper.dataset[constraint]
       || defaultErrorMessages[constraint];
     if (limit !== undefined) {
-      message = message.replace(/\$0/g, limit);
+      message = message.replace(/\$0/, limit);
     }
     if (multiple && invalidFiles?.length) {
       message = `${message} ${invalidFiles.map((file) => file.name).join(', ')}`;
@@ -105,6 +104,7 @@ function fileValidation(input, files) {
     errors.push(message);
   };
 
+  // Check required first (valueMissing)
   if (isRequired && files.length === 0) {
     addError('required');
   } else {
@@ -143,6 +143,9 @@ function updateButtonIndex(elements = []) {
 }
 
 function dispatchChangeEvent(input, files) {
+  if (!files.length) {
+    input.value = null;
+  }
   const dataTransfer = new DataTransfer();
   files.forEach((file) => {
     dataTransfer.items.add(file instanceof File
@@ -163,10 +166,9 @@ function fileElement(file, index) {
   const el = document.createElement('div');
   el.dataset.index = index;
   el.classList.add('file-description');
-  el.innerHTML = `<span class="file-description-name"></span>
+  el.innerHTML = `<span class="file-description-name">${file.name}</span>
   <span class="file-description-size">${formatBytes(file.size)}</span>
   <button class="file-description-remove" type="button"></button>`;
-  el.querySelector('.file-description-name').textContent = file.name;
   return el;
 }
 
