@@ -18,7 +18,7 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import { handleSubmit, submitSuccess, submitFailure } from '../submit.js';
+import { submitSuccess, submitFailure } from '../submit.js';
 import {
   createHelpText,
   createLabel,
@@ -341,11 +341,6 @@ function applyRuleEngine(htmlForm, form, captcha) {
 
   htmlForm.addEventListener('click', async (e) => {
     if (e.target.tagName === 'BUTTON') {
-      if (e.target.type === 'submit'
-        && htmlForm.querySelector('input[type="file"][data-file-validation-message]:invalid')) {
-        await handleSubmit(e, htmlForm, captcha);
-        return;
-      }
       const element = form.getElement(e.target.id);
       if (e.target.type === 'submit' && captcha) {
         const token = await captcha.getToken();

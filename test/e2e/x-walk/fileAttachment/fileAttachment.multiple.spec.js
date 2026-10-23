@@ -141,24 +141,6 @@ test.describe('multiple file attachments with the rule engine', () => {
     await expect(page.getByText('Submitted', { exact: true })).toBeVisible();
   });
 
-  test('does not submit files that fail attachment validation', async ({ page }) => {
-    await openForm(page, { maxFileSize: '1KB' });
-    let submitRequests = 0;
-    await page.route(`${origin}/submit`, (route) => {
-      submitRequests += 1;
-      return route.fulfill({
-        contentType: 'application/json',
-        body: JSON.stringify({ thankYouMessage: 'Submitted' }),
-      });
-    });
-    await page.locator(fileInput).setInputFiles([upload('valid.pdf'), upload('large.pdf', 2048)]);
-    await page.getByRole('button', { name: 'Submit', exact: true }).click();
-    await page.evaluate(() => window.myForm.waitForPromises());
-    await page.waitForLoadState('networkidle');
-    expect(submitRequests).toBe(0);
-    await expect(page.locator('.field-invalid')).toHaveCount(1);
-  });
-
   test('uses author count messages and recovers at the minimum and maximum boundaries', async ({ page }) => {
     await openForm(page, {
       minItems: 2,

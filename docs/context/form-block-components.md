@@ -113,9 +113,7 @@ The controller passes an array to a multiple-attachment model and a file or
 File validation uses the existing inline `.field-description` area. Multiple
 attachments report each failing type and size constraint with comma-separated
 filenames. Count constraints use the authored messages or the default messages.
-Invalid files remain listed so you can remove them; they block submission until
-you correct the errors. The controller uses the existing submit handler to block
-submit-button actions while an attachment has an inline validation error.
+Invalid files remain listed so you can remove them and correct the errors.
 The decorator marks its current error with
 `data-file-validation-message` so model validity updates don't replace or clear
 the aggregated message.
