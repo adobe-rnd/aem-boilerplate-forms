@@ -98,9 +98,6 @@ export async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'validationMessage':
         {
-          if (field.type === 'file' && field.dataset.fileValidationMessage) {
-            break;
-          }
           const { validity } = payload.field;
 
           // TODO: File inputs use DOM-based validation for file-specific constraints
@@ -249,7 +246,6 @@ export async function fieldChanged(payload, form, generateFormRendition) {
       case 'activeChild': handleActiveChild(activeChild, form);
         break;
       case 'valid':
-        // Preserve the file component's aggregated errors during model synchronization.
         if (field.type === 'file' && field.dataset.fileValidationMessage) {
           break;
         }
@@ -322,8 +318,7 @@ function applyRuleEngine(htmlForm, form, captcha) {
     } else if (field.type === 'checkbox') {
       form.getElement(id).value = checked ? value : field.dataset.uncheckedValue;
     } else if (field.type === 'file') {
-      const files = Array.from(e?.detail?.files || field.files || []);
-      form.getElement(id).value = field.multiple ? files : files[0] ?? null;
+      form.getElement(id).value = Array.from(e?.detail?.files || field.files || []);
     } else {
       form.getElement(id).value = value;
     }
