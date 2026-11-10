@@ -35,7 +35,9 @@ export const fieldDef = {
 
 export const extraChecks = [
   (html) => {
-    assert.equal(html.querySelector('#textinput-4e4f61cad9').value, 'Tan');
+    const input = html.querySelector('#textinput-4e4f61cad9');
+    assert.equal(input.value, 'Tan');
+    assert.equal(input.getAttribute('autocomplete'), 'family-name');
   },
 ];
 

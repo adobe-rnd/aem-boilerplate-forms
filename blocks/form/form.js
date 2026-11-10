@@ -233,6 +233,9 @@ function inputDecorator(field, element) {
     if (field.default !== undefined) {
       input.setAttribute('value', field.default);
     }
+    if (field.autocomplete) {
+      input.setAttribute('autocomplete', field.autocomplete);
+    }
     if (input.type === 'email') {
       input.pattern = emailPattern;
     }
