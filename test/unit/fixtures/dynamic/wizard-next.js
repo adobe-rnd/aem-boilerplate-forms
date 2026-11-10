@@ -17,4 +17,6 @@ export function expect(block) {
   const step2 = instances?.[1];
   assert.equal(step2?.dataset.index, 1);
   assert.equal(step2?.classList.contains('current-wizard-step'), true);
+  const firstFocusableElement = step2?.querySelector('legend') || step2?.querySelector('input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex="0"]');
+  assert.equal(firstFocusableElement.hasFocus(), true);
 }
