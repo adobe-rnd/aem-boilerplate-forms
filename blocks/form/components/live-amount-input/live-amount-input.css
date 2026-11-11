@@ -1,0 +1,190 @@
+main .form .live-amount-input {
+    min-width: 0;
+    padding: clamp(20px, 4vw, 36px);
+    border: 1px solid #e6e9f0;
+    border-radius: 24px;
+    background: #fcfcff;
+    box-shadow: 0 8px 24px rgb(15 23 42 / 9%);
+    color: #0c1222;
+    font-family: var(--body-font-family, sans-serif);
+}
+
+main .form .live-amount-input-header {
+    margin-bottom: 32px;
+}
+
+main .form .live-amount-input-header h3 {
+    margin: 0 0 8px;
+    color: #0c1222;
+    font-family: inherit;
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+main .form .live-amount-input-header p {
+    margin: 0;
+    color: #565e70;
+    font-size: 18px;
+}
+
+main .form .live-amount-input label {
+    display: block;
+    margin-bottom: 10px;
+    color: #0c1222;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+main .form .live-amount-input-entry {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border: 2px solid #d9dde6;
+    border-radius: 12px;
+    background: #fff;
+}
+
+main .form .live-amount-input-entry:focus-within {
+    border-color: #1769ff;
+    box-shadow: 0 0 0 1px #1769ff;
+}
+
+main .form .live-amount-input-entry:has([aria-invalid="true"]) {
+    border-color: var(--form-error-color);
+}
+
+main .form .live-amount-input-currency {
+    align-self: stretch;
+    display: grid;
+    place-items: center;
+    padding: 0 22px;
+    border-inline-end: 1px solid #d9dde6;
+    background: #f0f2f7;
+    color: #565e70;
+    font-size: 28px;
+}
+
+main .form .live-amount-input input {
+    min-width: 0;
+    margin: 0;
+    height: auto;
+    padding: 16px;
+    color: #0c1222;
+    font-family: inherit;
+}
+
+main .form .live-amount-input .live-amount-input-value {
+    flex: 1;
+    width: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    font-size: 28px;
+    outline: none;
+}
+
+main .form .live-amount-input .live-amount-input-value:disabled {
+    background: var(--form-input-disable-color);
+}
+
+main .form .live-amount-input .live-amount-input-clear {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    margin: 0 20px 0 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #999;
+    color: #fff;
+    font-size: 26px;
+    line-height: 1;
+}
+
+main .form .live-amount-input-clear:focus-visible {
+    outline: 2px solid #1769ff;
+    outline-offset: 4px;
+}
+
+main .form .live-amount-input-clear[hidden] {
+    display: none;
+}
+
+main .form .live-amount-input-result {
+    margin-top: 28px;
+}
+
+main .form .live-amount-input .live-amount-input-words {
+    border: 2px solid #d9dde6;
+    border-radius: 12px;
+    background: #f0f2f7;
+    font-size: 20px;
+}
+
+main .form .live-amount-input-note {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    color: #626b7d;
+    font-size: 16px;
+}
+
+main .form .live-amount-input-lock {
+    position: relative;
+    width: 16px;
+    height: 14px;
+    margin-top: 6px;
+    border: 2px solid currentcolor;
+    border-radius: 3px;
+    background: linear-gradient(currentcolor, currentcolor) center / 2px 6px no-repeat;
+}
+
+main .form .live-amount-input-lock::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 1px;
+    width: 10px;
+    height: 9px;
+    border: 2px solid currentcolor;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+main .form .live-amount-input-error {
+    margin: 8px 0 0;
+    color: var(--form-error-color);
+    font-size: 16px;
+}
+
+main .form .live-amount-input-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@media (width <= 600px) {
+    main .form .live-amount-input {
+        padding: 16px;
+    }
+
+    main .form .live-amount-input .live-amount-input-value {
+        padding: 14px 12px;
+        font-size: 22px;
+    }
+
+    main .form .live-amount-input-currency {
+        padding-inline: 12px;
+        font-size: 22px;
+    }
+
+    main .form .live-amount-input .live-amount-input-clear {
+        margin-inline-end: 12px;
+    }
+}

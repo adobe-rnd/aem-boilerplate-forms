@@ -1,0 +1,40 @@
+{
+  "id": "live-amount-input-test-form",
+  "fieldType": "form",
+  "title": "live-amount-input e2e test",
+  "action": "/adobe/forms/af/submit/live-amount-input-test-form",
+  "properties": {},
+  "items": [
+    {
+      "id": "field-under-test",
+      "name": "fieldUnderTest",
+      "fieldType": "text-input",
+      "type": "string",
+      ":type": "live-amount-input",
+      "default": "12,345.67",
+      "required": true,
+      "pattern": "^(?:(?:\\d{1,9}|[1-9]\\d{0,2}(?:,\\d{3}){1,2}|[1-9]\\d?(?:,\\d{2}){0,2},\\d{3})(?:\\.\\d{0,2})?|\\.\\d{1,2})$",
+      "visible": true,
+      "enabled": true,
+      "label": {
+        "value": "Amount",
+        "visible": true
+      },
+      "properties": {
+        "heading": "live-amount-input",
+        "wordsLabel": "Amount (in words)"
+      }
+    },
+    {
+      "id": "next-field",
+      "name": "nextField",
+      "fieldType": "text-input",
+      "label": {
+        "value": "Next field"
+      },
+      "rules": {
+        "value": "fieldUnderTest"
+      }
+    }
+  ]
+}

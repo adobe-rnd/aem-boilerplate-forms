@@ -84,7 +84,7 @@ All 11 registered field renderers:
 **mappings.js overview:**
 
 - **OOTBComponentDecorators**: accordion, file, modal, password, rating, repeat, tnc, toggleable-link, wizard
-- **customComponents** (default: ['range'])
+- **customComponents** (default: ['range', 'live-amount-input'])
 - **loadComponent**:
   - Status tracking via dataset.componentStatus (loading/loaded)
   - CSS load from components directory
@@ -95,6 +95,16 @@ All 11 registered field renderers:
     - file-input → file component
     - :type ends with 'wizard' → wizard component
     - :type in OOTB or custom list → that component
+
+### Live Amount Input
+
+`live-amount-input` extends `text-input` with a rupee prefix, clear button and
+read-only amount-in-words input. It deliberately writes the string `model.value`
+on each native `input` event, rather than waiting for the default blur/change
+commit, so change rules can react while typing. The derived words are view-only
+and never replace the submitted amount. Model subscriptions synchronize prefill,
+rules and reset changes. See the [component README](../../blocks/form/components/live-amount-input/README.md)
+for authoring properties and supported amounts.
 
 ## Section 7: Subscription System
 

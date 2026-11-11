@@ -42,6 +42,9 @@
       "components": [
         {
           "...": "../blocks/form/components/range/_range.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/live-amount-input/_live-amount-input.json#/definitions"
         }
       ]
     }
