@@ -1,0 +1,70 @@
+{
+  "definitions": [
+    {
+      "title": "Live Amount Input",
+      "id": "live-amount-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/textinput/v1/textinput",
+            "template": {
+              "jcr:title": "Amount",
+              "fieldType": "text-input",
+              "fd:viewType": "live-amount-input",
+              "required": true,
+              "pattern": "^(?:(?:\\d{1,9}|[1-9]\\d{0,2}(?:,\\d{3}){1,2}|[1-9]\\d?(?:,\\d{2}){0,2},\\d{3})(?:\\.\\d{0,2})?|\\.\\d{1,2})$"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "live-amount-input",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-default-value-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_string-validation-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Custom Properties",
+          "name": "custom"
+        },
+        {
+          "component": "text",
+          "name": "heading",
+          "label": "Card heading",
+          "valueType": "string",
+          "value": "live-amount-input"
+        },
+        {
+          "component": "text",
+          "name": "wordsLabel",
+          "label": "Amount-in-words label",
+          "valueType": "string",
+          "value": "Amount (in words)"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        }
+      ]
+    }
+  ]
+}

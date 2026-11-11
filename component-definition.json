@@ -685,6 +685,24 @@
               }
             }
           }
+        },
+        {
+          "title": "Live Amount Input",
+          "id": "live-amount-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Amount",
+                  "fieldType": "text-input",
+                  "fd:viewType": "live-amount-input",
+                  "required": true,
+                  "pattern": "^(?:(?:\\d{1,9}|[1-9]\\d{0,2}(?:,\\d{3}){1,2}|[1-9]\\d?(?:,\\d{2}){0,2},\\d{3})(?:\\.\\d{0,2})?|\\.\\d{1,2})$"
+                }
+              }
+            }
+          }
         }
       ]
     }
