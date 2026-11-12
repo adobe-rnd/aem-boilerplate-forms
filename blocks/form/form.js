@@ -2,7 +2,6 @@ import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import {
   emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE, SUPPORTED_SUBMISSION_ACTION_TYPES,
-  USE_RULE_ENGINE_WORKER,
 } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
@@ -336,7 +335,7 @@ async function createFormForAuthoring(formDef) {
   return form;
 }
 
-export async function createForm(formDef, data, source = 'aem', { initializeRules = true } = {}) {
+export async function createForm(formDef, data, source = 'aem', { initializeRules = true, useWorker = true } = {}) {
   const { action: formPath } = formDef;
   const form = document.createElement('form');
   form.dataset.action = formPath;
@@ -369,7 +368,7 @@ export async function createForm(formDef, data, source = 'aem', { initializeRule
   }
   transferRepeatableDOM(form, formDef, form, formId);
 
-  if (initializeRules && afModule && (!USE_RULE_ENGINE_WORKER || typeof Worker === 'undefined')) {
+  if (initializeRules && afModule && (!useWorker || typeof Worker === 'undefined')) {
     window.setTimeout(async () => {
       afModule.loadRuleEngine(formDef, form, captcha, generateFormRendition, data);
     }, DELAY_MS);
@@ -377,7 +376,7 @@ export async function createForm(formDef, data, source = 'aem', { initializeRule
 
   form.addEventListener('reset', async () => {
     const currentSource = form.dataset.source || 'aem';
-    const response = await createForm(formDef, undefined, currentSource);
+    const response = await createForm(formDef, undefined, currentSource, { useWorker });
     if (response?.form) {
       form.replaceWith(response.form);
     }
@@ -518,7 +517,9 @@ function shouldRouteToSubmissionService(actionType) {
   return SUPPORTED_SUBMISSION_ACTION_TYPES.includes(actionType);
 }
 
-async function setupForm(formDef, { pathname, block, editMode = false } = {}) {
+async function setupForm(formDef, {
+  pathname, block, editMode = false, useWorker = true,
+} = {}) {
   const submitProps = formDef?.properties?.['fd:submit'];
   const actionType = submitProps?.actionName || formDef?.properties?.actionType;
   if (shouldRouteToSubmissionService(actionType)) {
@@ -548,8 +549,8 @@ async function setupForm(formDef, { pathname, block, editMode = false } = {}) {
     addRequestContextToForm(formDef);
     if (afModule && afModule.initAdaptiveForm && !editMode) {
       // initAdaptiveForm installs the model; standalone rendering and reset still initialize rules.
-      const renderHTMLForm = (state, data) => createForm(state, data, 'aem', { initializeRules: false });
-      ({ form, afbForm } = await afModule.initAdaptiveForm(formDef, renderHTMLForm));
+      const renderHTMLForm = (state, data) => createForm(state, data, 'aem', { initializeRules: false, useWorker });
+      ({ form, afbForm } = await afModule.initAdaptiveForm(formDef, renderHTMLForm, useWorker));
     } else {
       form = await createFormForAuthoring(formDef);
     }
@@ -567,8 +568,8 @@ async function setupForm(formDef, { pathname, block, editMode = false } = {}) {
   return { form, afbForm };
 }
 
-export async function renderForm(formDef, element) {
-  const { form, afbForm } = await setupForm(formDef);
+export async function renderForm(formDef, element, { useWorker = true } = {}) {
+  const { form, afbForm } = await setupForm(formDef, { useWorker });
   element.appendChild(form);
   return { form, afbForm };
 }

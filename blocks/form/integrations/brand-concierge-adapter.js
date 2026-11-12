@@ -10,8 +10,8 @@
  * - `@aemforms/af-forms-block` → the in-repo `../form.js` renderer directly, so customer
  *   customizations to the block/components are picked up (not a prebuilt package copy).
  * - `@aemforms/af-forms-block/form.css?inline` → the block's own `form.css` (and component CSS,
- *   loaded lazily by the block's component decorators), scoped with an `.af-embedded` selector
- *   alongside each `main`-scoped rule so styling applies outside the page's `<main>` landmark.
+ *   loaded lazily by the block's component decorators). The block's CSS is class-scoped
+ *   (`.form ...`), so it applies whether or not the form sits inside the page's `<main>` landmark.
  * - PR 607's `src/types/FormProvider.ts` is the source of truth for the
  *   `FormProviderEvent`/`FormProviderContext`/`FormProviderInstance` shapes this file
  *   implements; it is not copied here. The only runtime value from it this file needs — which
@@ -36,7 +36,6 @@ const TERMINAL_EVENTS = ['completed', 'cancelled', 'error'];
 export const ADAPTIVE_FORM_PROVIDER_ID = 'adaptive-form';
 const ADAPTIVE_FORM_PROVIDER_DESCRIPTION = 'Renders AEM Adaptive Forms inside the Brand Concierge chat.';
 const PROVIDER_CLASS = 'bc-adaptive-form-provider';
-const EMBEDDED_CLASS = 'af-embedded';
 const UNAVAILABLE_MESSAGE = 'This form is currently unavailable. Please try again later.';
 
 /**
@@ -65,7 +64,7 @@ export function createAdaptiveFormProvider() {
     description: ADAPTIVE_FORM_PROVIDER_DESCRIPTION,
     render(mount, context) {
       const root = document.createElement('div');
-      root.className = `${PROVIDER_CLASS} ${EMBEDDED_CLASS}`;
+      root.className = PROVIDER_CLASS;
       if (context.theme) {
         Object.entries(context.theme)
           .forEach(([name, value]) => root.style.setProperty(name, value));
@@ -158,7 +157,9 @@ export function createAdaptiveFormProvider() {
           const codeBasePath = ensureCodeBasePath();
           const [, result] = await Promise.all([
             loadCSS(`${codeBasePath}/blocks/form/form.css`),
-            renderForm(structuredClone(input), staging),
+            // Run the rule engine on the main thread: the worker path returns a deferred
+            // (null) model, and cross-origin Worker construction is blocked by the platform.
+            renderForm(structuredClone(input), staging, { useWorker: false }),
           ]);
           if (destroyed) {
             staging.replaceChildren();

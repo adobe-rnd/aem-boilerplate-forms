@@ -186,16 +186,16 @@ describe('Native form lifecycle', () => {
     assert.ok(form.querySelector('.error-message'));
   });
 
-  it('runs the rule engine on the main thread and bypasses an available Worker', async () => {
+  it('bypasses an available Worker when useWorker is false (Brand Concierge opt-out)', async () => {
     const input = definition('worker');
-    const { afbForm } = await renderForm(input, container);
+    const { afbForm } = await renderForm(input, container, { useWorker: false });
     const state = afbForm.getState(true);
     const previousWorker = global.Worker;
     let workerConstructed = false;
     global.Worker = class {
       constructor() {
         workerConstructed = true;
-        throw new Error('Worker must not be constructed when USE_RULE_ENGINE_WORKER is false');
+        throw new Error('Worker must not be constructed when useWorker is false');
       }
     };
     window.hlx = { codeBasePath: '..' };
@@ -204,7 +204,7 @@ describe('Native form lifecycle', () => {
       input.properties = { customFunctionsPath: '/functions.js' };
       form.dataset.id = state.id;
       const renderer = Sinon.stub().resolves({ form });
-      const response = await initAdaptiveForm(input, renderer);
+      const response = await initAdaptiveForm(input, renderer, false);
       assert.strictEqual(workerConstructed, false, 'does not construct a Worker');
       assert.ok(response.afbForm, 'model is available synchronously (non-null)');
       assert.strictEqual(renderer.callCount, 1);

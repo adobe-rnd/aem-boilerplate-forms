@@ -3,13 +3,6 @@ export const dragDropText = 'Drag and Drop To Upload';
 
 export const DEFAULT_THANK_YOU_MESSAGE = 'Thank you for your submission.';
 
-// When false, the rule engine runs on the main thread instead of a Web Worker.
-// The main-thread path avoids cross-origin Worker construction (which the platform
-// blocks regardless of CORS) and makes the form model available synchronously, at
-// the cost of running rule evaluation off the UI thread. Set to true to restore the
-// Web Worker path.
-export const USE_RULE_ENGINE_WORKER = false;
-
 // Logging Configuration
 // Control logging via URL parameter: ?log=<level>
 // Valid levels: debug, info, error, off, warn → returns that level
