@@ -141,7 +141,13 @@ export async function fieldChanged(payload, form, generateFormRendition) {
           field.setAttribute('edit-value', valueToSet);
           field.setAttribute('display-value', displayValue);
           if (document.activeElement !== field) {
-            field.value = displayValue;
+            // Native date/number inputs reject formatted text and clear themselves,
+            // so only write displayValue while the input is in its text (display) mode.
+            if (field.type === 'text') {
+              field.value = displayValue;
+            } else if (field.value !== String(valueToSet)) {
+              field.value = valueToSet;
+            }
           }
         } else if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
           field.querySelectorAll(`input[name=${id}_${name}]`).forEach((el) => {
