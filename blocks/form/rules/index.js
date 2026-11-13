@@ -433,8 +433,8 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
   form.dispatch(new CustomEvent('formViewInitialized'));
 }
 
-async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
-  if (typeof Worker === 'undefined') {
+async function initializeRuleEngineWorker(formDef, renderHTMLForm, useWorker = true) {
+  if (!useWorker || typeof Worker === 'undefined') {
     // No worker: fetch prefill only when enabled (worker path does the same in RuleEngineWorker.js)
     const needsPrefill = formDef?.properties?.['fd:formDataEnabled'] === true;
     const data = needsPrefill ? await fetchData(formDef?.id, window.location.search || '') : null;
@@ -538,10 +538,10 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
   });
 }
 
-export async function initAdaptiveForm(formDef, createForm) {
+export async function initAdaptiveForm(formDef, createForm, useWorker = true) {
   preloadFunctionScripts(formDef?.properties?.customFunctionsPath, window.hlx?.codeBasePath);
   await registerCustomFunctions(formDef?.properties?.customFunctionsPath || '/blocks/form/functions.js', window.hlx?.codeBasePath);
-  const response = await initializeRuleEngineWorker(formDef, createForm);
+  const response = await initializeRuleEngineWorker(formDef, createForm, useWorker);
   return { form: response?.form, afbForm: response?.afbForm };
 }
 

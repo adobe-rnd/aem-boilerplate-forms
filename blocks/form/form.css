@@ -67,7 +67,7 @@
     box-sizing: border-box;
 }
 
-main .form pre {
+.form pre {
     display: none;
 }
 
@@ -81,42 +81,42 @@ form:not(.edit-mode) [data-visible="false"] {
     display: none !important;
 }
 
-main .form-container {
+.form-container {
     background-color: var(--form-background-color);
     padding: var(--form-padding);
     width: var(--form-width);
 }
 
-main .form {
+.form {
     background-color: var(--form-background-color);
 }
 
-main .form > div:not(:first-child) {
+.form > div:not(:first-child) {
     display: none;
 }
 
-main .form form {
+.form form {
     display: grid;
     grid-template-columns: repeat(var(--form-columns), minmax(0, 1fr));
     gap: var(--form-field-vert-gap) var(--form-field-horz-gap);
 }
 
-main .form form fieldset {
+.form form fieldset {
     border: var(--form-fieldset-border);
     margin: var(--form-fieldset-marign);
     width: 100%;
 }
 
-main .form form fieldset fieldset {
+.form form fieldset fieldset {
     padding: 0;
 }
 
-main .form .field-description {
+.form .field-description {
     color: var(--form-label-color);
     font-size: var(--form-font-size-xs);
 }
 
-main .form form .field-invalid .field-description {
+.form form .field-invalid .field-description {
     color: var(--form-error-color);
     font-weight: 700;
 }
@@ -139,18 +139,18 @@ main .form form .field-invalid .field-description {
       content: none;
   }
   
-  main .form form .checkbox-wrapper.field-invalid {
+  .form form .checkbox-wrapper.field-invalid {
       flex-wrap: wrap;
   }
 
-main .form select {
+.form select {
     padding-top: 0;
     padding-bottom: 0;
   }
 
-main .form input,
-main .form textarea,
-main .form select {
+.form input,
+.form textarea,
+.form select {
     background-color: var(--form-input-background-color);
     border: var(--form-input-border-size) solid var(--form-input-border-color);
     width: 100%;
@@ -164,28 +164,29 @@ main .form select {
     border-radius: 0.25rem;
 }
 
-main .form input:hover, main .form select:hover {
+.form input:hover,
+.form select:hover {
     border-color: rgb(90 92 96);
 }
 
-main .form input:disabled{
+.form input:disabled {
     background-color: var(--form-input-disable-color);
 }
 
-main .form form .radio-wrapper.field-invalid > input,
-main .form form .checkbox-wrapper.field-invalid > input {
+.form form .radio-wrapper.field-invalid > input,
+.form form .checkbox-wrapper.field-invalid > input {
     outline: 1px solid var(--form-error-color);
 }
 
-main .form input[type='file'] {
+.form input[type='file'] {
     border: none;
     padding-inline-start:0;
     background: unset;
     color: unset;
 }
 
-main .form input[type='checkbox'],
-main .form input[type='radio'] {
+.form input[type='checkbox'],
+.form input[type='radio'] {
     width: 16px;
     height: 16px;
     flex: none;
@@ -194,11 +195,11 @@ main .form input[type='radio'] {
     z-index: 1;
 }
 
-main .form textarea {
+.form textarea {
     min-height: 100px;
 }
 
-main .form fieldset:not(.checkbox-group-wrapper, .radio-group-wrapper) legend {
+.form fieldset:not(.checkbox-group-wrapper, .radio-group-wrapper) legend {
     font-weight: var(--form-fieldset-legend-font-weight);
     font-size: var(--form-fieldset-legend-font-size);
     color: var(--form-fieldset-legend-color);
@@ -208,47 +209,48 @@ main .form fieldset:not(.checkbox-group-wrapper, .radio-group-wrapper) legend {
     margin-bottom: 10px;
 }
 
-main .form label,
-main .form fieldset.checkbox-group-wrapper legend,
-main .form fieldset.radio-group-wrapper legend {
+.form label,
+.form fieldset.checkbox-group-wrapper legend,
+.form fieldset.radio-group-wrapper legend {
     font-weight: var(--form-label-font-weight);
     font-size: var(--form-label-font-size);
     color: var(--form-label-color);
 }
 
-main .form form fieldset.checkbox-group-wrapper,
-main .form form fieldset.radio-group-wrapper {
+.form form fieldset.checkbox-group-wrapper,
+.form form fieldset.radio-group-wrapper {
     padding-left: 0;
     margin-left:0;
 }
 
-main .form form fieldset.checkbox-group-wrapper > legend,
-main .form form fieldset.radio-group-wrapper > legend {
+.form form fieldset.checkbox-group-wrapper > legend,
+.form form fieldset.radio-group-wrapper > legend {
     padding-left: 0;
 }
 
-main .form label.required::after {
+.form label.required::after {
     content: "*";
     color: var(--form-label-color);
     padding-inline-start: 5px;
 }
 
-main .form form p,
-main .form form .repeat-wrapper,
-main .form form .field-wrapper {
+.form form p,
+.form form .repeat-wrapper,
+.form form .field-wrapper {
     margin: var(--form-field-gap);
     color: var(--form-label-color);
     grid-column: span 12;
 }
 
-main .form form p {
+.form form p {
     font-size: var(--form-paragraph-font-size);
     font-style: var(--form-paragraph-font-style);
     color: var(--form-paragraph-color);
     margin: var(--form-paragraph-margin);
 }
 
-main .form form .checkbox-wrapper, main .form form .radio-wrapper {
+.form form .checkbox-wrapper,
+.form form .radio-wrapper {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -256,29 +258,29 @@ main .form form .checkbox-wrapper, main .form form .radio-wrapper {
     gap: 8px;
 }
 
-main .form form fieldset > .radio-wrapper,
-main .form form fieldset > .checkbox-wrapper {
+.form form fieldset > .radio-wrapper,
+.form form fieldset > .checkbox-wrapper {
     margin-left: var(--form-field-gap);
 }
 
-main .form .radio-wrapper  label,
-main .form .checkbox-wrapper label {
+.form .radio-wrapper  label,
+.form .checkbox-wrapper label {
     flex-basis: calc(100% - 24px);
 }
 
-main .form fieldset.link .checkbox-wrapper label {
+.form fieldset.link .checkbox-wrapper label {
     flex-basis: unset;
 }
 
-main .form form fieldset.cards {
+.form form fieldset.cards {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
     margin-top: 0.5rem;
 }
 
-main .form form fieldset.cards > .radio-wrapper,
-main .form form fieldset.cards > .checkbox-wrapper {
+.form form fieldset.cards > .radio-wrapper,
+.form form fieldset.cards > .checkbox-wrapper {
     margin: 0;
     position: relative;
     flex: 1 1 auto;
@@ -286,8 +288,8 @@ main .form form fieldset.cards > .checkbox-wrapper {
     max-width: 300px;
 }
 
-main .form form fieldset.cards > .radio-wrapper > label,
-main .form form fieldset.cards > .checkbox-wrapper > label {
+.form form fieldset.cards > .radio-wrapper > label,
+.form form fieldset.cards > .checkbox-wrapper > label {
     display: flex;
     gap: 0.5rem;
     margin: 0;
@@ -306,40 +308,40 @@ main .form form fieldset.cards > .checkbox-wrapper > label {
     font-size: 0.95em;
 }
 
-main .form form fieldset.cards > .radio-wrapper > label:hover,
-main .form form fieldset.cards > .checkbox-wrapper > label:hover {
+.form form fieldset.cards > .radio-wrapper > label:hover,
+.form form fieldset.cards > .checkbox-wrapper > label:hover {
     box-shadow: var(--form-card-hover-shadow);
     border-color: #ccc;
     transform: translateY(-1px);
 }
 
-main .form form fieldset.cards.horizontal {
+.form form fieldset.cards.horizontal {
     flex-direction: row;
     column-gap: 0.75rem;
     column-gap: 0;
 }
 
-main .form form fieldset.cards.horizontal > .radio-wrapper,
-main .form form fieldset.cards.horizontal > .checkbox-wrapper {
+.form form fieldset.cards.horizontal > .radio-wrapper,
+.form form fieldset.cards.horizontal > .checkbox-wrapper {
     flex: 0 1 auto;
     max-width: none;
 }
 
-main .form form fieldset.cards.horizontal > .radio-wrapper > label,
-main .form form fieldset.cards.horizontal > .checkbox-wrapper > label {
+.form form fieldset.cards.horizontal > .radio-wrapper > label,
+.form form fieldset.cards.horizontal > .checkbox-wrapper > label {
     min-width: -webkit-fill-available; 
 }
 
-main .form form fieldset.cards > .radio-wrapper > input,
-main .form form fieldset.cards > .checkbox-wrapper > input {
+.form form fieldset.cards > .radio-wrapper > input,
+.form form fieldset.cards > .checkbox-wrapper > input {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-main .form form fieldset.cards > .radio-wrapper > input:checked ~ label,
-main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label {
+.form form fieldset.cards > .radio-wrapper > input:checked ~ label,
+.form form fieldset.cards > .checkbox-wrapper > input:checked ~ label {
     border: 1px solid var(--form-card-selected-border-color);
     background-color: var(--form-card-selected-background);
     box-shadow: var(--form-card-selected-shadow);
@@ -347,8 +349,8 @@ main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label {
     font-weight: 500;
 }
 
-main .form form fieldset.cards > .radio-wrapper > input:checked ~ label::after,
-main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label::after {
+.form form fieldset.cards > .radio-wrapper > input:checked ~ label::after,
+.form form fieldset.cards > .checkbox-wrapper > input:checked ~ label::after {
     content: "";
     display: inline-block;
     width: 8px;
@@ -358,20 +360,20 @@ main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label::afte
     margin-left: auto;
 }
 
-main .form form fieldset.cards > .radio-wrapper > input:focus ~ label,
-main .form form fieldset.cards > .checkbox-wrapper > input:focus ~ label {
+.form form fieldset.cards > .radio-wrapper > input:focus ~ label,
+.form form fieldset.cards > .checkbox-wrapper > input:focus ~ label {
     outline: none;
     box-shadow: 0 0 0 1px var(--button-primary-color);
 }
 
-main .form .form-image-wrapper img {
+.form .form-image-wrapper img {
     max-width: 100%;
     height: auto;
   }
 
 /* For cards with icons or images */
-main .form form fieldset.cards > .radio-wrapper > label > img,
-main .form form fieldset.cards > .checkbox-wrapper > label > img {
+.form form fieldset.cards > .radio-wrapper > label > img,
+.form form fieldset.cards > .checkbox-wrapper > label > img {
     max-width: 18px;
     max-height: 18px;
     object-fit: contain;
@@ -379,17 +381,17 @@ main .form form fieldset.cards > .checkbox-wrapper > label > img {
 
 /* Responsive adjustments for cards */
 @media (width <= 768px) {
-    main .form form fieldset.cards > .radio-wrapper,
-    main .form form fieldset.cards > .checkbox-wrapper {
+    .form form fieldset.cards > .radio-wrapper,
+    .form form fieldset.cards > .checkbox-wrapper {
         min-width: 100%;
     }
     
-    main .form form fieldset.cards.horizontal {
+    .form form fieldset.cards.horizontal {
         flex-wrap: wrap;
     }
     
-    main .form form fieldset.cards.horizontal > .radio-wrapper,
-    main .form form fieldset.cards.horizontal > .checkbox-wrapper {
+    .form form fieldset.cards.horizontal > .radio-wrapper,
+    .form form fieldset.cards.horizontal > .checkbox-wrapper {
         min-width: 100%;
     }
 }
@@ -401,7 +403,7 @@ input::file-selector-button {
     text-align: center;
 }
 
-main .form button {
+.form button {
     color: var(--form-button-color);
     background: var(--form-button-background-color);
     border: var(--form-button-border);
@@ -411,29 +413,29 @@ main .form button {
     width: 100%;
 }
 
-main form .file-wrapper > button{
+form .file-wrapper > button {
     display: flex;
 }
 
-main .form button:hover {
+.form button:hover {
     background: var(--form-button-background-hover-color);
 }
 
-main .submit-wrapper{
+.submit-wrapper {
     width: var(--form-submit-width);
 }
 
-main .form textarea:disabled,
-main .form select:disabled,
-main .form button:disabled {
+.form textarea:disabled,
+.form select:disabled,
+.form button:disabled {
     background-color: var(--form-input-disable-color);
 }
 
-main .file-wrapper.decorated input[type="file"] {
+.file-wrapper.decorated input[type="file"] {
     display: none;
 }
 
-main .file-wrapper .field-dropregion {
+.file-wrapper .field-dropregion {
     background: rgb(0 0 0 / 2%);
     border: 1px dashed var(--form-input-border-color);
     border-radius: 4px;
@@ -443,52 +445,52 @@ main .file-wrapper .field-dropregion {
 }
 
 /* Repeatable Styling */
-main .form form .repeat-actions {
+.form form .repeat-actions {
     grid-column: span 12;
     order: 2;
 }
 
-main .form form .item-remove,
-main .form form .item-add {
+.form form .item-remove,
+.form form .item-add {
     overflow: unset;
 }
 
-main .form form .item-remove {
+.form form .item-remove {
     justify-self: end;
     grid-column: span 12;
     order: 1;
 }
 
-main .form form div[data-variant="addDeleteButtons"] .item-add,
-main .form form div[data-variant="addDeleteButtons"] .item-remove {
+.form form div[data-variant="addDeleteButtons"] .item-add,
+.form form div[data-variant="addDeleteButtons"] .item-remove {
     display: block;
 }
 
 /* Hide add button when add instance is disabled */
-main .form form .repeat-wrapper[data-add-instance="false"] .item-add {
+.form form .repeat-wrapper[data-add-instance="false"] .item-add {
   display: none;
 }
 
 /* Hide remove buttons when remove instance is disabled */
-main .form form .repeat-wrapper[data-remove-instance="false"] .item-remove {
+.form form .repeat-wrapper[data-remove-instance="false"] .item-remove {
   display: none;
 }
 
 /* End of Repeatable Styling */
-main .form .file-description{
+.form .file-description {
   display: flex;
   gap: 20px;
   align-items: center;
   margin-top: 5px;
 }
 
-main .form .file-description .file-description-name {
+.form .file-description .file-description-name {
   cursor: pointer;
   text-decoration: underline;
   flex: 1;
 }
 
-main .file-wrapper .file-description button {
+.file-wrapper .file-description button {
     --form-button-padding: 15px;
 
     width: 12px;
@@ -501,7 +503,7 @@ main .file-wrapper .file-description button {
     border-radius: 3px;
 }
 
-main .file-wrapper .file-description button::after{
+.file-wrapper .file-description button::after {
     content: 'X';
     position: absolute;
     top: 50%;
@@ -510,64 +512,64 @@ main .file-wrapper .file-description button::after{
     transform: translate(-50%, -50%);
 }
 
-main .form .button-wrapper button {
+.form .button-wrapper button {
     cursor:pointer
 }
 
-main .form .button-wrapper button:hover {
+.form .button-wrapper button:hover {
     border: 3px solid #fff;
     color: #fff;
     background-color: var(--button-secondary-color);
 }
 
-main .form .button-wrapper button[disabled] {
+.form .button-wrapper button[disabled] {
     cursor:auto
 }
 
-main .form .button-wrapper button[disabled]:hover {
+.form .button-wrapper button[disabled]:hover {
     border: 3px solid var(--button-secondary-color);
     color: var(--button-secondary-color);
     background-color: transparent;
 }
 
 @media (width >= 600px) {
-    main .form button {
+    .form button {
         width: unset;
     }
 }
 
-main form .panel-wrapper {
+form .panel-wrapper {
   display: flex;
   padding: 0;
   flex-direction: column;
 }
 
-main .form form .panel-wrapper{
+.form form .panel-wrapper {
   display: grid;
   grid-template-columns: repeat(var(--form-columns), minmax(0, 1fr));
   gap: var(--form-field-vert-gap) var(--form-field-horz-gap);
 }
 
-main .form form .repeat-wrapper{
+.form form .repeat-wrapper {
     display: grid;
     grid-template-columns: repeat(var(--form-columns), minmax(0, 1fr));
     gap: var(--form-field-vert-gap) var(--form-field-horz-gap);
 }
 
 @media (width >= 1200px) {
-    main .form form .form-textarea-wrapper,
-    main .form form .file-wrapper,
-    main .form form .panel-wrapper {
+    .form form .form-textarea-wrapper,
+    .form form .file-wrapper,
+    .form form .panel-wrapper {
         flex: 1 0 100%;
     }
 
-    main .form form .panel-wrapper {
+    .form form .panel-wrapper {
         flex-flow: row wrap;
         gap: 10px 15px;
     }
 }
 
-main .form .form-message.success-message {
+.form .form-message.success-message {
     color: #0f5132;
     background-color: #d1e7dd;
     border-color: #badbcc;
@@ -576,7 +578,7 @@ main .form .form-message.success-message {
     padding: 10px;
 }
 
-main .form .form-message.error-message {
+.form .form-message.error-message {
     color: #842029;
     background-color: #f8d7da;
     border-color: #f5c2c7;
@@ -585,7 +587,7 @@ main .form .form-message.error-message {
     padding: 10px;
 }
 
-main .form .file-wrapper .file-drag-area {
+.form .file-wrapper .file-drag-area {
   border: 1px dashed var(--border-color);
   border-radius: 5px;
   padding: 10px 5px;
@@ -597,81 +599,81 @@ main .form .file-wrapper .file-drag-area {
 }
 
 /* grid css */
-main .form form .field-wrapper .field-description{
+.form form .field-wrapper .field-description {
   grid-column: span 12;
 }
 
-main .form form .field-wrapper.col-12 {
+.form form .field-wrapper.col-12 {
     grid-column: span 12;
 }
 
-main .form form .field-wrapper.col-11 {
+.form form .field-wrapper.col-11 {
     grid-column: span 11;
 }
 
-main .form form .field-wrapper.col-10 {
+.form form .field-wrapper.col-10 {
   grid-column: span 10;
 }
 
-main .form form .field-wrapper.col-9 {
+.form form .field-wrapper.col-9 {
     grid-column: span 9;
 }
 
-main .form form .field-wrapper.col-8 {
+.form form .field-wrapper.col-8 {
     grid-column: span 8;
 }
 
-main .form form .field-wrapper.col-7 {
+.form form .field-wrapper.col-7 {
     grid-column: span 7;
 }
 
-main .form form .field-wrapper.col-6 {
+.form form .field-wrapper.col-6 {
       grid-column: span 6;
 }
 
-main .form form .field-wrapper.col-5 {
+.form form .field-wrapper.col-5 {
       grid-column: span 5;
 }
 
-main .form form .field-wrapper.col-4 {
+.form form .field-wrapper.col-4 {
       grid-column: span 4;
 }
 
-main .form form .field-wrapper.col-3 {
+.form form .field-wrapper.col-3 {
       grid-column: span 3;
 }
 
-main .form form .field-wrapper.col-2 {
+.form form .field-wrapper.col-2 {
       grid-column: span 2;
 }
 
-main .form form .field-wrapper.col-1 {
+.form form .field-wrapper.col-1 {
     grid-column: span 1;
 }
 
-main .form form .checkbox-wrapper.field-invalid > .field-description {
+.form form .checkbox-wrapper.field-invalid > .field-description {
       order: 1;
 }
 
-main .form form:not(.edit-mode) .captcha-wrapper{
+.form form:not(.edit-mode) .captcha-wrapper {
     display: none ;
 }
 
-main .form form .radio-group-wrapper.horizontal,
-main .form form .checkbox-group-wrapper.horizontal {
+.form form .radio-group-wrapper.horizontal,
+.form form .checkbox-group-wrapper.horizontal {
     display: flex;
     flex-flow: row wrap;
     gap: inherit;
 }
 
-main .form form .radio-group-wrapper.horizontal .field-description,
-main .form form .checkbox-group-wrapper.horizontal .field-description {
+.form form .radio-group-wrapper.horizontal .field-description,
+.form form .checkbox-group-wrapper.horizontal .field-description {
     width: 100%;
     order: 1;
     margin-top: 0.5rem;
 }
 
-main div.form-wrapper {
+div.form-wrapper {
     background: white;
     padding: 40px;
     border-radius: 12px;
@@ -686,6 +688,6 @@ main div.form-wrapper {
 }
 
 /* Expand height for multi-select dropdowns (array types) */
-main .form form select[multiple] {
+.form form select[multiple] {
     height: calc(42px + 50px);
 }
