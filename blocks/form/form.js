@@ -10,6 +10,7 @@ import DocBasedFormToAF from './transform.js';
 import {
   checkValidation,
   createButton,
+  createDMOptimizedPicture,
   createDropdownUsingEnum,
   createFieldWrapper,
   createHelpText,
@@ -18,6 +19,7 @@ import {
   extractIdFromUrl,
   getHTMLRenderType,
   getSitePageName,
+  isDynamicMediaUrl,
   setConstraints,
   setPlaceholder,
   stripTags,
@@ -126,7 +128,10 @@ function createImage(fd) {
   field.id = fd?.id;
   const imagePath = fd.value || fd.properties['fd:repoPath'] || '';
   const altText = fd.altText || fd.name;
-  field.append(createOptimizedPicture(imagePath, altText));
+  const picture = isDynamicMediaUrl(imagePath)
+    ? createDMOptimizedPicture(imagePath, altText)
+    : createOptimizedPicture(imagePath, altText);
+  field.append(picture);
   return field;
 }
 
