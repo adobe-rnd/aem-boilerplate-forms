@@ -35,7 +35,19 @@
                     "name": "basic"
                 },
                 {
-                    "...": "../form-common/_basic-select-fields.json#/fields"
+                    "...": "../form-common/_basic-input-fields.json#/fields"
+                },
+                {
+                    "component": "radio-group-options",
+                    "name": "radioOptions",
+                    "label": "Options (Validated Editor)",
+                    "valueType": "string"
+                },
+                {
+                    "component": "text",
+                    "name": "default",
+                    "label": "Default option",
+                    "valueType": "string"
                 },
                 {
                     "component": "select",
@@ -52,26 +64,6 @@
                         }
                     ],
                     "value": "default"
-                },
-                {
-                    "component": "select",
-                    "label": "Save value as",
-                    "name": "type",
-                    "valueType": "string",
-                    "options": [
-                        {
-                            "name": "String",
-                            "value": "string"
-                        },
-                        {
-                            "name": "Boolean",
-                            "value": "boolean"
-                        },
-                        {
-                            "name": "Number",
-                            "value": "number"
-                        }
-                    ]
                 },
                 {
                     "component": "radio-group",

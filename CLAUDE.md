@@ -16,6 +16,11 @@ This is an **MVC** architecture with a **dual-model pattern**: the **Model** run
 
 For detailed architecture, see [`docs/context/architecture.md`](./docs/context/architecture.md).
 
+Radio Group UE options use the Radio Options extension's `radio-group-options`
+renderer instead of native option/type controls. Deploy and enable the matching
+`af-extensions` version before deploying the model. Default option stays native.
+See [`form-block-components.md`](docs/context/form-block-components.md).
+
 ## File Map
 
 ```
