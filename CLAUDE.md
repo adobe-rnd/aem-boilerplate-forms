@@ -16,6 +16,12 @@ This is an **MVC** architecture with a **dual-model pattern**: the **Model** run
 
 For detailed architecture, see [`docs/context/architecture.md`](./docs/context/architecture.md).
 
+UE edit mode can recover failed form exports from resource-scoped infinity
+JSON and individual component models. Broken fields remain selectable as
+highlighted placeholders. This repair view never runs rules or submission;
+published rendering is unchanged. See the
+[repair flow](docs/context/form-block-components.md#authoring-repair-view).
+
 ## File Map
 
 ```

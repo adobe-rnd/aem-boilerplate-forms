@@ -17,7 +17,8 @@
  * Adobe permits you to use and modify this file solely in accordance with
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
-import decorate, { generateFormRendition, fetchForm } from '../blocks/form/form.js';
+import decorate, { generateFormRendition, fetchForm, recoverFormForAuthoring } from '../blocks/form/form.js';
+import { authoringDefinitions } from '../blocks/form/authoring-recovery.js';
 import { loadCSS } from './aem.js';
 import { handleAccordionNavigation } from '../blocks/form/components/accordion/accordion.js';
 import { createButton as createRepeatButton } from '../blocks/form/components/repeat/repeat.js';
@@ -176,6 +177,9 @@ function annotateItems(items, formDefinition, formFieldMap) {
             fieldWrapper.setAttribute('data-aue-model', getPropertyModel(fd));
             fieldWrapper.setAttribute('data-aue-label', fd.label?.value || fd.name);
           }
+          if (fd.properties['fd:authoringError']) {
+            fieldWrapper.dataset.aueLabel += ' (needs attention)';
+          }
         } else {
           console.warn(`field ${id} not found in form definition`);
         }
@@ -233,29 +237,43 @@ export function handleEditorSelect(event) {
   }
 }
 
+async function recoverFormBlock(block, retryModel) {
+  const result = await recoverFormForAuthoring(block, retryModel);
+  if (result) annotateFormForEditing(result.formEl, result.formDef);
+  return result;
+}
+
 export async function renderFormBlock(form, editMode) {
   const block = form.closest('.block[data-aue-resource]');
+  if (form.dataset.authoringRecovery === 'true') {
+    return editMode ? recoverFormBlock(block) : null;
+  }
   if ((editMode && !block.classList.contains('edit-mode')) || !editMode) {
     block.classList.toggle('edit-mode', editMode);
     const div = form.parentElement;
     let formDef;
     try {
       const formDefResp = await fetch(`${form.dataset.formpath}.model.json`);
+      if (formDefResp.ok === false) {
+        throw new Error(`Unable to load form model: HTTP ${formDefResp.status}`);
+      }
       formDef = await formDefResp.json();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.warn('Failed to fetch form model json:', error);
       try {
         formDef = await fetchForm(document.location.pathname);
+        if (formDef?.properties?.['fd:path'] !== form.dataset.formpath) {
+          formDef = null;
+        }
       } catch (fallbackError) {
         // eslint-disable-next-line no-console
         console.error('Failed to fetch fallback form definition:', fallbackError);
-        return null;
       }
     }
 
     if (!formDef) {
-      return null;
+      return editMode ? recoverFormBlock(block, false) : null;
     }
 
     div.replaceChildren();
@@ -276,6 +294,11 @@ export async function renderFormBlock(form, editMode) {
 async function annotateFormsForEditing(forms) {
   if (typeof window.currentMode !== 'undefined' && window.currentMode === 'preview') return;
   forms.forEach(async (form) => {
+    const definition = authoringDefinitions.get(form);
+    if (definition) {
+      annotateFormForEditing(form, definition);
+      return;
+    }
     const { formEl, formDef } = (await renderFormBlock(form, true)) || {};
     if (formEl && formDef) {
       annotateFormForEditing(formEl, formDef);
@@ -322,6 +345,11 @@ export async function applyChanges(event) {
     || detail?.request?.target?.container?.resource // update, patch, add to sections
     || detail?.request?.to?.container?.resource; // move in sections
   if (!resource) return false;
+  const target = document.querySelector(`[data-aue-resource="${resource}"]`);
+  const recoveryBlock = target?.closest('.block[data-aue-resource]');
+  if (recoveryBlock?.querySelector('form[data-authoring-recovery="true"]')) {
+    return Boolean(await recoverFormBlock(recoveryBlock));
+  }
   const updates = detail?.response?.updates;
   if (!updates.length) return false;
   const { content } = updates[0];
@@ -335,12 +363,18 @@ export async function applyChanges(event) {
     if (block) {
       const blockResource = block.getAttribute('data-aue-resource');
       const newBlock = parsedUpdate.querySelector(`[data-aue-resource="${blockResource}"]`);
-      if (block.dataset.aueModel === 'form') {
+      if (block.dataset.aueModel === 'form' && newBlock) {
         const newContainer = newBlock.querySelector('pre');
         const codeEl = newContainer?.querySelector('code');
         const jsonContent = codeEl?.textContent;
         if (jsonContent) {
-          const formDef = decode(jsonContent);
+          let formDef;
+          try {
+            formDef = decode(jsonContent);
+          } catch (error) {
+            console.warn('Unable to read the updated form definition', error);
+            return Boolean(await recoverFormBlock(block));
+          }
           if (element.classList.contains('panel-wrapper')) {
             element = element.parentNode;
           }
@@ -388,6 +422,11 @@ export function attachEventListners(main) {
     window.currentMode = 'edit';
     const forms = document.querySelectorAll('form');
     annotateFormsForEditing(forms);
+    document.querySelectorAll('.block.form[data-aue-resource]').forEach(async (block) => {
+      if (!block.querySelector('form')) {
+        await recoverFormBlock(block);
+      }
+    });
   };
 
   if (document.documentElement.classList.contains('adobe-ue-edit')) {

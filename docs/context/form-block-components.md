@@ -2,6 +2,36 @@
 
 This document describes the rendering pipeline, component decorator system, and view update mechanisms for form components in the AEM Boilerplate Forms project.
 
+## Authoring repair view
+
+If the complete definition is unavailable in Universal Editor edit mode, the
+form block retrieves the affected form resource's `.-1.json` content and
+fetches its child components' `.model.json` definitions. Recovery uses the
+block's `data-aue-resource` path, not the first form on the page.
+
+Healthy components use their exported models. A component whose model fails
+gets a highlighted placeholder with its original resource path and property
+model. Its content-tree label ends with **(needs attention)**. Failed
+containers retain their recoverable children. Fix highlighted child
+components before reviewing the container's own properties.
+
+The warning asks you to fix highlighted components before editing other
+fields. This is guidance, not a lock on the properties panel. Input controls
+and submission are disabled, and the partial definition never initializes
+the rules engine. Preview remains unavailable while the repair view is
+active. If content cannot be retrieved, the warning explains that recovery
+is unavailable instead of showing an apparently empty, healthy form.
+
+After an edit in the repair view, the block retries the complete model. If
+it succeeds, normal authoring rendering replaces the placeholders and
+warning. Otherwise, the block refreshes the repair view. Entering edit mode
+also recovers blocks that failed before any form DOM was created.
+
+`authoring-recovery.js` builds this in-memory authoring snapshot.
+`fd:authoringRecovery` and `fd:authoringError` are local rendering markers;
+they are not written to AEM. Published rendering and backend serialization
+are unchanged.
+
 ## Section 1: Rendering Pipeline
 
 **One-line flow:**
