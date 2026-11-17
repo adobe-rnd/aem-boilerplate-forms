@@ -1,36 +1,30 @@
 # Card Choice
 
-Horizontal carousel of product cards extending `text-input`. Selecting a card stores its `id` as the field value.
+Horizontal carousel of product cards that extends `text-input`. Selecting a card stores its `id` as the field value.
 
 ## How to Use
 
-Insert a **Card Choice** component, then set `properties.cards` from a rule (rule editor "Set Property", which dispatches `custom:setProperty`).
+Add a Text Input with `fd:viewType` `card-choice`. Provide the card data at runtime with a rule (Set Property action on the field, property `cards`).
 
 ## Authoring Properties
 
-No custom authoring properties; it inherits the `text-input` fields. Card data comes from the runtime property `cards`:
+| Property | Description |
+|----------|-------------|
+| `properties.cards` | Set at runtime by a rule. Array of `{ id, title, subtitle, image, features[], detailsUrl, minAmount, ctaLabel }` |
 
-| Key | Description |
-|-----|-------------|
-| `id` | Value written to the model when selected |
-| `title`, `subtitle` | Card heading texts |
-| `image` | Card image URL |
-| `features` | Array of feature strings (each with an icon) |
-| `detailsUrl` | Target of the "All Features & Benefits" link |
-| `minAmount` | Number, shown as Indian Rupees, e.g. `₹15,000/-` |
-| `ctaLabel` | Label of the call-to-action button |
+`minAmount` is shown as Indian Rupees (e.g. `₹15,000/-`).
 
 ## Model Subscriptions
 
-- `properties` / `properties.cards` changes: re-render all cards (also on register if already set).
-- `value` changes: mark the matching card selected.
+- `properties` change (`cards`): re-renders all cards (also read on register if already set).
+- `value` change: marks the card with the matching `id` as selected.
 
 ## Model Properties Set
 
-`model.value` is set to the card `id` immediately when a call-to-action is clicked (one `value` change per selection).
+- `value`: the selected card's `id`, committed on click of the card's call-to-action (one change per selection).
 
 ## Usage Notes
 
-- Base type `text-input`, `fd:viewType` `card-choice`. The text input is hidden.
-- Track is horizontally scrollable; "Previous"/"Next" buttons and pagination dots scroll it.
-- CTA buttons expose `aria-pressed`; only one card is selected at a time.
+- Base type `text-input`, `fd:viewType` `card-choice`; the text input is hidden.
+- Cards sit in a horizontally scrollable track with Previous/Next buttons and pagination dots.
+- Each call-to-action is a `<button type="button">` exposing `aria-pressed`; only one card is selected.

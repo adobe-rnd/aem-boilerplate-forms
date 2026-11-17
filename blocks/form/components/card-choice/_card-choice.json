@@ -10,7 +10,9 @@
                         "template": {
                             "jcr:title": "Card Choice",
                             "fieldType": "text-input",
-                            "fd:viewType": "card-choice"
+                            "fd:viewType": "card-choice",
+                            "enabled": true,
+                            "visible": true
                         }
                     }
                 }

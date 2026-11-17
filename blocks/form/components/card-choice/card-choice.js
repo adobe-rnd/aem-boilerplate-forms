@@ -1,13 +1,13 @@
 import { subscribe } from '../../rules/index.js';
 
-const ICON_SVG = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M2.5 3.5h11v9h-11z M2.5 6.5h11" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>';
-const CHEVRON_RIGHT = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
-const CHEVRON_LEFT = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+const ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><rect x="2" y="3" width="12" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2 6.5h12" stroke="currentColor" stroke-width="1.2"/></svg>';
+const CHEVRON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ARROW_LEFT = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-function formatRupees(amount) {
-  const num = Number(amount);
-  if (amount === undefined || amount === null || amount === '' || Number.isNaN(num)) return '';
-  return `₹${num.toLocaleString('en-IN')}/-`;
+function formatAmount(amount) {
+  const n = Number(amount);
+  if (amount === undefined || amount === null || amount === '' || Number.isNaN(n)) return '';
+  return `₹${n.toLocaleString('en-IN')}/-`;
 }
 
 function el(tag, className, text) {
@@ -17,110 +17,94 @@ function el(tag, className, text) {
   return node;
 }
 
-function safeUrl(url) {
-  try {
-    const parsed = new URL(url, window.location.href);
-    return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
-  } catch (e) {
-    return '';
-  }
-}
-
 function createCard(card) {
-  const li = el('li', 'card-choice-card');
-  li.dataset.cardId = String(card.id);
-  li.append(el('h3', 'card-choice-title', card.title || ''));
-  if (card.subtitle) li.append(el('p', 'card-choice-subtitle', card.subtitle));
-
+  const item = el('li', 'card-choice-card');
+  item.dataset.cardId = card.id;
+  item.append(el('h3', 'card-choice-title', card.title));
+  if (card.subtitle) item.append(el('p', 'card-choice-subtitle', card.subtitle));
   if (card.image) {
-    const imgWrap = el('div', 'card-choice-image');
-    const img = document.createElement('img');
-    img.src = safeUrl(card.image);
+    const img = el('img', 'card-choice-image');
+    img.src = card.image;
     img.alt = card.title || '';
     img.loading = 'lazy';
-    imgWrap.append(img);
-    li.append(imgWrap);
+    item.append(img);
   }
-
-  if (Array.isArray(card.features) && card.features.length) {
-    const ul = el('ul', 'card-choice-features');
-    card.features.forEach((feature) => {
-      const item = el('li', 'card-choice-feature');
-      const icon = el('span', 'card-choice-feature-icon');
-      icon.innerHTML = ICON_SVG;
-      item.append(icon, el('span', 'card-choice-feature-text', feature));
-      ul.append(item);
-    });
-    li.append(ul);
-  }
-
-  const href = card.detailsUrl ? safeUrl(card.detailsUrl) : '';
-  if (href) {
-    const link = el('a', 'card-choice-details');
-    link.href = href;
+  const features = el('ul', 'card-choice-features');
+  (card.features || []).forEach((text) => {
+    const li = el('li', 'card-choice-feature');
+    const icon = el('span', 'card-choice-feature-icon');
+    icon.innerHTML = ICON;
+    li.append(icon, el('span', 'card-choice-feature-text', text));
+    features.append(li);
+  });
+  item.append(features);
+  if (card.detailsUrl) {
+    const link = el('a', 'card-choice-link');
+    link.href = card.detailsUrl;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.append(document.createTextNode('All Features & Benefits'));
-    const chevron = el('span', 'card-choice-chevron');
-    chevron.innerHTML = CHEVRON_RIGHT;
-    link.append(chevron);
-    li.append(link);
+    const chev = el('span', 'card-choice-link-icon');
+    chev.innerHTML = CHEVRON;
+    link.append(chev);
+    item.append(link);
   }
-
-  if (card.minAmount !== undefined && card.minAmount !== null && card.minAmount !== '') {
+  if (card.minAmount !== undefined && card.minAmount !== null) {
     const row = el('div', 'card-choice-amount');
-    row.append(
-      el('span', 'card-choice-amount-label', 'Min. FD Amount'),
-      el('span', 'card-choice-amount-value', formatRupees(card.minAmount)),
-    );
-    li.append(row);
+    const label = el('span', 'card-choice-amount-label', 'Min. FD Amount');
+    const value = el('span', 'card-choice-amount-value', formatAmount(card.minAmount));
+    row.append(label, value);
+    item.append(row);
   }
-
-  const cta = el('button', 'card-choice-cta', card.ctaLabel || 'Get This Card');
+  const cta = el('button', 'card-choice-cta', card.ctaLabel || 'Select');
   cta.type = 'button';
   cta.setAttribute('aria-pressed', 'false');
-  li.append(cta);
-  return li;
+  item.append(cta);
+  return item;
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const input = fieldDiv.querySelector('input, textarea');
   if (input) {
     input.hidden = true;
-    input.style.display = 'none';
     input.setAttribute('aria-hidden', 'true');
     input.tabIndex = -1;
   }
   fieldDiv.classList.add('card-choice-wrapper');
 
   const root = el('div', 'card-choice');
-  const viewport = el('div', 'card-choice-viewport');
   const track = el('ul', 'card-choice-track');
   track.setAttribute('role', 'list');
-  const dots = el('div', 'card-choice-dots');
-
-  const prev = el('button', 'card-choice-arrow card-choice-prev');
+  const prev = el('button', 'card-choice-nav card-choice-prev');
   prev.type = 'button';
   prev.setAttribute('aria-label', 'Previous');
-  prev.innerHTML = CHEVRON_LEFT;
-  const next = el('button', 'card-choice-arrow card-choice-next');
+  prev.innerHTML = ARROW_LEFT;
+  const next = el('button', 'card-choice-nav card-choice-next');
   next.type = 'button';
   next.setAttribute('aria-label', 'Next');
-  next.innerHTML = CHEVRON_RIGHT;
-
-  viewport.append(track, prev, next);
-  root.append(viewport, dots);
-  const anchor = fieldDiv.querySelector('.field-description');
-  if (anchor) fieldDiv.insertBefore(root, anchor);
-  else fieldDiv.append(root);
+  next.innerHTML = ARROW_LEFT;
+  const dots = el('div', 'card-choice-dots');
+  root.append(track, prev, next, dots);
+  (input || fieldDiv).after(root);
 
   let model = null;
-  let renderedCards = null;
+  let cards = [];
+  let selected = '';
+  let renderedKey = 'null';
 
-  const pageSize = () => Math.max(track.clientWidth, 1);
+  const pageWidth = () => track.clientWidth || 1;
+  const scrollByPage = (dir) => {
+    const [first, second] = track.querySelectorAll('.card-choice-card');
+    const step = first && second
+      ? second.getBoundingClientRect().left - first.getBoundingClientRect().left
+      : pageWidth();
+    track.scrollBy({ left: dir * step, behavior: 'smooth' });
+  };
 
   const updateNav = () => {
     const max = track.scrollWidth - track.clientWidth;
+    prev.hidden = track.scrollLeft <= 1;
+    next.hidden = max <= 1 || track.scrollLeft >= max - 1;
     const pages = dots.children.length;
     if (pages) {
       const idx = max > 0 ? Math.round((track.scrollLeft / max) * (pages - 1)) : 0;
@@ -128,88 +112,65 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
     }
   };
 
-  const buildDots = () => {
-    dots.textContent = '';
-    if (track.children.length === 0) return;
-    const pages = Math.max(1, Math.ceil(track.scrollWidth / pageSize()));
+  const renderDots = () => {
+    dots.replaceChildren();
+    const pages = Math.max(1, Math.ceil(track.scrollWidth / pageWidth() - 0.01));
+    if (cards.length === 0) return;
     for (let i = 0; i < pages; i += 1) {
-      const dot = el('button', 'card-choice-dot');
-      dot.type = 'button';
-      dot.setAttribute('aria-label', `Go to page ${i + 1}`);
-      dot.addEventListener('click', () => {
-        track.scrollTo({ left: i * pageSize(), behavior: 'smooth' });
-      });
+      const dot = el('span', 'card-choice-dot');
       dots.append(dot);
     }
   };
 
-  const syncSelection = () => {
-    const value = model ? model.value : input?.value;
-    const selected = value === undefined || value === null || value === '' ? null : String(value);
-    track.querySelectorAll('.card-choice-card').forEach((card) => {
-      const isSelected = selected !== null && card.dataset.cardId === selected;
-      card.classList.toggle('selected', isSelected);
-      card.querySelector('.card-choice-cta').setAttribute('aria-pressed', String(isSelected));
+  const applySelection = () => {
+    track.querySelectorAll('.card-choice-card').forEach((item) => {
+      const on = selected !== '' && item.dataset.cardId === selected;
+      item.classList.toggle('selected', on);
+      item.querySelector('.card-choice-cta').setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   };
 
-  const render = (cards) => {
-    track.textContent = '';
-    if (Array.isArray(cards)) {
-      cards.forEach((card) => {
-        if (card && typeof card === 'object') track.append(createCard(card));
-      });
-    }
-    renderedCards = cards;
-    buildDots();
-    syncSelection();
+  const select = (id) => {
+    selected = id;
+    applySelection();
+    if (model && model.value !== id) model.value = id;
+  };
+
+  const render = (list) => {
+    renderedKey = JSON.stringify(list ?? null);
+    cards = Array.isArray(list) ? list.filter((c) => c && c.id !== undefined) : [];
+    const items = cards.map((c) => {
+      const item = createCard({ ...c, id: String(c.id) });
+      item.querySelector('.card-choice-cta').addEventListener('click', () => select(String(c.id)));
+      return item;
+    });
+    track.replaceChildren(...items);
+    applySelection();
+    renderDots();
     updateNav();
   };
 
-  const refreshCards = () => {
-    const cards = model?.properties?.cards;
-    if (cards !== renderedCards && JSON.stringify(cards) !== JSON.stringify(renderedCards)) {
-      render(cards);
-    }
-  };
-
-  prev.addEventListener('click', () => {
-    track.scrollBy({ left: -pageSize(), behavior: 'smooth' });
-  });
-  next.addEventListener('click', () => {
-    track.scrollBy({ left: pageSize(), behavior: 'smooth' });
-  });
+  prev.addEventListener('click', () => scrollByPage(-1));
+  next.addEventListener('click', () => scrollByPage(1));
   track.addEventListener('scroll', updateNav, { passive: true });
-
-  track.addEventListener('click', (event) => {
-    const cta = event.target.closest('.card-choice-cta');
-    if (!cta || !model) return;
-    const { cardId } = cta.closest('.card-choice-card').dataset;
-    model.value = cardId;
-    syncSelection();
-  });
-
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(() => {
-      if (track.children.length) {
-        buildDots();
-        updateNav();
-      }
-    }).observe(track);
-  }
+  window.addEventListener('resize', () => { renderDots(); updateNav(); });
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
     if (eventType === 'register') {
       model = fieldModel;
-      refreshCards();
-      syncSelection();
+      selected = model.value !== undefined && model.value !== null ? String(model.value) : '';
+      render(model.properties?.cards);
     } else if (eventType === 'change') {
       payload?.changes?.forEach((change) => {
         const name = change?.propertyName;
-        if (name === 'value') {
-          syncSelection();
-        } else if (name === 'properties' || name?.startsWith('properties.')) {
-          refreshCards();
+        if (name === 'properties.cards' || name === 'properties') {
+          const curCards = name === 'properties' ? change.currentValue?.cards : change.currentValue;
+          const key = JSON.stringify(curCards ?? null);
+          if (key !== renderedKey) render(curCards);
+        } else if (change?.propertyName === 'value') {
+          const v = change.currentValue;
+          selected = v !== undefined && v !== null ? String(v) : '';
+          applySelection();
         }
       });
     }
