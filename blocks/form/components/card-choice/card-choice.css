@@ -1,0 +1,189 @@
+.form .card-choice-wrapper .card-choice {
+    position: relative;
+    margin-top: 12px;
+}
+
+.form .card-choice-wrapper > input,
+.form .card-choice-wrapper > textarea {
+    display: none;
+}
+
+.form .card-choice-wrapper .card-choice-track {
+    display: flex;
+    gap: 16px;
+    margin: 0;
+    padding: 4px 0 12px;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.form .card-choice-wrapper .card-choice-track::-webkit-scrollbar {
+    display: none;
+}
+
+.form .card-choice-wrapper .card-choice-card {
+    flex: 0 0 min(292px, 80%);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #d9dce3;
+    border-radius: 16px;
+    scroll-snap-align: start;
+}
+
+.form .card-choice-wrapper .card-choice-card.selected {
+    border-color: #1f3fcc;
+    box-shadow: inset 0 0 0 1px #1f3fcc;
+}
+
+.form .card-choice-wrapper .card-choice-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.form .card-choice-wrapper .card-choice-subtitle {
+    margin: 0;
+    color: #5b6170;
+    font-size: 14px;
+}
+
+.form .card-choice-wrapper .card-choice-image {
+    width: 166px;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 166 / 104;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.form .card-choice-wrapper .card-choice-features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+}
+
+.form .card-choice-wrapper .card-choice-feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form .card-choice-wrapper .card-choice-feature-icon {
+    display: inline-flex;
+    flex: none;
+}
+
+.form .card-choice-wrapper .card-choice-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #1f3fcc;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.form .card-choice-wrapper .card-choice-amount {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    overflow: hidden;
+    border: 1px solid #d9dce3;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.form .card-choice-wrapper .card-choice-amount-label {
+    padding: 12px 14px;
+}
+
+.form .card-choice-wrapper .card-choice-amount-value {
+    padding: 12px 14px;
+    background: #f1f2f6;
+    font-weight: 600;
+}
+
+.form .card-choice-wrapper .card-choice-cta {
+    margin-top: auto;
+    width: 100%;
+    padding: 12px;
+    background: #fff;
+    color: #1f3fcc;
+    border: 1px solid #1f3fcc;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form .card-choice-wrapper .card-choice-cta[aria-pressed="true"],
+.form .card-choice-wrapper .card-choice-cta:hover {
+    background: #1f3fcc;
+    color: #fff;
+}
+
+.form .card-choice-wrapper .card-choice-cta:focus-visible,
+.form .card-choice-wrapper .card-choice-nav:focus-visible {
+    outline: 2px solid #1f3fcc;
+    outline-offset: 2px;
+}
+
+.form .card-choice-wrapper .card-choice-nav {
+    position: absolute;
+    top: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: #fff;
+    background: #1f3fcc;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.form .card-choice-wrapper .card-choice-nav[hidden] {
+    display: none;
+}
+
+.form .card-choice-wrapper .card-choice-prev {
+    left: -8px;
+}
+
+.form .card-choice-wrapper .card-choice-next {
+    right: -8px;
+}
+
+.form .card-choice-wrapper .card-choice-next svg {
+    transform: rotate(180deg);
+}
+
+.form .card-choice-wrapper .card-choice-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.form .card-choice-wrapper .card-choice-dot {
+    width: 8px;
+    height: 8px;
+    background: #c9cdd8;
+    border-radius: 4px;
+}
+
+.form .card-choice-wrapper .card-choice-dot.active {
+    width: 32px;
+    background: #5470d6;
+}
