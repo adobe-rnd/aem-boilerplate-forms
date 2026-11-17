@@ -1,0 +1,34 @@
+{
+  "id": "inr-input-test-form",
+  "fieldType": "form",
+  "title": "inr-input e2e test",
+  "action": "/adobe/forms/af/submit/inr-input-test-form",
+  "properties": {},
+  "items": [
+    {
+      "id": "field-under-test",
+      "name": "fieldUnderTest",
+      "fieldType": "number-input",
+      ":type": "inr-input",
+      "visible": true,
+      "enabled": true,
+      "label": {
+        "value": "INR Input",
+        "visible": true
+      },
+      "properties": {
+        "type": "number",
+        "displayFormat": ""
+      },
+      "type": "number"
+    },
+    {
+      "id": "next-field",
+      "name": "nextField",
+      "fieldType": "text-input",
+      "label": {
+        "value": "Next field"
+      }
+    }
+  ]
+}

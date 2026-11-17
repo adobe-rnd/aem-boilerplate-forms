@@ -1,0 +1,55 @@
+.form .inr-input-wrapper .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid #d9dbe3;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.form .inr-input-wrapper .inr-input-group:focus-within {
+    border-color: #1473e6;
+}
+
+.form .inr-input-wrapper .inr-input-prefix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    padding: 0 12px;
+    background: #f1f2f6;
+    border-right: 1px solid #d9dbe3;
+    color: #4b5063;
+    font-size: 1.25rem;
+}
+
+.form .inr-input-wrapper .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+}
+
+.form .inr-input-wrapper .inr-input-words {
+    margin-top: 16px;
+}
+
+.form .inr-input-wrapper .inr-input-words-field {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid #d9dbe3;
+    border-radius: 12px;
+    background: #f1f2f6;
+    color: #2b2f3a;
+    cursor: default;
+}
+
+.form .inr-input-wrapper .inr-input-words-hint {
+    display: block;
+    margin-top: 6px;
+    text-align: right;
+    color: #6b7080;
+}
