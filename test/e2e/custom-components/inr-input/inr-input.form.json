@@ -17,7 +17,7 @@
         "visible": true
       },
       "properties": {
-        "type": "number",
+        "type": "integer",
         "displayFormat": ""
       },
       "type": "number"

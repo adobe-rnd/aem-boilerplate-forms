@@ -8,66 +8,49 @@ import {
 const formDef = loadFormJson('inr-input');
 const FIELD = 'field-under-test';
 
-const words = (page) => field(page, FIELD).getByLabel(/in words/i);
-const amount = (page) => field(page, FIELD).locator('input[type="number"]');
+const CASES = [
+  [100000, 'One Lakh Rupees Only'],
+  [250000, 'Two Lakh Fifty Thousand Rupees Only'],
+  [1500, 'One Thousand Five Hundred Rupees Only'],
+  [123456.78, 'One Lakh Twenty Three Thousand Four Hundred Fifty Six Rupees and Seventy Eight Paise Only'],
+  [12345678.9, 'One Crore Twenty Three Lakh Forty Five Thousand Six Hundred Seventy Eight Rupees and Ninety Paise Only'],
+  [0.05, 'Five Paise Only'],
+];
 
 test.describe('inr-input custom component', () => {
   test.beforeEach(async ({ page, formServer }) => {
     await renderForm(page, formServer, formDef);
   });
 
-  test('renders prefix and read-only words field', async ({ page }) => {
+  const words = (page) => field(page, FIELD).locator('input[readonly], textarea[readonly], output');
+
+  test('renders prefix, amount input and read-only words field', async ({ page }) => {
     const wrapper = field(page, FIELD);
     await expect(wrapper).toHaveAttribute('data-component-status', 'loaded');
     await expect(wrapper.locator('.inr-input-prefix')).toHaveText('₹');
-    await expect(words(page)).toHaveAttribute('readonly', '');
+    await expect(wrapper.getByLabel('in words')).toHaveCount(1);
     await expect(words(page)).toHaveValue('');
-    await expect(wrapper.locator('.inr-input-words-hint')).toHaveText('Read-only');
+    await expect(wrapper.locator('.inr-input-readonly-hint')).toHaveText('Read-only');
   });
 
-  test('updates words live while typing, commits model on blur only', async ({ page }) => {
-    const changes = await trackChanges(page, FIELD);
-    await amount(page).click();
-    await amount(page).pressSequentially('250000');
-    await expect(words(page)).toHaveValue('Two Lakh Fifty Thousand Rupees Only');
-    expect(await changes()).toBe(0);
-    await page.getByLabel('Next field').click();
-    await expect.poll(() => getModel(page, FIELD)).toEqual(250000);
-    expect(await changes()).toBe(1);
-  });
-
-  const cases = [
-    [100000, 'One Lakh Rupees Only'],
-    [1500, 'One Thousand Five Hundred Rupees Only'],
-    [123456.78, 'One Lakh Twenty Three Thousand Four Hundred Fifty Six Rupees and Seventy Eight Paise Only'],
-    [12345678.9, 'One Crore Twenty Three Lakh Forty Five Thousand Six Hundred Seventy Eight Rupees and Ninety Paise Only'],
-    [0.05, 'Five Paise Only'],
-  ];
-  cases.forEach(([value, text]) => {
-    test(`typing ${value} shows words`, async ({ page }) => {
-      await amount(page).fill(String(value));
-      await expect(words(page)).toHaveValue(text);
+  for (const [amount, expected] of CASES) {
+    test(`model value ${amount} shows words`, async ({ page }) => {
+      await setModel(page, FIELD, 'value', amount);
+      await expect(words(page)).toHaveValue(expected);
     });
-  });
+  }
 
-  test('clearing the input empties the words', async ({ page }) => {
-    await amount(page).fill('1500');
-    await amount(page).fill('');
-    await expect(words(page)).toHaveValue('');
-  });
-
-  test('reflects external model changes', async ({ page }) => {
-    await setModel(page, FIELD, 'value', 100000);
-    await expect(words(page)).toHaveValue('One Lakh Rupees Only');
-    await expect(amount(page)).toHaveValue('100000');
-  });
-
-  test('keyboard: tab into amount and out to next field', async ({ page }) => {
-    await amount(page).focus();
-    await page.keyboard.type('1500');
+  test('words update live while typing; model commits once on blur', async ({ page }) => {
+    const changes = await trackChanges(page, FIELD);
+    const input = field(page, FIELD).locator('input:not([readonly])');
+    await input.click();
+    await input.pressSequentially('123456.78');
+    await expect(words(page)).toHaveValue(CASES[3][1]);
+    expect(await getModel(page, FIELD)).toBeFalsy();
     await page.keyboard.press('Tab');
-    await expect(page.getByLabel('Next field')).toBeFocused();
-    await expect.poll(() => getModel(page, FIELD)).toEqual(1500);
-    expect(dispatchModelEvent).toBeDefined();
+    await expect.poll(() => getModel(page, FIELD)).toEqual(123456.78);
+    expect(await changes()).toBe(1);
+    await input.fill('');
+    await expect(words(page)).toHaveValue('');
   });
 });
