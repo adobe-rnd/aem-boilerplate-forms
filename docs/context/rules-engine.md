@@ -10,11 +10,24 @@ These files are generated from upstream packages and must not be edited manually
 |------|---------------|----------------|
 | rules/model/afb-runtime.js | @aemforms/af-core | npm run update:core |
 | rules/model/afb-events.js | @aemforms/af-core | npm run update:core |
+| rules/model/afb-webmcp.js | @aemforms/af-webmcp | npm run update:webmcp |
 | rules/model/afb-formatters.js | @aemforms/af-formatters | npm run update:formatters |
 | rules/formula/* | @adobe/json-formula | npm run update:formula |
 | rules/functions.js | @aemforms/af-custom-functions | npm run update:functions |
 
 **Note:** Rollup configurations are in `rollup/`. Each bundle also has a .min.js variant generated.
+
+The core build groups shared event code into the canonical `afb-events` entry.
+Runtime and events bundles share their event constructors within each variant;
+readable runtime imports readable events, formula and formatters, while minified
+runtime imports their minified counterparts. No separate hashed Events chunk is
+required. Events may expose additional generated aliases used internally by the
+runtime; the existing named event exports remain available.
+
+The WebMCP build externalizes af-core and imports the matching vendored runtime
+variant, rather than bundling a second engine. `test/unit/core-bundles.test.js`
+checks generated filenames, dependency variants, public event exports and shared
+event constructor identity.
 
 ## Form Model Class Hierarchy
 

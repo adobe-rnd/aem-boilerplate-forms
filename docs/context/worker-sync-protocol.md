@@ -107,8 +107,10 @@ Iterates changes and sets properties on main-thread model.
 ## 5. No-Worker Fallback
 
 When web workers unavailable (in `initializeRuleEngineWorker`):
-- `createFormInstance()` on main thread
-- `setTimeout` for `loadRuleEngine` in form.js
+- `createFormInstance()` runs on the main thread.
+- Its state is rendered, then `loadRuleEngine()` is awaited to bind the restored model and optional WebMCP catalog.
+- Rule binding reserves `data-rules="true"` before yielding to the runtime import.
+- The delayed fallback in `createForm()` handles direct-render/reset paths only when rules have not already been reserved.
 
 ## 6. Loading State
 

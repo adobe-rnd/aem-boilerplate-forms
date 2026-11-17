@@ -209,6 +209,48 @@ The form maintains two synchronized model instances:
 - Main thread applies changes via `fieldChanged()` (DOM) + `applyFieldChangeToFormModel()` (model)
 - Main-thread model stays in sync with authoritative worker state
 
+## WebMCP Ownership and Lifecycle
+
+Adaptive Forms register `@aemforms/af-webmcp` against the restored main-thread
+model after rule binding. The authored `properties["fd:webMcpEnabled"]` flag is
+default-off; opted-out forms do not load the adapter. Spreadsheet forms use their
+separate rules engine and do not register this catalog.
+
+In Universal Editor, select the Adaptive Form and enable **Enable AI assistant
+access (WebMCP)** in its properties. The default-off Boolean control in
+`blocks/form/_form.json` saves `fd:webMcpEnabled` on the form resource, without
+an FT gate. The AEM form exporter must include that saved Boolean under
+`properties["fd:webMcpEnabled"]` in the exported definition. Turning the control
+off saves `false`; loading that definition revokes any previous registration.
+Existing forms with an absent property remain opted out. Regenerate
+`component-models.json` with `npm run build:json:models` after changing this model.
+Tool results may contain entered data, so enable access only for forms intended
+to expose their data and supported actions to the configured AI host.
+
+The adapter owns one shared catalog per host: `list_forms` plus twelve form-bound
+tools for inspection, completeness, focus, panel navigation, field updates,
+prefill, repeatable instances and submission. Multi-form calls use `form_id`.
+Renderer focus requests are resolved within the registered form, and custom
+`additionalTools` factories stay bound to that form model.
+
+Each HTML form owns one registration record. Replacement cleans up the previous
+registration before acquiring another; pending imports check record identity.
+Removing a form revokes its tools without removing another form's catalog.
+`pagehide` unregisters tools, retains records for persisted navigation, and
+persisted `pageshow` re-registers connected forms. Lifecycle listeners are
+installed once per window.
+
+Without workers, initialization creates a model, renders its state and awaits
+`loadRuleEngine` to bind the restored model. Rule initialization is marked before
+the asynchronous runtime import so the delayed direct-render/reset fallback
+cannot attach duplicate listeners.
+
+Repeat controls and rule-editor `addInstance`/`removeInstance` functions call
+`addItem`/`removeItem` directly; WebMCP instance tools dispatch model instance
+actions. Both paths operate on the main-thread model and notify the existing
+renderer. Vendored model files come from released packages through the Rollup
+update scripts, not manual runtime patches.
+
 ## Form Sources
 
 ### Adaptive Forms
