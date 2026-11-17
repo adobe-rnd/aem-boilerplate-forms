@@ -1,19 +1,22 @@
-/* styling for image-choice */
-main .form .image-choice .image-choice-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-    gap: 16px;
-    margin-top: 8px;
-}
-
-main .form .image-choice .image-choice-tile {
-    position: relative;
-    display: block;
-    margin: 0;
+.form .image-choice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    border: 0;
     padding: 0;
 }
 
-main .form .image-choice .image-choice-tile input[type="checkbox"] {
+.form .image-choice > legend {
+    flex-basis: 100%;
+}
+
+.form .image-choice .image-choice-tile {
+    position: relative;
+    display: block;
+    margin: 0;
+}
+
+.form .image-choice .image-choice-tile input[type="checkbox"] {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -24,46 +27,49 @@ main .form .image-choice .image-choice-tile input[type="checkbox"] {
     z-index: 1;
 }
 
-main .form .image-choice .image-choice-tile label {
+.form .image-choice .image-choice-tile label {
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    min-height: 96px;
-    padding: 12px;
-    border: 2px solid transparent;
+    width: 96px;
+    height: 96px;
+    padding: 8px;
+    border: 2px solid #ccc;
     border-radius: 8px;
     background: #fff;
-    cursor: pointer;
 }
 
-main .form .image-choice .image-choice-tile label::before,
-main .form .image-choice .image-choice-tile label::after {
-    content: none;
+.form .image-choice .image-choice-tile label.image-choice-text {
+    width: auto;
+    min-width: 96px;
 }
 
-main .form .image-choice .image-choice-tile label img {
+.form .image-choice .image-choice-tile img {
     max-width: 100%;
-    max-height: 72px;
+    max-height: 100%;
     object-fit: contain;
 }
 
-main .form .image-choice .image-choice-tile:hover label {
-    border-color: #c5c5c5;
+.form .image-choice .image-choice-tile input:hover + label {
+    border-color: #888;
 }
 
-main .form .image-choice .image-choice-tile.selected label {
-    border-color: var(--button-primary-color, #1473e6);
-    background: #eaf2fd;
-    box-shadow: 0 0 0 1px var(--button-primary-color, #1473e6);
+.form .image-choice .image-choice-tile input:checked + label {
+    border-color: #1473e6;
+    background: #e8f1fd;
+    box-shadow: 0 0 0 2px #1473e6;
 }
 
-main .form .image-choice .image-choice-tile input[type="checkbox"]:focus-visible + label {
-    outline: 2px solid var(--button-primary-color, #1473e6);
+.form .image-choice .image-choice-tile input:focus-visible + label {
+    outline: 2px solid #000;
     outline-offset: 2px;
 }
 
-main .form .image-choice .image-choice-tile input[type="checkbox"]:disabled + label {
-    opacity: 0.5;
+.form .image-choice .image-choice-tile input:disabled {
     cursor: not-allowed;
+}
+
+.form .image-choice .image-choice-tile input:disabled + label {
+    opacity: 0.5;
 }

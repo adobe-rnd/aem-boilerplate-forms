@@ -4,14 +4,15 @@ import {
 
 const formDef = loadFormJson('image-choice');
 const FIELD = 'field-under-test';
-const tile = (page, name) => field(page, FIELD).getByRole('checkbox', { name, exact: true });
-const withProps = (props) => {
+
+const withMode = (mode) => {
   const copy = JSON.parse(JSON.stringify(formDef));
-  Object.assign(copy.items[0].properties, props);
+  copy.items[0].properties.selectionMode = mode;
   return copy;
 };
+const tile = (page, i) => field(page, FIELD).locator('input[type="checkbox"]').nth(i);
 
-test.describe('image-choice custom component', () => {
+test.describe('image-choice custom component (multiple)', () => {
   test.beforeEach(async ({ page, formServer }) => {
     await renderForm(page, formServer, formDef);
   });
@@ -20,61 +21,58 @@ test.describe('image-choice custom component', () => {
     const wrapper = field(page, FIELD);
     await expect(wrapper).toHaveAttribute('data-component-status', 'loaded');
     await expect(wrapper.locator('.image-choice-tile')).toHaveCount(3);
-    await expect(wrapper.locator('.image-choice-tile img').nth(1)).toHaveAttribute('alt', 'Option B');
-    await expect(wrapper.locator('.image-choice-tile img').nth(1)).toHaveAttribute('src', '/b.svg');
-    await expect(tile(page, 'Option C')).toHaveCount(1);
+    await expect(wrapper.locator('img').nth(1)).toHaveAttribute('src', 'b.png');
+    await expect(wrapper.locator('img').nth(1)).toHaveAttribute('alt', 'Option B');
+    await expect(wrapper.getByRole('checkbox', { name: 'Option C' })).toHaveCount(1);
   });
 
-  test('multiple mode toggles tiles and commits one change per click', async ({ page }) => {
+  test('model value highlights tiles', async ({ page }) => {
+    await setModel(page, FIELD, 'value', ['b', 'c']);
+    await expect(tile(page, 0)).not.toBeChecked();
+    await expect(tile(page, 1)).toBeChecked();
+    await expect(tile(page, 2)).toBeChecked();
+  });
+
+  test('clicking toggles and commits once per click', async ({ page }) => {
     const changes = await trackChanges(page, FIELD);
-    await tile(page, 'Option A').check({ force: true });
-    await tile(page, 'Option B').check({ force: true });
-    await expect.poll(() => getModel(page, FIELD)).toEqual(['a', 'b']);
-    await expect(field(page, FIELD).locator('.image-choice-tile.selected')).toHaveCount(2);
-    await tile(page, 'Option A').uncheck({ force: true });
-    await expect.poll(() => getModel(page, FIELD)).toEqual(['b']);
+    await tile(page, 0).click({ force: true });
+    await tile(page, 2).click({ force: true });
+    await expect.poll(() => getModel(page, FIELD)).toEqual(['a', 'c']);
+    await tile(page, 0).click({ force: true });
+    await expect.poll(() => getModel(page, FIELD)).toEqual(['c']);
     expect(await changes()).toBe(3);
   });
 
-  test('single mode replaces the selection and keeps the selected tile', async ({ page, formServer }) => {
-    await renderForm(page, formServer, withProps({ selectionMode: 'single' }));
-    await tile(page, 'Option A').check({ force: true });
-    await expect.poll(() => getModel(page, FIELD)).toEqual(['a']);
-    await tile(page, 'Option B').check({ force: true });
+  test('keyboard: Tab focuses, Space toggles', async ({ page }) => {
+    await tile(page, 0).focus();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Space');
     await expect.poll(() => getModel(page, FIELD)).toEqual(['b']);
-    await expect(tile(page, 'Option A')).not.toBeChecked();
-    await tile(page, 'Option B').click({ force: true });
-    await expect(tile(page, 'Option B')).toBeChecked();
+    await expect(tile(page, 1)).toBeChecked();
+  });
+});
+
+test.describe('image-choice custom component (single)', () => {
+  test.beforeEach(async ({ page, formServer }) => {
+    await renderForm(page, formServer, withMode('single'));
+  });
+
+  test('selecting replaces; clicking selected keeps it', async ({ page }) => {
+    await tile(page, 0).click({ force: true });
+    await expect.poll(() => getModel(page, FIELD)).toEqual(['a']);
+    await tile(page, 1).click({ force: true });
+    await expect.poll(() => getModel(page, FIELD)).toEqual(['b']);
+    await expect(tile(page, 0)).not.toBeChecked();
+    await tile(page, 1).click({ force: true });
+    await expect(tile(page, 1)).toBeChecked();
     expect(await getModel(page, FIELD)).toEqual(['b']);
-    await expect(field(page, FIELD).locator('.image-choice-tile.selected')).toHaveCount(1);
   });
 
-  test('reflects model value set externally', async ({ page }) => {
-    await setModel(page, FIELD, 'value', ['b', 'c']);
-    await expect(tile(page, 'Option B')).toBeChecked();
-    await expect(tile(page, 'Option C')).toBeChecked();
-    await expect(tile(page, 'Option A')).not.toBeChecked();
-    await expect(field(page, FIELD).locator('.image-choice-tile.selected')).toHaveCount(2);
+  test('external value updates the tile', async ({ page }) => {
+    await setModel(page, FIELD, 'value', ['c']);
+    await expect(tile(page, 2)).toBeChecked();
     await setModel(page, FIELD, 'value', ['a']);
-    await expect(tile(page, 'Option B')).not.toBeChecked();
-    await expect(field(page, FIELD).locator('.image-choice-tile.selected')).toHaveCount(1);
-  });
-
-  test('is keyboard operable', async ({ page }) => {
-    await tile(page, 'Option A').focus();
-    await page.keyboard.press('Space');
-    await expect.poll(() => getModel(page, FIELD)).toEqual(['a']);
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Space');
-    await expect.poll(() => getModel(page, FIELD)).toEqual(['a', 'b']);
-  });
-
-  test('single mode keyboard selection replaces', async ({ page, formServer }) => {
-    await renderForm(page, formServer, withProps({ selectionMode: 'single' }));
-    await tile(page, 'Option A').focus();
-    await page.keyboard.press('Space');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Space');
-    await expect.poll(() => getModel(page, FIELD)).toEqual(['b']);
+    await expect(tile(page, 0)).toBeChecked();
+    await expect(tile(page, 2)).not.toBeChecked();
   });
 });

@@ -4234,22 +4234,6 @@
       },
       {
         "component": "select",
-        "name": "variant",
-        "label": "Variant",
-        "options": [
-          {
-            "name": "Default",
-            "value": "default"
-          },
-          {
-            "name": "Cards",
-            "value": "cards"
-          }
-        ],
-        "value": "default"
-      },
-      {
-        "component": "select",
         "label": "Save value as",
         "name": "type",
         "valueType": "string",
@@ -4289,14 +4273,14 @@
       {
         "component": "tab",
         "label": "Image Choice",
-        "name": "imageChoice"
+        "name": "imagechoice"
       },
       {
         "component": "text",
         "name": "optionImages",
         "label": "Option images",
         "valueType": "string",
-        "description": "Comma-separated list of image URLs, in the same order as the options"
+        "description": "Comma-separated image URLs, in the same order as the options"
       },
       {
         "component": "select",

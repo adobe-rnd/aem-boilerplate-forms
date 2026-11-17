@@ -20,7 +20,8 @@
                             ],
                             "orientation": "horizontal",
                             "type": "string[]",
-                            "fd:viewType": "image-choice"
+                            "fd:viewType": "image-choice",
+                            "selectionMode": "multiple"
                         }
                     }
                 }
@@ -38,22 +39,6 @@
                 },
                 {
                     "...": "../../models/form-common/_basic-select-fields.json#/fields"
-                },
-                {
-                    "component": "select",
-                    "name": "variant",
-                    "label": "Variant",
-                    "options": [
-                        {
-                            "name": "Default",
-                            "value": "default"
-                        },
-                        {
-                            "name": "Cards",
-                            "value": "cards"
-                        }
-                    ],
-                    "value": "default"
                 },
                 {
                     "component": "select",
@@ -96,14 +81,14 @@
                 {
                     "component": "tab",
                     "label": "Image Choice",
-                    "name": "imageChoice"
+                    "name": "imagechoice"
                 },
                 {
                     "component": "text",
                     "name": "optionImages",
                     "label": "Option images",
                     "valueType": "string",
-                    "description": "Comma-separated list of image URLs, in the same order as the options"
+                    "description": "Comma-separated image URLs, in the same order as the options"
                 },
                 {
                     "component": "select",

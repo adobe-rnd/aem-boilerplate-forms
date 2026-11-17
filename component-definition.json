@@ -724,7 +724,8 @@
                   ],
                   "orientation": "horizontal",
                   "type": "string[]",
-                  "fd:viewType": "image-choice"
+                  "fd:viewType": "image-choice",
+                  "selectionMode": "multiple"
                 }
               }
             }

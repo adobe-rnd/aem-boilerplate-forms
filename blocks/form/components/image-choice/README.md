@@ -1,27 +1,28 @@
 # Image Choice
 
-Checkbox group rendered as a grid of selectable image tiles (e.g. "Select your team").
+Image tile grid for choosing one or several options, extending `checkbox-group`.
 
 ## How to Use
 
-Insert the *Image Choice* component, define the options with `enum` / `enumNames`, and set `optionImages`.
+Add an Image Choice component, define options with the standard `enum` / `enumNames`, and set `optionImages`.
 
 ## Authoring Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `optionImages` | text | Comma-separated image URLs, in the same order as the options. The option label becomes the image `alt`. Options without a URL keep their text label. |
-| `selectionMode` | select | `multiple` (default) or `single`. |
+| `optionImages` | text | Comma-separated image URLs, in option order |
+| `selectionMode` | select | `single` or `multiple` (default) |
 
 ## Model Subscriptions
 
-Listens to `value` (re-applies single-mode limit) and `enum` / `enumNames` (re-renders tiles).
+Subscribes to its own model (`register`, `change`); in `single` mode a model value with several entries is trimmed to the first one. Option re-renders (enum/enumNames changes) are re-decorated via a `MutationObserver`.
 
 ## Model Properties Set
 
-Uses the native checkbox `change` event of the form block: `model.value` is an array of selected option values, committed once per click. In `single` mode it holds at most one value; selecting another tile replaces it, and clicking the selected tile keeps it selected (no change fired). An external value with several entries in `single` mode is trimmed to the first.
+`value` is an array of selected option values, committed on the native `change` of a tile's checkbox (once per click). In `single` mode the other tiles are unchecked first, and clicking the selected tile keeps it selected (no change is fired). External `value` changes are applied by the form block to the checkboxes.
 
 ## Usage Notes
 
 - Base type `checkbox-group`, `fd:viewType` `image-choice`.
-- Tiles are native, visually hidden checkboxes labelled by the option text (accessible name), so Tab/Space work; selected tiles get a `selected` class and highlight.
+- Each tile is a visually hidden native checkbox over a label containing the image; the option label is the image `alt` (accessible name). Without an image URL, the label text is shown.
+- Space toggles the focused tile; checked tiles are highlighted.

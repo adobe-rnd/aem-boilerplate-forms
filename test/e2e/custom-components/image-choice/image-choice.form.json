@@ -17,11 +17,10 @@
         "visible": true
       },
       "properties": {
-        "variant": "default",
         "type": "string[]",
         "orientation": "horizontal",
         "selectionMode": "multiple",
-        "optionImages": "/a.svg,/b.svg,/c.svg"
+        "optionImages": "a.png,b.png,c.png"
       },
       "enum": [
         "a",
