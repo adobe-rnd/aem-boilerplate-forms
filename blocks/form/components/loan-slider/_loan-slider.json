@@ -1,0 +1,61 @@
+{
+    "definitions": [
+        {
+            "title": "Loan Slider",
+            "id": "loan-slider",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                        "template": {
+                            "jcr:title": "Loan Slider",
+                            "fieldType": "number-input",
+                            "fd:viewType": "loan-slider",
+                            "enabled": true,
+                            "visible": true
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "loan-slider",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-input-fields.json#/fields"
+                },
+                {
+                    "component": "tab",
+                    "label": "Validation",
+                    "name": "validation"
+                },
+                {
+                    "...": "../../models/form-common/_number-validation-fields.json#/fields"
+                },
+                {
+                    "component": "tab",
+                    "label": "Custom Properties",
+                    "name": "custom"
+                },
+                {
+                    "component": "number",
+                    "name": "splits",
+                    "label": "Splits",
+                    "valueType": "number",
+                    "value": 5,
+                    "description": "Number of equal intervals between minimum and maximum (tick marks = splits + 1)"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
+        }
+    ]
+}
