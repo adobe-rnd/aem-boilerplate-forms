@@ -1,0 +1,47 @@
+{
+  "id": "image-choice-test-form",
+  "fieldType": "form",
+  "title": "image-choice e2e test",
+  "action": "/adobe/forms/af/submit/image-choice-test-form",
+  "properties": {},
+  "items": [
+    {
+      "id": "field-under-test",
+      "name": "fieldUnderTest",
+      "fieldType": "checkbox-group",
+      ":type": "image-choice",
+      "visible": true,
+      "enabled": true,
+      "label": {
+        "value": "Image Choice",
+        "visible": true
+      },
+      "properties": {
+        "variant": "default",
+        "type": "string[]",
+        "orientation": "horizontal",
+        "selectionMode": "multiple",
+        "optionImages": "/a.svg,/b.svg,/c.svg"
+      },
+      "enum": [
+        "a",
+        "b",
+        "c"
+      ],
+      "enumNames": [
+        "Option A",
+        "Option B",
+        "Option C"
+      ],
+      "type": "string[]"
+    },
+    {
+      "id": "next-field",
+      "name": "nextField",
+      "fieldType": "text-input",
+      "label": {
+        "value": "Next field"
+      }
+    }
+  ]
+}
