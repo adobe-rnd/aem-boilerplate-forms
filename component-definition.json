@@ -746,6 +746,22 @@
               }
             }
           }
+        },
+        {
+          "title": "Card Choice",
+          "id": "card-choice",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Card Choice",
+                  "fieldType": "text-input",
+                  "fd:viewType": "card-choice"
+                }
+              }
+            }
+          }
         }
       ]
     }

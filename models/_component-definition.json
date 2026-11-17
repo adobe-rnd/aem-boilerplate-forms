@@ -51,6 +51,9 @@
         },
         {
           "...": "../blocks/form/components/inr-input/_inr-input.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/card-choice/_card-choice.json#/definitions"
         }
       ]
     }
