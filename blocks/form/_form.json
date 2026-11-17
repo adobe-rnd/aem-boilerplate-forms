@@ -101,7 +101,8 @@
         "wizard",
         "range",
         "loan-slider",
-        "image-choice"
+        "image-choice",
+        "inr-input"
       ]
     }
   ]
