@@ -19,9 +19,7 @@
       "properties": {
         "splits": 5
       },
-      "type": "number",
-      "minimum": 50000,
-      "maximum": 1250000
+      "type": "number"
     },
     {
       "id": "next-field",

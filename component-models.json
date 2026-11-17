@@ -4796,9 +4796,9 @@
         "component": "number",
         "name": "splits",
         "label": "Splits",
+        "description": "Number of equal intervals between minimum and maximum (splits + 1 tick marks are shown)",
         "valueType": "number",
-        "value": 5,
-        "description": "Number of equal intervals between minimum and maximum (tick marks = splits + 1)"
+        "value": 5
       },
       {
         "component": "tab",
