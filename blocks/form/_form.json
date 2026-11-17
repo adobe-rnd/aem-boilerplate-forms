@@ -31,6 +31,9 @@
       "...": "./components/rating/_rating.json#/definitions" 
     },
     { 
+      "...": "./components/image-choice/_image-choice.json#/definitions" 
+    },
+    { 
       "...": "./components/tnc/_tnc.json#/definitions" 
     },
     { 
@@ -95,6 +98,7 @@
         "plain-text",
         "radio-group",
         "rating",
+        "image-choice",
         "telephone-input",
         "text-input",
         "tnc",
