@@ -1,0 +1,61 @@
+main .form .inr-input-wrapper .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid #d5d7e0;
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+}
+
+main .form .inr-input-wrapper .inr-input-group:focus-within {
+    outline: 2px solid var(--link-color, #035fe6);
+    outline-offset: 2px;
+}
+
+main .form .inr-input-wrapper .inr-input-prefix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    padding: 0 12px;
+    background: #f1f2f6;
+    border-right: 1px solid #d5d7e0;
+    color: #4b5063;
+    font-size: 1.25rem;
+}
+
+main .form .inr-input-wrapper .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+    outline: none;
+}
+
+main .form .inr-input-wrapper .inr-input-words {
+    margin-top: 16px;
+}
+
+main .form .inr-input-wrapper .inr-input-words-field {
+    width: 100%;
+    box-sizing: border-box;
+    background: #f1f2f6;
+    border: 2px solid #d5d7e0;
+    border-radius: 16px;
+    color: #1d2033;
+    cursor: default;
+}
+
+main .form .inr-input-wrapper .inr-input-readonly-hint {
+    margin-top: 6px;
+    text-align: right;
+    font-size: 0.875rem;
+    color: #5b6075;
+}
+
+main .form .inr-input-wrapper[data-invalid="true"] .inr-input-group,
+main .form .inr-input-wrapper .inr-input-group:has(input:user-invalid) {
+    border-color: var(--error-color, #d31510);
+}
