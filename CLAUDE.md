@@ -46,6 +46,7 @@ blocks/form/
 │   ├── accordion/
 │   ├── file/
 │   ├── modal/
+│   ├── nps-rating/                   — Authorable 0–10 recommendation scale
 │   ├── password/
 │   ├── rating/
 │   ├── range/

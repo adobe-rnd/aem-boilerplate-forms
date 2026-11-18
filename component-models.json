@@ -4944,6 +4944,253 @@
     ]
   },
   {
+    "id": "nps-rating",
+    "fields": [
+      {
+        "component": "tab",
+        "name": "basic",
+        "label": "Basic"
+      },
+      {
+        "component": "text",
+        "name": "name",
+        "label": "Name",
+        "valueType": "string",
+        "required": true,
+        "valueFormat": "regexp",
+        "validation": {
+          "regExp": "^[^$].*",
+          "customErrorMsg": "Name cannot start with $"
+        }
+      },
+      {
+        "component": "text",
+        "name": "jcr:title",
+        "label": "Title",
+        "valueType": "string"
+      },
+      {
+        "component": "boolean",
+        "name": "hideTitle",
+        "label": "Hide title",
+        "valueType": "boolean"
+      },
+      {
+        "component": "datasource-bindref",
+        "name": "dataRef",
+        "label": "Bind reference",
+        "valueType": "string"
+      },
+      {
+        "component": "boolean",
+        "name": "unboundFormElement",
+        "label": "Mark as Unbound Form Element",
+        "valueType": "boolean"
+      },
+      {
+        "component": "boolean",
+        "name": "visible",
+        "label": "Show Component",
+        "valueType": "boolean",
+        "value": true
+      },
+      {
+        "component": "boolean",
+        "name": "enabled",
+        "label": "Enable Component",
+        "valueType": "boolean",
+        "value": true
+      },
+      {
+        "component": "boolean",
+        "name": "readOnly",
+        "label": "Read-only",
+        "valueType": "boolean"
+      },
+      {
+        "component": "select",
+        "name": "colspan",
+        "label": "Column Span",
+        "valueType": "string",
+        "value": "12",
+        "options": [
+          {
+            "name": "1 column",
+            "value": "1"
+          },
+          {
+            "name": "2 column",
+            "value": "2"
+          },
+          {
+            "name": "3 column",
+            "value": "3"
+          },
+          {
+            "name": "4 column",
+            "value": "4"
+          },
+          {
+            "name": "5 column",
+            "value": "5"
+          },
+          {
+            "name": "6 column",
+            "value": "6"
+          },
+          {
+            "name": "7 column",
+            "value": "7"
+          },
+          {
+            "name": "8 column",
+            "value": "8"
+          },
+          {
+            "name": "9 column",
+            "value": "9"
+          },
+          {
+            "name": "10 column",
+            "value": "10"
+          },
+          {
+            "name": "11 column",
+            "value": "11"
+          },
+          {
+            "name": "12 column",
+            "value": "12"
+          }
+        ]
+      },
+      {
+        "component": "number",
+        "name": "default",
+        "label": "Default score",
+        "description": "Optional score from 0 to 10. Leave empty for no initial selection.",
+        "valueType": "number",
+        "validation": {
+          "numberMin": 0,
+          "numberMax": 10
+        }
+      },
+      {
+        "component": "tab",
+        "name": "scale",
+        "label": "Rating Scale"
+      },
+      {
+        "component": "number",
+        "name": "lowMax",
+        "label": "Low range maximum",
+        "description": "Last low-range score. Must be less than the middle range maximum.",
+        "valueType": "number",
+        "value": 6,
+        "validation": {
+          "numberMin": 0,
+          "numberMax": 8
+        }
+      },
+      {
+        "component": "number",
+        "name": "middleMax",
+        "label": "Middle range maximum",
+        "description": "Last middle-range score. Must be greater than the low range maximum.",
+        "valueType": "number",
+        "value": 8,
+        "validation": {
+          "numberMin": 1,
+          "numberMax": 9
+        }
+      },
+      {
+        "component": "text",
+        "name": "lowLabel",
+        "label": "Low range label",
+        "valueType": "string",
+        "value": "Not likely"
+      },
+      {
+        "component": "text",
+        "name": "middleLabel",
+        "label": "Middle range label",
+        "valueType": "string",
+        "value": "May be"
+      },
+      {
+        "component": "text",
+        "name": "highLabel",
+        "label": "High range label",
+        "valueType": "string",
+        "value": "Very likely"
+      },
+      {
+        "component": "text",
+        "name": "lowColor",
+        "label": "Low range CSS color",
+        "valueType": "string",
+        "value": "#f2546b"
+      },
+      {
+        "component": "text",
+        "name": "middleColor",
+        "label": "Middle range CSS color",
+        "valueType": "string",
+        "value": "#ffa12f"
+      },
+      {
+        "component": "text",
+        "name": "highColor",
+        "label": "High range CSS color",
+        "valueType": "string",
+        "value": "#25b783"
+      },
+      {
+        "component": "tab",
+        "name": "validation",
+        "label": "Validation"
+      },
+      {
+        "component": "boolean",
+        "name": "required",
+        "label": "Required",
+        "valueType": "boolean"
+      },
+      {
+        "component": "text",
+        "name": "mandatoryMessage",
+        "label": "Error message",
+        "valueType": "string",
+        "description": "Error message shown when required field is left empty."
+      },
+      {
+        "component": "text",
+        "name": "validateExpMessage",
+        "label": "Script validation message",
+        "valueType": "string",
+        "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
+        "label": "Help Content",
+        "name": "help"
+      },
+      {
+        "component": "richtext",
+        "name": "description",
+        "label": "Help text",
+        "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "tooltip",
+        "label": "Short description",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "password",
     "fields": [
       {

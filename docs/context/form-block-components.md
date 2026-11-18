@@ -84,7 +84,8 @@ All 11 registered field renderers:
 **mappings.js overview:**
 
 - **OOTBComponentDecorators**: accordion, file, modal, password, rating, repeat, tnc, toggleable-link, wizard
-- **customComponents** (default: ['range'])
+- **customComponents**: range, loan-slider, image-choice, inr-input, card-choice, nps-rating
+- **nps-rating**: extends number-input with an accessible 0–10 radio scale, authorable range thresholds/labels/colors, and one numeric model commit per changed selection. See [component authoring and behavior](../../blocks/form/components/nps-rating/README.md).
 - **loadComponent**:
   - Status tracking via dataset.componentStatus (loading/loaded)
   - CSS load from components directory

@@ -1,0 +1,44 @@
+{
+  "id": "nps-rating-test-form",
+  "fieldType": "form",
+  "title": "nps-rating e2e test",
+  "action": "/adobe/forms/af/submit/nps-rating-test-form",
+  "properties": {},
+  "items": [
+    {
+      "id": "field-under-test",
+      "name": "fieldUnderTest",
+      "fieldType": "number-input",
+      ":type": "nps-rating",
+      "visible": true,
+      "enabled": true,
+      "label": {
+        "value": "How likely are you to recommend this online service to others?",
+        "visible": true
+      },
+      "properties": {
+        "lowMax": 6,
+        "middleMax": 8,
+        "lowLabel": "Not likely",
+        "middleLabel": "May be",
+        "highLabel": "Very likely",
+        "lowColor": "#f2546b",
+        "middleColor": "#ffa12f",
+        "highColor": "#25b783"
+      },
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "id": "next-field",
+      "name": "nextField",
+      "fieldType": "text-input",
+      "label": {
+        "value": "Next field"
+      }
+    }
+  ]
+}

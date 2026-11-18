@@ -54,6 +54,9 @@
         },
         {
           "...": "../blocks/form/components/card-choice/_card-choice.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/nps-rating/_nps-rating.json#/definitions"
         }
       ]
     }

@@ -764,6 +764,28 @@
               }
             }
           }
+        },
+        {
+          "title": "NPS Rating",
+          "id": "nps-rating",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                "template": {
+                  "jcr:title": "How likely are you to recommend this online service to others?",
+                  "fieldType": "number-input",
+                  "fd:viewType": "nps-rating",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "step": 1,
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
         }
       ]
     }

@@ -1,0 +1,124 @@
+.form .nps-rating {
+    min-width: 0;
+    padding: clamp(20px, 3.5vw, 60px);
+    border: 1px solid #d4d6de;
+    border-radius: 32px;
+    background: #fff;
+}
+
+.form .nps-rating > .field-label {
+    display: block;
+    margin-bottom: 36px;
+    color: #111827;
+    font-size: clamp(20px, 2.8vw, 38px);
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.form .nps-rating-scale,
+.form .nps-rating-legend {
+    display: grid;
+    grid-template-columns: repeat(11, minmax(0, 1fr));
+}
+
+.form .nps-rating-scale {
+    border: 1px solid #d4d6de;
+    border-radius: 12px;
+}
+
+.form .nps-rating-low {
+    --nps-range-color: var(--nps-low-color);
+}
+
+.form .nps-rating-middle {
+    --nps-range-color: var(--nps-middle-color);
+}
+
+.form .nps-rating-high {
+    --nps-range-color: var(--nps-high-color);
+}
+
+.form .nps-rating .nps-rating-score {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+    height: clamp(44px, 5vw, 68px);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-right: 1px solid #d4d6de;
+    border-radius: 0;
+    background: transparent;
+    color: #4b5563;
+    font: inherit;
+    font-size: clamp(14px, 1.8vw, 24px);
+    cursor: pointer;
+    overflow: visible;
+}
+
+.form .nps-rating .nps-rating-score:last-child {
+    border-right: 0;
+}
+
+.form .nps-rating .nps-rating-score[aria-checked="true"] {
+    z-index: 1;
+    border-color: transparent;
+    border-radius: 6px;
+    background: var(--nps-range-color);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 -7px var(--nps-range-color), 0 7px var(--nps-range-color);
+}
+
+.form .nps-rating .nps-rating-score:focus-visible {
+    z-index: 2;
+    outline: 3px solid #111827;
+    outline-offset: 3px;
+}
+
+.form .nps-rating .nps-rating-score:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.form .nps-rating-legend {
+    gap: 3px;
+    margin-top: 20px;
+}
+
+.form .nps-rating-segment {
+    min-width: 0;
+    border-top: 9px solid var(--nps-range-color);
+    padding-top: 18px;
+    color: #6b7280;
+    font-size: clamp(12px, 1.8vw, 22px);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.form .nps-rating-segment:first-child {
+    border-top-left-radius: 5px;
+}
+
+.form .nps-rating-segment:last-child {
+    border-top-right-radius: 5px;
+}
+
+.form .nps-rating.field-invalid .nps-rating-scale {
+    border-color: var(--form-error-color);
+}
+
+@media (width <= 600px) {
+    .form .nps-rating {
+        padding: 20px 12px;
+        border-radius: 20px;
+    }
+
+    .form .nps-rating > .field-label {
+        margin-bottom: 24px;
+    }
+
+    .form .nps-rating-segment {
+        padding-top: 10px;
+    }
+}

@@ -1,0 +1,71 @@
+{
+  "definitions": [
+    {
+      "title": "NPS Rating",
+      "id": "nps-rating",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+            "template": {
+              "jcr:title": "How likely are you to recommend this online service to others?",
+              "fieldType": "number-input",
+              "fd:viewType": "nps-rating",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10,
+              "step": 1,
+              "enabled": true,
+              "visible": true
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "nps-rating",
+      "fields": [
+        { "component": "tab", "name": "basic", "label": "Basic" },
+        { "...": "../../models/form-common/_basic-input-fields.json#/fields" },
+        {
+          "component": "number",
+          "name": "default",
+          "label": "Default score",
+          "description": "Optional score from 0 to 10. Leave empty for no initial selection.",
+          "valueType": "number",
+          "validation": { "numberMin": 0, "numberMax": 10 }
+        },
+        { "component": "tab", "name": "scale", "label": "Rating Scale" },
+        {
+          "component": "number",
+          "name": "lowMax",
+          "label": "Low range maximum",
+          "description": "Last low-range score. Must be less than the middle range maximum.",
+          "valueType": "number",
+          "value": 6,
+          "validation": { "numberMin": 0, "numberMax": 8 }
+        },
+        {
+          "component": "number",
+          "name": "middleMax",
+          "label": "Middle range maximum",
+          "description": "Last middle-range score. Must be greater than the low range maximum.",
+          "valueType": "number",
+          "value": 8,
+          "validation": { "numberMin": 1, "numberMax": 9 }
+        },
+        { "component": "text", "name": "lowLabel", "label": "Low range label", "valueType": "string", "value": "Not likely" },
+        { "component": "text", "name": "middleLabel", "label": "Middle range label", "valueType": "string", "value": "May be" },
+        { "component": "text", "name": "highLabel", "label": "High range label", "valueType": "string", "value": "Very likely" },
+        { "component": "text", "name": "lowColor", "label": "Low range CSS color", "valueType": "string", "value": "#f2546b" },
+        { "component": "text", "name": "middleColor", "label": "Middle range CSS color", "valueType": "string", "value": "#ffa12f" },
+        { "component": "text", "name": "highColor", "label": "High range CSS color", "valueType": "string", "value": "#25b783" },
+        { "component": "tab", "name": "validation", "label": "Validation" },
+        { "...": "../../models/form-common/_basic-validation-fields.json#/fields" },
+        { "...": "../../models/form-common/_help-container.json#/fields" }
+      ]
+    }
+  ]
+}

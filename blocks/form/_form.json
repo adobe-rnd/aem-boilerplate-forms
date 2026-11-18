@@ -103,7 +103,8 @@
         "loan-slider",
         "image-choice",
         "inr-input",
-        "card-choice"
+        "card-choice",
+        "nps-rating"
       ]
     }
   ]
