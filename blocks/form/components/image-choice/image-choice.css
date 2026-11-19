@@ -1,0 +1,100 @@
+main .form .image-choice {
+    --image-choice-size: 96px;
+    --image-choice-selected-color: var(--link-color, #1473e6);
+}
+
+main .form .image-choice-small {
+    --image-choice-size: 64px;
+}
+
+main .form .image-choice-large {
+    --image-choice-size: 140px;
+}
+
+main .form .image-choice.image-choice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+}
+
+main .form .image-choice > legend {
+    flex-basis: 100%;
+    text-align: center;
+}
+
+main .form .image-choice > .field-description {
+    flex-basis: 100%;
+}
+
+main .form .image-choice .image-choice-option {
+    position: relative;
+    margin: 0;
+}
+
+main .form .image-choice .image-choice-option > input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+main .form .image-choice .image-choice-option > label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+    width: calc(var(--image-choice-size) + 24px);
+    min-height: calc(var(--image-choice-size) + 24px);
+    padding: 12px;
+    justify-content: center;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    text-align: center;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+main .form .image-choice .image-choice-image {
+    width: var(--image-choice-size);
+    height: var(--image-choice-size);
+    object-fit: contain;
+}
+
+main .form .image-choice.field-invalid .image-choice-option > label {
+    border-color: var(--form-error-color, #d31510);
+}
+
+main .form .image-choice .image-choice-option > input:hover + label {
+    border-color: #ccc;
+}
+
+main .form .image-choice .image-choice-option > input:checked + label {
+    border-color: var(--image-choice-selected-color);
+    box-shadow: 0 0 0 2px var(--image-choice-selected-color);
+}
+
+main .form .image-choice .image-choice-option > input:focus-visible + label {
+    outline: 2px solid var(--image-choice-selected-color);
+    outline-offset: 2px;
+}
+
+main .form .image-choice .image-choice-option > input:disabled {
+    cursor: not-allowed;
+}
+
+main .form .image-choice .image-choice-option > input:disabled + label {
+    opacity: 0.5;
+}
+
+main .form .image-choice .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}

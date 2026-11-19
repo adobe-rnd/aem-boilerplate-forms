@@ -45,6 +45,7 @@ module.exports = {
       accordion: 14,
       modal: 11,
       rating: 18,
+      'image-choice': 23,
       password: 20,
       tnc: 12,
       range: 19
