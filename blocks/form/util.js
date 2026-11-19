@@ -259,6 +259,7 @@ export function extractIdFromUrl(url) {
 }
 const constraintsDef = Object.entries({
   'password|tel|email|text': [['maxLength', 'maxlength'], ['minLength', 'minlength'], 'pattern'],
+  multiline: [['maxLength', 'maxlength'], ['minLength', 'minlength']],
   'number|range|date': [['maximum', 'Max'], ['minimum', 'Min'], 'step'],
   file: ['accept', 'Multiple'],
   panel: [['maxOccur', 'data-max'], ['minOccur', 'data-min']],
