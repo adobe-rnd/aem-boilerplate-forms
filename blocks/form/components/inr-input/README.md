@@ -1,28 +1,27 @@
 # INR Input
 
-Indian Rupee amount field with a read-only amount-in-words field that updates live as the user types.
+Indian Rupee (₹) amount field with a read-only amount-in-words field below it that updates live as the user types.
 
 ## How to Use
 
-Insert **INR Input** from the Custom Form Components group. It extends a text input; the user types an amount (digits and an optional decimal with up to 2 digits), and the words field below shows e.g. `One Lakh Twenty Three Thousand Rupees and Fifty Paise Only` using Thousand, Lakh and Crore.
+Insert the **INR Input** component in a form. Base type is `number-input`; all number validations (min/max, required) apply.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `wordsLabel` | Label of the read-only words field (default `Amount (in words)`) |
-
-Other properties are those of the text input (placeholder, default value, validation, help).
+| `wordsLabel` | Label of the amount-in-words field. Default: `Amount (in words)` |
 
 ## Model Subscriptions
 
-Listens to `value` changes on its own field and updates the input and words.
+Subscribes to the field's `value` changes (e.g. set by rules) and refreshes the words.
 
 ## Model Properties Set
 
-Sets `model.value` to the sanitized numeric string on every keystroke (component-handled `input` event), so change rules fire per keystroke. The words field is display-only and not part of the model.
+None written. `model.value` is committed on blur/`change` (OOTB default); the words are updated per keystroke from the `input` event, so change rules fire once per edit. The words field is display-only and not part of the model.
 
 ## Usage Notes
 
-- Base type: `text-input`; `fd:viewType`: `inr-input`.
-- Non-numeric characters and commas are stripped; decimals are capped at 2 (Paise).
+- `fd:viewType`: `inr-input`.
+- Uses the Indian numbering system (Hundred, Thousand, Lakh, Crore). Example: `123456.5` → `Rupees One Lakh Twenty Three Thousand Four Hundred Fifty Six and Fifty Paise Only`.
+- Up to two decimals (paise) are used; extra digits are truncated.

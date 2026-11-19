@@ -1,56 +1,60 @@
 {
-    "definitions": [
-        {
-            "title": "Text Input",
-            "id": "inr-input",
-            "plugins": {
-                "xwalk": {
-                    "page": {
-                        "resourceType": "core/fd/components/form/textinput/v1/textinput",
-                        "template": {
-                            "jcr:title": "INR Input",
-                            "fieldType": "text-input",
-                            "fd:viewType": "inr-input"
-                        }
-                    }
-                }
+  "definitions": [
+    {
+      "title": "INR Input",
+      "id": "inr-input",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+            "template": {
+              "jcr:title": "INR Input",
+              "fieldType": "number-input",
+              "fd:viewType": "inr-input",
+              "enabled": true,
+              "visible": true
             }
+          }
         }
-    ],
-    "models": [
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "inr-input",
+      "fields": [
         {
-            "id": "inr-input",
-            "fields": [
-                {
-                    "component": "tab",
-                    "label": "Basic",
-                    "name": "basic"
-                },
-                {
-                    "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
-                },
-                {
-                    "...": "../../models/form-common/_basic-input-default-value-fields.json#/fields"
-                },
-                {
-                    "component": "text",
-                    "name": "wordsLabel",
-                    "label": "Amount in words label",
-                    "valueType": "string",
-                    "value": "Amount (in words)"
-                },
-                {
-                    "component": "tab",
-                    "label": "Validation",
-                    "name": "validation"
-                },
-                {
-                    "...": "../../models/form-common/_string-validation-fields.json#/fields"
-                },
-                {
-                    "...": "../../models/form-common/_help-container.json#/fields"
-                }
-            ]
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_number-validation-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Custom Properties",
+          "name": "custom"
+        },
+        {
+          "component": "text",
+          "name": "wordsLabel",
+          "label": "Amount in Words Label",
+          "valueType": "string",
+          "description": "Label of the read-only amount-in-words field. Defaults to \"Amount (in words)\""
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
         }
-    ]
+      ]
+    }
+  ]
 }

@@ -4416,25 +4416,6 @@
         ]
       },
       {
-        "component": "text",
-        "name": "placeholder",
-        "label": "Placeholder text",
-        "valueType": "string"
-      },
-      {
-        "component": "text",
-        "name": "default",
-        "label": "Default Value",
-        "valueType": "string"
-      },
-      {
-        "component": "text",
-        "name": "wordsLabel",
-        "label": "Amount in words label",
-        "valueType": "string",
-        "value": "Amount (in words)"
-      },
-      {
         "component": "tab",
         "label": "Validation",
         "name": "validation"
@@ -4461,45 +4442,43 @@
       },
       {
         "component": "number",
-        "name": "minLength",
-        "label": "Minimum number of characters",
+        "name": "minimum",
+        "label": "Lowest number / Smallest number",
         "valueType": "number",
-        "description": "Minimum length of the text in the field"
+        "description": "Minimum number allowed in the field"
       },
       {
         "component": "text",
-        "name": "minLengthMessage",
+        "name": "minimumMessage",
         "valueType": "string",
-        "label": "Minimum characters error message",
-        "description": "Error message shown when less than minimum characters are entered."
+        "label": "Minimum error message",
+        "description": "Error message shown when entered value is less than minimum."
       },
       {
         "component": "number",
-        "name": "maxLength",
-        "label": "Maximum number of characters",
+        "name": "maximum",
+        "label": "Highest number / Largest number",
         "valueType": "number",
-        "description": "Maximum length of the text in the field"
+        "description": "Maximum number allowed in the field"
       },
       {
         "component": "text",
-        "name": "maxLengthMessage",
+        "name": "maximumMessage",
         "valueType": "string",
-        "label": "Maximum characters error message",
-        "description": "Error message shown when more than maximum characters are entered."
+        "label": "Maximum error message",
+        "description": "Error message shown when the entered value is more than maximum."
+      },
+      {
+        "component": "tab",
+        "label": "Custom Properties",
+        "name": "custom"
       },
       {
         "component": "text",
-        "name": "pattern",
+        "name": "wordsLabel",
+        "label": "Amount in Words Label",
         "valueType": "string",
-        "label": "Pattern",
-        "description": "Regular Expression is permitted."
-      },
-      {
-        "component": "text",
-        "name": "validatePictureClauseMessage",
-        "valueType": "string",
-        "label": "Pattern Error message",
-        "description": "Error message shown when the pattern is not matched."
+        "description": "Label of the read-only amount-in-words field. Defaults to \"Amount (in words)\""
       },
       {
         "component": "tab",
