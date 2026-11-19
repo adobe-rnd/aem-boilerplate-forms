@@ -1,15 +1,17 @@
 # Card Choice
 
-Carousel of selectable cards (image, features, minimum amount, call to action) populated by a rule. Selecting a card stores its details in the model.
+Renders an array of card objects as a horizontally scrollable carousel; the card the user picks is stored in the field's model.
 
 ## How to Use
 
-Add the **Card Choice** component to a form. The label is rendered as the heading. A rule supplies the cards, either by:
+Add a **Card choice** component to the form (base type `text-input`, `fd:viewType: card-choice`). A rule (on form initialize, another field's change, etc.) supplies the cards, either by setting the `cards` property or by dispatching a `setCards` custom event:
 
-- `setProperty(field, { properties: { cards: [...] } })`, or
-- dispatching the custom event `setCards` on the field with the array as payload.
+```js
+setProperty($form.cardChoice, { properties: { cards: [ /* ... */ ] } });
+// or: dispatchEvent($form.cardChoice, 'custom:setCards', [ /* ... */ ]);
+```
 
-Card shape (all keys optional except `title`; `id` identifies the card, falling back to `title`):
+Card shape (all optional except `title`):
 
 ```json
 {
@@ -17,34 +19,39 @@ Card shape (all keys optional except `title`; `id` identifies the card, falling 
   "category": "Retail Cards",
   "title": "Freedom",
   "subtitle": "Best Card for Rewards & Offers",
-  "image": "/images/freedom.png",
+  "image": "https://example.com/freedom.png",
   "imageAlt": "Freedom card",
-  "features": ["Upto 10X CashPoints", { "text": "Joining Fees - ₹500/-" }],
-  "featuresLink": { "label": "All Features & Benefits", "url": "https://example.com" },
-  "minAmount": 15000
+  "features": ["Upto 10X CashPoints", "₹150 spent = 1 Fuel Point", "Joining Fees - ₹500/-"],
+  "linkText": "All Features & Benefits",
+  "linkUrl": "https://example.com/freedom",
+  "amountLabel": "Min. FD Amount",
+  "amount": "₹ 15,000/-",
+  "buttonText": "Get This Card"
 }
 ```
 
-When cards carry two or more distinct `category` values, filter pills are shown. The track scrolls horizontally (touch, arrows, keyboard left/right, dots).
+If cards have two or more distinct `category` values, category tabs are shown and filter the carousel.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `subtitle` | Text under the heading |
-| `minAmountLabel` | Label of the amount row (default `Min. FD Amount`) |
-| `ctaLabel` | Select button label (default `Get This Card`) |
+| `buttonText` | Default text of the select button (default `Get This Card`) |
+| `selectedButtonText` | Button text on the selected card (default `Selected`) |
+| `amountLabel` | Default amount label (default `Min. FD Amount`) |
 
 ## Model Subscriptions
 
-- `value` changes: selection is synced to the matching card (by `id`/`title`).
-- `properties.cards` / `properties` changes: cards are re-rendered.
+- `properties` change: re-renders when `properties.cards` is present.
+- `value` change: updates the selected card highlight.
 - Custom event `setCards`: payload is the cards array.
 
 ## Model Properties Set
 
-`value` is set to `JSON.stringify(selectedCard)` when the customer clicks a card's select button, via a bubbling `change` event on the hidden input (committed once per selection; change rules fire once). Re-selecting the same card does nothing.
+`model.value` is set to the JSON string of the selected card object when the user clicks the card's button (committed once per selection, not on blur). Change rules fire once per new selection. Re-clicking the selected card does nothing. If `id` is present it is used to match the selection against new card data; otherwise deep equality is used.
 
 ## Usage Notes
 
-Base type `text-input`, `fd:viewType` `card-choice`. A rule can read the selection with `JSON.parse(field.$value)`, and can preselect a card by setting the value to a card's JSON.
+- Base type: `text-input`; `fd:viewType`: `card-choice`. The text input is hidden.
+- Scroll with touch/trackpad, the arrow buttons, or the pagination dots. Cards snap to the start.
+- Text is rendered via `textContent`; only `http(s)`/relative URLs are used for images and links.

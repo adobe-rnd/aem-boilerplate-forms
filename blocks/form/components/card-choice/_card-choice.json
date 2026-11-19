@@ -1,66 +1,67 @@
 {
-  "definitions": [
-    {
-      "title": "Card Choice",
-      "id": "card-choice",
-      "plugins": {
-        "xwalk": {
-          "page": {
-            "resourceType": "core/fd/components/form/textinput/v1/textinput",
-            "template": {
-              "jcr:title": "Card Choice",
-              "fieldType": "text-input",
-              "fd:viewType": "card-choice"
+    "definitions": [
+        {
+            "title": "Card choice",
+            "id": "card-choice",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                        "template": {
+                            "jcr:title": "Card choice",
+                            "fieldType": "text-input",
+                            "fd:viewType": "card-choice"
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  ],
-  "models": [
-    {
-      "id": "card-choice",
-      "fields": [
+    ],
+    "models": [
         {
-          "component": "tab",
-          "label": "Basic",
-          "name": "basic"
-        },
-        {
-          "...": "../../models/form-common/_basic-input-fields.json#/fields"
-        },
-        {
-          "component": "text",
-          "name": "subtitle",
-          "label": "Subtitle",
-          "valueType": "string"
-        },
-        {
-          "component": "text",
-          "name": "minAmountLabel",
-          "label": "Minimum amount label",
-          "valueType": "string",
-          "value": "Min. FD Amount"
-        },
-        {
-          "component": "text",
-          "name": "ctaLabel",
-          "label": "Select button label",
-          "valueType": "string",
-          "value": "Get This Card"
-        },
-        {
-          "component": "tab",
-          "label": "Validation",
-          "name": "validation"
-        },
-        {
-          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
-        },
-        {
-          "...": "../../models/form-common/_help-container.json#/fields"
+            "id": "card-choice",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-input-fields.json#/fields"
+                },
+                {
+                    "component": "text",
+                    "name": "buttonText",
+                    "label": "Select button text",
+                    "valueType": "string",
+                    "description": "Default text of the button on each card. A card can override it with buttonText."
+                },
+                {
+                    "component": "text",
+                    "name": "selectedButtonText",
+                    "label": "Selected button text",
+                    "valueType": "string",
+                    "description": "Text of the button on the selected card."
+                },
+                {
+                    "component": "text",
+                    "name": "amountLabel",
+                    "label": "Amount label",
+                    "valueType": "string",
+                    "description": "Default label shown next to the card amount. A card can override it with amountLabel."
+                },
+                {
+                    "component": "tab",
+                    "label": "Validation",
+                    "name": "validation"
+                },
+                {
+                    "...": "../../models/form-common/_string-validation-fields.json#/fields"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
