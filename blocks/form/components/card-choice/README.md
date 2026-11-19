@@ -1,36 +1,40 @@
 # Card Choice
 
-Horizontally scrollable carousel of cards. Card data is pushed in by a rule; the card the customer picks is written to the model.
+Horizontally scrollable (carousel) list of cards, populated by a rule, where the customer picks one card.
 
 ## How to Use
 
-Add a Text Input, set its component type to **Card Choice**, and add a rule that sets `properties.cards` (e.g. `setProperty(cardChoice, { properties: { cards: [...] } })`). The field label is used as the heading and the help text as the sub-heading.
+Add a **Card Choice** component. A rule sets the cards on the field's `properties.cards`, e.g. `setProperty($field, {properties: {cards: [...]}})` or `$field.properties = {...}`.
 
 ## Authoring Properties
 
-Standard text-input properties (name, title, visibility, enabled, read-only, required, help text). No custom properties.
+Standard text-input basic and validation properties; no custom properties.
 
-### Card data shape (`properties.cards`)
+Card shape (all keys optional except `title`):
 
-| Key | Description |
-|-----|-------------|
-| `id` | Optional unique id (falls back to `title`) |
-| `title`, `subtitle` | Card heading and tagline |
-| `image` | http(s) image URL; `imageAlt` optional |
-| `features` | Array of strings or `{ text, icon }` |
-| `linkText`, `linkUrl` | "All Features & Benefits" link |
-| `minAmountLabel`, `minAmount` | Amount row (label defaults to "Min. FD Amount") |
-| `buttonText` | Select button label (default "Get This Card") |
-| `category` | Optional; with 2+ categories, filter chips are shown |
+```json
+{
+  "id": "freedom",
+  "title": "Freedom",
+  "subtitle": "Best Card for Rewards & Offers",
+  "image": "https://.../freedom.png",
+  "features": ["Upto 10X CashPoints", { "text": "Joining Fees - ₹500/-", "icon": "https://.../fee.svg" }],
+  "linkText": "All Features & Benefits",
+  "linkUrl": "https://...",
+  "minAmountLabel": "Min. FD Amount",
+  "minAmount": "₹ 15,000/-",
+  "ctaLabel": "Get This Card"
+}
+```
 
 ## Model Subscriptions
 
-`properties.cards` / `properties` (re-render), `value` (sync selected card), `enabled`, `readOnly`.
+`properties` (re-renders when `cards` changes) and `value` (highlights the selected card).
 
 ## Model Properties Set
 
-On clicking a card's button, `model.value` is set to the **JSON string of the selected card object** via a single native `change` event, so change rules fire once per selection. Parse it with `JSON.parse` in rules.
+`value` is set to the JSON string of the whole selected card object when the user clicks the card's button (once per selection). Rules can `JSON.parse` it.
 
 ## Usage Notes
 
-Base type `text-input`, `fd:viewType` = `card-choice`. Scrolling uses CSS scroll-snap with prev/next arrows, pagination dots and Arrow-key support on the focused viewport. Text is rendered via `textContent` and URLs are restricted to http(s).
+Base type `text-input`, `fd:viewType` `card-choice`. Cards scroll with touch/trackpad, the arrow buttons or the Left/Right keys; the dots show the current page.

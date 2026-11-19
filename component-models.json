@@ -4004,6 +4004,20 @@
         "valueType": "boolean"
       },
       {
+        "component": "text",
+        "name": "mandatoryMessage",
+        "label": "Error message",
+        "valueType": "string",
+        "description": "Error message shown when required field is left empty."
+      },
+      {
+        "component": "text",
+        "name": "validateExpMessage",
+        "label": "Script validation message",
+        "valueType": "string",
+        "description": "Displayed when validation script fails."
+      },
+      {
         "component": "tab",
         "label": "Help Content",
         "name": "help"

@@ -16,9 +16,7 @@
         "value": "Card Choice",
         "visible": true
       },
-      "properties": {
-        "required": false
-      }
+      "properties": {}
     },
     {
       "id": "next-field",

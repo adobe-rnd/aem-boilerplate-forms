@@ -1,49 +1,46 @@
 {
-    "definitions": [
-        {
-            "title": "Card Choice",
-            "id": "card-choice",
-            "plugins": {
-                "xwalk": {
-                    "page": {
-                        "resourceType": "core/fd/components/form/textinput/v1/textinput",
-                        "template": {
-                            "jcr:title": "Card Choice",
-                            "fieldType": "text-input",
-                            "fd:viewType": "card-choice"
-                        }
-                    }
-                }
+  "definitions": [
+    {
+      "title": "Card Choice",
+      "id": "card-choice",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/textinput/v1/textinput",
+            "template": {
+              "jcr:title": "Card Choice",
+              "fieldType": "text-input",
+              "fd:viewType": "card-choice"
             }
+          }
         }
-    ],
-    "models": [
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "card-choice",
+      "fields": [
         {
-            "id": "card-choice",
-            "fields": [
-                {
-                    "component": "tab",
-                    "label": "Basic",
-                    "name": "basic"
-                },
-                {
-                    "...": "../../models/form-common/_basic-input-fields.json#/fields"
-                },
-                {
-                    "component": "tab",
-                    "label": "Validation",
-                    "name": "validation"
-                },
-                {
-                    "component": "boolean",
-                    "name": "required",
-                    "label": "Required",
-                    "valueType": "boolean"
-                },
-                {
-                    "...": "../../models/form-common/_help-container.json#/fields"
-                }
-            ]
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
         }
-    ]
+      ]
+    }
+  ]
 }

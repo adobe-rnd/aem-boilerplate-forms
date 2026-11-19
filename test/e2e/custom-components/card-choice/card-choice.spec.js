@@ -4,74 +4,70 @@ import {
 
 const formDef = loadFormJson('card-choice');
 const FIELD = 'field-under-test';
-
-const cards = Array.from({ length: 6 }, (_, i) => ({
-  id: `c${i}`,
-  title: `Card ${i}`,
-  subtitle: 'Best Card',
-  features: ['Upto 10X CashPoints', 'Joining Fees - ₹500/-'],
-  linkText: 'All Features & Benefits',
-  minAmount: '₹ 15,000/-',
-  category: i < 4 ? 'Retail Cards' : 'Business Cards',
-}));
-
-const setCards = (page) => setModel(page, FIELD, 'properties', { cards });
+const cards = [
+  {
+    id: 'freedom',
+    title: 'Freedom',
+    subtitle: 'Best Card for Rewards & Offers',
+    features: ['Upto 10X CashPoints', { text: 'Joining Fees - ₹500/-' }],
+    linkText: 'All Features & Benefits',
+    minAmount: '₹ 15,000/-',
+  },
+  { id: 'oil', title: 'Indian Oil', minAmount: '₹ 30,000/-' },
+  { id: 'mb', title: 'Moneyback+' },
+  { id: 'tata', title: 'Tata Neu' },
+  { id: 'x', title: 'Fifth' },
+];
 
 test.describe('card-choice custom component', () => {
   test.beforeEach(async ({ page, formServer }) => {
-    await page.setViewportSize({ width: 700, height: 900 });
     await renderForm(page, formServer, formDef);
   });
 
-  test('decorates the field and renders cards set by a rule', async ({ page }) => {
+  test('is loaded and renders no cards before data arrives', async ({ page }) => {
     const wrapper = field(page, FIELD);
     await expect(wrapper).toHaveAttribute('data-component-status', 'loaded');
+    await expect(wrapper.locator('.card-choice-track')).toBeVisible();
     await expect(wrapper.locator('.card-choice-card')).toHaveCount(0);
-    await setCards(page);
-    const rendered = wrapper.locator('.card-choice-card');
-    await expect(rendered).toHaveCount(4);
-    await expect(rendered.first().locator('.card-choice-title')).toHaveText('Card 0');
-    await expect(rendered.first().locator('.card-choice-feature')).toHaveCount(2);
-    await expect(rendered.first().locator('.card-choice-amount-value')).toHaveText('₹ 15,000/-');
-    await expect(rendered.first().locator('.card-choice-select')).toHaveText('Get This Card');
-    await expect(wrapper.locator('.card-choice-category')).toHaveCount(2);
   });
 
-  test('scrolls horizontally with the next arrow', async ({ page }) => {
-    await setCards(page);
-    const viewport = field(page, FIELD).locator('.card-choice-viewport');
-    await expect(field(page, FIELD).locator('.card-choice-next')).toBeVisible();
-    await field(page, FIELD).locator('.card-choice-next').click();
-    await expect.poll(() => viewport.evaluate((v) => v.scrollLeft)).toBeGreaterThan(0);
-    await expect(field(page, FIELD).locator('.card-choice-prev')).toBeVisible();
+  test('renders cards with all details when a rule sets the data', async ({ page }) => {
+    await setModel(page, FIELD, 'properties', { cards });
+    const first = field(page, FIELD).locator('.card-choice-card').first();
+    await expect(field(page, FIELD).locator('.card-choice-card')).toHaveCount(5);
+    await expect(first.locator('.card-choice-title')).toHaveText('Freedom');
+    await expect(first.locator('.card-choice-subtitle')).toHaveText('Best Card for Rewards & Offers');
+    await expect(first.locator('.card-choice-feature')).toHaveCount(2);
+    await expect(first.locator('.card-choice-link')).toHaveText('All Features & Benefits');
+    await expect(first.locator('.card-choice-amount-value')).toHaveText('₹ 15,000/-');
+    await expect(first.locator('.card-choice-select')).toHaveText('Get This Card');
   });
 
-  test('switching category shows that category cards', async ({ page }) => {
-    await setCards(page);
-    await field(page, FIELD).locator('.card-choice-category', { hasText: 'Business Cards' }).click();
-    await expect(field(page, FIELD).locator('.card-choice-card')).toHaveCount(2);
-  });
-
-  test('selecting a card sets the selected card in the model once', async ({ page }) => {
-    await setCards(page);
+  test('selecting a card sets its details in the model once', async ({ page }) => {
+    await setModel(page, FIELD, 'properties', { cards });
     const changes = await trackChanges(page, FIELD);
-    const card = field(page, FIELD).locator('.card-choice-card').nth(1);
-    await card.locator('.card-choice-select').click();
-    await expect.poll(async () => JSON.parse((await getModel(page, FIELD)) || 'null')?.id).toBe('c1');
-    await expect(card).toHaveClass(/selected/);
+    const second = field(page, FIELD).locator('.card-choice-card').nth(1);
+    await second.locator('.card-choice-select').click();
+    await expect.poll(() => getModel(page, FIELD)).toEqual(JSON.stringify(cards[1]));
     expect(await changes()).toBe(1);
+    await expect(second).toHaveClass(/selected/);
+    await field(page, FIELD).locator('.card-choice-card').first().locator('.card-choice-select').click();
+    await expect(second).not.toHaveClass(/selected/);
   });
 
-  test('reflects a model value set by a rule', async ({ page }) => {
-    await setCards(page);
+  test('model value highlights the card', async ({ page }) => {
+    await setModel(page, FIELD, 'properties', { cards });
     await setModel(page, FIELD, 'value', JSON.stringify(cards[2]));
     await expect(field(page, FIELD).locator('.card-choice-card').nth(2)).toHaveClass(/selected/);
   });
 
-  test('cards are operable by keyboard', async ({ page }) => {
-    await setCards(page);
-    await field(page, FIELD).locator('.card-choice-select').first().focus();
-    await page.keyboard.press('Enter');
-    await expect.poll(async () => JSON.parse((await getModel(page, FIELD)) || 'null')?.id).toBe('c0');
+  test('cards scroll horizontally via the next button', async ({ page }) => {
+    await page.setViewportSize({ width: 700, height: 900 });
+    await setModel(page, FIELD, 'properties', { cards });
+    const track = field(page, FIELD).locator('.card-choice-track');
+    const next = field(page, FIELD).locator('.card-choice-next');
+    await expect(next).toBeVisible();
+    await next.click();
+    await expect.poll(() => track.evaluate((t) => t.scrollLeft)).toBeGreaterThan(0);
   });
 });
