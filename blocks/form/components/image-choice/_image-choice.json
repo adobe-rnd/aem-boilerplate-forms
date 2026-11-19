@@ -10,7 +10,6 @@
                         "template": {
                             "jcr:title": "Image Choice",
                             "fieldType": "checkbox-group",
-                            "fd:viewType": "image-choice",
                             "enum": [
                                 "0",
                                 "1"
@@ -19,7 +18,10 @@
                                 "Item 1",
                                 "Item 2"
                             ],
-                            "type": "string[]"
+                            "orientation": "horizontal",
+                            "type": "string[]",
+                            "fd:viewType": "image-choice",
+                            "selectionMode": "single"
                         }
                     }
                 }
@@ -40,6 +42,44 @@
                 },
                 {
                     "component": "select",
+                    "name": "selectionMode",
+                    "label": "Selection mode",
+                    "valueType": "string",
+                    "value": "single",
+                    "description": "Allow selecting a single image or multiple images.",
+                    "options": [
+                        {
+                            "name": "Single",
+                            "value": "single"
+                        },
+                        {
+                            "name": "Multiple",
+                            "value": "multiple"
+                        }
+                    ]
+                },
+                {
+                    "component": "text",
+                    "name": "images",
+                    "label": "Option images (URL, same order as options)",
+                    "valueType": "string",
+                    "multi": true
+                },
+                {
+                    "component": "number",
+                    "name": "columns",
+                    "label": "Images per row",
+                    "valueType": "number",
+                    "value": 4
+                },
+                {
+                    "component": "boolean",
+                    "name": "showLabels",
+                    "label": "Show option names below images",
+                    "valueType": "boolean"
+                },
+                {
+                    "component": "select",
                     "label": "Save value as",
                     "name": "type",
                     "valueType": "string",
@@ -48,6 +88,10 @@
                         {
                             "name": "String",
                             "value": "string[]"
+                        },
+                        {
+                            "name": "Boolean",
+                            "value": "boolean[]"
                         },
                         {
                             "name": "Number",
@@ -62,51 +106,6 @@
                 },
                 {
                     "...": "../../models/form-common/_basic-validation-fields.json#/fields"
-                },
-                {
-                    "component": "tab",
-                    "label": "Image Choice",
-                    "name": "imagechoice"
-                },
-                {
-                    "component": "radio-group",
-                    "label": "Selection mode",
-                    "name": "selectionMode",
-                    "valueType": "string",
-                    "value": "single",
-                    "options": [
-                        {
-                            "name": "Single choice",
-                            "value": "single"
-                        },
-                        {
-                            "name": "Multiple choice",
-                            "value": "multi"
-                        }
-                    ]
-                },
-                {
-                    "component": "textarea",
-                    "label": "Image URLs",
-                    "name": "imageUrls",
-                    "valueType": "string",
-                    "description": "One image URL per line, in the same order as the options"
-                },
-                {
-                    "component": "number",
-                    "label": "Columns",
-                    "name": "columns",
-                    "valueType": "number",
-                    "value": 4,
-                    "description": "Number of images per row"
-                },
-                {
-                    "component": "boolean",
-                    "label": "Show labels",
-                    "name": "showLabels",
-                    "valueType": "boolean",
-                    "value": false,
-                    "description": "Show option names below the images"
                 },
                 {
                     "...": "../../models/form-common/_help-container.json#/fields"

@@ -5,19 +5,16 @@ import {
 const formDef = loadFormJson('image-choice');
 const FIELD = 'field-under-test';
 
-function withProps(props) {
-  const def = structuredClone(formDef);
-  Object.assign(def.items[0].properties, props);
-  return def;
-}
+const withProps = (props) => {
+  const copy = structuredClone(formDef);
+  Object.assign(copy.items[0].properties, props);
+  return copy;
+};
 
-const options = (page) => field(page, FIELD).locator('.image-choice-option');
-const optionLabel = (page, index) => options(page).nth(index).locator('label');
-const checkedValues = (page) => field(page, FIELD).locator('input:checked')
-  .evaluateAll((inputs) => inputs.map((i) => i.value));
+const option = (page, index) => field(page, FIELD).locator('.image-choice-option').nth(index);
 
 test.describe('image-choice custom component', () => {
-  test.describe('single mode', () => {
+  test.describe('single selection (default)', () => {
     test.beforeEach(async ({ page, formServer }) => {
       await renderForm(page, formServer, formDef);
     });
@@ -26,67 +23,63 @@ test.describe('image-choice custom component', () => {
       const wrapper = field(page, FIELD);
       await expect(wrapper).toHaveAttribute('data-component-status', 'loaded');
       await expect(wrapper).toHaveClass(/image-choice-single/);
-      await expect(options(page)).toHaveCount(3);
-      await expect(wrapper.locator('.image-choice-image')).toHaveCount(3);
-      await expect(wrapper.locator('.image-choice-image').first()).toHaveAttribute('alt', 'Option A');
-      const box = await wrapper.locator('.image-choice-text').first().boundingBox();
-      expect(box.width).toBeLessThanOrEqual(1);
+      await expect(wrapper.locator('.image-choice-option')).toHaveCount(3);
+      await expect(wrapper.locator('.image-choice-option img')).toHaveCount(3);
+      await expect(option(page, 0).locator('img')).toHaveAttribute('alt', 'Option A');
     });
 
-    test('selecting an image replaces the previous selection with one model change each', async ({ page }) => {
+    test('hides captions unless showLabels is set', async ({ page }) => {
+      await expect(option(page, 0).locator('.image-choice-caption')).toHaveClass(/image-choice-sr-only/);
+    });
+
+    test('only one image stays selected and the model follows', async ({ page }) => {
       const changes = await trackChanges(page, FIELD);
-      await optionLabel(page, 0).click();
+      await option(page, 0).locator('input').click({ force: true });
       await expect.poll(() => getModel(page, FIELD)).toEqual(['a']);
-      await optionLabel(page, 1).click();
-      await expect.poll(() => getModel(page, FIELD)).toEqual(['b']);
-      expect(await checkedValues(page)).toEqual(['b']);
+      await option(page, 2).locator('input').click({ force: true });
+      await expect.poll(() => getModel(page, FIELD)).toEqual(['c']);
+      await expect(option(page, 0).locator('input')).not.toBeChecked();
       expect(await changes()).toBe(2);
     });
 
-    test('clicking the selected image clears it', async ({ page }) => {
-      await optionLabel(page, 2).click();
-      await expect.poll(() => getModel(page, FIELD)).toEqual(['c']);
-      await optionLabel(page, 2).click();
-      await expect.poll(() => getModel(page, FIELD)).toEqual([]);
-    });
-
-    test('reflects a model value', async ({ page }) => {
+    test('reflects a model value set by a rule', async ({ page }) => {
       await setModel(page, FIELD, 'value', ['b']);
-      await expect.poll(() => checkedValues(page)).toEqual(['b']);
-      await expect(options(page).nth(1).locator('input')).toBeChecked();
+      await expect(option(page, 1).locator('input')).toBeChecked();
+      await expect(option(page, 0).locator('input')).not.toBeChecked();
     });
 
-    test('is operable with the keyboard', async ({ page }) => {
-      await optionLabel(page, 0).click();
-      await page.keyboard.press('Tab');
+    test('is keyboard operable', async ({ page }) => {
+      await option(page, 1).locator('input').focus();
       await page.keyboard.press('Space');
       await expect.poll(() => getModel(page, FIELD)).toEqual(['b']);
+      await page.keyboard.press('Tab');
+      await page.keyboard.press('Tab');
+      await expect(page.locator('input[name="nextField"], #next-field')).toBeFocused();
     });
   });
 
-  test.describe('multi mode', () => {
+  test.describe('multiple selection', () => {
     test.beforeEach(async ({ page, formServer }) => {
-      await renderForm(page, formServer, withProps({ selectionMode: 'multi' }));
+      await renderForm(page, formServer, withProps({ selectionMode: 'multiple', showLabels: true, columns: 2 }));
     });
 
-    test('allows several selections', async ({ page }) => {
-      await expect(field(page, FIELD)).toHaveClass(/image-choice-multi/);
-      await optionLabel(page, 0).click();
-      await optionLabel(page, 2).click();
+    test('allows several images and shows captions', async ({ page }) => {
+      const wrapper = field(page, FIELD);
+      await expect(wrapper).toHaveClass(/image-choice-multiple/);
+      await expect(option(page, 0).locator('.image-choice-caption')).not.toHaveClass(/image-choice-sr-only/);
+      await expect(option(page, 0).locator('.image-choice-caption')).toHaveText('Option A');
+      expect(await wrapper.evaluate((el) => el.style.getPropertyValue('--image-choice-columns'))).toBe('2');
+      await option(page, 0).locator('input').click({ force: true });
+      await option(page, 2).locator('input').click({ force: true });
       await expect.poll(() => getModel(page, FIELD)).toEqual(['a', 'c']);
-      expect(await checkedValues(page)).toEqual(['a', 'c']);
     });
   });
 
-  test.describe('authored properties', () => {
-    test('columns and showLabels', async ({ page, formServer }) => {
-      await renderForm(page, formServer, withProps({ columns: 2, showLabels: true }));
-      const wrapper = field(page, FIELD);
-      await expect(wrapper).toHaveClass(/image-choice-show-labels/);
-      await expect(wrapper.locator('.image-choice-text').first()).toBeVisible();
-      const tops = await options(page).evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top));
-      expect(tops[1]).toBe(tops[0]);
-      expect(tops[2]).toBeGreaterThan(tops[0]);
-    });
+  test('re-applies images when the options change', async ({ page, formServer }) => {
+    await renderForm(page, formServer, formDef);
+    await setModel(page, FIELD, 'enum', ['a', 'b', 'c', 'd']);
+    await setModel(page, FIELD, 'enumNames', ['A', 'B', 'C', 'D']);
+    await expect(field(page, FIELD).locator('.image-choice-option')).toHaveCount(4);
+    await expect(field(page, FIELD).locator('.image-choice-option img')).toHaveCount(3);
   });
 });
