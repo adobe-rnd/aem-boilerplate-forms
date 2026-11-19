@@ -1,0 +1,96 @@
+main .form .image-choice.checkbox-group-wrapper {
+    display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns, 4), minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+}
+
+main .form .image-choice > legend,
+main .form .image-choice > .field-description {
+    grid-column: 1 / -1;
+}
+
+main .form .image-choice .image-choice-option {
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+main .form .image-choice .image-choice-option input[type="checkbox"] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    opacity: 0;
+    margin: 0;
+}
+
+main .form .image-choice .image-choice-option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    block-size: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+main .form .image-choice .image-choice-option label::before,
+main .form .image-choice .image-choice-option label::after {
+    display: none;
+}
+
+main .form .image-choice .image-choice-image {
+    inline-size: 100%;
+    max-inline-size: 96px;
+    block-size: 72px;
+    object-fit: contain;
+}
+
+main .form .image-choice .image-choice-text {
+    font-size: var(--form-input-font-size, 14px);
+    text-align: center;
+}
+
+main .form .image-choice:not(.image-choice-show-labels) .image-choice-image + .image-choice-text {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+main .form .image-choice .image-choice-option label:hover {
+    background-color: rgb(0 0 0 / 4%);
+}
+
+main .form .image-choice.field-invalid .image-choice-option label {
+    border-color: var(--form-invalid-border-color, #ff5f3f);
+}
+
+main .form .image-choice .image-choice-option input:checked + label {
+    border-color: var(--link-color, #1473e6);
+    background-color: rgb(20 115 230 / 8%);
+    box-shadow: 0 0 0 1px var(--link-color, #1473e6);
+}
+
+main .form .image-choice .image-choice-option input:focus-visible + label {
+    outline: 2px solid var(--link-color, #1473e6);
+    outline-offset: 2px;
+}
+
+main .form .image-choice .image-choice-option input:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (width < 600px) {
+    main .form .image-choice.checkbox-group-wrapper {
+        grid-template-columns: repeat(min(var(--image-choice-columns, 4), 3), minmax(0, 1fr));
+    }
+}

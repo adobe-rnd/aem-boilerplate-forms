@@ -1,0 +1,117 @@
+{
+    "definitions": [
+        {
+            "title": "Image Choice",
+            "id": "image-choice",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                        "template": {
+                            "jcr:title": "Image Choice",
+                            "fieldType": "checkbox-group",
+                            "fd:viewType": "image-choice",
+                            "enum": [
+                                "0",
+                                "1"
+                            ],
+                            "enumNames": [
+                                "Item 1",
+                                "Item 2"
+                            ],
+                            "type": "string[]"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "image-choice",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-select-fields.json#/fields"
+                },
+                {
+                    "component": "select",
+                    "label": "Save value as",
+                    "name": "type",
+                    "valueType": "string",
+                    "value": "string[]",
+                    "options": [
+                        {
+                            "name": "String",
+                            "value": "string[]"
+                        },
+                        {
+                            "name": "Number",
+                            "value": "number[]"
+                        }
+                    ]
+                },
+                {
+                    "component": "tab",
+                    "label": "Validation",
+                    "name": "validation"
+                },
+                {
+                    "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+                },
+                {
+                    "component": "tab",
+                    "label": "Image Choice",
+                    "name": "imagechoice"
+                },
+                {
+                    "component": "radio-group",
+                    "label": "Selection mode",
+                    "name": "selectionMode",
+                    "valueType": "string",
+                    "value": "single",
+                    "options": [
+                        {
+                            "name": "Single choice",
+                            "value": "single"
+                        },
+                        {
+                            "name": "Multiple choice",
+                            "value": "multi"
+                        }
+                    ]
+                },
+                {
+                    "component": "textarea",
+                    "label": "Image URLs",
+                    "name": "imageUrls",
+                    "valueType": "string",
+                    "description": "One image URL per line, in the same order as the options"
+                },
+                {
+                    "component": "number",
+                    "label": "Columns",
+                    "name": "columns",
+                    "valueType": "number",
+                    "value": 4,
+                    "description": "Number of images per row"
+                },
+                {
+                    "component": "boolean",
+                    "label": "Show labels",
+                    "name": "showLabels",
+                    "valueType": "boolean",
+                    "value": false,
+                    "description": "Show option names below the images"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
+        }
+    ]
+}

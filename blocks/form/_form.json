@@ -28,6 +28,9 @@
       "...": "./components/password/_password.json#/definitions" 
     },
     { 
+      "...": "./components/image-choice/_image-choice.json#/definitions" 
+    },
+    { 
       "...": "./components/rating/_rating.json#/definitions" 
     },
     { 
@@ -99,7 +102,8 @@
         "text-input",
         "tnc",
         "wizard",
-        "range"
+        "range",
+        "image-choice"
       ]
     }
   ]
