@@ -1,65 +1,63 @@
 import { subscribe } from '../../rules/index.js';
 
-function parseImages(images) {
-  if (Array.isArray(images)) return images;
-  if (typeof images === 'string') {
-    return images.split(/[\n,]/).map((s) => s.trim()).filter(Boolean);
-  }
-  return [];
-}
-
-function decorateOptions(fieldDiv, images) {
-  fieldDiv.querySelectorAll('.checkbox-wrapper').forEach((option, index) => {
-    const label = option.querySelector('label');
-    if (!label || label.querySelector('.image-choice-picture')) return;
-    const text = label.textContent.trim();
-    const src = images[index];
-    const caption = document.createElement('span');
-    caption.className = 'image-choice-caption';
-    caption.textContent = text;
-    label.textContent = '';
-    if (src) {
-      const img = document.createElement('img');
-      img.className = 'image-choice-picture';
-      img.src = src;
-      img.alt = '';
-      img.loading = 'lazy';
-      label.append(img);
-    } else {
-      label.classList.add('image-choice-noimage');
-    }
-    label.append(caption);
-    label.title = text;
-  });
+function toList(value) {
+  if (Array.isArray(value)) return value;
+  return value ? String(value).split(',').map((s) => s.trim()) : [];
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
-  const fieldset = fieldDiv.matches('fieldset') ? fieldDiv : fieldDiv.querySelector('fieldset');
-  const target = fieldset || fieldDiv;
   const props = fieldJson?.properties || {};
-  const images = parseImages(props.images);
-  const single = props.selectionMode !== 'multiple';
-  const columns = parseInt(props.columns, 10);
+  const isMulti = props.selectionMode === 'multi';
+  const images = toList(props.images);
+  const columns = parseInt(props.columns, 10) || 4;
+  const showLabels = props.showLabels === true || props.showLabels === 'true';
 
-  target.classList.add('image-choice');
-  target.classList.toggle('image-choice-single', single);
-  if (columns > 0) target.style.setProperty('--image-choice-columns', columns);
-  decorateOptions(fieldDiv, images);
+  fieldDiv.classList.add('image-choice');
+  fieldDiv.classList.toggle('image-choice-single', !isMulti);
+  fieldDiv.classList.toggle('image-choice-show-labels', showLabels);
+  fieldDiv.style.setProperty('--image-choice-columns', columns);
 
-  // Runs on the field before the form-level handler that writes model.value
+  // Options are rebuilt by the form block when enum/enumNames change, so decorate lazily.
+  const enhance = () => {
+    fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((input, index) => {
+      const item = input.parentElement;
+      if (item.classList.contains('image-choice-item')) return;
+      item.classList.add('image-choice-item');
+      const label = item.querySelector('label');
+      const text = label.textContent;
+      label.textContent = '';
+      const src = images[index];
+      if (src) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = showLabels ? '' : text;
+        img.loading = 'lazy';
+        label.append(img);
+      }
+      const caption = document.createElement('span');
+      caption.className = 'image-choice-label';
+      caption.textContent = text;
+      if (src && !showLabels) caption.classList.add('image-choice-sr-only');
+      label.append(caption);
+    });
+  };
+
+  enhance();
+  new MutationObserver(enhance).observe(fieldDiv, { childList: true });
+
+  // Capture phase runs before the form block's change handler reads the checked inputs.
   fieldDiv.addEventListener('change', (e) => {
-    const input = e.target;
-    if (single && input.type === 'checkbox' && input.checked) {
+    if (!isMulti && e.target.checked) {
       fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((other) => {
-        if (other !== input) other.checked = false;
+        if (other !== e.target) other.checked = false;
       });
     }
-  });
+  }, true);
 
-  subscribe(fieldDiv, formId, (_el, _model, eventType, payload) => {
-    if (eventType === 'change') {
-      const rebuilt = payload?.changes?.some((c) => ['enum', 'enumNames'].includes(c?.propertyName));
-      if (rebuilt) decorateOptions(fieldDiv, images);
+  subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType) => {
+    if (eventType === 'register' && !isMulti && Array.isArray(fieldModel.value)
+      && fieldModel.value.length > 1) {
+      fieldModel.value = fieldModel.value.slice(0, 1);
     }
   }, { listenChanges: true });
 

@@ -18,12 +18,10 @@
       },
       "properties": {
         "selectionMode": "single",
-        "columns": 4,
-        "type": "string[]",
-        "orientation": "horizontal",
+        "showLabels": false,
         "images": [
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Crect width='10' height='10' fill='%23f00'/%3E%3C/svg%3E",
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Crect width='10' height='10' fill='%230f0'/%3E%3C/svg%3E"
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'/%3E",
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'/%3E"
         ]
       },
       "enum": [

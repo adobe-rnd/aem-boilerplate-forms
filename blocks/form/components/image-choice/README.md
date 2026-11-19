@@ -1,29 +1,29 @@
 # Image Choice
 
-Pick one or several options by clicking images (for example team logos) instead of text checkboxes. Selection can be single or multiple.
+Selectable grid of images (logos, icons, avatars) where the user picks one or several options.
 
 ## How to Use
 
-Insert **Image Choice** in a form. Set the option values (`enum`), display names (`enumNames`, used as the accessible name and tooltip) and the images, in the same order as the options.
+Insert the **Image Choice** component, define the options (data and display values) and add one image URL per option, in the same order.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `selectionMode` | `single` (default) allows one image; `multiple` allows any number |
-| `images` | Image URL per option, in option order |
-| `columns` | Images per row (default 4; capped at 3 on small screens) |
+| `images` | Image URLs, in the same order as the options |
+| `selectionMode` | `single` (default) or `multi` |
+| `columns` | Images per row (default 4, 2 on narrow screens) |
+| `showLabels` | Show the option display values under the images; otherwise they are screen-reader only |
 
 ## Model Subscriptions
 
-Subscribes to `enum` / `enumNames` changes and re-applies the images to the rebuilt options.
+Subscribes to its own model on `register`. In single mode, a prefilled value with several entries is trimmed to the first one.
 
 ## Model Properties Set
 
-Writes `value` through the standard checkbox-group `change` handling: once per click, as an array (`string[]` by default). In single mode the value is an array with at most one item (empty when deselected).
+`value` is an array (`string[]` by default) built by the form block on the input's native `change` event, so rules fire once per click. In single mode the array holds at most one item; clicking the selected image again clears it.
 
 ## Usage Notes
 
-- Base type `checkbox-group`, `fd:viewType` = `image-choice`.
-- Native checkboxes stay in the DOM (visually hidden), so keyboard (Tab/Space), required/min/max validation and read-only/disabled work as usual.
-- Options without an image fall back to their text.
+- Base type: `checkbox-group`; `fd:viewType`: `image-choice`.
+- Each option is a visually hidden checkbox, so keyboard (Tab, Space), required/min/max validation and enum updates keep working.
