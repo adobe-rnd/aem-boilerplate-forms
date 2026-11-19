@@ -1,0 +1,64 @@
+.form .inr-input-wrapper .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid #d8dae0;
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.form .inr-input-wrapper .inr-input-group:focus-within {
+    border-color: #1473e6;
+}
+
+.form .inr-input-wrapper[data-invalid='true'] .inr-input-group,
+.form .inr-input-wrapper .inr-input-group:has(input[aria-invalid='true']) {
+    border-color: #d31510;
+}
+
+.form .inr-input-wrapper .inr-input-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    background: #f1f2f6;
+    border-right: 1px solid #d8dae0;
+    font-size: 1.25rem;
+    color: #4b5563;
+}
+
+.form .inr-input-wrapper .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    margin: 0;
+    background: transparent;
+}
+
+.form .inr-input-wrapper .inr-input-words {
+    margin-top: 16px;
+}
+
+.form .inr-input-wrapper .inr-input-words-field {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid #d8dae0;
+    border-radius: 16px;
+    background: #f1f2f6;
+    color: #111827;
+    cursor: default;
+}
+
+.form .inr-input-wrapper .inr-input-readonly {
+    margin-top: 8px;
+    text-align: right;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.form .inr-input-wrapper .inr-input-readonly::before {
+    content: '\1F512\FE0E';
+    margin-right: 6px;
+}

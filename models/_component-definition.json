@@ -42,6 +42,9 @@
       "components": [
         {
           "...": "../blocks/form/components/range/_range.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/inr-input/_inr-input.json#/definitions"
         }
       ]
     }
