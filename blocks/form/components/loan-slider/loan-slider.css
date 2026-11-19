@@ -1,0 +1,117 @@
+.loan-slider-wrapper {
+    --thumb: 28px;
+    --accent: #eca550;
+    --rail: #d3d4d9;
+    position: relative;
+    margin-top: 16px;
+}
+
+.loan-slider-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+main .form .loan-slider-header input.loan-slider-text {
+    width: 180px;
+    max-width: 50%;
+    padding: 14px 20px;
+    border: 1px solid #d3d4d9;
+    border-radius: 12px;
+    font-size: 20px;
+    text-align: left;
+}
+
+.loan-slider-track {
+    position: relative;
+    height: var(--thumb);
+}
+
+.loan-slider-ticks {
+    position: absolute;
+    inset: 0 calc(var(--thumb) / 2);
+    pointer-events: none;
+}
+
+.loan-slider-tick {
+    position: absolute;
+    left: calc(var(--pos) * 100%);
+    top: 50%;
+    width: 1px;
+    height: 12px;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    opacity: .7;
+    z-index: 1;
+}
+
+main .form .loan-slider-wrapper input.loan-slider-range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: var(--thumb);
+    margin: 0;
+    padding: 0;
+    border: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.loan-slider-range::-webkit-slider-runnable-track {
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, var(--accent) calc(var(--progress) * (100% - var(--thumb)) + var(--thumb) / 2), var(--rail) 0);
+}
+
+.loan-slider-range::-moz-range-track {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--rail);
+}
+
+.loan-slider-range::-moz-range-progress {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--accent);
+}
+
+.loan-slider-range::-webkit-slider-thumb {
+    appearance: none;
+    width: var(--thumb);
+    height: var(--thumb);
+    margin-top: -9px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent);
+    position: relative;
+    z-index: 2;
+}
+
+.loan-slider-range::-moz-range-thumb {
+    width: var(--thumb);
+    height: var(--thumb);
+    border: none;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.loan-slider-range:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+}
+
+.loan-slider-labels {
+    position: relative;
+    height: 24px;
+    margin: 8px calc(var(--thumb) / 2) 0;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.loan-slider-label {
+    position: absolute;
+    left: calc(var(--pos) * 100%);
+    transform: translateX(-50%);
+}
