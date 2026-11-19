@@ -1,0 +1,65 @@
+.form .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid #d6d8e0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.form .inr-input-group:focus-within {
+    border-color: #3b63fb;
+}
+
+.form .inr-input-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    background: #f1f2f6;
+    border-right: 1px solid #d6d8e0;
+    font-size: 24px;
+    color: #4b5266;
+}
+
+.form .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    padding: 16px;
+    background: transparent;
+}
+
+.form .inr-input-words-wrapper {
+    margin-top: 16px;
+}
+
+.form .inr-input-words-wrapper .inr-input-words {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 56px;
+    padding: 16px;
+    border: 2px solid #d6d8e0;
+    border-radius: 12px;
+    background: #f1f2f6;
+    color: inherit;
+    cursor: default;
+}
+
+.form .inr-input-readonly-hint {
+    margin-top: 8px;
+    text-align: right;
+    font-size: 14px;
+    color: #4b5266;
+}
+
+.form .inr-input-readonly-hint::before {
+    content: '\1F512\FE0E';
+    margin-right: 6px;
+}
+
+.form .field-wrapper.field-invalid .inr-input-group {
+    border-color: var(--form-error-color, #d31510);
+}
