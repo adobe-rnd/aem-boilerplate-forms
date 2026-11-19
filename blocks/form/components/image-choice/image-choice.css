@@ -1,0 +1,69 @@
+.form .image-choice .image-choice-item {
+    display: inline-block;
+    position: relative;
+    margin: 0 8px 8px 0;
+}
+
+.form .image-choice .image-choice-item input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.form .image-choice .image-choice-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form .image-choice .image-choice-label::before,
+.form .image-choice .image-choice-label::after {
+    display: none;
+}
+
+.form .image-choice .image-choice-img {
+    width: var(--image-choice-size, 80px);
+    height: var(--image-choice-size, 80px);
+    object-fit: contain;
+}
+
+.form .image-choice .image-choice-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.form .image-choice.field-invalid .image-choice-label {
+    border-color: var(--form-error-color, #ff5f3f);
+}
+
+.form .image-choice .image-choice-item:hover .image-choice-label {
+    background-color: rgb(0 0 0 / 5%);
+}
+
+.form .image-choice .image-choice-item input:checked + .image-choice-label {
+    border-color: var(--button-primary-color, #1473e6);
+    background-color: rgb(20 115 230 / 8%);
+}
+
+.form .image-choice .image-choice-item input:focus-visible + .image-choice-label {
+    box-shadow: 0 0 0 2px rgb(95 141 218 / 40%);
+}
+
+.form .image-choice .image-choice-item input:disabled + .image-choice-label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
