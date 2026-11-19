@@ -16,7 +16,9 @@
         "value": "INR Input",
         "visible": true
       },
-      "properties": {}
+      "properties": {
+        "wordsLabel": "Amount (in words)"
+      }
     },
     {
       "id": "next-field",

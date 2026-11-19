@@ -731,7 +731,7 @@
           }
         },
         {
-          "title": "INR Input",
+          "title": "Text Input",
           "id": "inr-input",
           "plugins": {
             "xwalk": {
@@ -740,9 +740,7 @@
                 "template": {
                   "jcr:title": "INR Input",
                   "fieldType": "text-input",
-                  "fd:viewType": "inr-input",
-                  "enabled": true,
-                  "visible": true
+                  "fd:viewType": "inr-input"
                 }
               }
             }

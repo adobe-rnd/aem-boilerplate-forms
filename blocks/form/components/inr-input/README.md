@@ -1,30 +1,28 @@
 # INR Input
 
-Indian Rupee (₹) amount field with a read-only amount-in-words field below it that updates live as the user types.
+Indian Rupee amount field with a read-only amount-in-words field that updates live as the user types.
 
 ## How to Use
 
-Insert **INR Input** from the Custom Form Components group. Typing `1234567.5` shows
-"Twelve Lakh Thirty Four Thousand Five Hundred Sixty Seven Rupees and Fifty Paise Only".
+Insert **INR Input** from the Custom Form Components group. It extends a text input; the user types an amount (digits and an optional decimal with up to 2 digits), and the words field below shows e.g. `One Lakh Twenty Three Thousand Rupees and Fifty Paise Only` using Thousand, Lakh and Crore.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `amountInWordsLabel` | Label of the words field (default "Amount (in words)") |
+| `wordsLabel` | Label of the read-only words field (default `Amount (in words)`) |
 
-Standard text-input properties (label, placeholder, required, default value, help) apply.
+Other properties are those of the text input (placeholder, default value, validation, help).
 
 ## Model Subscriptions
 
-Subscribes to the field's `value` changes (rules, prefill) and refreshes the words.
+Listens to `value` changes on its own field and updates the input and words.
 
 ## Model Properties Set
 
-Sets nothing. `model.value` holds the raw amount string (e.g. `"1234.50"`, no ₹ or commas) and is committed on blur/`change` (OOTB default), so rules run once per edit. Only the words are updated on every keystroke; the words field is not a model field and is not submitted.
+Sets `model.value` to the sanitized numeric string on every keystroke (component-handled `input` event), so change rules fire per keystroke. The words field is display-only and not part of the model.
 
 ## Usage Notes
 
-- Base type `text-input`, `fd:viewType` `inr-input`.
-- Input is restricted to digits and one decimal point with at most two decimals (Paise).
-- Uses the Indian numbering system (Thousand, Lakh, Crore); the exported `amountToWords` helper does the conversion.
+- Base type: `text-input`; `fd:viewType`: `inr-input`.
+- Non-numeric characters and commas are stripped; decimals are capped at 2 (Paise).

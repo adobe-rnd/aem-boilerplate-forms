@@ -4,7 +4,7 @@ const ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'
   'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
 const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
-function below1000(n) {
+function belowThousand(n) {
   const parts = [];
   const hundreds = Math.floor(n / 100);
   const rest = n % 100;
@@ -15,58 +15,60 @@ function below1000(n) {
   return parts.join(' ');
 }
 
-/** Words for a non-negative integer given as a digit string, Indian numbering system. */
 function integerToWords(digits) {
-  const clean = digits.replace(/^0+/, '');
-  if (!clean) return 'Zero';
-  const lastThree = Number(clean.slice(-3));
-  let rest = clean.slice(0, -3);
-  const groups = [];
-  if (lastThree) groups.push(below1000(lastThree));
-  ['Thousand', 'Lakh'].forEach((unit) => {
-    if (!rest) return;
-    const n = Number(rest.slice(-2));
-    rest = rest.slice(0, -2);
-    if (n) groups.unshift(`${below1000(n)} ${unit}`);
+  const stripped = digits.replace(/^0+/, '');
+  if (!stripped) return 'Zero';
+  const parts = [];
+  const crores = stripped.slice(0, -7);
+  let n = Number(stripped.slice(-7));
+  // crores can exceed 99, so they are expressed recursively
+  if (crores) parts.push(`${integerToWords(crores)} Crore`);
+  [[100000, 'Lakh'], [1000, 'Thousand']].forEach(([size, name]) => {
+    const q = Math.floor(n / size);
+    n %= size;
+    if (q) parts.push(`${belowThousand(q)} ${name}`);
   });
-  if (rest) {
-    // everything above 99,99,999 is expressed in Crores, which may itself be large
-    groups.unshift(`${integerToWords(rest)} Crore`);
-  }
-  return groups.join(' ');
+  if (n > 0) parts.push(belowThousand(n));
+  return parts.join(' ');
 }
 
 /**
- * Converts an amount string (e.g. "1234.5") to Indian Rupees and Paise in words.
- * Returns '' for empty or invalid input.
+ * Sanitizes raw user text to digits with at most one decimal point and two decimals.
+ * @param {string} raw
+ * @returns {string}
  */
-export function amountToWords(value) {
-  const str = String(value ?? '').replace(/[,\s₹]/g, '');
-  if (!/^(\d+\.?\d*|\.\d+)$/.test(str)) return '';
-  const [intPart = '', decPart = ''] = str.split('.');
-  const paise = Number(`${decPart}00`.slice(0, 2));
-  const rupees = intPart.replace(/^0+/, '');
-  if (!rupees && !paise) return 'Zero Rupees Only';
-  const parts = [];
-  if (rupees) parts.push(`${integerToWords(rupees)} ${rupees === '1' ? 'Rupee' : 'Rupees'}`);
-  if (paise) parts.push(`${below1000(paise)} Paise`);
-  return `${parts.join(' and ')} Only`;
+export function sanitizeAmount(raw) {
+  const cleaned = String(raw ?? '').replace(/[^\d.]/g, '');
+  const [whole, ...fraction] = cleaned.split('.');
+  if (!fraction.length) return whole;
+  return `${whole}.${fraction.join('').slice(0, 2)}`;
 }
 
-// keeps digits and a single decimal point with at most two decimals
-function sanitize(raw) {
-  const cleaned = raw.replace(/[^\d.]/g, '');
-  const dot = cleaned.indexOf('.');
-  if (dot === -1) return cleaned;
-  return `${cleaned.slice(0, dot + 1)}${cleaned.slice(dot + 1).replace(/\./g, '').slice(0, 2)}`;
+/**
+ * Converts an amount to words using the Indian numbering system.
+ * @param {string|number} value
+ * @returns {string} words, or an empty string for empty/invalid input
+ */
+export function amountToWords(value) {
+  const text = sanitizeAmount(String(value ?? '').replace(/,/g, ''));
+  if (!/\d/.test(text)) return '';
+  const [whole = '', fraction = ''] = text.split('.');
+  const rupees = whole.replace(/^0+(?=\d)/, '') || '0';
+  const paise = Number(fraction.padEnd(2, '0').slice(0, 2));
+  if (rupees === '0' && paise === 0) return 'Zero Rupees Only';
+  const parts = [];
+  if (rupees !== '0') parts.push(`${integerToWords(rupees)} ${rupees === '1' ? 'Rupee' : 'Rupees'}`);
+  if (paise) parts.push(`${belowThousand(paise)} Paise`);
+  return `${parts.join(' and ')} Only`;
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const input = fieldDiv.querySelector('input');
+  if (!input || fieldDiv.querySelector('.inr-input-group')) return fieldDiv;
+
   input.type = 'text';
   input.inputMode = 'decimal';
   input.autocomplete = 'off';
-  fieldDiv.classList.add('inr-input-wrapper');
 
   const group = document.createElement('div');
   group.className = 'inr-input-group';
@@ -79,46 +81,54 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
 
   const wordsId = `${input.id}-words`;
   const wordsWrapper = document.createElement('div');
-  wordsWrapper.className = 'inr-input-words';
+  wordsWrapper.className = 'inr-input-words-wrapper';
   const wordsLabel = document.createElement('label');
-  wordsLabel.className = 'field-label';
+  wordsLabel.className = 'field-label inr-input-words-label';
   wordsLabel.htmlFor = wordsId;
-  wordsLabel.textContent = fieldJson?.properties?.amountInWordsLabel || 'Amount (in words)';
+  wordsLabel.textContent = fieldJson?.properties?.wordsLabel || 'Amount (in words)';
   const words = document.createElement('input');
   words.type = 'text';
   words.id = wordsId;
-  words.className = 'inr-input-words-field';
+  words.className = 'inr-input-words';
   words.readOnly = true;
   words.tabIndex = -1;
   words.setAttribute('aria-live', 'polite');
-  const readOnlyHint = document.createElement('div');
-  readOnlyHint.className = 'inr-input-readonly';
-  readOnlyHint.textContent = 'Read-only';
-  wordsWrapper.append(wordsLabel, words, readOnlyHint);
-  const description = fieldDiv.querySelector('.field-description');
-  if (description) description.before(wordsWrapper);
-  else fieldDiv.append(wordsWrapper);
+  wordsWrapper.append(wordsLabel, words);
+  group.after(wordsWrapper);
 
-  const update = (value = input.value) => {
-    words.value = amountToWords(value);
+  const lock = document.createElement('div');
+  lock.className = 'inr-input-readonly-hint';
+  lock.textContent = 'Read-only';
+  wordsWrapper.append(lock);
+
+  const render = (text) => {
+    words.value = amountToWords(text);
   };
 
-  // the model value is committed by the native change event (on blur); only the words are live
+  let model = null;
+
   input.addEventListener('input', () => {
-    const clean = sanitize(input.value);
+    const clean = sanitizeAmount(input.value);
     if (clean !== input.value) input.value = clean;
-    update();
+    render(clean);
+    // commit per keystroke so rules see the live amount; skip when unchanged
+    if (model && model.value !== clean) model.value = clean;
   });
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
     if (eventType === 'register') {
-      update(fieldModel.value ?? input.value);
-    } else if (eventType === 'change'
-      && payload?.changes?.some((c) => c?.propertyName === 'value')) {
-      update(fieldModel.value);
+      model = fieldModel;
+      render(input.value);
+    } else if (eventType === 'change') {
+      payload?.changes?.forEach((change) => {
+        if (change?.propertyName === 'value') {
+          const next = change.currentValue == null ? '' : String(change.currentValue);
+          if (sanitizeAmount(input.value) !== next) input.value = next;
+          render(next);
+        }
+      });
     }
   }, { listenChanges: true });
 
-  update();
   return fieldDiv;
 }

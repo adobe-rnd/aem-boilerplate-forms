@@ -1,64 +1,65 @@
-.form .inr-input-wrapper .inr-input-group {
+.form .inr-input-group {
     display: flex;
     align-items: stretch;
-    border: 2px solid #d8dae0;
-    border-radius: 16px;
-    background: #fff;
+    border: 2px solid #d6d8e0;
+    border-radius: 12px;
     overflow: hidden;
+    background: #fff;
 }
 
-.form .inr-input-wrapper .inr-input-group:focus-within {
-    border-color: #1473e6;
+.form .inr-input-group:focus-within {
+    border-color: #3b63fb;
 }
 
-.form .inr-input-wrapper[data-invalid='true'] .inr-input-group,
-.form .inr-input-wrapper .inr-input-group:has(input[aria-invalid='true']) {
-    border-color: #d31510;
-}
-
-.form .inr-input-wrapper .inr-input-symbol {
+.form .inr-input-symbol {
     display: flex;
     align-items: center;
     justify-content: center;
     min-width: 52px;
     background: #f1f2f6;
-    border-right: 1px solid #d8dae0;
-    font-size: 1.25rem;
-    color: #4b5563;
+    border-right: 1px solid #d6d8e0;
+    font-size: 24px;
+    color: #4b5266;
 }
 
-.form .inr-input-wrapper .inr-input-group input {
+.form .inr-input-group input {
     flex: 1;
     min-width: 0;
     border: 0;
     border-radius: 0;
-    outline: 0;
-    margin: 0;
+    outline: none;
+    padding: 16px;
     background: transparent;
 }
 
-.form .inr-input-wrapper .inr-input-words {
+.form .inr-input-words-wrapper {
     margin-top: 16px;
 }
 
-.form .inr-input-wrapper .inr-input-words-field {
+.form .inr-input-words-wrapper .inr-input-words {
     width: 100%;
     box-sizing: border-box;
-    border: 2px solid #d8dae0;
-    border-radius: 16px;
+    min-height: 56px;
+    padding: 16px;
+    border: 2px solid #d6d8e0;
+    border-radius: 12px;
     background: #f1f2f6;
-    color: #111827;
+    color: inherit;
     cursor: default;
 }
 
-.form .inr-input-wrapper .inr-input-readonly {
+.form .inr-input-readonly-hint {
     margin-top: 8px;
     text-align: right;
-    font-size: 0.875rem;
-    color: #6b7280;
+    font-size: 14px;
+    color: #4b5266;
 }
 
-.form .inr-input-wrapper .inr-input-readonly::before {
+.form .inr-input-readonly-hint::before {
     content: '\1F512\FE0E';
     margin-right: 6px;
+}
+
+.form .field-wrapper.field-invalid .inr-input-group {
+    border-color: var(--form-error-color, #d31510);
 }
