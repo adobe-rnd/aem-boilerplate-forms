@@ -1,0 +1,93 @@
+main .form .image-choice {
+    --image-choice-columns: 4;
+
+    display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns), minmax(0, 1fr));
+    gap: 16px;
+    border: 0;
+    padding: 0;
+}
+
+main .form .image-choice > legend {
+    grid-column: 1 / -1;
+}
+
+main .form .image-choice > .field-description {
+    grid-column: 1 / -1;
+}
+
+main .form .image-choice .image-choice-option {
+    position: relative;
+    margin: 0;
+}
+
+main .form .image-choice .image-choice-option input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: 0;
+    opacity: 0;
+}
+
+main .form .image-choice .image-choice-option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+main .form .image-choice .image-choice-option label::before,
+main .form .image-choice .image-choice-option label::after {
+    display: none;
+}
+
+main .form .image-choice .image-choice-option img {
+    display: block;
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+}
+
+main .form .image-choice.field-invalid .image-choice-option label {
+    border-color: var(--form-error-color, #d31510);
+}
+
+main .form .image-choice .image-choice-option label:hover {
+    border-color: var(--form-input-border-color, #ccc);
+}
+
+main .form .image-choice .image-choice-option input:focus-visible + label {
+    outline: 2px solid var(--link-color, #0b6fe0);
+    outline-offset: 2px;
+}
+
+main .form .image-choice .image-choice-option input:checked + label {
+    border-color: var(--link-color, #0b6fe0);
+    background-color: rgb(11 111 224 / 8%);
+}
+
+main .form .image-choice .image-choice-option input:disabled + label {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+main .form .image-choice .image-choice-label {
+    font-size: 14px;
+    text-align: center;
+}
+
+@media (width <= 600px) {
+    main .form .image-choice {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
