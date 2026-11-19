@@ -550,6 +550,32 @@
           }
         },
         {
+          "title": "Image Choice",
+          "id": "image-choice",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                "template": {
+                  "jcr:title": "Image Choice",
+                  "fieldType": "checkbox-group",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Item 1",
+                    "Item 2"
+                  ],
+                  "orientation": "horizontal",
+                  "type": "string[]",
+                  "fd:viewType": "image-choice"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Terms and conditions",
           "id": "tnc",
           "plugins": {
@@ -681,6 +707,32 @@
                   "fd:viewType": "range",
                   "enabled": true,
                   "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Image Choice",
+          "id": "image-choice",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                "template": {
+                  "jcr:title": "Image Choice",
+                  "fieldType": "checkbox-group",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Item 1",
+                    "Item 2"
+                  ],
+                  "orientation": "horizontal",
+                  "type": "string[]",
+                  "fd:viewType": "image-choice"
                 }
               }
             }

@@ -1,0 +1,88 @@
+main .form form fieldset.image-choice {
+    display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns, 4), minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+main .form form fieldset.image-choice > .checkbox-wrapper {
+    margin: 0;
+    position: relative;
+}
+
+main .form form fieldset.image-choice > .checkbox-wrapper > input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+main .form form fieldset.image-choice > .checkbox-wrapper > label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    aspect-ratio: 1;
+    margin: 0;
+    padding: 0.75rem;
+    border: 2px solid transparent;
+    border-radius: var(--form-card-border-radius, 8px);
+    background-color: var(--form-card-background, #fff);
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+main .form form fieldset.image-choice > .checkbox-wrapper > label::before,
+main .form form fieldset.image-choice > .checkbox-wrapper > label::after {
+    display: none;
+}
+
+main .form form fieldset.image-choice > .checkbox-wrapper > label:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--form-card-hover-shadow, 0 2px 8px rgb(0 0 0 / 15%));
+}
+
+main .form form fieldset.image-choice > .checkbox-wrapper > input:checked + label {
+    border-color: var(--link-color, #035fe6);
+    box-shadow: 0 0 0 2px var(--link-color, #035fe6);
+}
+
+main .form form fieldset.image-choice > .checkbox-wrapper > input:focus-visible + label {
+    outline: 2px solid var(--link-color, #035fe6);
+    outline-offset: 2px;
+}
+
+main .form form fieldset.image-choice > .checkbox-wrapper > input:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+main .form form fieldset.image-choice .image-choice-picture {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+main .form form fieldset.image-choice .image-choice-caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+main .form form fieldset.image-choice .image-choice-noimage .image-choice-caption {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    white-space: normal;
+    text-align: center;
+}
+
+@media (width <= 600px) {
+    main .form form fieldset.image-choice {
+        grid-template-columns: repeat(min(var(--image-choice-columns, 4), 3), minmax(0, 1fr));
+    }
+}

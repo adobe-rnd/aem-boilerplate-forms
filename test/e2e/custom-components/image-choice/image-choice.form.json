@@ -1,0 +1,50 @@
+{
+  "id": "image-choice-test-form",
+  "fieldType": "form",
+  "title": "image-choice e2e test",
+  "action": "/adobe/forms/af/submit/image-choice-test-form",
+  "properties": {},
+  "items": [
+    {
+      "id": "field-under-test",
+      "name": "fieldUnderTest",
+      "fieldType": "checkbox-group",
+      ":type": "image-choice",
+      "visible": true,
+      "enabled": true,
+      "label": {
+        "value": "Image Choice",
+        "visible": true
+      },
+      "properties": {
+        "selectionMode": "single",
+        "columns": 4,
+        "type": "string[]",
+        "orientation": "horizontal",
+        "images": [
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Crect width='10' height='10' fill='%23f00'/%3E%3C/svg%3E",
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Crect width='10' height='10' fill='%230f0'/%3E%3C/svg%3E"
+        ]
+      },
+      "enum": [
+        "a",
+        "b",
+        "c"
+      ],
+      "enumNames": [
+        "Option A",
+        "Option B",
+        "Option C"
+      ],
+      "type": "string[]"
+    },
+    {
+      "id": "next-field",
+      "name": "nextField",
+      "fieldType": "text-input",
+      "label": {
+        "value": "Next field"
+      }
+    }
+  ]
+}

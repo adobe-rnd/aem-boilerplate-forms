@@ -30,6 +30,9 @@
     { 
       "...": "./components/rating/_rating.json#/definitions" 
     },
+    {
+      "...": "./components/image-choice/_image-choice.json#/definitions"
+    },
     { 
       "...": "./components/tnc/_tnc.json#/definitions" 
     },
@@ -89,6 +92,7 @@
         "form-modal",
         "form-reset-button",
         "form-submit-button",
+        "image-choice",
         "number-input",
         "panel",
         "password",
