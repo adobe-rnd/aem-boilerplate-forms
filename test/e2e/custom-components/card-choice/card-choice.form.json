@@ -26,10 +26,5 @@
         "value": "Next field"
       }
     }
-  ],
-  "events": {
-    "initialize": [
-      "dispatchEvent($form.fieldUnderTest, 'custom:setProperty', {properties: {cards: `[{\"title\": \"Card 1\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Retail\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 2\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Retail\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 3\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Retail\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 4\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Retail\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 5\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Business\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 6\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Business\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}]`}})"
-    ]
-  }
+  ]
 }

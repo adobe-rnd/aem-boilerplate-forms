@@ -1,84 +1,128 @@
 import { subscribe } from '../../rules/index.js';
 
-const ALL = 'All';
-
-function parseCards(data) {
-  let cards = data;
-  if (typeof cards === 'string') {
-    try {
-      cards = JSON.parse(cards);
-    } catch (e) {
-      cards = [];
-    }
-  }
-  return Array.isArray(cards) ? cards.filter((c) => c && typeof c === 'object') : [];
-}
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
-  if (text !== undefined && text !== null) node.textContent = text;
+  if (text !== undefined && text !== null && text !== '') node.textContent = text;
   return node;
 }
 
-function sameCard(a, b) {
-  return !!a && !!b && JSON.stringify(a) === JSON.stringify(b);
+function safeUrl(url) {
+  if (typeof url !== 'string' || !url) return '';
+  try {
+    const parsed = new URL(url, window.location.href);
+    return ['http:', 'https:'].includes(parsed.protocol) ? url : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function parseCards(raw) {
+  let data = raw;
+  if (typeof data === 'string') {
+    try {
+      data = JSON.parse(data);
+    } catch (e) {
+      return [];
+    }
+  }
+  if (!Array.isArray(data)) return [];
+  return data
+    .filter((card) => card && typeof card === 'object')
+    .map((card, index) => ({
+      ...card,
+      cardId: card.id !== undefined && card.id !== null ? String(card.id) : `card-${index}`,
+      source: card,
+    }));
 }
 
 function parseValue(value) {
   if (!value) return null;
+  if (typeof value === 'object') return value;
   try {
-    return typeof value === 'string' ? JSON.parse(value) : value;
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' ? parsed : null;
   } catch (e) {
     return null;
   }
 }
 
-function buildCard(card, onSelect) {
+function createChevron() {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', 'M9 5l7 7-7 7');
+  svg.append(path);
+  return svg;
+}
+
+function createFeature(feature) {
+  const item = el('li', 'card-choice-feature');
+  const text = typeof feature === 'string' ? feature : feature?.text;
+  const icon = typeof feature === 'object' ? safeUrl(feature?.icon) : '';
+  if (icon) {
+    const img = el('img', 'card-choice-feature-icon');
+    img.src = icon;
+    img.alt = '';
+    img.loading = 'lazy';
+    item.append(img);
+  } else {
+    item.append(el('span', 'card-choice-feature-icon default'));
+  }
+  item.append(el('span', 'card-choice-feature-text', text));
+  return item;
+}
+
+function createCard(card, labels, onSelect) {
   const item = el('li', 'card-choice-card');
-  item.setAttribute('role', 'listitem');
-  if (card.title) item.append(el('h3', 'card-choice-title', card.title));
-  if (card.subtitle) item.append(el('p', 'card-choice-card-subtitle', card.subtitle));
-  if (card.image) {
+  item.dataset.cardId = card.cardId;
+  if (card.category) item.dataset.category = card.category;
+
+  item.append(el('h3', 'card-choice-title', card.title));
+  if (card.subtitle) item.append(el('p', 'card-choice-subtitle', card.subtitle));
+
+  const imageSrc = safeUrl(card.image);
+  if (imageSrc) {
     const img = el('img', 'card-choice-image');
-    img.src = card.image;
+    img.src = imageSrc;
     img.alt = card.imageAlt || card.title || '';
     img.loading = 'lazy';
     item.append(img);
   }
+
   if (Array.isArray(card.features) && card.features.length) {
     const list = el('ul', 'card-choice-features');
-    card.features.forEach((f) => {
-      const feature = typeof f === 'object' ? f : { text: f };
-      const li = el('li');
-      if (feature.icon) {
-        const icon = el('img', 'card-choice-feature-icon');
-        icon.src = feature.icon;
-        icon.alt = '';
-        li.append(icon);
-      } else {
-        li.append(el('span', 'card-choice-feature-icon placeholder'));
-      }
-      li.append(el('span', 'card-choice-feature-text', feature.text));
-      list.append(li);
-    });
+    card.features.forEach((feature) => list.append(createFeature(feature)));
     item.append(list);
   }
-  if (card.link || card.linkText) {
-    const a = el('a', 'card-choice-link', card.linkText || 'All Features & Benefits');
-    a.href = card.link || '#';
-    if (card.link) a.target = '_blank';
-    if (card.link) a.rel = 'noopener noreferrer';
-    item.append(a);
+
+  const linkHref = safeUrl(card.linkUrl);
+  if (card.linkText) {
+    const link = el(linkHref ? 'a' : 'span', 'card-choice-link', card.linkText);
+    if (linkHref) {
+      link.href = linkHref;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    }
+    link.append(createChevron());
+    item.append(link);
   }
-  if (card.amount !== undefined || card.amountLabel) {
-    const box = el('div', 'card-choice-amount');
-    box.append(el('span', 'card-choice-amount-label', card.amountLabel || ''));
-    box.append(el('span', 'card-choice-amount-value', card.amount));
-    item.append(box);
+
+  if (card.minAmount !== undefined && card.minAmount !== null && card.minAmount !== '') {
+    const amount = el('div', 'card-choice-amount');
+    amount.append(
+      el('span', 'card-choice-amount-label', card.minAmountLabel || ''),
+      el('span', 'card-choice-amount-value', card.minAmount),
+    );
+    item.append(amount);
   }
-  const button = el('button', 'card-choice-select', card.buttonText || 'Get This Card');
+
+  const button = el('button', 'card-choice-select', labels.select);
   button.type = 'button';
+  button.setAttribute('aria-pressed', 'false');
   button.addEventListener('click', () => onSelect(card));
   item.append(button);
   return item;
@@ -86,160 +130,140 @@ function buildCard(card, onSelect) {
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const input = fieldDiv.querySelector('input, textarea');
-  if (input) input.style.display = 'none';
-  const subtitle = fieldJson?.properties?.subtitle;
-
+  const labels = {
+    select: fieldJson?.properties?.selectLabel || 'Get This Card',
+    selected: fieldJson?.properties?.selectedLabel || 'Selected',
+  };
   let model = null;
-  let cards = parseCards(fieldJson?.properties?.cards);
-  let selected = parseValue(fieldJson?.value);
-  let category = ALL;
-  let interactive = fieldJson?.enabled !== false && fieldJson?.readOnly !== true;
+  let cards = [];
+  let selectedId = null;
+  let activeCategory = null;
+
+  if (input) input.style.display = 'none';
 
   const widget = el('div', 'card-choice-widget');
-  if (subtitle) widget.append(el('p', 'card-choice-subtitle', subtitle));
   const tabs = el('div', 'card-choice-tabs');
   tabs.setAttribute('role', 'tablist');
   const viewport = el('div', 'card-choice-viewport');
   const track = el('ul', 'card-choice-track');
-  track.setAttribute('role', 'list');
   track.tabIndex = 0;
   const prev = el('button', 'card-choice-nav prev');
-  prev.type = 'button';
-  prev.setAttribute('aria-label', 'Previous cards');
   const next = el('button', 'card-choice-nav next');
-  next.type = 'button';
-  next.setAttribute('aria-label', 'Next cards');
+  [prev, next].forEach((btn, i) => {
+    btn.type = 'button';
+    btn.setAttribute('aria-label', i === 0 ? 'Previous cards' : 'Next cards');
+    btn.append(createChevron());
+  });
   const dots = el('div', 'card-choice-dots');
   viewport.append(track, prev, next);
   widget.append(tabs, viewport, dots);
-  const anchor = fieldDiv.querySelector('.field-description');
-  if (anchor) anchor.before(widget);
+  const helpText = fieldDiv.querySelector('.field-description');
+  if (helpText) fieldDiv.insertBefore(widget, helpText);
   else fieldDiv.append(widget);
 
-  const pageWidth = () => track.clientWidth || 1;
-  const pageCount = () => Math.max(1, Math.ceil(track.scrollWidth / pageWidth() - 0.05));
+  const pageSize = () => Math.max(track.clientWidth, 1);
+  const pageCount = () => Math.max(1, Math.ceil((track.scrollWidth - 1) / pageSize()));
 
-  const updateNav = () => {
-    const max = track.scrollWidth - track.clientWidth;
-    prev.hidden = track.scrollLeft <= 1;
-    next.hidden = track.scrollLeft >= max - 1;
+  const updateCarousel = () => {
     const pages = pageCount();
-    const ratio = max <= 0 ? 0 : track.scrollLeft / max;
-    const current = Math.min(pages - 1, Math.round(ratio * (pages - 1)));
-    [...dots.children].forEach((d, i) => d.classList.toggle('active', i === current));
-  };
-
-  const renderDots = () => {
-    dots.replaceChildren();
-    const pages = pageCount();
-    if (pages < 2) return;
-    for (let i = 0; i < pages; i += 1) {
-      const dot = el('button', 'card-choice-dot');
-      dot.type = 'button';
-      dot.setAttribute('aria-label', `Go to page ${i + 1}`);
-      dot.addEventListener('click', () => {
-        const max = track.scrollWidth - track.clientWidth;
-        track.scrollTo({ left: (max * i) / (pages - 1), behavior: 'smooth' });
-      });
-      dots.append(dot);
+    const current = Math.min(pages - 1, Math.round(track.scrollLeft / pageSize()));
+    const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    prev.hidden = track.scrollLeft <= 2;
+    next.hidden = atEnd;
+    if (dots.children.length !== pages) {
+      dots.replaceChildren(...Array.from({ length: pages }, (_, i) => {
+        const dot = el('button', 'card-choice-dot');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `Go to page ${i + 1}`);
+        dot.addEventListener('click', () => track.scrollTo({ left: i * pageSize(), behavior: 'smooth' }));
+        return dot;
+      }));
     }
+    dots.hidden = pages <= 1;
+    Array.from(dots.children).forEach((dot, i) => dot.classList.toggle('active', i === current));
   };
 
-  const scrollByPage = (dir) => track.scrollBy({ left: dir * pageWidth(), behavior: 'smooth' });
-  prev.addEventListener('click', () => scrollByPage(-1));
-  next.addEventListener('click', () => scrollByPage(1));
-  track.addEventListener('scroll', updateNav, { passive: true });
-  track.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') scrollByPage(1);
-    if (e.key === 'ArrowLeft') scrollByPage(-1);
-  });
-
-  const markSelection = () => {
-    track.querySelectorAll('.card-choice-card').forEach((li) => {
-      const card = li.cardData;
-      const isSel = sameCard(card, selected);
-      li.classList.toggle('selected', isSel);
-      li.setAttribute('aria-current', isSel ? 'true' : 'false');
-      const btn = li.querySelector('.card-choice-select');
-      btn.disabled = !interactive;
-      btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
-      btn.textContent = isSel ? 'Selected' : (card.buttonText || 'Get This Card');
+  const updateSelection = () => {
+    track.querySelectorAll('.card-choice-card').forEach((item) => {
+      const isSelected = item.dataset.cardId === selectedId;
+      item.classList.toggle('selected', isSelected);
+      const button = item.querySelector('.card-choice-select');
+      button.setAttribute('aria-pressed', String(isSelected));
+      button.textContent = isSelected ? labels.selected : labels.select;
     });
+  };
+
+  const applyCategory = () => {
+    track.querySelectorAll('.card-choice-card').forEach((item) => {
+      item.hidden = Boolean(activeCategory) && item.dataset.category !== activeCategory;
+    });
+    tabs.querySelectorAll('.card-choice-tab').forEach((tab) => {
+      const isActive = tab.dataset.category === activeCategory;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
+    });
+    track.scrollLeft = 0;
+    updateCarousel();
   };
 
   const select = (card) => {
-    if (!interactive) return;
-    selected = card;
-    markSelection();
-    if (model) model.value = JSON.stringify(card);
+    selectedId = card.cardId;
+    updateSelection();
+    if (model) {
+      model.value = JSON.stringify(card.source);
+    }
   };
 
-  const renderCards = () => {
-    track.replaceChildren();
-    cards
-      .filter((c) => category === ALL || c.category === category)
-      .forEach((card) => {
-        const li = buildCard(card, select);
-        li.cardData = card;
-        track.append(li);
-      });
-    track.scrollLeft = 0;
-    markSelection();
-    renderDots();
-    updateNav();
+  const syncFromValue = (value) => {
+    const selected = parseValue(value);
+    const match = selected && cards.find((card) => (
+      (selected.id !== undefined && String(selected.id) === card.cardId)
+      || (selected.title !== undefined && selected.title === card.title)));
+    selectedId = match ? match.cardId : null;
+    updateSelection();
   };
 
-  const renderTabs = () => {
-    tabs.replaceChildren();
-    const categories = [...new Set(cards.map((c) => c.category).filter(Boolean))];
-    tabs.hidden = categories.length < 2;
-    if (category !== ALL && !categories.includes(category)) category = ALL;
-    if (categories.length > 1 && category === ALL) [category] = categories;
-    categories.forEach((name) => {
-      const tab = el('button', 'card-choice-tab', name);
+  const render = (rawCards) => {
+    cards = parseCards(rawCards);
+    const categories = [...new Set(cards.map((card) => card.category).filter(Boolean))];
+    if (!categories.includes(activeCategory)) [activeCategory] = categories;
+    tabs.replaceChildren(...(categories.length > 1 ? categories.map((category) => {
+      const tab = el('button', 'card-choice-tab', category);
       tab.type = 'button';
+      tab.dataset.category = category;
       tab.setAttribute('role', 'tab');
-      tab.setAttribute('aria-selected', String(name === category));
-      tab.classList.toggle('active', name === category);
       tab.addEventListener('click', () => {
-        category = name;
-        renderTabs();
-        renderCards();
+        activeCategory = category;
+        applyCategory();
       });
-      tabs.append(tab);
-    });
+      return tab;
+    }) : []));
+    if (categories.length <= 1) activeCategory = null;
+    tabs.hidden = categories.length <= 1;
+    track.replaceChildren(...cards.map((card) => createCard(card, labels, select)));
+    syncFromValue(model?.value);
+    applyCategory();
   };
 
-  const setCards = (data) => {
-    cards = parseCards(data);
-    renderTabs();
-    renderCards();
-  };
-
-  setCards(cards);
-  window.addEventListener('resize', () => {
-    renderDots();
-    updateNav();
+  prev.addEventListener('click', () => track.scrollBy({ left: -pageSize(), behavior: 'smooth' }));
+  next.addEventListener('click', () => track.scrollBy({ left: pageSize(), behavior: 'smooth' }));
+  track.addEventListener('scroll', updateCarousel, { passive: true });
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') next.click();
+    else if (e.key === 'ArrowLeft') prev.click();
   });
+  if (window.ResizeObserver) new ResizeObserver(updateCarousel).observe(track);
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
     if (eventType === 'register') {
       model = fieldModel;
-      if (model.properties?.cards) setCards(model.properties.cards);
-      selected = parseValue(model.value) || selected;
-      markSelection();
+      render(fieldModel.properties?.cards);
     } else if (eventType === 'change') {
       payload?.changes?.forEach((change) => {
-        const { propertyName } = change;
-        if (propertyName === 'properties' || propertyName === 'properties.cards') {
-          const data = propertyName === 'properties' ? change.currentValue?.cards : change.currentValue;
-          if (JSON.stringify(data) !== JSON.stringify(cards)) setCards(data);
-        } else if (propertyName === 'value') {
-          selected = parseValue(change.currentValue);
-          markSelection();
-        } else if (propertyName === 'enabled' || propertyName === 'readOnly') {
-          interactive = model.enabled !== false && !model.readOnly;
-          markSelection();
+        if (change?.propertyName === 'properties.cards') {
+          render(change.currentValue);
+        } else if (change?.propertyName === 'value') {
+          syncFromValue(change.currentValue);
         }
       });
     }

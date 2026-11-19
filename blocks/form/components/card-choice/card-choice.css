@@ -1,225 +1,266 @@
-main .form .card-choice-widget {
+/* styling for card-choice */
+.form .card-choice-widget {
     position: relative;
-    margin-top: 16px;
+    width: 100%;
 }
 
-main .form .card-choice-widget .card-choice-subtitle {
-    margin: 0 0 16px;
-    color: #5b6470;
-}
-
-main .form .card-choice-widget .card-choice-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-main .form .card-choice-widget .card-choice-tabs[hidden],
-main .form .card-choice-widget .card-choice-nav[hidden] {
+.form .card-choice-widget[hidden],
+.form .card-choice-widget [hidden] {
     display: none;
 }
 
-main .form .card-choice-widget .card-choice-tab {
+.form .card-choice-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.form .card-choice-tab {
+    width: auto;
     margin: 0;
     padding: 6px 16px;
-    border: 1px solid #1d3fc4;
+    border: 1px solid #1f3fc4;
     border-radius: 20px;
     background: #fff;
-    color: #1d3fc4;
-    font-size: 13px;
+    color: #1f3fc4;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
 }
 
-main .form .card-choice-widget .card-choice-tab.active {
-    background: #1d3fc4;
+.form .card-choice-tab:hover {
+    background: #eef1fc;
+}
+
+.form .card-choice-tab.active,
+.form .card-choice-tab.active:hover {
+    background: #1f3fc4;
     color: #fff;
 }
 
-main .form .card-choice-widget .card-choice-viewport {
+.form .card-choice-viewport {
     position: relative;
 }
 
-main .form .card-choice-widget .card-choice-track {
+.form .card-choice-track {
     display: flex;
     gap: 24px;
     margin: 0;
-    padding: 4px 2px 8px;
+    padding: 4px;
     list-style: none;
     overflow-x: auto;
+    scroll-padding: 4px;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none;
 }
 
-main .form .card-choice-widget .card-choice-track::-webkit-scrollbar {
+.form .card-choice-track::-webkit-scrollbar {
     display: none;
 }
 
-main .form .card-choice-widget .card-choice-card {
-    flex: 0 0 min(290px, 85%);
-    box-sizing: border-box;
+.form .card-choice-card {
     display: flex;
+    flex: 0 0 calc((100% - 48px) / 3);
     flex-direction: column;
-    gap: 12px;
+    box-sizing: border-box;
+    min-width: 240px;
     padding: 20px;
-    border: 1px solid #d8dde6;
-    border-radius: 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 16px;
     background: #fff;
     scroll-snap-align: start;
 }
 
-main .form .card-choice-widget .card-choice-card.selected {
-    border-color: #1d3fc4;
-    box-shadow: 0 0 0 2px #1d3fc4;
+.form .card-choice-card[hidden] {
+    display: none;
 }
 
-main .form .card-choice-widget .card-choice-title {
-    margin: 0;
+.form .card-choice-card.selected {
+    border-color: #1f3fc4;
+    box-shadow: 0 0 0 2px #1f3fc4;
+}
+
+.form .card-choice-title {
+    margin: 0 0 8px;
     font-size: 18px;
-    line-height: 1.3;
+    font-weight: 600;
 }
 
-main .form .card-choice-widget .card-choice-card-subtitle {
-    margin: 0;
-    color: #5b6470;
+.form .card-choice-subtitle {
+    margin: 0 0 16px;
+    color: #5f6677;
     font-size: 14px;
 }
 
-main .form .card-choice-widget .card-choice-image {
+.form .card-choice-image {
     width: 166px;
     max-width: 100%;
     height: auto;
+    margin-bottom: 16px;
     border-radius: 8px;
 }
 
-main .form .card-choice-widget .card-choice-features {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 0;
+.form .card-choice-features {
+    flex: 1;
+    margin: 0 0 12px;
     padding: 0;
     list-style: none;
-    font-size: 13px;
 }
 
-main .form .card-choice-widget .card-choice-features li {
+.form .card-choice-feature {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
 }
 
-main .form .card-choice-widget .card-choice-feature-icon {
-    width: 14px;
-    height: 14px;
-    flex: none;
+.form .card-choice-feature-icon {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
 }
 
-main .form .card-choice-widget .card-choice-link {
-    color: #1d3fc4;
-    font-weight: 600;
+.form .card-choice-feature-icon.default {
+    box-sizing: border-box;
+    border: 1.5px solid #444;
+    border-radius: 3px;
+}
+
+.form .card-choice-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 16px;
+    color: #1f3fc4;
     font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
 }
 
-main .form .card-choice-widget .card-choice-link::after {
-    content: " \203A";
+.form .card-choice-link svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 2.5;
 }
 
-main .form .card-choice-widget .card-choice-amount {
+.form .card-choice-amount {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-top: auto;
-    border: 1px solid #d8dde6;
-    border-radius: 6px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-left: 16px;
     overflow: hidden;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
     font-size: 13px;
 }
 
-main .form .card-choice-widget .card-choice-amount-label {
-    padding: 0 12px;
-}
-
-main .form .card-choice-widget .card-choice-amount-value {
-    padding: 12px;
-    background: #f1f2f6;
+.form .card-choice-amount-value {
+    padding: 14px 16px;
+    background: #f3f4f8;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
-main .form .card-choice-widget .card-choice-select {
+.form .card-choice-select {
     margin: 0;
     padding: 12px;
-    border: 1px solid #1d3fc4;
-    border-radius: 6px;
+    border: 1px solid #1f3fc4;
+    border-radius: 8px;
     background: #fff;
-    color: #1d3fc4;
+    color: #1f3fc4;
     font-weight: 600;
     cursor: pointer;
 }
 
-main .form .card-choice-widget .card-choice-card.selected .card-choice-select {
-    background: #1d3fc4;
+.form .card-choice-select:hover {
+    background: #eef1fc;
+}
+
+.form .card-choice-card.selected .card-choice-select,
+.form .card-choice-card.selected .card-choice-select:hover {
+    background: #1f3fc4;
     color: #fff;
 }
 
-main .form .card-choice-widget .card-choice-select:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-main .form .card-choice-widget .card-choice-nav {
+.form .card-choice-nav {
     position: absolute;
     top: 50%;
+    z-index: 1;
     width: 36px;
     height: 36px;
     margin: 0;
     padding: 0;
+    transform: translateY(-50%);
     border: 0;
     border-radius: 50%;
-    background: #1d3fc4;
+    background: #1f3fc4;
     color: #fff;
-    transform: translateY(-50%);
     cursor: pointer;
 }
 
-main .form .card-choice-widget .card-choice-nav.prev {
-    left: -12px;
+.form .card-choice-nav:hover {
+    background: #1f3fc4;
 }
 
-main .form .card-choice-widget .card-choice-nav.next {
-    right: -12px;
+.form .card-choice-nav.prev {
+    left: -8px;
+    transform: translateY(-50%) scaleX(-1);
 }
 
-main .form .card-choice-widget .card-choice-nav.prev::before {
-    content: "\2039";
-    font-size: 24px;
+.form .card-choice-nav.next {
+    right: -8px;
 }
 
-main .form .card-choice-widget .card-choice-nav.next::before {
-    content: "\203A";
-    font-size: 24px;
+.form .card-choice-nav svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 2.5;
 }
 
-main .form .card-choice-widget .card-choice-dots {
+.form .card-choice-dots {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 16px;
 }
 
-main .form .card-choice-widget .card-choice-dot {
+.form .card-choice-dot {
     width: 8px;
     height: 8px;
     margin: 0;
     padding: 0;
     border: 0;
     border-radius: 4px;
-    background: #c5cbe0;
+    background: #cfd4e6;
     cursor: pointer;
 }
 
-main .form .card-choice-widget .card-choice-dot.active {
+.form .card-choice-dot:hover {
+    background: #cfd4e6;
+}
+
+.form .card-choice-dot.active,
+.form .card-choice-dot.active:hover {
     width: 32px;
-    background: #4f6fe0;
+    background: #5470d6;
+}
+
+@media (width <= 900px) {
+    .form .card-choice-card {
+        flex-basis: calc((100% - 24px) / 2);
+    }
+}
+
+@media (width <= 600px) {
+    .form .card-choice-card {
+        flex-basis: 85%;
+    }
 }

@@ -1,41 +1,42 @@
 # Card Choice
 
-Horizontally scrollable carousel of cards populated by a rule; the card the user picks is written to the field's model value.
+Horizontally scrollable carousel of cards populated by a rule; the card the user picks is written to the model.
 
 ## How to Use
 
-Insert **Card Choice** in a form. A rule (e.g. on form initialize) supplies the cards:
+Insert the **Card Choice** component. Use a rule (e.g. on form initialize or another field's change) to set the cards:
 
 ```js
-dispatchEvent($form.cardChoice, 'custom:setProperty', {properties: {cards: `[{"title": "Freedom"}]`}})
+setProperty(cardChoice, { properties: { cards: [ /* card objects */ ] } });
 ```
 
-Card object (all keys optional):
+Card object (all optional except `title`):
 
 | Key | Description |
 |-----|-------------|
-| `title`, `subtitle` | Card heading and tagline |
+| `id` | Unique id (defaults to the card index) |
+| `title`, `subtitle` | Heading and tagline |
 | `image`, `imageAlt` | Card artwork |
-| `features` | Array of strings or `{ text, icon }` |
-| `link`, `linkText` | "All Features & Benefits" link |
-| `amountLabel`, `amount` | Boxed label/value row (e.g. Min. FD Amount) |
-| `buttonText` | Select button label (default "Get This Card") |
-| `category` | When 2+ categories exist, pill tabs filter the cards |
+| `features` | Array of strings or `{ "text", "icon" }` |
+| `linkText`, `linkUrl` | "All Features & Benefits" link |
+| `minAmountLabel`, `minAmount` | Amount box, e.g. `Min. FD Amount` / `₹ 15,000/-` |
+| `category` | When more than one category exists, filter tabs are shown |
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `subtitle` | Text under the field label |
+| `selectLabel` | Button label, default `Get This Card` |
+| `selectedLabel` | Label on selected card, default `Selected` |
 
 ## Model Subscriptions
 
-`properties` (re-renders when `cards` changes), `value` (highlights the matching card), `enabled`/`readOnly`.
+`properties.cards` (re-renders) and `value` (highlights the matching card, by `id` or `title`).
 
 ## Model Properties Set
 
-`value` is set to `JSON.stringify(card)` of the clicked card, once per click (on `change` rules fire once). Parse it in rules with `JSON.parse`.
+`value` is set to the JSON string of the selected card object when its button is clicked (once per selection).
 
 ## Usage Notes
 
-Base type `text-input`, `fd:viewType` `card-choice`. Scrolling uses CSS scroll-snap, arrow buttons, dots and ←/→ keys.
+Base type `text-input`, `fd:viewType` `card-choice`. Carousel supports arrow buttons, dots, touch/trackpad scrolling and arrow keys.

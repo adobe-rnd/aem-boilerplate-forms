@@ -3994,40 +3994,22 @@
       },
       {
         "component": "tab",
-        "label": "Validation",
-        "name": "validation"
-      },
-      {
-        "component": "boolean",
-        "name": "required",
-        "label": "Required",
-        "valueType": "boolean"
-      },
-      {
-        "component": "text",
-        "name": "mandatoryMessage",
-        "label": "Error message",
-        "valueType": "string",
-        "description": "Error message shown when required field is left empty."
-      },
-      {
-        "component": "text",
-        "name": "validateExpMessage",
-        "label": "Script validation message",
-        "valueType": "string",
-        "description": "Displayed when validation script fails."
-      },
-      {
-        "component": "tab",
         "label": "Custom Properties",
         "name": "custom"
       },
       {
         "component": "text",
-        "name": "subtitle",
-        "label": "Subtitle",
+        "name": "selectLabel",
+        "label": "Select button label",
         "valueType": "string",
-        "description": "Text shown below the heading"
+        "description": "Label of the button on each card. Defaults to 'Get This Card'"
+      },
+      {
+        "component": "text",
+        "name": "selectedLabel",
+        "label": "Selected button label",
+        "valueType": "string",
+        "description": "Label of the button on the selected card. Defaults to 'Selected'"
       },
       {
         "component": "tab",
