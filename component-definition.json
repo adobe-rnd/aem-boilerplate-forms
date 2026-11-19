@@ -696,9 +696,7 @@
                 "template": {
                   "jcr:title": "Loan Slider",
                   "fieldType": "number-input",
-                  "fd:viewType": "loan-slider",
-                  "enabled": true,
-                  "visible": true
+                  "fd:viewType": "loan-slider"
                 }
               }
             }

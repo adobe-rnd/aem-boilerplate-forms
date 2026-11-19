@@ -4627,6 +4627,18 @@
         ]
       },
       {
+        "component": "text",
+        "name": "placeholder",
+        "label": "Placeholder text",
+        "valueType": "string"
+      },
+      {
+        "component": "number",
+        "name": "default",
+        "label": "Default Value",
+        "valueType": "number"
+      },
+      {
         "component": "tab",
         "label": "Validation",
         "name": "validation"
@@ -4681,20 +4693,27 @@
       },
       {
         "component": "tab",
-        "label": "Custom Properties",
-        "name": "custom"
+        "label": "Slider",
+        "name": "slider"
       },
       {
         "component": "number",
         "name": "splits",
-        "label": "Number of splits",
+        "label": "Number of Splits",
         "valueType": "number",
-        "description": "Number of equal splits between the minimum and the maximum (default 12)"
+        "description": "Number of equal splits between the minimum and maximum amount (default 10)"
+      },
+      {
+        "component": "number",
+        "name": "stepValue",
+        "label": "Step Value",
+        "valueType": "number",
+        "description": "Amount the slider moves by (default 1)"
       },
       {
         "component": "text",
         "name": "currencySymbol",
-        "label": "Currency symbol",
+        "label": "Currency Symbol",
         "valueType": "string",
         "description": "Symbol shown before the amount (default ₹)"
       },
