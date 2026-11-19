@@ -1,0 +1,103 @@
+{
+    "definitions": [
+        {
+            "title": "Image choice",
+            "id": "image-choice",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                        "template": {
+                            "jcr:title": "Image choice",
+                            "fieldType": "checkbox-group",
+                            "fd:viewType": "image-choice",
+                            "enum": [
+                                "0",
+                                "1"
+                            ],
+                            "enumNames": [
+                                "Option 1",
+                                "Option 2"
+                            ],
+                            "type": "string[]"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "image-choice",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-select-fields.json#/fields"
+                },
+                {
+                    "component": "text",
+                    "name": "images",
+                    "label": "Option images (URL or path, in the same order as the options)",
+                    "valueType": "string",
+                    "multi": true
+                },
+                {
+                    "component": "radio-group",
+                    "name": "selectionMode",
+                    "label": "Selection mode",
+                    "valueType": "string",
+                    "value": "single",
+                    "options": [
+                        {
+                            "name": "Single choice",
+                            "value": "single"
+                        },
+                        {
+                            "name": "Multiple choice",
+                            "value": "multi"
+                        }
+                    ]
+                },
+                {
+                    "component": "number",
+                    "name": "columns",
+                    "label": "Choices per row",
+                    "valueType": "number",
+                    "value": 4
+                },
+                {
+                    "component": "radio-group",
+                    "name": "showCaptions",
+                    "label": "Show option names under images",
+                    "valueType": "string",
+                    "value": "hide",
+                    "options": [
+                        {
+                            "name": "Hide",
+                            "value": "hide"
+                        },
+                        {
+                            "name": "Show",
+                            "value": "show"
+                        }
+                    ]
+                },
+                {
+                    "component": "tab",
+                    "label": "Validation",
+                    "name": "validation"
+                },
+                {
+                    "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
+        }
+    ]
+}
