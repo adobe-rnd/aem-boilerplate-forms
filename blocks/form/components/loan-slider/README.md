@@ -1,32 +1,29 @@
 # Loan Slider
 
-A loan amount slider with a synchronised, editable amount text box and equally spaced tick marks with compact labels (50K, 2L, 1.5Cr).
+A loan amount slider (INR) with a draggable head, equal splits with tick labels, and a text box that stays in sync with the slider.
 
 ## How to Use
 
-Add the **Loan Slider** component in the Universal Editor, or set `fd:viewType` to `loan-slider` on a `number-input` field. Set the minimum and maximum amounts in the Validation tab.
+Add a **Loan Slider** component to the form in the Universal Editor and set the minimum, maximum and number of splits.
 
 ## Authoring Properties
 
 | Property | Description | Default |
 |----------|-------------|---------|
-| `minimum` / `maximum` | Amount range (Validation tab) | 0 / 100000 |
-| `splits` | Number of equal splits between min and max; one tick per split | 10 |
-| `stepValue` | Amount the slider moves by; typed values snap to it | 1 |
-| `currencySymbol` | Symbol shown before the amount | ₹ |
-| `default` | Initial amount | minimum |
+| Minimum (`minimum`) | Lowest amount | 50000 |
+| Maximum (`maximum`) | Highest amount | 1250000 |
+| Number of Splits (`splits`) | Number of equal splits between min and max; the slider head snaps to them | 10 |
 
 ## Model Subscriptions
 
-- `value`: updates the slider and text box when a rule or other code changes the value.
-- `enabled` / `readOnly`: disables the slider and text box.
+Listens to `value` (updates slider and text box, e.g. from rules) and `enabled` changes.
 
 ## Model Properties Set
 
-`value` is committed through the hidden number input's `change` event: when the slider is released, or when the text box is committed (blur or Enter). Dragging and typing update the other control live without firing change rules. Typed values are clamped to min/max and snapped to the step.
+`model.value` is committed when the slider is released (`change`) and when the text box is blurred or Enter is pressed. While dragging or typing, the slider and text box update live without firing change rules. Typed values are clamped to min/max and are not snapped to a split.
 
 ## Usage Notes
 
 - Base type: `number-input`, `fd:viewType`: `loan-slider`.
-- The original number input is hidden and kept as the source of truth for the model.
-- The text box displays the amount in Indian digit grouping (`5,00,000`).
+- The original input is hidden and carries the committed value.
+- Amounts are shown in the Indian format (`₹5,00,000`); tick labels use `K`, `L` and `Cr`, with at most 7 labels shown.
