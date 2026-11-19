@@ -1,0 +1,57 @@
+/* INR input: rupee prefix + read-only amount in words */
+.form .inr-input-wrapper .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--border-color, #c5c5c5);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.form .inr-input-wrapper .inr-input-group:focus-within {
+    outline: 2px solid var(--link-color, #1473e6);
+    outline-offset: 1px;
+}
+
+.form .inr-input-wrapper .inr-input-symbol {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    background: #f1f2f6;
+    border-right: 1px solid var(--border-color, #c5c5c5);
+    font-size: 1.25rem;
+}
+
+.form .inr-input-wrapper .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    outline: none;
+}
+
+.form .inr-input-wrapper[data-valid="false"] .inr-input-group,
+.form .inr-input-wrapper .inr-input-group:has(input:invalid:not(:placeholder-shown)) {
+    border-color: var(--error-color, #d31510);
+}
+
+.form .inr-input-wrapper .inr-input-words-wrapper {
+    margin-top: 16px;
+}
+
+.form .inr-input-wrapper .inr-input-words-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.form .inr-input-wrapper input.inr-input-words {
+    width: 100%;
+    box-sizing: border-box;
+    background: #f1f2f6;
+    border: 1px solid var(--border-color, #c5c5c5);
+    border-radius: 8px;
+    cursor: default;
+    text-overflow: ellipsis;
+}
