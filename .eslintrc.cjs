@@ -23,6 +23,7 @@ module.exports = {
     }],
     'xwalk/max-cells': ['error', {
       '*': 4, // default limit for all models
+      'loan-slider': 21,
       form: 17,
       wizard: 12,
       'form-button': 7,

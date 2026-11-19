@@ -1,0 +1,72 @@
+{
+  "definitions": [
+    {
+      "title": "Loan slider",
+      "id": "loan-slider",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+            "template": {
+              "jcr:title": "Loan slider",
+              "fieldType": "number-input",
+              "fd:viewType": "loan-slider"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "loan-slider",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_number-validation-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Custom Properties",
+          "name": "custom"
+        },
+        {
+          "component": "number",
+          "name": "splits",
+          "label": "Number of splits",
+          "valueType": "number",
+          "description": "Number of equal splits between the minimum and the maximum amount (tick marks = splits + 1)"
+        },
+        {
+          "component": "number",
+          "name": "stepValue",
+          "label": "Step Value",
+          "valueType": "number",
+          "description": "Amount the slider head moves by. Defaults to 1"
+        },
+        {
+          "component": "text",
+          "name": "currencySymbol",
+          "label": "Currency symbol",
+          "valueType": "string",
+          "description": "Shown before the amount in the text box. Defaults to ₹"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        }
+      ]
+    }
+  ]
+}
