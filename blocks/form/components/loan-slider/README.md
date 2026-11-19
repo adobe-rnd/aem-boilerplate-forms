@@ -1,31 +1,26 @@
 # Loan Slider
 
-A loan amount slider with a draggable head, equal-split tick marks and a synced text box showing the current amount (e.g. `₹5,00,000`).
+Loan amount slider with equal splits, tick marks, compact labels (50K, 2L, 1.5Cr) and a synced INR amount text box.
 
 ## How to Use
 
-Add the **Loan Slider** component to a form in the Universal Editor and set the properties below. Dragging the head updates the text box; typing an amount in the text box (commit with Enter or blur) moves the head. Typed values are clamped to the min/max.
+Add a **Loan Slider** field in the Universal Editor and set Minimum and Maximum (Validation tab). The range is divided into equal splits; the slider head snaps to each split. Typing in the text box moves the slider to the nearest split, and moving the slider updates the text box.
 
 ## Authoring Properties
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| `minAmount` | Lowest amount | `50000` |
-| `maxAmount` | Highest amount | `1250000` |
-| `splits` | Number of equal parts the range is divided into (ticks are drawn at each split; the head snaps to them while sliding) | `10` |
-
-Tick labels use Indian short notation (`50K`, `2L`, `12.5L`) and are thinned to at most 6.
+| Property | Description |
+|----------|-------------|
+| Minimum / Maximum | Range bounds (defaults 50,000 / 10,00,000). Typed values are clamped to it |
+| `splits` | Number of equal parts between min and max (default 10) |
 
 ## Model Subscriptions
 
-- `value` changes on the field (e.g. set by a rule) update the slider and text box.
+Listens to `value` (re-renders slider and text box) and `enabled` changes.
 
 ## Model Properties Set
 
-`model.value` is a number. It is committed through a bubbling `change` event on the hidden number input: on every snapped step while sliding, and on blur/Enter for the text box. Change rules fire once per distinct value.
+Sets `value` (the exact amount, number) via a native `change` event on the hidden input: when the slider is released, or when the text box is committed (blur/Enter). Dragging or typing does not fire rules; each commit fires change rules once.
 
 ## Usage Notes
 
-- Base type: `number-input`; `fd:viewType`: `loan-slider`.
-- The original number input is hidden and acts as the value carrier.
-- Typed amounts are not snapped to a split; the head is placed at the exact position.
+Base type `number-input`, `fd:viewType` `loan-slider`. Text box accepts plain or formatted input (`₹5,00,000`).

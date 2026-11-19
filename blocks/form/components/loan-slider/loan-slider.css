@@ -1,104 +1,160 @@
-/* loan slider */
-.form .loan-slider-header {
-    display: flex;
+.form .loan-slider-field {
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: 24px 16px;
 }
 
-.form .loan-slider-header .field-label {
+.form .loan-slider-field > * {
+    grid-column: 1 / -1;
+}
+
+.form .loan-slider-field > label {
+    grid-column: 1;
+    grid-row: 1;
     margin: 0;
+    font-size: 20px;
     font-weight: 600;
 }
 
-.form .loan-slider-header input.loan-slider-value {
-    width: 180px;
-    max-width: 50%;
-    margin: 0;
-    padding: 14px 20px;
-    border: 1px solid #d4d5db;
-    border-radius: 12px;
-    font-size: 1.125rem;
+.form .loan-slider-field .loan-slider-amount {
+    grid-column: 2;
+    grid-row: 1;
+    width: 200px;
     box-sizing: border-box;
+    padding: 16px 20px;
+    border: 1px solid #d1d3d9;
+    border-radius: 12px;
+    font-size: 20px;
+    background: #fff;
 }
 
-.form .loan-slider-widget {
-    --loan-slider-color: #eba550;
-    --loan-slider-track: #d4d5db;
+.form .loan-slider-field .loan-slider-amount:focus-visible {
+    outline: 2px solid var(--link-color, #eba44f);
+    outline-offset: 1px;
+}
+
+.form .loan-slider-field .loan-slider-widget {
+    --loan-slider-color: #eba44f;
+    --loan-slider-thumb: 28px;
 
     position: relative;
-    padding-bottom: 40px;
+    padding-bottom: 32px;
+    margin: 0 calc(var(--loan-slider-thumb) / 2);
 }
 
-.form .loan-slider-widget input.loan-slider-range {
+.form .loan-slider-field .loan-slider-range {
     display: block;
-    width: 100%;
-    height: 14px;
-    margin: 0;
+    width: calc(100% + var(--loan-slider-thumb));
+    margin: 0 calc(var(--loan-slider-thumb) / -2);
     padding: 0;
-    border: none;
-    border-radius: 7px;
+    height: var(--loan-slider-thumb);
     appearance: none;
+    background: transparent;
+    border: none;
     cursor: pointer;
-    background: linear-gradient(to right, var(--loan-slider-color) var(--loan-slider-progress), var(--loan-slider-track) var(--loan-slider-progress));
+    position: relative;
+    z-index: 2;
 }
 
-.form .loan-slider-widget input.loan-slider-range:focus {
+.form .loan-slider-field .loan-slider-range:focus {
     outline: none;
 }
 
-.form .loan-slider-widget input.loan-slider-range::-webkit-slider-thumb {
+.form .loan-slider-field .loan-slider-range::-webkit-slider-runnable-track {
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, var(--loan-slider-color) var(--fill, 0%), #d1d3d9 var(--fill, 0%));
+}
+
+.form .loan-slider-field .loan-slider-range::-moz-range-track {
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, var(--loan-slider-color) var(--fill, 0%), #d1d3d9 var(--fill, 0%));
+}
+
+.form .loan-slider-field .loan-slider-range::-webkit-slider-thumb {
     appearance: none;
-    width: 26px;
-    height: 26px;
+    width: var(--loan-slider-thumb);
+    height: var(--loan-slider-thumb);
+    margin-top: -9px;
     border-radius: 50%;
     border: none;
     background: var(--loan-slider-color);
 }
 
-.form .loan-slider-widget input.loan-slider-range::-moz-range-thumb {
-    width: 26px;
-    height: 26px;
+.form .loan-slider-field .loan-slider-range::-moz-range-thumb {
+    width: var(--loan-slider-thumb);
+    height: var(--loan-slider-thumb);
     border-radius: 50%;
     border: none;
     background: var(--loan-slider-color);
 }
 
-.form .loan-slider-widget input.loan-slider-range:focus-visible::-webkit-slider-thumb {
-    outline: 3px solid rgb(235 165 80 / 40%);
+.form .loan-slider-field .loan-slider-range:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 4px rgb(235 164 79 / 40%);
 }
 
-.form .loan-slider-widget input.loan-slider-range:focus-visible::-moz-range-thumb {
-    outline: 3px solid rgb(235 165 80 / 40%);
+.form .loan-slider-field .loan-slider-range:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 4px rgb(235 164 79 / 40%);
 }
 
-.form .loan-slider-widget input.loan-slider-range:disabled {
+.form .loan-slider-field .loan-slider-range:disabled {
     cursor: not-allowed;
     opacity: 0.6;
 }
 
-.form .loan-slider-scale {
+.form .loan-slider-field .loan-slider-ticks {
     position: absolute;
-    inset: 0 0 auto;
-    height: 14px;
+    top: calc((var(--loan-slider-thumb) - 20px) / 2);
+    left: 0;
+    right: 0;
+    height: 20px;
     pointer-events: none;
 }
 
-.form .loan-slider-tick {
+.form .loan-slider-field .loan-slider-tick {
     position: absolute;
+    left: var(--pos);
     top: 0;
     width: 1px;
-    height: 14px;
-    background: rgb(0 0 0 / 15%);
-    transform: translateX(-50%);
+    height: 100%;
+    background: #d1d3d9;
 }
 
-.form .loan-slider-label {
+.form .loan-slider-field .loan-slider-tick.filled {
+    background: var(--loan-slider-color);
+}
+
+.form .loan-slider-field .loan-slider-labels {
     position: absolute;
-    top: 26px;
-    color: #6b6d7b;
-    font-size: 0.875rem;
-    white-space: nowrap;
+    top: calc(var(--loan-slider-thumb) + 10px);
+    left: 0;
+    right: 0;
+    height: 20px;
+}
+
+.form .loan-slider-field .loan-slider-label {
+    position: absolute;
+    left: var(--pos);
     transform: translateX(-50%);
+    font-size: 16px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+@media (width < 600px) {
+    .form .loan-slider-field .loan-slider-amount {
+        width: 150px;
+        font-size: 16px;
+        padding: 12px 14px;
+    }
+
+    .form .loan-slider-field > label {
+        font-size: 16px;
+    }
+
+    .form .loan-slider-field .loan-slider-label {
+        font-size: 12px;
+    }
 }
