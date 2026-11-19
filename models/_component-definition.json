@@ -42,6 +42,9 @@
       "components": [
         {
           "...": "../blocks/form/components/range/_range.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/card-choice/_card-choice.json#/definitions"
         }
       ]
     }

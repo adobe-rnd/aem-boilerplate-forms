@@ -25,6 +25,7 @@ module.exports = {
       '*': 4, // default limit for all models
       form: 17,
       wizard: 12,
+      'card-choice': 14,
       'form-button': 7,
       'checkbox-group': 20,
       checkbox: 19,
