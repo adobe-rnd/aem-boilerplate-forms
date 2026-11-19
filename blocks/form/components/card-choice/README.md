@@ -1,43 +1,43 @@
 # Card Choice
 
-Horizontally scrollable carousel of selectable cards, populated from data set by a rule.
+Carousel of selectable cards (title, image, features, minimum amount, call-to-action) populated by a rule; the chosen card is written to the model.
 
 ## How to Use
 
-Add the **Card choice** component to a form. Use a rule (or custom function) to set the card data on the field:
+Add a **Card choice** component (text-input based) to the form. A rule (e.g. on form initialize or another field's change) sets the card data on the component's `cards` property:
 
 ```js
-setProperty($form.cardChoice, { properties: { cards: [ /* card objects */ ] } });
+setProperty(cardChoice, { properties: { cards: [ /* card objects */ ] } });
 ```
 
-`properties.cards` may be an array or a JSON string. Each card:
+A `custom:setCards` event whose payload is the array is also supported.
+
+Card object:
 
 | Key | Description |
 |-----|-------------|
-| `id` | Unique id (falls back to `name`, `title`, then index) |
+| `id` | Unique key (falls back to `name`/`title`) |
 | `title`, `subtitle` | Heading and tagline |
-| `image`, `imageAlt` | Card image |
-| `features` | Array of `{ icon?, text }` (or plain strings) |
-| `featuresUrl`, `featuresLinkText` | Optional "All Features & Benefits" link |
-| `minAmount`, `minAmountLabel` | Amount row (numbers are formatted as `₹ 15,000/-`) |
-| `ctaText` | Button text override |
+| `image`, `imageAlt` | Card artwork |
+| `features` | Array of strings or `{ text, icon }` |
+| `featuresLabel`, `featuresLink` | "All Features & Benefits" link |
+| `minAmountLabel`, `minAmount` | Minimum amount row (value displayed as given, e.g. `₹ 15,000/-`) |
+| `ctaLabel` | Select button label (default `Get This Card`) |
 
 ## Authoring Properties
 
-| Property | Description |
-|----------|-------------|
-| `ctaText` | Default button text (`Get This Card`) |
-| `featuresLinkText` | Default features link text |
-| `minAmountLabel` | Default amount label (`Min. FD Amount`) |
+Standard text-input basic, validation and help fields. Cards are data-driven, not authored.
 
 ## Model Subscriptions
 
-`properties` (re-renders when `cards` changes) and `value` (updates the highlighted card).
+- `properties` change → re-renders cards from `properties.cards`
+- `value` change → highlights the matching card
+- custom event `setCards` → re-renders from payload
 
 ## Model Properties Set
 
-On clicking a card's button, `properties.selectedCard` is set to the full card object and `value` to the card id (committed immediately on click, so change rules fire once per selection). If new cards no longer contain the selected id, the selection is cleared.
+`value` is set to `JSON.stringify(card)` of the selected card immediately on click (rules on change fire once per selection).
 
 ## Usage Notes
 
-Base type `text-input` (input hidden), `fd:viewType` `card-choice`. Scroll via touch/trackpad, arrows, dots or keyboard left/right arrows.
+Base type `text-input`, `fd:viewType` = `card-choice`. Cards scroll horizontally (scroll-snap, touch, arrow buttons, ←/→ keys) with page dots. The selected card is matched by `id`. Disabled/read-only fields ignore clicks.

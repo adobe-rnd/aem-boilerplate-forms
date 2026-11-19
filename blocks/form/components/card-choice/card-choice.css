@@ -1,192 +1,192 @@
-.form .card-choice-field .card-choice {
+.form .card-choice-carousel {
     position: relative;
-    padding: 0 0 24px;
 }
 
-.form .card-choice-field .card-choice-viewport {
+.form .card-choice-track {
     display: flex;
     gap: 24px;
+    margin: 0;
+    padding: 4px 2px 8px;
+    list-style: none;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none;
-    padding: 4px;
 }
 
-.form .card-choice-field .card-choice-viewport::-webkit-scrollbar {
+.form .card-choice-track::-webkit-scrollbar {
     display: none;
 }
 
-.form .card-choice-field .card-choice-card {
-    flex: 0 0 min(292px, 85%);
-    scroll-snap-align: start;
+.form .card-choice-card {
     box-sizing: border-box;
-    padding: 20px;
-    background: #fff;
-    border: 1px solid #d9dbe3;
-    border-radius: 16px;
+    flex: 0 0 min(300px, 85%);
     display: flex;
     flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid #d9dde3;
+    border-radius: 16px;
+    background: #fff;
+    scroll-snap-align: start;
 }
 
-.form .card-choice-field .card-choice-card.selected {
-    border-color: #1f3fcc;
-    box-shadow: 0 0 0 2px #1f3fcc;
+.form .card-choice-card.selected {
+    border-color: #1d3fcc;
+    box-shadow: 0 0 0 2px #1d3fcc;
 }
 
-.form .card-choice-field .card-choice-title {
+.form .card-choice-title {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
 }
 
-.form .card-choice-field .card-choice-subtitle {
-    margin: 6px 0 16px;
+.form .card-choice-subtitle {
+    margin: 0;
+    color: #5f6672;
     font-size: 14px;
-    color: #5c6270;
 }
 
-.form .card-choice-field .card-choice-image-wrapper {
-    margin-bottom: 16px;
-}
-
-.form .card-choice-field .card-choice-image {
-    display: block;
+.form .card-choice-image {
     width: 166px;
     max-width: 100%;
     height: auto;
+    aspect-ratio: 166 / 104;
     border-radius: 8px;
+    object-fit: cover;
 }
 
-.form .card-choice-field .card-choice-features {
-    list-style: none;
-    margin: 0 0 16px;
-    padding: 0;
+.form .card-choice-features {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
     font-size: 13px;
 }
 
-.form .card-choice-field .card-choice-features li {
+.form .card-choice-feature {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.form .card-choice-field .card-choice-feature-icon {
+.form .card-choice-feature-icon {
+    flex: 0 0 16px;
     width: 16px;
     height: 16px;
 }
 
-.form .card-choice-field .card-choice-feature-bullet {
-    width: 6px;
-    height: 6px;
-    margin: 0 5px;
-    border-radius: 50%;
-    background: #1f3fcc;
+.form .card-choice-feature-bullet {
+    box-sizing: border-box;
+    border: 1.5px solid #333;
+    border-radius: 3px;
 }
 
-.form .card-choice-field .card-choice-link {
-    margin-bottom: 16px;
+.form .card-choice-link {
+    color: #1d3fcc;
     font-size: 14px;
     font-weight: 600;
-    color: #1f3fcc;
     text-decoration: none;
 }
 
-.form .card-choice-field .card-choice-link::after {
+.form .card-choice-link::after {
     content: ' ›';
 }
 
-.form .card-choice-field .card-choice-amount {
+.form .card-choice-amount {
     display: flex;
-    justify-content: space-between;
     align-items: stretch;
     margin-top: auto;
-    margin-bottom: 16px;
-    border: 1px solid #d9dbe3;
+    border: 1px solid #d9dde3;
     border-radius: 8px;
     overflow: hidden;
     font-size: 13px;
 }
 
-.form .card-choice-field .card-choice-amount-label {
+.form .card-choice-amount-label {
+    flex: 1;
     padding: 12px;
 }
 
-.form .card-choice-field .card-choice-amount-value {
-    padding: 12px;
-    font-weight: 600;
+.form .card-choice-amount-value {
+    padding: 12px 16px;
+    background: #f1f2f6;
     font-size: 15px;
-    background: #f3f4f8;
+    font-weight: 600;
 }
 
-.form .card-choice-field .card-choice-select {
-    margin: 0;
-    padding: 12px;
+.form .card-choice-select {
     width: 100%;
-    background: #fff;
-    color: #1f3fcc;
-    border: 1px solid #1f3fcc;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid #1d3fcc;
     border-radius: 8px;
+    background: #fff;
+    color: #1d3fcc;
     font-weight: 600;
     cursor: pointer;
 }
 
-.form .card-choice-field .card-choice-select:hover,
-.form .card-choice-field .card-choice-card.selected .card-choice-select {
-    background: #1f3fcc;
+.form .card-choice-select:hover,
+.form .card-choice-card.selected .card-choice-select {
+    background: #1d3fcc;
     color: #fff;
 }
 
-.form .card-choice-field .card-choice-nav {
+.form .card-choice-nav {
     position: absolute;
-    top: 45%;
-    right: -8px;
+    top: 50%;
+    right: -12px;
     z-index: 1;
     width: 36px;
     height: 36px;
-    margin: 0;
+    margin: -18px 0 0;
     padding: 0;
     border: 0;
     border-radius: 50%;
-    background: #1f3fcc;
+    background: #1d3fcc;
     color: #fff;
     font-size: 22px;
     line-height: 1;
     cursor: pointer;
 }
 
-.form .card-choice-field .card-choice-prev {
+.form .card-choice-nav.card-choice-prev {
     right: auto;
-    left: -8px;
+    left: -12px;
 }
 
-.form .card-choice-field .card-choice-nav:disabled {
+.form .card-choice-nav:disabled {
     display: none;
 }
 
-.form .card-choice-field .card-choice-dots {
+.form .card-choice-dots {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 16px;
+    margin-top: 8px;
 }
 
-.form .card-choice-field .card-choice-dot {
+.form .card-choice-dot {
     width: 8px;
     height: 8px;
-    min-width: 0;
     margin: 0;
     padding: 0;
     border: 0;
     border-radius: 4px;
-    background: #c8cde0;
+    background: #c9d0e6;
     cursor: pointer;
 }
 
-.form .card-choice-field .card-choice-dot.active {
+.form .card-choice-dot.active {
     width: 32px;
-    background: #4f6bdc;
+    background: #4f6bd8;
+}
+
+.form .card-choice-empty .card-choice-carousel,
+.form .card-choice-empty .card-choice-dots {
+    display: none;
 }

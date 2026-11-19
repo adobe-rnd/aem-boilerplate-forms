@@ -1,70 +1,46 @@
 {
-  "definitions": [
-    {
-      "title": "Card choice",
-      "id": "card-choice",
-      "plugins": {
-        "xwalk": {
-          "page": {
-            "resourceType": "core/fd/components/form/textinput/v1/textinput",
-            "template": {
-              "jcr:title": "Card choice",
-              "fieldType": "text-input",
-              "fd:viewType": "card-choice"
+    "definitions": [
+        {
+            "title": "Card choice",
+            "id": "card-choice",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                        "template": {
+                            "jcr:title": "Card choice",
+                            "fieldType": "text-input",
+                            "fd:viewType": "card-choice"
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  ],
-  "models": [
-    {
-      "id": "card-choice",
-      "fields": [
+    ],
+    "models": [
         {
-          "component": "tab",
-          "label": "Basic",
-          "name": "basic"
-        },
-        {
-          "...": "../../models/form-common/_basic-input-fields.json#/fields"
-        },
-        {
-          "component": "text",
-          "name": "ctaText",
-          "label": "Select button text",
-          "valueType": "string",
-          "description": "Text of the button on each card. Defaults to 'Get This Card'."
-        },
-        {
-          "component": "text",
-          "name": "featuresLinkText",
-          "label": "Features link text",
-          "valueType": "string",
-          "description": "Fallback text of the features link when a card has none. Defaults to 'All Features & Benefits'."
-        },
-        {
-          "component": "text",
-          "name": "minAmountLabel",
-          "label": "Minimum amount label",
-          "valueType": "string",
-          "description": "Fallback label for the amount row when a card has none. Defaults to 'Min. FD Amount'."
-        },
-        {
-          "component": "tab",
-          "label": "Validation",
-          "name": "validation"
-        },
-        {
-          "component": "boolean",
-          "name": "required",
-          "label": "Required",
-          "valueType": "boolean"
-        },
-        {
-          "...": "../../models/form-common/_help-container.json#/fields"
+            "id": "card-choice",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-input-fields.json#/fields"
+                },
+                {
+                    "component": "tab",
+                    "label": "Validation",
+                    "name": "validation"
+                },
+                {
+                    "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
