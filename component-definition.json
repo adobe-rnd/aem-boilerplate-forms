@@ -501,6 +501,24 @@
           }
         },
         {
+          "title": "Card Choice",
+          "id": "card-choice",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Card Choice",
+                  "fieldType": "text-input",
+                  "fd:viewType": "card-choice",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Modal",
           "id": "form-modal",
           "plugins": {
@@ -679,6 +697,24 @@
                   "jcr:title": "Range",
                   "fieldType": "number-input",
                   "fd:viewType": "range",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Card Choice",
+          "id": "card-choice",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Card Choice",
+                  "fieldType": "text-input",
+                  "fd:viewType": "card-choice",
                   "enabled": true,
                   "visible": true
                 }

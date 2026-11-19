@@ -22,6 +22,9 @@
       "...": "./components/accordion/_accordion.json#/definitions" 
     },
     { 
+      "...": "./components/card-choice/_card-choice.json#/definitions" 
+    },
+    { 
       "...": "./components/modal/_modal.json#/definitions" 
     },
     { 
@@ -95,6 +98,7 @@
         "plain-text",
         "radio-group",
         "rating",
+        "card-choice",
         "telephone-input",
         "text-input",
         "tnc",
