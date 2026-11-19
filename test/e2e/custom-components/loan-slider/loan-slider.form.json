@@ -1,0 +1,35 @@
+{
+  "id": "loan-slider-test-form",
+  "fieldType": "form",
+  "title": "loan-slider e2e test",
+  "action": "/adobe/forms/af/submit/loan-slider-test-form",
+  "properties": {},
+  "items": [
+    {
+      "id": "field-under-test",
+      "name": "fieldUnderTest",
+      "fieldType": "number-input",
+      ":type": "loan-slider",
+      "visible": true,
+      "enabled": true,
+      "label": {
+        "value": "Loan Slider",
+        "visible": true
+      },
+      "properties": {
+        "splits": 12
+      },
+      "type": "number",
+      "minimum": 50000,
+      "maximum": 1250000
+    },
+    {
+      "id": "next-field",
+      "name": "nextField",
+      "fieldType": "text-input",
+      "label": {
+        "value": "Next field"
+      }
+    }
+  ]
+}
