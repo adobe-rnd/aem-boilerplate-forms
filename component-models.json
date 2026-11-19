@@ -4186,41 +4186,65 @@
         "valueType": "string"
       },
       {
-        "component": "text",
-        "name": "images",
-        "label": "Option images (URL or path, same order as options)",
+        "component": "select",
+        "label": "Save value as",
+        "name": "type",
         "valueType": "string",
-        "multi": true
+        "value": "string[]",
+        "options": [
+          {
+            "name": "String",
+            "value": "string[]"
+          },
+          {
+            "name": "Boolean",
+            "value": "boolean[]"
+          },
+          {
+            "name": "Number",
+            "value": "number[]"
+          }
+        ]
       },
       {
-        "component": "select",
-        "name": "selectionMode",
+        "component": "radio-group",
         "label": "Selection mode",
+        "name": "selectionMode",
         "valueType": "string",
         "value": "single",
         "options": [
           {
-            "name": "Single choice",
+            "name": "Single",
             "value": "single"
           },
           {
-            "name": "Multiple choice",
+            "name": "Multiple",
             "value": "multi"
           }
         ]
       },
       {
+        "component": "text",
+        "name": "imageUrls",
+        "label": "Option images (URLs)",
+        "valueType": "string",
+        "multi": true,
+        "description": "One image URL per option, in the same order as the options."
+      },
+      {
         "component": "number",
         "name": "columns",
-        "label": "Images per row",
+        "label": "Columns",
         "valueType": "number",
-        "value": 4
+        "description": "Number of images per row. Leave empty to fit automatically."
       },
       {
         "component": "boolean",
         "name": "showLabels",
-        "label": "Show option labels below images",
-        "valueType": "boolean"
+        "label": "Show option labels",
+        "valueType": "boolean",
+        "value": false,
+        "description": "Show the display value below each image. It is always used as the image alt text."
       },
       {
         "component": "tab",

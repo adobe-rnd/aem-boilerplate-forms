@@ -1,31 +1,32 @@
 # Image Choice
 
-Renders a checkbox group as a grid of selectable images (for example logos). Authors choose whether one or many images can be selected.
+A checkbox group rendered as a grid of selectable images. Authors choose whether users can pick a single image or several.
 
 ## How to Use
 
-Add the **Image choice** component to a form. Define the options (data values and display names) as for a checkbox group, then list one image URL per option in the same order.
+Add the **Image choice** component from the *Custom Form Components* group, define the options (data value and display value) and give each option an image URL in the same order.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `enum` / `enumNames` | Option values and display names (display name is used as image alt text) |
-| `images` | Image URL or path for each option, in the same order as the options |
-| `selectionMode` | `single` (default) or `multi` |
-| `columns` | Images per row (default 4; 2 on small screens) |
-| `showLabels` | Show the display name below each image |
+| `selectionMode` | `single` (default) allows one image at a time; `multi` allows several. |
+| `imageUrls` | Image URL per option, in the same order as the options. |
+| `columns` | Images per row. Empty fits as many as possible. |
+| `showLabels` | Shows the display value under each image. It is always used as the image `alt`. |
+
+All other properties come from the checkbox group (options, default, required, `minItems`/`maxItems`, help text, ...).
 
 ## Model Subscriptions
 
-Subscribes to its own `value` with `{ listenChanges: true }`. In single mode, if a rule or prefill sets more than one value, only the last one is kept.
+- `enum` / `enumNames`: the form block re-renders the options, so the images are applied again.
 
 ## Model Properties Set
 
-`model.value` is an array of the selected option values. It is committed on the native `change` event of the checkbox clicked, so change rules fire once per click. In single mode, selecting an image unchecks the others before the commit; clicking the selected image again clears the selection.
+`value` is an array of the selected option values (as with a checkbox group), committed from the native checkbox `change` event, once per click. In `single` mode the other checkboxes are unchecked before the event reaches the form, so the model changes once and only holds one value. Clicking the selected image again clears the selection unless the field is required.
 
 ## Usage Notes
 
 - Base type: `checkbox-group`; `fd:viewType`: `image-choice`.
-- Options without a matching image keep the standard checkbox and label.
-- The native checkboxes stay in the DOM (visually hidden), so keyboard use (Tab, Space) and required validation work as usual.
+- The native checkboxes stay in the DOM (visually transparent over the image), so keyboard (Space, Tab) and validation behave as usual.
+- An option without an image URL falls back to its text label.

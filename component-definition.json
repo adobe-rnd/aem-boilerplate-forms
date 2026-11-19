@@ -714,7 +714,6 @@
                 "template": {
                   "jcr:title": "Image choice",
                   "fieldType": "checkbox-group",
-                  "fd:viewType": "image-choice",
                   "enum": [
                     "0",
                     "1"
@@ -723,7 +722,9 @@
                     "Option 1",
                     "Option 2"
                   ],
-                  "type": "string[]"
+                  "orientation": "horizontal",
+                  "type": "string[]",
+                  "fd:viewType": "image-choice"
                 }
               }
             }

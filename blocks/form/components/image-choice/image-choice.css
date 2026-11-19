@@ -1,35 +1,49 @@
-main .form .image-choice {
-    --image-choice-columns: 4;
+.form .image-choice {
+    --image-choice-size: 96px;
+    --image-choice-selected-color: var(--link-color, #3b63fb);
+}
 
+.form .image-choice.image-choice-fixed-columns,
+.form .image-choice:not(.image-choice-fixed-columns) {
     display: grid;
-    grid-template-columns: repeat(var(--image-choice-columns), minmax(0, 1fr));
     gap: 16px;
-    border: 0;
+}
+
+.form .image-choice:not(.image-choice-fixed-columns) {
+    grid-template-columns: repeat(auto-fill, minmax(var(--image-choice-size), 1fr));
+}
+
+.form .image-choice.image-choice-fixed-columns {
+    grid-template-columns: repeat(var(--image-choice-columns), minmax(0, 1fr));
+}
+
+.form .image-choice > legend,
+.form .image-choice > .field-description {
+    grid-column: 1 / -1;
+}
+
+.form .image-choice .image-choice-item {
+    position: relative;
+    margin: 0;
     padding: 0;
 }
 
-main .form .image-choice > legend {
-    grid-column: 1 / -1;
-}
-
-main .form .image-choice > .field-description {
-    grid-column: 1 / -1;
-}
-
-main .form .image-choice .image-choice-option {
-    position: relative;
-    margin: 0;
-}
-
-main .form .image-choice .image-choice-option input {
+.form .image-choice .image-choice-item input {
     position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     margin: 0;
     opacity: 0;
+    cursor: pointer;
+    z-index: 1;
 }
 
-main .form .image-choice .image-choice-option label {
+.form .image-choice .image-choice-item input:disabled {
+    cursor: not-allowed;
+}
+
+.form .image-choice .image-choice-item label {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,54 +54,42 @@ main .form .image-choice .image-choice-option label {
     padding: 12px;
     border: 2px solid transparent;
     border-radius: 8px;
-    cursor: pointer;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
+    text-align: center;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-main .form .image-choice .image-choice-option label::before,
-main .form .image-choice .image-choice-option label::after {
+.form .image-choice .image-choice-item label::before,
+.form .image-choice .image-choice-item label::after {
     display: none;
 }
 
-main .form .image-choice .image-choice-option img {
-    display: block;
+.form .image-choice .image-choice-item label img {
     width: 100%;
-    max-width: 120px;
+    max-width: var(--image-choice-size);
     height: auto;
     aspect-ratio: 1;
     object-fit: contain;
 }
 
-main .form .image-choice.field-invalid .image-choice-option label {
+.form .image-choice.field-invalid .image-choice-item label {
     border-color: var(--form-error-color, #d31510);
 }
 
-main .form .image-choice .image-choice-option label:hover {
-    border-color: var(--form-input-border-color, #ccc);
+.form .image-choice .image-choice-item input:checked + label {
+    border-color: var(--image-choice-selected-color);
+    background-color: rgb(59 99 251 / 8%);
+    box-shadow: 0 0 0 1px var(--image-choice-selected-color);
 }
 
-main .form .image-choice .image-choice-option input:focus-visible + label {
-    outline: 2px solid var(--link-color, #0b6fe0);
+.form .image-choice .image-choice-item input:focus-visible + label {
+    outline: 2px solid var(--image-choice-selected-color);
     outline-offset: 2px;
 }
 
-main .form .image-choice .image-choice-option input:checked + label {
-    border-color: var(--link-color, #0b6fe0);
-    background-color: rgb(11 111 224 / 8%);
-}
-
-main .form .image-choice .image-choice-option input:disabled + label {
-    cursor: not-allowed;
+.form .image-choice .image-choice-item input:disabled + label {
     opacity: 0.5;
 }
 
-main .form .image-choice .image-choice-label {
-    font-size: 14px;
-    text-align: center;
-}
-
-@media (width <= 600px) {
-    main .form .image-choice {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+.form .image-choice .image-choice-item:hover input:not(:checked, :disabled) + label {
+    border-color: #ccc;
 }
