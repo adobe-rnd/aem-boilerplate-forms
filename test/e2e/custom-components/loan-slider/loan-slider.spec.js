@@ -2,6 +2,7 @@ import {
   test, expect, renderForm, loadFormJson, field, getModel, setModel, trackChanges,
 } from '../form-harness.js';
 
+// Form: min 100000, max 600000, 5 splits => split size 100000.
 const formDef = loadFormJson('loan-slider');
 const FIELD = 'field-under-test';
 
@@ -10,70 +11,57 @@ test.describe('loan-slider custom component', () => {
     await renderForm(page, formServer, formDef);
   });
 
-  test('decorates the field with slider, textbox, ticks and labels', async ({ page }) => {
+  test('renders slider, amount box, ticks and labels from authored properties', async ({ page }) => {
     const wrapper = field(page, FIELD);
     await expect(wrapper).toHaveAttribute('data-component-status', 'loaded');
-    await expect(wrapper.locator('.loan-slider-range')).toBeVisible();
-    await expect(wrapper.locator('.loan-slider-text')).toHaveValue('₹50,000');
-    await expect(wrapper.locator('.loan-slider-tick')).toHaveCount(13);
-    const labels = await wrapper.locator('.loan-slider-label').allTextContents();
-    expect(labels[0]).toBe('50K');
-    expect(labels[labels.length - 1]).toBe('12.5L');
+    await expect(wrapper.locator('.loan-slider-range')).toHaveAttribute('max', '5');
+    await expect(wrapper.locator('.loan-slider-tick')).toHaveCount(6);
+    await expect(wrapper.locator('.loan-slider-label')).toHaveText(['1L', '2L', '3L', '4L', '5L', '6L']);
+    await expect(wrapper.locator('.loan-slider-input')).toBeVisible();
   });
 
-  test('splits and min/max come from authored properties', async ({ page, formServer }) => {
-    const def = JSON.parse(JSON.stringify(formDef));
-    def.items[0].properties.splits = 4;
-    def.items[0].minimum = 100000;
-    def.items[0].maximum = 500000;
-    await renderForm(page, formServer, def);
+  test('model value updates slider and textbox', async ({ page }) => {
+    await setModel(page, FIELD, 'value', 300000);
     const wrapper = field(page, FIELD);
-    await expect(wrapper.locator('.loan-slider-tick')).toHaveCount(5);
-    await expect(wrapper.locator('.loan-slider-range')).toHaveAttribute('max', '4');
-    await expect(wrapper.locator('.loan-slider-text')).toHaveValue('₹1,00,000');
-    await expect(wrapper.locator('.loan-slider-label').nth(1)).toHaveText('2L');
+    await expect(wrapper.locator('.loan-slider-range')).toHaveValue('2');
+    await expect(wrapper.locator('.loan-slider-input')).toHaveValue('₹3,00,000');
   });
 
-  test('reflects a model value set by a rule or prefill', async ({ page }) => {
-    await setModel(page, FIELD, 'value', 500000);
+  test('moving the slider updates the textbox and commits the model once', async ({ page }) => {
     const wrapper = field(page, FIELD);
-    await expect(wrapper.locator('.loan-slider-text')).toHaveValue('₹5,00,000');
-    await expect(wrapper.locator('.loan-slider-range')).toHaveValue('5');
-  });
-
-  test('slider updates the textbox and commits the model on each release', async ({ page }) => {
     const changes = await trackChanges(page, FIELD);
-    const wrapper = field(page, FIELD);
-    const slider = wrapper.locator('.loan-slider-range');
-    await slider.focus();
-    await slider.press('ArrowRight');
-    await slider.press('ArrowRight');
-    await expect(wrapper.locator('.loan-slider-text')).toHaveValue('₹2,50,000');
-    await expect.poll(() => getModel(page, FIELD)).toEqual(250000);
+    const range = wrapper.locator('.loan-slider-range');
+    await range.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(wrapper.locator('.loan-slider-input')).toHaveValue('₹2,00,000');
+    await expect.poll(() => getModel(page, FIELD)).toEqual(200000);
+    await page.keyboard.press('End');
+    await expect(wrapper.locator('.loan-slider-input')).toHaveValue('₹6,00,000');
+    await expect.poll(() => getModel(page, FIELD)).toEqual(600000);
     expect(await changes()).toBe(2);
   });
 
-  test('textbox updates the slider and the model', async ({ page }) => {
+  test('typing in the textbox moves the slider, snapping and clamping', async ({ page }) => {
     const wrapper = field(page, FIELD);
-    const text = wrapper.locator('.loan-slider-text');
-    await text.fill('6,50,000');
-    await expect(wrapper.locator('.loan-slider-range')).toHaveValue('6');
-    await text.press('Enter');
-    await expect(text).toHaveValue('₹6,50,000');
-    await expect.poll(() => getModel(page, FIELD)).toEqual(650000);
+    const box = wrapper.locator('.loan-slider-input');
+    const range = wrapper.locator('.loan-slider-range');
+    await box.fill('330000');
+    await expect(range).toHaveValue('2');
+    await box.press('Enter');
+    await expect(box).toHaveValue('₹3,00,000');
+    await expect.poll(() => getModel(page, FIELD)).toEqual(300000);
+
+    await box.fill('9999999');
+    await box.blur();
+    await expect(range).toHaveValue('5');
+    await expect(box).toHaveValue('₹6,00,000');
+    await expect.poll(() => getModel(page, FIELD)).toEqual(600000);
   });
 
-  test('textbox clamps values outside min/max', async ({ page }) => {
+  test('keyboard: tab reaches the textbox and slider', async ({ page }) => {
     const wrapper = field(page, FIELD);
-    const text = wrapper.locator('.loan-slider-text');
-    await text.fill('99999999');
-    await text.press('Tab');
-    await expect(text).toHaveValue('₹12,50,000');
-    await expect(wrapper.locator('.loan-slider-range')).toHaveValue('12');
-    await expect.poll(() => getModel(page, FIELD)).toEqual(1250000);
-    await text.fill('10');
-    await text.press('Tab');
-    await expect(text).toHaveValue('₹50,000');
-    await expect.poll(() => getModel(page, FIELD)).toEqual(50000);
+    await wrapper.locator('.loan-slider-input').focus();
+    await page.keyboard.press('Tab');
+    await expect(wrapper.locator('.loan-slider-range')).toBeFocused();
   });
 });

@@ -17,11 +17,11 @@
         "visible": true
       },
       "properties": {
-        "splits": 12
+        "splits": 5
       },
       "type": "number",
-      "minimum": 50000,
-      "maximum": 1250000
+      "minimum": 100000,
+      "maximum": 600000
     },
     {
       "id": "next-field",

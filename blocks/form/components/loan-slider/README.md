@@ -1,27 +1,31 @@
 # Loan Slider
 
-Number-input widget with a draggable slider head, equal-split tick marks and an editable ₹ textbox, kept in sync both ways.
+A snapping amount slider paired with an editable amount text box. Both stay in sync.
 
 ## How to Use
 
-Insert **Loan Slider** from the Custom Form Components group, or set `"fd:viewType": "loan-slider"` on a `number-input`.
+Insert a **Loan Slider** component, set the lowest/highest number and the number of splits.
+The range between them is divided into equal splits; the slider head snaps to each split and ticks mark them.
 
 ## Authoring Properties
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| `minimum` (Validation tab) | Minimum amount | 50000 |
-| `maximum` (Validation tab) | Maximum amount | 1250000 |
-| `splits` | Number of equal splits between min and max; the slider snaps to each split | 12 |
+| Property | Description |
+|----------|-------------|
+| `minimum` | Lowest amount (Validation tab) |
+| `maximum` | Highest amount (Validation tab) |
+| `splits` | Number of equal splits between min and max (default 10) |
+| `currencySymbol` | Symbol shown before the amount (default `₹`) |
 
 ## Model Subscriptions
 
-`value` and `enabled` changes of the field (via `subscribe` with `listenChanges`) update the slider and textbox.
+Listens to `value` (updates slider and text box) and `enabled` changes.
 
 ## Model Properties Set
 
-`model.value` is committed when the slider head is moved (release or keyboard step), or when the textbox is committed (blur/Enter). Typing in the textbox moves the slider live but does not commit per keystroke. Textbox values are clamped to min/max; values between splits are kept as typed while the slider head shows the nearest split.
+Sets `model.value` to the raw number (no symbol or grouping). It is committed once per interaction: when the slider head is released or a key press ends, and when the text box is blurred or Enter is pressed. Typed values are clamped to min/max and snapped to the nearest split.
 
 ## Usage Notes
 
-Base type `number-input`, `fd:viewType` `loan-slider`. The original input is hidden and feeds the model; the textbox and slider are helper controls whose native `change` events are stopped from reaching the form handler. The only synthetic `change` without bubbling is the textbox's Enter-key commit, which is intentionally internal. Amounts use the `en-IN` format; tick labels use K / L / Cr.
+- Base type: `number-input`, `fd:viewType`: `loan-slider`.
+- The original input is kept hidden as the model-bound carrier; the visible text box is a separate input.
+- Amounts are formatted with the `en-IN` locale; axis labels use `K`, `L`, `Cr`.
