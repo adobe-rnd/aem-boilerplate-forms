@@ -550,6 +550,22 @@
           }
         },
         {
+          "title": "Card Choice",
+          "id": "card-choice",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Card Choice",
+                  "fieldType": "text-input",
+                  "fd:viewType": "card-choice"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Terms and conditions",
           "id": "tnc",
           "plugins": {
@@ -681,6 +697,22 @@
                   "fd:viewType": "range",
                   "enabled": true,
                   "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "title": "Card Choice",
+          "id": "card-choice",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "Card Choice",
+                  "fieldType": "text-input",
+                  "fd:viewType": "card-choice"
                 }
               }
             }

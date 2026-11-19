@@ -31,6 +31,9 @@
       "...": "./components/rating/_rating.json#/definitions" 
     },
     { 
+      "...": "./components/card-choice/_card-choice.json#/definitions" 
+    },
+    { 
       "...": "./components/tnc/_tnc.json#/definitions" 
     },
     { 
@@ -99,7 +102,8 @@
         "text-input",
         "tnc",
         "wizard",
-        "range"
+        "range",
+        "card-choice"
       ]
     }
   ]
