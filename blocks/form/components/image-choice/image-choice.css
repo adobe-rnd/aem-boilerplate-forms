@@ -1,0 +1,103 @@
+main .form .image-choice {
+    --image-choice-columns: auto-fill;
+
+    display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns), minmax(96px, 1fr));
+    gap: 16px;
+    border: 0;
+    padding: 0;
+}
+
+main .form .image-choice > legend {
+    grid-column: 1 / -1;
+}
+
+main .form .image-choice > .field-description {
+    grid-column: 1 / -1;
+}
+
+main .form .image-choice > .checkbox-wrapper {
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+main .form .image-choice > .checkbox-wrapper > input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+}
+
+main .form .image-choice .image-choice-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: #fff;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+main .form .image-choice .image-choice-tile::before,
+main .form .image-choice .image-choice-tile::after {
+    display: none;
+}
+
+main .form .image-choice .image-choice-image {
+    display: block;
+    width: 100%;
+}
+
+main .form .image-choice .image-choice-image img {
+    display: block;
+    width: 100%;
+    height: 80px;
+    object-fit: contain;
+}
+
+main .form .image-choice .image-choice-caption {
+    font-size: 0.875rem;
+}
+
+/* Captions stay available to assistive tech but are hidden visually unless enabled */
+main .form .image-choice:not(.image-choice-labels) .image-choice-tile:not(.image-choice-no-image) .image-choice-caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+main .form .field-invalid.image-choice .image-choice-tile {
+    border-color: #d31510;
+}
+
+main .form .image-choice > .checkbox-wrapper:hover .image-choice-tile {
+    border-color: #b3b3b3;
+}
+
+main .form .image-choice > .checkbox-wrapper > input:checked + .image-choice-tile {
+    border-color: #1473e6;
+    box-shadow: 0 0 0 2px rgb(20 115 230 / 25%);
+}
+
+main .form .image-choice > .checkbox-wrapper > input:focus-visible + .image-choice-tile {
+    outline: 2px solid #1473e6;
+    outline-offset: 2px;
+}
+
+main .form .image-choice > .checkbox-wrapper > input:disabled + .image-choice-tile {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
