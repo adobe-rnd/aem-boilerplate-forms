@@ -1,5 +1,7 @@
 import { subscribe } from '../../rules/index.js';
 
+const ALL = 'All';
+
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -19,218 +21,208 @@ function parseCards(raw) {
   return Array.isArray(data) ? data.filter((c) => c && typeof c === 'object') : [];
 }
 
-function parseSelected(raw) {
-  if (!raw) return null;
-  if (typeof raw === 'object') return raw;
+function safeUrl(url) {
+  return typeof url === 'string' && /^(https?:\/\/|\/|#)/i.test(url) ? url : null;
+}
+
+function cardKey(card, index) {
+  return String(card.id ?? card.name ?? index);
+}
+
+function parseSelection(value) {
+  if (!value) return null;
   try {
-    const parsed = JSON.parse(raw);
+    const parsed = typeof value === 'string' ? JSON.parse(value) : value;
     return parsed && typeof parsed === 'object' ? parsed : null;
   } catch (e) {
     return null;
   }
 }
 
-function cardKey(card, index) {
-  return String(card.id ?? card.name ?? card.title ?? index);
-}
-
-function renderCard(card, index) {
+function buildCard(card, key, onSelect) {
   const item = el('li', 'card-choice-card');
-  item.dataset.cardKey = cardKey(card, index);
-  item.append(el('h3', 'card-choice-title', card.title || card.name));
-  if (card.subtitle) item.append(el('p', 'card-choice-subtitle', card.subtitle));
-
+  item.dataset.cardKey = key;
+  item.append(el('h3', 'card-choice-card-title', card.name));
+  if (card.tagline) item.append(el('p', 'card-choice-card-tagline', card.tagline));
   if (card.image) {
-    const img = el('img', 'card-choice-image');
+    const img = el('img', 'card-choice-card-image');
     img.src = card.image;
-    img.alt = card.imageAlt || card.title || '';
+    img.alt = card.imageAlt || card.name || '';
     img.loading = 'lazy';
     item.append(img);
   }
-
   if (Array.isArray(card.features) && card.features.length) {
-    const list = el('ul', 'card-choice-features');
-    card.features.forEach((feature) => {
-      const text = typeof feature === 'string' ? feature : feature?.text;
-      if (!text) return;
-      const li = el('li', 'card-choice-feature');
-      const icon = feature?.icon;
-      if (icon) {
-        const iconImg = el('img', 'card-choice-feature-icon');
-        iconImg.src = icon;
-        iconImg.alt = '';
-        li.append(iconImg);
-      } else {
-        li.append(el('span', 'card-choice-feature-icon card-choice-feature-bullet'));
-      }
-      li.append(el('span', 'card-choice-feature-text', text));
-      list.append(li);
-    });
+    const list = el('ul', 'card-choice-card-features');
+    card.features.forEach((f) => list.append(el('li', '', typeof f === 'object' ? f?.text : f)));
     item.append(list);
   }
-
-  if (card.featuresLabel || card.featuresLink) {
-    const link = el('a', 'card-choice-link', card.featuresLabel || 'All Features & Benefits');
-    link.href = card.featuresLink || '#';
-    if (card.featuresLink) link.target = '_blank';
-    link.rel = 'noopener';
+  if (card.linkText) {
+    const href = safeUrl(card.linkUrl);
+    const link = el(href ? 'a' : 'span', 'card-choice-card-link', card.linkText);
+    if (href) link.href = href;
     item.append(link);
   }
-
-  if (card.minAmount !== undefined && card.minAmount !== null && card.minAmount !== '') {
-    const amount = el('div', 'card-choice-amount');
-    amount.append(el('span', 'card-choice-amount-label', card.minAmountLabel || 'Min. FD Amount'));
-    amount.append(el('span', 'card-choice-amount-value', card.minAmount));
+  if (card.minAmount !== undefined && card.minAmount !== null) {
+    const amount = el('div', 'card-choice-card-amount');
+    amount.append(
+      el('span', 'card-choice-card-amount-label', card.minAmountLabel || 'Min. FD Amount'),
+      el('span', 'card-choice-card-amount-value', card.minAmount),
+    );
     item.append(amount);
   }
-
-  const button = el('button', 'card-choice-select', card.ctaLabel || 'Get This Card');
+  const button = el('button', 'card-choice-card-select', card.buttonLabel || 'Get This Card');
   button.type = 'button';
-  button.setAttribute('aria-pressed', 'false');
+  button.addEventListener('click', onSelect);
   item.append(button);
   return item;
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const input = fieldDiv.querySelector('input, textarea');
-  if (input) input.style.display = 'none';
+  if (input) input.hidden = true;
 
-  const carousel = el('div', 'card-choice-carousel');
+  const root = el('div', 'card-choice');
+  const tabs = el('div', 'card-choice-tabs');
+  tabs.setAttribute('role', 'tablist');
+  const viewport = el('div', 'card-choice-viewport');
+  const track = el('ul', 'card-choice-track');
+  track.tabIndex = 0;
   const prev = el('button', 'card-choice-nav card-choice-prev', '‹');
   const next = el('button', 'card-choice-nav card-choice-next', '›');
   prev.type = 'button';
   next.type = 'button';
   prev.setAttribute('aria-label', 'Previous cards');
   next.setAttribute('aria-label', 'Next cards');
-  const track = el('ul', 'card-choice-track');
-  track.tabIndex = 0;
   const dots = el('div', 'card-choice-dots');
-  carousel.append(prev, track, next);
-  const description = fieldDiv.querySelector('.field-description');
-  fieldDiv.append(carousel, dots);
-  if (description) fieldDiv.append(description);
+  viewport.append(prev, track, next);
+  root.append(tabs, viewport, dots);
+  const anchor = input || fieldDiv.querySelector('.field-description');
+  if (anchor) anchor.after(root);
+  else fieldDiv.append(root);
 
   let model = null;
-  let cards = [];
+  let cards = parseCards(fieldJson?.properties?.cards);
+  let category = ALL;
   let selectedKey = null;
 
-  const isDisabled = () => model?.enabled === false || model?.readOnly === true
-    || fieldJson?.enabled === false || fieldJson?.readOnly === true;
-
-  const pageCount = () => Math.max(
-    1,
-    Math.ceil(track.scrollWidth / Math.max(track.clientWidth, 1)),
-  );
-  const currentPage = () => {
-    const max = track.scrollWidth - track.clientWidth;
-    if (max <= 0) return 0;
-    return Math.round((track.scrollLeft / max) * (pageCount() - 1));
-  };
+  const pageWidth = () => track.clientWidth || 1;
 
   const updateNav = () => {
     const max = track.scrollWidth - track.clientWidth;
-    prev.disabled = track.scrollLeft <= 1;
-    next.disabled = track.scrollLeft >= max - 1;
-    const pages = pageCount();
-    const page = currentPage();
+    prev.hidden = track.scrollLeft <= 1;
+    next.hidden = max <= 1 || track.scrollLeft >= max - 1;
+    const pages = Math.max(1, Math.ceil(track.scrollWidth / pageWidth() - 0.05));
+    const ratio = max <= 1 ? 0 : track.scrollLeft / max;
+    const current = Math.min(pages - 1, Math.round(ratio * (pages - 1)));
     dots.hidden = pages <= 1;
-    dots.querySelectorAll('.card-choice-dot').forEach((dot, i) => {
-      dot.classList.toggle('active', i === page);
+    if (dots.children.length !== pages) {
+      dots.replaceChildren(...Array.from({ length: pages }, (_, i) => {
+        const dot = el('button', 'card-choice-dot');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `Go to page ${i + 1}`);
+        dot.addEventListener('click', () => track.scrollTo({ left: i * pageWidth(), behavior: 'smooth' }));
+        return dot;
+      }));
+    }
+    Array.from(dots.children).forEach((d, i) => d.classList.toggle('active', i === current));
+  };
+
+  const markSelected = () => {
+    track.querySelectorAll('.card-choice-card').forEach((c) => {
+      const on = c.dataset.cardKey === selectedKey;
+      c.classList.toggle('selected', on);
+      c.querySelector('.card-choice-card-select').setAttribute('aria-pressed', String(on));
     });
   };
 
-  const renderDots = () => {
-    dots.replaceChildren();
-    const pages = pageCount();
-    for (let i = 0; i < pages; i += 1) {
-      const dot = el('button', 'card-choice-dot');
-      dot.type = 'button';
-      dot.setAttribute('aria-label', `Go to page ${i + 1}`);
-      dot.addEventListener('click', () => {
-        const max = track.scrollWidth - track.clientWidth;
-        track.scrollTo({ left: pages > 1 ? (max * i) / (pages - 1) : 0, behavior: 'smooth' });
-      });
-      dots.append(dot);
+  const select = (card, key) => {
+    selectedKey = key;
+    markSelected();
+    const value = JSON.stringify(card);
+    if (input) {
+      input.value = value;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    } else if (model && model.value !== value) {
+      model.value = value;
     }
+  };
+
+  const renderCards = () => {
+    const visible = cards
+      .map((card, i) => ({ card, key: cardKey(card, i) }))
+      .filter(({ card }) => category === ALL || card.category === category);
+    track.replaceChildren(...visible.map(({ card, key }) => (
+      buildCard(card, key, () => select(card, key))
+    )));
+    markSelected();
+    track.scrollLeft = 0;
     updateNav();
   };
 
-  const scrollByPage = (dir) => {
-    track.scrollBy({ left: dir * track.clientWidth * 0.9, behavior: 'smooth' });
+  const renderTabs = () => {
+    const categories = [...new Set(cards.map((c) => c.category).filter(Boolean))];
+    if (category !== ALL && !categories.includes(category)) category = ALL;
+    tabs.hidden = categories.length < 2;
+    tabs.replaceChildren(...categories.map((name) => {
+      const tab = el('button', 'card-choice-tab', name);
+      tab.type = 'button';
+      tab.setAttribute('role', 'tab');
+      const active = name === category;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', String(active));
+      tab.addEventListener('click', () => {
+        category = category === name ? ALL : name;
+        renderTabs();
+        renderCards();
+      });
+      return tab;
+    }));
   };
-  prev.addEventListener('click', () => scrollByPage(-1));
-  next.addEventListener('click', () => scrollByPage(1));
+
+  const syncSelection = (value) => {
+    const picked = parseSelection(value);
+    if (!picked) {
+      selectedKey = null;
+    } else {
+      const index = cards.findIndex((c, i) => (picked.id !== undefined
+        ? cardKey(c, i) === String(picked.id)
+        : JSON.stringify(c) === JSON.stringify(picked)));
+      selectedKey = index >= 0 ? cardKey(cards[index], index) : null;
+    }
+    markSelected();
+  };
+
+  const setCards = (raw) => {
+    cards = parseCards(raw);
+    renderTabs();
+    renderCards();
+    syncSelection(model?.value ?? input?.value);
+  };
+
+  prev.addEventListener('click', () => track.scrollBy({ left: -pageWidth(), behavior: 'smooth' }));
+  next.addEventListener('click', () => track.scrollBy({ left: pageWidth(), behavior: 'smooth' }));
   track.addEventListener('scroll', updateNav, { passive: true });
   track.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') scrollByPage(1);
-    if (e.key === 'ArrowLeft') scrollByPage(-1);
+    if (e.key === 'ArrowRight') track.scrollBy({ left: pageWidth() / 2, behavior: 'smooth' });
+    if (e.key === 'ArrowLeft') track.scrollBy({ left: -pageWidth() / 2, behavior: 'smooth' });
   });
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(renderDots).observe(track);
-  }
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(updateNav).observe(track);
 
-  const paintSelection = () => {
-    track.querySelectorAll('.card-choice-card').forEach((item) => {
-      const on = item.dataset.cardKey === selectedKey;
-      item.classList.toggle('selected', on);
-      const btn = item.querySelector('.card-choice-select');
-      btn.setAttribute('aria-pressed', String(on));
-      btn.textContent = on ? 'Selected' : (cards.find((c, i) => cardKey(c, i) === item.dataset.cardKey)?.ctaLabel || 'Get This Card');
-    });
-  };
-
-  const syncSelectionFromValue = (value) => {
-    const selected = parseSelected(value);
-    const idx = selected ? cards.findIndex((c, i) => cardKey(c, i) === cardKey(selected, -1)) : -1;
-    selectedKey = idx >= 0 ? cardKey(cards[idx], idx) : null;
-    paintSelection();
-  };
-
-  const select = (card, index) => {
-    if (isDisabled()) return;
-    const serialized = JSON.stringify(card);
-    selectedKey = cardKey(card, index);
-    paintSelection();
-    if (input) input.value = serialized;
-    if (model && model.value !== serialized) {
-      model.value = serialized;
-    } else if (!model && input) {
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-  };
-
-  const renderCards = (data) => {
-    cards = data;
-    track.replaceChildren();
-    cards.forEach((card, index) => {
-      const item = renderCard(card, index);
-      item.querySelector('.card-choice-select').addEventListener('click', () => select(card, index));
-      track.append(item);
-    });
-    track.scrollLeft = 0;
-    fieldDiv.classList.toggle('card-choice-empty', cards.length === 0);
-    syncSelectionFromValue(model?.value ?? input?.value);
-    renderDots();
-  };
-
-  renderCards(parseCards(fieldJson?.properties?.cards));
+  setCards(cards);
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
     if (eventType === 'register') {
       model = fieldModel;
-      const initial = parseCards(model.properties?.cards);
-      if (initial.length) renderCards(initial);
-      else syncSelectionFromValue(model.value);
-      model.subscribe((evt) => {
-        renderCards(parseCards(evt?.payload ?? evt?.detail));
-      }, 'setCards');
+      setCards(model.properties?.cards ?? cards);
     } else if (eventType === 'change') {
       payload?.changes?.forEach((change) => {
         if (change?.propertyName === 'properties') {
-          const incoming = parseCards(change.currentValue?.cards);
-          if (JSON.stringify(incoming) !== JSON.stringify(cards)) renderCards(incoming);
+          const incoming = change.currentValue?.cards;
+          if (JSON.stringify(incoming) !== JSON.stringify(change.prevValue?.cards)) {
+            setCards(incoming);
+          }
         } else if (change?.propertyName === 'value') {
-          syncSelectionFromValue(change.currentValue);
+          syncSelection(change.currentValue);
         }
       });
     }
