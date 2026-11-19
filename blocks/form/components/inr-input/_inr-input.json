@@ -1,108 +1,52 @@
 {
-  "definitions": [
-    {
-      "title": "INR Input",
-      "id": "inr-input",
-      "plugins": {
-        "xwalk": {
-          "page": {
-            "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
-            "template": {
-              "jcr:title": "INR Input",
-              "fieldType": "number-input",
-              "fd:viewType": "inr-input"
+    "definitions": [
+        {
+            "title": "INR Input",
+            "id": "inr-input",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                        "template": {
+                            "jcr:title": "INR Input",
+                            "fieldType": "text-input",
+                            "fd:viewType": "inr-input",
+                            "enabled": true,
+                            "visible": true
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  ],
-  "models": [
-    {
-      "id": "inr-input",
-      "fields": [
+    ],
+    "models": [
         {
-          "component": "tab",
-          "label": "Basic",
-          "name": "basic"
-        },
-        {
-          "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
-        },
-        {
-          "component": "number",
-          "name": "default",
-          "label": "Default Value",
-          "valueType": "number"
-        },
-        {
-          "component": "select",
-          "name": "type",
-          "label": "Number type",
-          "valueType": "string",
-          "options": [
-            {
-              "name": "Integer (1234)",
-              "value": "integer"
-            },
-            {
-              "name": "Decimal (1234.000)",
-              "value": "number"
-            }
-          ]
-        },
-        {
-          "component": "text",
-          "name": "wordsLabel",
-          "label": "Amount in Words Label",
-          "valueType": "string",
-          "description": "Label of the read-only amount-in-words field"
-        },
-        {
-          "component": "tab",
-          "label": "Validation",
-          "name": "validation"
-        },
-        {
-          "...": "../../models/form-common/_number-validation-fields.json#/fields"
-        },
-        {
-          "component": "tab",
-          "label": "Formats",
-          "name": "formats"
-        },
-        {
-          "component": "select",
-          "label": "Display Format",
-          "name": "displayFormat",
-          "valueType": "string",
-          "options": [
-            {
-              "name": "No Pattern",
-              "value": ""
-            },
-            {
-              "name": "$1,234.21",
-              "value": "\u00a4#,##0.00"
-            },
-            {
-              "name": "$1234.21",
-              "value": "\u00a4####0.00"
-            },
-            {
-              "name": "1,234.210",
-              "value": "#,###,##0.000"
-            },
-            {
-              "name": "123,421%",
-              "value": "#,###,##0%"
-            }
-          ]
-        },
-        {
-          "...": "../../models/form-common/_help-container.json#/fields"
+            "id": "inr-input",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
+                },
+                {
+                    "component": "tab",
+                    "label": "Custom Properties",
+                    "name": "custom"
+                },
+                {
+                    "component": "text",
+                    "name": "amountInWordsLabel",
+                    "label": "Amount in words label",
+                    "valueType": "string",
+                    "description": "Label of the read-only amount-in-words field. Defaults to \"Amount (in words)\""
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

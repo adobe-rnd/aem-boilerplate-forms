@@ -4409,119 +4409,16 @@
         "valueType": "string"
       },
       {
-        "component": "number",
-        "name": "default",
-        "label": "Default Value",
-        "valueType": "number"
-      },
-      {
-        "component": "select",
-        "name": "type",
-        "label": "Number type",
-        "valueType": "string",
-        "options": [
-          {
-            "name": "Integer (1234)",
-            "value": "integer"
-          },
-          {
-            "name": "Decimal (1234.000)",
-            "value": "number"
-          }
-        ]
-      },
-      {
-        "component": "text",
-        "name": "wordsLabel",
-        "label": "Amount in Words Label",
-        "valueType": "string",
-        "description": "Label of the read-only amount-in-words field"
-      },
-      {
         "component": "tab",
-        "label": "Validation",
-        "name": "validation"
-      },
-      {
-        "component": "boolean",
-        "name": "required",
-        "label": "Required",
-        "valueType": "boolean"
+        "label": "Custom Properties",
+        "name": "custom"
       },
       {
         "component": "text",
-        "name": "mandatoryMessage",
-        "label": "Error message",
+        "name": "amountInWordsLabel",
+        "label": "Amount in words label",
         "valueType": "string",
-        "description": "Error message shown when required field is left empty."
-      },
-      {
-        "component": "text",
-        "name": "validateExpMessage",
-        "label": "Script validation message",
-        "valueType": "string",
-        "description": "Displayed when validation script fails."
-      },
-      {
-        "component": "number",
-        "name": "minimum",
-        "label": "Lowest number / Smallest number",
-        "valueType": "number",
-        "description": "Minimum number allowed in the field"
-      },
-      {
-        "component": "text",
-        "name": "minimumMessage",
-        "valueType": "string",
-        "label": "Minimum error message",
-        "description": "Error message shown when entered value is less than minimum."
-      },
-      {
-        "component": "number",
-        "name": "maximum",
-        "label": "Highest number / Largest number",
-        "valueType": "number",
-        "description": "Maximum number allowed in the field"
-      },
-      {
-        "component": "text",
-        "name": "maximumMessage",
-        "valueType": "string",
-        "label": "Maximum error message",
-        "description": "Error message shown when the entered value is more than maximum."
-      },
-      {
-        "component": "tab",
-        "label": "Formats",
-        "name": "formats"
-      },
-      {
-        "component": "select",
-        "label": "Display Format",
-        "name": "displayFormat",
-        "valueType": "string",
-        "options": [
-          {
-            "name": "No Pattern",
-            "value": ""
-          },
-          {
-            "name": "$1,234.21",
-            "value": "¤#,##0.00"
-          },
-          {
-            "name": "$1234.21",
-            "value": "¤####0.00"
-          },
-          {
-            "name": "1,234.210",
-            "value": "#,###,##0.000"
-          },
-          {
-            "name": "123,421%",
-            "value": "#,###,##0%"
-          }
-        ]
+        "description": "Label of the read-only amount-in-words field. Defaults to \"Amount (in words)\""
       },
       {
         "component": "tab",

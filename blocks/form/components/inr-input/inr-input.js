@@ -1,74 +1,72 @@
-/* global BigInt */
 import { subscribe } from '../../rules/index.js';
 
 const ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
   'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
 const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
-function belowHundred(n) {
-  if (n < 20) return ONES[n];
-  return [TENS[Math.floor(n / 10)], ONES[n % 10]].filter(Boolean).join(' ');
-}
-
-function belowThousand(n) {
+function below1000(n) {
   const parts = [];
-  if (n >= 100) parts.push(`${ONES[Math.floor(n / 100)]} Hundred`);
-  if (n % 100) parts.push(belowHundred(n % 100));
+  const hundreds = Math.floor(n / 100);
+  const rest = n % 100;
+  if (hundreds) parts.push(`${ONES[hundreds]} Hundred`);
+  if (rest) {
+    parts.push(rest < 20 ? ONES[rest] : `${TENS[Math.floor(rest / 10)]}${rest % 10 ? ` ${ONES[rest % 10]}` : ''}`);
+  }
   return parts.join(' ');
 }
 
-/**
- * Converts a non-negative integer to words using the Indian numbering system.
- * @param {bigint} num
- * @returns {string}
- */
-function integerToWords(num) {
-  if (num === 0n) return 'Zero';
-  const crore = num / 10000000n;
-  const lakh = Number((num / 100000n) % 100n);
-  const thousand = Number((num / 1000n) % 100n);
-  const rest = Number(num % 1000n);
-  const parts = [];
-  if (crore > 0n) parts.push(`${integerToWords(crore)} Crore`);
-  if (lakh) parts.push(`${belowHundred(lakh)} Lakh`);
-  if (thousand) parts.push(`${belowHundred(thousand)} Thousand`);
-  if (rest) parts.push(belowThousand(rest));
-  return parts.join(' ');
+/** Words for a non-negative integer given as a digit string, Indian numbering system. */
+function integerToWords(digits) {
+  const clean = digits.replace(/^0+/, '');
+  if (!clean) return 'Zero';
+  const lastThree = Number(clean.slice(-3));
+  let rest = clean.slice(0, -3);
+  const groups = [];
+  if (lastThree) groups.push(below1000(lastThree));
+  ['Thousand', 'Lakh'].forEach((unit) => {
+    if (!rest) return;
+    const n = Number(rest.slice(-2));
+    rest = rest.slice(0, -2);
+    if (n) groups.unshift(`${below1000(n)} ${unit}`);
+  });
+  if (rest) {
+    // everything above 99,99,999 is expressed in Crores, which may itself be large
+    groups.unshift(`${integerToWords(rest)} Crore`);
+  }
+  return groups.join(' ');
 }
 
 /**
- * Converts an amount (number or numeric string, max 2 decimals) to Indian Rupee words.
- * Returns an empty string for empty or invalid input.
- * @param {string|number} value
- * @returns {string}
+ * Converts an amount string (e.g. "1234.5") to Indian Rupees and Paise in words.
+ * Returns '' for empty or invalid input.
  */
 export function amountToWords(value) {
-  const str = String(value ?? '').replace(/,/g, '').trim();
-  const match = /^(\d*)(?:\.(\d*))?$/.exec(str);
-  if (!str || !match || (!match[1] && !match[2])) return '';
-  const rupees = BigInt(match[1] || '0');
-  const paise = Number(`${match[2] || ''}00`.slice(0, 2));
+  const str = String(value ?? '').replace(/[,\s₹]/g, '');
+  if (!/^(\d+\.?\d*|\.\d+)$/.test(str)) return '';
+  const [intPart = '', decPart = ''] = str.split('.');
+  const paise = Number(`${decPart}00`.slice(0, 2));
+  const rupees = intPart.replace(/^0+/, '');
+  if (!rupees && !paise) return 'Zero Rupees Only';
   const parts = [];
-  if (rupees > 0n || paise === 0) {
-    parts.push(`${integerToWords(rupees)} ${rupees === 1n ? 'Rupee' : 'Rupees'}`);
-  }
-  if (paise > 0) parts.push(`${belowHundred(paise)} Paise`);
+  if (rupees) parts.push(`${integerToWords(rupees)} ${rupees === '1' ? 'Rupee' : 'Rupees'}`);
+  if (paise) parts.push(`${below1000(paise)} Paise`);
   return `${parts.join(' and ')} Only`;
 }
 
+// keeps digits and a single decimal point with at most two decimals
 function sanitize(raw) {
   const cleaned = raw.replace(/[^\d.]/g, '');
-  const [intPart, ...decimals] = cleaned.split('.');
-  return decimals.length ? `${intPart}.${decimals.join('').slice(0, 2)}` : intPart;
+  const dot = cleaned.indexOf('.');
+  if (dot === -1) return cleaned;
+  return `${cleaned.slice(0, dot + 1)}${cleaned.slice(dot + 1).replace(/\./g, '').slice(0, 2)}`;
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const input = fieldDiv.querySelector('input');
-  if (!input) return fieldDiv;
   input.type = 'text';
   input.inputMode = 'decimal';
   input.autocomplete = 'off';
-  input.removeAttribute('step');
+  fieldDiv.classList.add('inr-input-wrapper');
 
   const group = document.createElement('div');
   group.className = 'inr-input-group';
@@ -79,45 +77,48 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   input.before(group);
   group.append(symbol, input);
 
-  const wordsId = `${input.id || fieldJson.id}-words`;
+  const wordsId = `${input.id}-words`;
   const wordsWrapper = document.createElement('div');
-  wordsWrapper.className = 'inr-input-words-wrapper';
+  wordsWrapper.className = 'inr-input-words';
   const wordsLabel = document.createElement('label');
-  wordsLabel.className = 'inr-input-words-label';
+  wordsLabel.className = 'field-label';
   wordsLabel.htmlFor = wordsId;
-  wordsLabel.textContent = fieldJson?.properties?.wordsLabel || 'Amount (in words)';
+  wordsLabel.textContent = fieldJson?.properties?.amountInWordsLabel || 'Amount (in words)';
   const words = document.createElement('input');
   words.type = 'text';
   words.id = wordsId;
-  words.className = 'inr-input-words';
+  words.className = 'inr-input-words-field';
   words.readOnly = true;
   words.tabIndex = -1;
   words.setAttribute('aria-live', 'polite');
-  wordsWrapper.append(wordsLabel, words);
+  const readOnlyHint = document.createElement('div');
+  readOnlyHint.className = 'inr-input-readonly';
+  readOnlyHint.textContent = 'Read-only';
+  wordsWrapper.append(wordsLabel, words, readOnlyHint);
+  const description = fieldDiv.querySelector('.field-description');
+  if (description) description.before(wordsWrapper);
+  else fieldDiv.append(wordsWrapper);
 
-  const anchor = fieldDiv.querySelector('.field-description, .field-description-container');
-  if (anchor) anchor.before(wordsWrapper);
-  else group.after(wordsWrapper);
-
-  const update = (value) => {
+  const update = (value = input.value) => {
     words.value = amountToWords(value);
   };
 
+  // the model value is committed by the native change event (on blur); only the words are live
   input.addEventListener('input', () => {
-    const cleaned = sanitize(input.value);
-    if (cleaned !== input.value) input.value = cleaned;
-    update(cleaned);
+    const clean = sanitize(input.value);
+    if (clean !== input.value) input.value = clean;
+    update();
   });
 
-  subscribe(fieldDiv, formId, (_, fieldModel, eventType, payload) => {
-    // model changes made outside typing (rules, reset, default value)
-    const changed = eventType === 'register'
-      || (eventType === 'change' && payload?.changes?.some((c) => c.propertyName === 'value'));
-    if (changed && document.activeElement !== input) {
+  subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
+    if (eventType === 'register') {
       update(fieldModel.value ?? input.value);
+    } else if (eventType === 'change'
+      && payload?.changes?.some((c) => c?.propertyName === 'value')) {
+      update(fieldModel.value);
     }
   }, { listenChanges: true });
 
-  update(input.value);
+  update();
   return fieldDiv;
 }
