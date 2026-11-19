@@ -1,45 +1,50 @@
 # Card Choice
 
-Horizontally scrollable carousel of cards (name, tagline, image, features, benefits link, minimum amount, call-to-action) that lets the user pick one card.
+Horizontally scrollable carousel of product cards. A rule supplies the card data; the card the customer picks is written to the model.
 
 ## How to Use
 
-Add the **Card choice** component to a form. Cards are supplied at runtime by a rule or custom function that sets the `cards` property on the field, e.g. `globals.functions.setProperty(field, { properties: { cards: [...] } })`.
+Add a **Card choice** component to the form. Use a rule on another field (or on form init) to push the cards:
+
+```js
+dispatchEvent(cardChoiceField, 'custom:setCards', [
+  {
+    id: 'freedom',
+    name: 'Freedom',
+    description: 'Best Card for Rewards & Offers',
+    image: '/images/freedom.png',
+    features: ['Upto 10X CashPoints', { icon: '/icons/fuel.svg', text: '₹150 spent = 1 Fuel Point' }],
+    linkText: 'All Features & Benefits',
+    linkUrl: '/freedom',
+    minAmount: '₹ 15,000/-',
+    category: 'Retail Cards'
+  }
+]);
+```
+
+Alternatively set `properties.cards` on the field (initially or via a rule).
+
+Card fields: `id`, `name`, `description`, `image`, `imageAlt`, `features` (strings or `{ icon, text }`), `linkText`, `linkUrl`, `minAmountLabel`, `minAmount`, `ctaLabel`, `category`. Filter pills are shown when cards have two or more distinct `category` values.
 
 ## Authoring Properties
 
-Only the standard text-input properties (name, title, visibility, enabled, read-only, column span, help text). Card data is not authored; it comes from the rule.
-
-## Cards Data Shape
-
-```json
-[{
-  "id": "freedom",
-  "name": "Freedom",
-  "tagline": "Best Card for Rewards & Offers",
-  "image": "https://.../freedom.png",
-  "imageAlt": "Freedom card",
-  "features": ["Upto 10X CashPoints", { "icon": "https://.../icon.svg", "text": "Joining Fees - ₹500/-" }],
-  "link": { "label": "All Features & Benefits", "url": "https://..." },
-  "minAmountLabel": "Min. FD Amount",
-  "minAmount": 15000,
-  "ctaLabel": "Get This Card"
-}]
-```
-
-`id` identifies the card (falls back to `name`). A numeric `minAmount` is shown as `₹ 15,000/-`; a string is shown as is. All keys except `name` are optional.
+| Property | Description |
+|----------|-------------|
+| Label | Heading shown above the carousel |
+| `subtitle` | Text under the heading |
+| `ctaLabel` | Default select button label (default `Get This Card`) |
+| `minAmountLabel` | Default label for the minimum amount (default `Min. FD Amount`) |
 
 ## Model Subscriptions
 
-- `properties.cards` (or `properties`): re-renders the cards.
-- `value`: highlights the card matching the model value.
-- `enabled` / `readOnly`: enables or disables the select buttons.
+- Custom event `setCards`: payload is the card array (or `{ cards }`).
+- `properties.cards` changes.
+- `value` changes (highlights the matching card, matched by `id`, then `name`).
 
 ## Model Properties Set
 
-On clicking a card's button, the input's `change` event is dispatched once; `model.value` becomes the JSON string of the selected card object (`JSON.parse` it in rules). Change rules fire once per selection. Re-selecting the same card is a no-op.
+`value` is set to the JSON string of the selected card object when the customer clicks the card's select button, once per click, and only if it differs from the current value. Change rules fire once per selection.
 
 ## Usage Notes
 
-- Base type: `text-input`; `fd:viewType`: `card-choice`.
-- Carousel uses CSS scroll-snap: swipe/drag, prev/next buttons, arrow keys on the track, and pagination dots.
+Base type `text-input`, `fd:viewType` `card-choice`. The text input is hidden. Scrolling uses CSS scroll snap, with arrow buttons and pagination dots.

@@ -1,6 +1,6 @@
 import { subscribe } from '../../rules/index.js';
 
-const CARDS_PROPERTY = 'cards';
+const ALL = 'All';
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -18,14 +18,17 @@ function parseCards(data) {
       return [];
     }
   }
-  return Array.isArray(cards) ? cards.filter((card) => card && typeof card === 'object') : [];
+  if (cards && !Array.isArray(cards) && Array.isArray(cards.cards)) {
+    cards = cards.cards;
+  }
+  return Array.isArray(cards) ? cards.filter((c) => c && typeof c === 'object') : [];
 }
 
 function cardKey(card, index) {
   return String(card.id ?? card.name ?? index);
 }
 
-function parseSelected(value) {
+function parseSelection(value) {
   if (!value) return null;
   try {
     const parsed = JSON.parse(value);
@@ -35,186 +38,210 @@ function parseSelected(value) {
   }
 }
 
-function formatAmount(amount) {
-  if (typeof amount === 'number') return `₹ ${amount.toLocaleString('en-IN')}/-`;
-  return amount;
-}
+function createCard(card, key, opts) {
+  const li = el('li', 'card-choice-card');
+  li.dataset.cardId = key;
+  li.append(el('h3', 'card-choice-card-title', card.name));
+  if (card.description) li.append(el('p', 'card-choice-card-description', card.description));
 
-function createFeature(feature) {
-  const item = el('li', 'card-choice-feature');
-  const text = typeof feature === 'object' ? feature.text : feature;
-  const icon = typeof feature === 'object' ? feature.icon : null;
-  if (icon) {
-    const img = el('img', 'card-choice-feature-icon');
-    img.src = icon;
-    img.alt = '';
-    item.append(img);
-  } else {
-    item.append(el('span', 'card-choice-feature-icon card-choice-feature-icon-default'));
-  }
-  item.append(el('span', 'card-choice-feature-text', text));
-  return item;
-}
-
-function createCard(card, index, selected, enabled, onSelect) {
-  const article = el('article', 'card-choice-card');
-  article.dataset.cardKey = cardKey(card, index);
-  article.append(el('h3', 'card-choice-title', card.name));
-  if (card.tagline) article.append(el('p', 'card-choice-tagline', card.tagline));
   if (card.image) {
-    const img = el('img', 'card-choice-image');
+    const imgWrap = el('div', 'card-choice-card-image');
+    const img = document.createElement('img');
     img.src = card.image;
     img.alt = card.imageAlt || card.name || '';
     img.loading = 'lazy';
-    article.append(img);
+    imgWrap.append(img);
+    li.append(imgWrap);
   }
+
   if (Array.isArray(card.features) && card.features.length) {
-    const list = el('ul', 'card-choice-features');
-    card.features.forEach((feature) => list.append(createFeature(feature)));
-    article.append(list);
+    const ul = el('ul', 'card-choice-card-features');
+    card.features.forEach((f) => {
+      const item = el('li');
+      const feature = typeof f === 'string' ? { text: f } : f || {};
+      if (feature.icon) {
+        const icon = document.createElement('img');
+        icon.src = feature.icon;
+        icon.alt = '';
+        icon.className = 'card-choice-feature-icon';
+        item.append(icon);
+      }
+      item.append(el('span', null, feature.text));
+      ul.append(item);
+    });
+    li.append(ul);
   }
-  if (card.link?.url || card.link?.label) {
-    const link = el('a', 'card-choice-link', card.link.label || 'All Features & Benefits');
-    link.href = card.link.url || '#';
-    article.append(link);
+
+  if (card.linkText) {
+    const link = el('a', 'card-choice-card-link', card.linkText);
+    link.href = card.linkUrl || '#';
+    li.append(link);
   }
-  if (card.minAmount !== undefined && card.minAmount !== null) {
-    const amount = el('div', 'card-choice-amount');
+
+  if (card.minAmount !== undefined && card.minAmount !== null && card.minAmount !== '') {
+    const amount = el('div', 'card-choice-card-amount');
     amount.append(
-      el('span', 'card-choice-amount-label', card.minAmountLabel || 'Min. FD Amount'),
-      el('span', 'card-choice-amount-value', formatAmount(card.minAmount)),
+      el('span', 'card-choice-amount-label', card.minAmountLabel || opts.minAmountLabel),
+      el('span', 'card-choice-amount-value', card.minAmount),
     );
-    article.append(amount);
+    li.append(amount);
   }
-  const button = el('button', 'card-choice-select', card.ctaLabel || 'Get This Card');
+
+  const button = el('button', 'card-choice-card-select', card.ctaLabel || opts.ctaLabel);
   button.type = 'button';
-  button.disabled = !enabled;
   button.setAttribute('aria-pressed', 'false');
-  button.addEventListener('click', () => onSelect(card));
-  article.append(button);
-  if (selected) article.classList.add('selected');
-  return article;
+  li.append(button);
+  return { li, button };
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
-  const input = fieldDiv.querySelector('input');
-  input.type = 'hidden';
+  const input = fieldDiv.querySelector('input, textarea');
+  const props = fieldJson?.properties || {};
+  const opts = {
+    ctaLabel: props.ctaLabel || 'Get This Card',
+    minAmountLabel: props.minAmountLabel || 'Min. FD Amount',
+  };
+  let model = null;
+  let cards = [];
+  let category = ALL;
+
+  if (input) input.style.display = 'none';
   fieldDiv.classList.add('card-choice-wrapper');
 
-  const widget = el('div', 'card-choice-widget');
-  const prev = el('button', 'card-choice-nav card-choice-prev');
-  const next = el('button', 'card-choice-nav card-choice-next');
-  [[prev, 'Previous cards', '‹'], [next, 'Next cards', '›']].forEach(([btn, label, glyph]) => {
-    btn.type = 'button';
-    btn.setAttribute('aria-label', label);
-    btn.textContent = glyph;
-  });
-  const track = el('div', 'card-choice-track');
-  track.tabIndex = 0;
-  track.setAttribute('role', 'group');
-  track.setAttribute('aria-label', 'Cards');
+  const header = el('div', 'card-choice-header');
+  const titles = el('div', 'card-choice-titles');
+  const heading = fieldDiv.querySelector('label');
+  if (heading) {
+    heading.classList.add('card-choice-heading');
+    titles.append(heading);
+  }
+  if (props.subtitle) titles.append(el('p', 'card-choice-subtitle', props.subtitle));
+  const filters = el('div', 'card-choice-filters');
+  filters.setAttribute('role', 'group');
+  header.append(titles, filters);
+
+  const carousel = el('div', 'card-choice-carousel');
+  const track = el('ul', 'card-choice-track');
+  track.setAttribute('role', 'list');
+  const prev = el('button', 'card-choice-nav card-choice-prev', '‹');
+  const next = el('button', 'card-choice-nav card-choice-next', '›');
+  prev.type = 'button';
+  next.type = 'button';
+  prev.setAttribute('aria-label', 'Previous cards');
+  next.setAttribute('aria-label', 'Next cards');
+  carousel.append(prev, track, next);
   const dots = el('div', 'card-choice-dots');
-  widget.append(prev, track, next, dots);
-  input.after(widget);
 
-  let model = null;
-  let cards = parseCards(fieldJson?.properties?.[CARDS_PROPERTY]);
-  let enabled = fieldJson?.enabled !== false && fieldJson?.readOnly !== true;
+  const anchor = input || fieldDiv.firstChild;
+  fieldDiv.insertBefore(header, anchor);
+  fieldDiv.insertBefore(carousel, anchor);
+  fieldDiv.insertBefore(dots, anchor);
 
-  const pageCount = () => Math.max(
-    1,
-    Math.ceil(track.scrollWidth / Math.max(track.clientWidth, 1) - 0.05),
-  );
-
-  const updateNav = () => {
-    const maxScroll = track.scrollWidth - track.clientWidth;
-    prev.hidden = track.scrollLeft <= 1;
-    next.hidden = maxScroll <= 1 || track.scrollLeft >= maxScroll - 1;
-    const pages = pageCount();
-    const atEnd = maxScroll > 0 && track.scrollLeft >= maxScroll - 1;
-    const page = atEnd
-      ? pages - 1
-      : Math.min(pages - 1, Math.round(track.scrollLeft / Math.max(track.clientWidth, 1)));
-    dots.hidden = pages <= 1;
-    if (dots.children.length !== pages) {
-      dots.replaceChildren(...Array.from({ length: pages }, () => el('span', 'card-choice-dot')));
-    }
-    Array.from(dots.children).forEach((dot, i) => dot.classList.toggle('active', i === page));
-  };
-
-  const scrollByPage = (direction) => {
-    track.scrollBy({ left: direction * track.clientWidth * 0.9, behavior: 'smooth' });
-  };
+  const step = () => Math.max(track.clientWidth, 1);
+  const scrollByPage = (dir) => track.scrollBy({ left: dir * step(), behavior: 'smooth' });
   prev.addEventListener('click', () => scrollByPage(-1));
   next.addEventListener('click', () => scrollByPage(1));
-  track.addEventListener('scroll', updateNav, { passive: true });
-  track.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') scrollByPage(1);
-    if (e.key === 'ArrowLeft') scrollByPage(-1);
-  });
-  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(updateNav).observe(track);
 
-  const currentKey = () => {
-    const selected = parseSelected(input.value);
-    if (!selected) return null;
-    const idx = cards.findIndex((card, i) => cardKey(card, i) === cardKey(selected, -1)
-      || (selected.id === undefined && selected.name === card.name));
-    return idx >= 0 ? cardKey(cards[idx], idx) : null;
-  };
+  function updateNav() {
+    const max = track.scrollWidth - track.clientWidth;
+    prev.hidden = track.scrollLeft <= 1;
+    next.hidden = max <= 1 || track.scrollLeft >= max - 1;
+    const pages = Math.max(1, Math.ceil(track.scrollWidth / step() - 0.05));
+    const current = max <= 1 ? 0 : Math.round((track.scrollLeft / max) * (pages - 1));
+    if (dots.children.length !== pages) {
+      dots.replaceChildren(...Array.from({ length: pages }, (_, i) => {
+        const dot = el('button', 'card-choice-dot');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `Go to page ${i + 1}`);
+        dot.addEventListener('click', () => track.scrollTo({
+          left: pages > 1 ? (i / (pages - 1)) * (track.scrollWidth - track.clientWidth) : 0,
+          behavior: 'smooth',
+        }));
+        return dot;
+      }));
+    }
+    Array.from(dots.children).forEach((d, i) => d.classList.toggle('active', i === current));
+    dots.hidden = pages <= 1;
+  }
+  track.addEventListener('scroll', () => window.requestAnimationFrame(updateNav));
+  window.addEventListener('resize', updateNav);
 
-  const markSelected = () => {
-    const key = currentKey();
-    track.querySelectorAll('.card-choice-card').forEach((node) => {
-      const isSelected = node.dataset.cardKey === key;
-      node.classList.toggle('selected', isSelected);
-      node.querySelector('.card-choice-select')?.setAttribute('aria-pressed', String(isSelected));
+  function markSelected(value) {
+    const selected = parseSelection(value);
+    const selectedKey = selected ? cardKey(selected, -1) : null;
+    track.querySelectorAll('.card-choice-card').forEach((li) => {
+      const isSelected = selectedKey !== null && li.dataset.cardId === selectedKey;
+      li.classList.toggle('selected', isSelected);
+      li.querySelector('.card-choice-card-select').setAttribute('aria-pressed', String(isSelected));
     });
-  };
+  }
 
-  const select = (card) => {
+  function select(card) {
     const value = JSON.stringify(card);
-    if (input.value === value) return;
-    input.value = value;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-    markSelected();
-  };
+    if (model && model.value !== value) {
+      model.value = value;
+    }
+    if (input && input.value !== value) input.value = value;
+    markSelected(value);
+  }
 
-  const render = () => {
-    track.replaceChildren(...cards.map((card, i) => createCard(card, i, false, enabled, select)));
-    widget.classList.toggle('empty', cards.length === 0);
-    markSelected();
+  function renderCards() {
+    const visible = cards
+      .map((card, i) => ({ card, key: cardKey(card, i) }))
+      .filter(({ card }) => category === ALL || card.category === category);
+    track.replaceChildren(...visible.map(({ card, key }) => {
+      const { li, button } = createCard(card, key, opts);
+      button.addEventListener('click', () => select(card));
+      return li;
+    }));
+    markSelected(model ? model.value : input?.value);
+    track.scrollLeft = 0;
     updateNav();
-  };
+  }
+
+  function renderFilters() {
+    const categories = [...new Set(cards.map((c) => c.category).filter(Boolean))];
+    if (category !== ALL && !categories.includes(category)) category = ALL;
+    filters.hidden = categories.length < 2;
+    filters.replaceChildren(...[ALL, ...categories].map((name) => {
+      const pill = el('button', 'card-choice-filter', name === ALL ? ALL : name);
+      pill.type = 'button';
+      pill.setAttribute('aria-pressed', String(name === category));
+      pill.classList.toggle('active', name === category);
+      pill.addEventListener('click', () => {
+        category = name;
+        renderFilters();
+        renderCards();
+      });
+      return pill;
+    }));
+  }
+
+  function setCards(data) {
+    cards = parseCards(data);
+    renderFilters();
+    renderCards();
+  }
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
     if (eventType === 'register') {
       model = fieldModel;
-      cards = parseCards(model.properties?.[CARDS_PROPERTY]);
-      enabled = model.enabled !== false && model.readOnly !== true;
-      if (model.value && !input.value) input.value = model.value;
-      render();
+      // A rule supplies the card array through this custom event
+      fieldModel.subscribe((e) => setCards(e?.payload), 'setCards');
+      const initial = fieldModel.properties?.cards ?? props.cards;
+      if (initial) setCards(initial);
     } else if (eventType === 'change') {
-      let rerender = false;
-      payload?.changes?.forEach(({ propertyName, currentValue }) => {
-        if (propertyName === `properties.${CARDS_PROPERTY}`) {
-          cards = parseCards(currentValue);
-          rerender = true;
-        } else if (propertyName === 'properties') {
-          cards = parseCards(currentValue?.[CARDS_PROPERTY]);
-          rerender = true;
-        } else if (propertyName === 'enabled' || propertyName === 'readOnly') {
-          enabled = model.enabled !== false && model.readOnly !== true;
-          rerender = true;
-        } else if (propertyName === 'value') {
-          const newValue = currentValue ?? '';
-          if (input.value !== newValue) input.value = newValue;
-          markSelected();
+      payload?.changes?.forEach((change) => {
+        if (change?.propertyName === 'value') {
+          markSelected(change.currentValue);
+        } else if (change?.propertyName === 'properties' && change.currentValue?.cards
+          && JSON.stringify(change.currentValue.cards) !== JSON.stringify(cards)) {
+          setCards(change.currentValue.cards);
         }
       });
-      if (rerender) render();
     }
   }, { listenChanges: true });
 
-  render();
+  updateNav();
   return fieldDiv;
 }
