@@ -1,0 +1,49 @@
+/** inr-input.css **/
+main .form .inr-input-wrapper .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: var(--form-input-border-size, 1px) solid var(--form-input-border-color, #c5c5c5);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+main .form .inr-input-wrapper .inr-input-group:focus-within {
+    outline: 2px solid var(--link-color, #1473e6);
+    outline-offset: 1px;
+}
+
+main .form .inr-input-wrapper .inr-input-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    background: #f1f2f6;
+    border-right: 1px solid var(--form-input-border-color, #c5c5c5);
+    font-size: 1.25rem;
+    color: #4b5160;
+}
+
+main .form .inr-input-wrapper .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    background: transparent;
+}
+
+main .form .inr-input-wrapper.field-invalid .inr-input-group {
+    border-color: var(--form-invalid-border-color, #ff5f3f);
+}
+
+main .form .inr-input-wrapper .inr-input-words-wrapper {
+    margin-top: 16px;
+}
+
+main .form .inr-input-wrapper .inr-input-words {
+    width: 100%;
+    background: #f1f2f6;
+    cursor: default;
+}

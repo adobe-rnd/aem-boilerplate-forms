@@ -1,0 +1,58 @@
+{
+    "definitions": [
+        {
+            "title": "INR Input",
+            "id": "inr-input",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                        "template": {
+                            "jcr:title": "INR Input",
+                            "fieldType": "number-input",
+                            "fd:viewType": "inr-input"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "inr-input",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
+                },
+                {
+                    "component": "number",
+                    "name": "default",
+                    "label": "Default Value",
+                    "valueType": "number"
+                },
+                {
+                    "component": "text",
+                    "name": "wordsLabel",
+                    "label": "Amount in words label",
+                    "valueType": "string"
+                },
+                {
+                    "component": "tab",
+                    "label": "Validation",
+                    "name": "validation"
+                },
+                {
+                    "...": "../../models/form-common/_number-validation-fields.json#/fields"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
+        }
+    ]
+}
