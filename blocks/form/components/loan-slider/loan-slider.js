@@ -1,53 +1,69 @@
 import { subscribe } from '../../rules/index.js';
 
-const MAX_LABELS = 6;
+const DEFAULT_SPLITS = 10;
 
-export function formatINR(value) {
-  return `₹${Number(value).toLocaleString('en-IN')}`;
+/** Formats a number using the Indian digit grouping, e.g. 500000 -> 5,00,000 */
+export function formatAmount(value) {
+  return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(value);
 }
 
-export function shortINR(value) {
-  const v = Number(value);
-  const fmt = (n, unit) => `${Number.isInteger(n) ? n : +n.toFixed(2)}${unit}`;
-  if (v >= 10000000) return fmt(v / 10000000, 'Cr');
-  if (v >= 100000) return fmt(v / 100000, 'L');
-  if (v >= 1000) return fmt(v / 1000, 'K');
-  return `${v}`;
+/** Compact label for tick marks, e.g. 50000 -> 50K, 200000 -> 2L, 20000000 -> 2Cr */
+export function formatCompact(value) {
+  const units = [[10000000, 'Cr'], [100000, 'L'], [1000, 'K']];
+  const unit = units.find(([size]) => Math.abs(value) >= size);
+  if (!unit) return `${+value.toFixed(2)}`;
+  return `${+(value / unit[0]).toFixed(2)}${unit[1]}`;
 }
 
 export function parseAmount(text) {
-  const n = parseFloat(String(text).replace(/[^\d.]/g, ''));
-  return Number.isNaN(n) ? null : n;
+  const cleaned = `${text ?? ''}`.replace(/[^0-9.-]/g, '');
+  return cleaned === '' ? NaN : Number(cleaned);
 }
 
-/** Clamps to [min, max] and snaps to the nearest split. */
-export function snap(value, min, max, step) {
-  const clamped = Math.min(max, Math.max(min, value));
-  const snapped = min + Math.round((clamped - min) / step) * step;
-  return Math.min(max, snapped);
+/** Returns equally spaced values from min to max (inclusive) */
+export function generateSplits(min, max, splits) {
+  const count = Math.max(1, Math.floor(splits) || DEFAULT_SPLITS);
+  const size = (max - min) / count;
+  return Array.from({ length: count + 1 }, (_, i) => (i === count ? max : min + size * i));
 }
 
 export default async function decorate(fieldDiv, fieldJson, container, formId) {
   const input = fieldDiv.querySelector('input');
-  const min = Number(fieldJson?.minimum ?? input.min ?? 0) || 0;
-  let max = Number(fieldJson?.maximum ?? input.max ?? 100) || 100;
-  if (max <= min) max = min + 1;
-  const stepProp = Number(fieldJson?.properties?.stepValue ?? fieldJson?.step);
-  const step = stepProp > 0 ? stepProp : (max - min) / 10;
-  const splits = Math.max(1, Math.round((max - min) / step));
+  if (!input) return fieldDiv;
+
+  let min = Number(fieldJson?.minimum ?? input.min);
+  let max = Number(fieldJson?.maximum ?? input.max);
+  if (Number.isNaN(min)) min = 0;
+  if (Number.isNaN(max) || max <= min) max = min + 100;
+  const splits = Number(fieldJson?.properties?.splits) || DEFAULT_SPLITS;
+  const step = Number(fieldJson?.properties?.stepValue) || 1;
+  const clamp = (v) => Math.min(max, Math.max(min, v));
+  const percent = (v) => ((v - min) / (max - min)) * 100;
+
+  // the original input stays the source of truth for the model, but is hidden from view
+  input.type = 'number';
+  input.min = min;
+  input.max = max;
+  input.classList.add('loan-slider-source');
+  input.hidden = true;
 
   const wrapper = document.createElement('div');
-  wrapper.className = 'loan-slider-wrapper';
+  wrapper.className = 'loan-slider-widget decorated';
 
-  const display = document.createElement('input');
-  display.type = 'text';
-  display.inputMode = 'numeric';
-  display.className = 'loan-slider-text';
-  display.id = input.id;
-  display.autocomplete = 'off';
-  input.removeAttribute('id');
-  input.type = 'hidden';
+  const textWrapper = document.createElement('div');
+  textWrapper.className = 'loan-slider-value';
+  const currency = document.createElement('span');
+  currency.className = 'loan-slider-currency';
+  currency.textContent = '₹';
+  const textBox = document.createElement('input');
+  textBox.type = 'text';
+  textBox.inputMode = 'numeric';
+  textBox.className = 'loan-slider-text';
+  textBox.setAttribute('aria-label', fieldJson?.label?.value || 'Loan amount');
+  textWrapper.append(currency, textBox);
 
+  const track = document.createElement('div');
+  track.className = 'loan-slider-track';
   const slider = document.createElement('input');
   slider.type = 'range';
   slider.className = 'loan-slider-range';
@@ -55,98 +71,95 @@ export default async function decorate(fieldDiv, fieldJson, container, formId) {
   slider.max = max;
   slider.step = step;
   slider.setAttribute('aria-label', fieldJson?.label?.value || 'Loan amount');
+  track.appendChild(slider);
 
-  const track = document.createElement('div');
-  track.className = 'loan-slider-track';
-  const ticks = document.createElement('div');
-  ticks.className = 'loan-slider-ticks';
   const labels = document.createElement('div');
   labels.className = 'loan-slider-labels';
-  const labelEvery = Math.ceil((splits + 1) / MAX_LABELS);
-  for (let i = 0; i <= splits; i += 1) {
-    const value = Math.min(max, min + i * step);
-    const pos = `--pos:${i / splits}`;
+  generateSplits(min, max, splits).forEach((value) => {
     const tick = document.createElement('span');
     tick.className = 'loan-slider-tick';
-    tick.setAttribute('style', pos);
-    ticks.append(tick);
-    if (i % labelEvery === 0 || i === splits) {
-      const label = document.createElement('span');
-      label.className = 'loan-slider-label';
-      label.setAttribute('style', pos);
-      label.textContent = shortINR(value);
-      labels.append(label);
-    }
-  }
-  track.append(ticks, slider);
-  wrapper.append(track, labels);
+    tick.style.left = `${percent(value)}%`;
+    tick.dataset.value = value;
+    tick.textContent = formatCompact(value);
+    labels.appendChild(tick);
+  });
+  const ticks = document.createElement('div');
+  ticks.className = 'loan-slider-ticks';
+  generateSplits(min, max, splits).forEach((value) => {
+    const mark = document.createElement('span');
+    mark.style.left = `${percent(value)}%`;
+    ticks.appendChild(mark);
+  });
+  track.appendChild(ticks);
 
-  const header = document.createElement('div');
-  header.className = 'loan-slider-header';
-  const label = fieldDiv.querySelector('label');
-  if (label) header.append(label);
-  header.append(display);
-  input.before(header);
+  wrapper.append(textWrapper, track, labels);
   input.after(wrapper);
 
   const render = (value) => {
-    slider.value = value;
-    display.value = formatINR(value);
-    wrapper.style.setProperty('--progress', (value - min) / (max - min));
+    const v = clamp(value);
+    slider.value = v;
+    textBox.value = formatAmount(v);
+    wrapper.style.setProperty('--loan-slider-percent', `${percent(v)}%`);
+    return v;
   };
 
   const commit = (value) => {
-    const next = snap(value, min, max, step);
-    render(next);
-    if (String(input.value) !== String(next)) {
-      input.value = next;
+    const v = render(value);
+    if (`${input.value}` !== `${v}`) {
+      input.value = v;
       input.dispatchEvent(new Event('change', { bubbles: true }));
     }
   };
 
-  slider.addEventListener('input', () => {
-    render(Number(slider.value));
+  const initial = parseAmount(input.value);
+  render(Number.isNaN(initial) ? min : initial);
+  if (Number.isNaN(initial)) input.value = '';
+
+  // keep the visible controls' events away from the form-level change handler
+  [slider, textBox].forEach((el) => el.addEventListener('change', (e) => e.stopPropagation()));
+
+  slider.addEventListener('input', () => commit(Number(slider.value)));
+
+  textBox.addEventListener('focus', () => {
+    textBox.value = `${parseAmount(textBox.value)}`;
   });
-  slider.addEventListener('change', () => commit(Number(slider.value)));
-  display.addEventListener('focus', () => {
-    display.value = display.value.replace(/[^\d.]/g, '');
-  });
-  display.addEventListener('input', () => {
-    const typed = parseAmount(display.value);
-    if (typed !== null && typed >= min && typed <= max) {
-      slider.value = snap(typed, min, max, step);
-      wrapper.style.setProperty('--progress', (slider.value - min) / (max - min));
+  const commitText = () => {
+    const parsed = parseAmount(textBox.value);
+    if (Number.isNaN(parsed)) {
+      render(parseAmount(input.value) || min);
+    } else {
+      commit(parsed);
     }
-  });
-  const onTextCommit = () => {
-    const typed = parseAmount(display.value);
-    commit(typed === null ? Number(slider.value) : typed);
   };
-  display.addEventListener('blur', onTextCommit);
-  display.addEventListener('keydown', (e) => {
+  textBox.addEventListener('blur', commitText);
+  textBox.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      onTextCommit();
+      commitText();
+    }
+  });
+  // while typing, move the slider without reformatting the text
+  textBox.addEventListener('input', () => {
+    const parsed = parseAmount(textBox.value);
+    if (!Number.isNaN(parsed)) {
+      slider.value = clamp(parsed);
+      wrapper.style.setProperty('--loan-slider-percent', `${percent(clamp(parsed))}%`);
     }
   });
 
-  const initial = parseAmount(input.value);
-  render(snap(initial ?? min, min, max, step));
-  if (initial === null) input.value = min;
+  const setEnabled = (enabled) => {
+    slider.disabled = !enabled;
+    textBox.disabled = !enabled;
+  };
+  setEnabled(fieldJson?.enabled !== false && fieldJson?.readOnly !== true);
 
-  // reflect model-driven changes (rules, prefill, reset)
-  subscribe(fieldDiv, formId, (_, fieldModel) => {
-    fieldModel?.subscribe((e) => {
-      e.payload?.changes?.forEach((change) => {
-        if (change.propertyName === 'value') {
-          const v = Number(change.currentValue);
-          if (!Number.isNaN(v) && change.currentValue !== '') {
-            input.value = v;
-            render(snap(v, min, max, step));
-          }
-        }
-      });
-    }, 'change');
-  });
+  // reflect model-driven changes (rules, reset, prefill) back into the widget
+  subscribe(fieldDiv, formId, (_el, fieldModel) => {
+    if (!fieldModel) return;
+    const value = parseAmount(fieldModel.value);
+    if (!Number.isNaN(value) && document.activeElement !== textBox) render(value);
+    setEnabled(fieldModel.enabled !== false && fieldModel.readOnly !== true);
+  }, { listenChanges: true });
+
   return fieldDiv;
 }

@@ -1,117 +1,143 @@
-.loan-slider-wrapper {
-    --thumb: 28px;
-    --accent: #eca550;
-    --rail: #d3d4d9;
-    position: relative;
-    margin-top: 16px;
+/** styling for loan slider */
+.loan-slider-widget.decorated {
+    --loan-slider-percent: 0%;
+    --loan-slider-accent: #eba54f;
+    --loan-slider-rail: #d3d4d9;
+    --loan-slider-thumb: 24px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
 }
 
-.loan-slider-header {
+main .form .loan-slider-source {
+    display: none;
+}
+
+.loan-slider-widget.decorated .loan-slider-value {
+    align-self: flex-end;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-
-main .form .loan-slider-header input.loan-slider-text {
-    width: 180px;
-    max-width: 50%;
-    padding: 14px 20px;
-    border: 1px solid #d3d4d9;
+    gap: 4px;
+    padding: 12px 20px;
+    border: 1px solid var(--loan-slider-rail);
     border-radius: 12px;
-    font-size: 20px;
-    text-align: left;
-}
-
-.loan-slider-track {
-    position: relative;
-    height: var(--thumb);
-}
-
-.loan-slider-ticks {
-    position: absolute;
-    inset: 0 calc(var(--thumb) / 2);
-    pointer-events: none;
-}
-
-.loan-slider-tick {
-    position: absolute;
-    left: calc(var(--pos) * 100%);
-    top: 50%;
-    width: 1px;
-    height: 12px;
-    transform: translate(-50%, -50%);
     background: #fff;
-    opacity: .7;
-    z-index: 1;
 }
 
-main .form .loan-slider-wrapper input.loan-slider-range {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: var(--thumb);
+.loan-slider-widget.decorated .loan-slider-currency {
+    font-size: 20px;
+}
+
+main .form .loan-slider-widget.decorated input.loan-slider-text {
+    width: 9ch;
     margin: 0;
     padding: 0;
     border: none;
+    outline: none;
+    background: transparent;
+    font-size: 20px;
+}
+
+.loan-slider-widget.decorated .loan-slider-track {
+    position: relative;
+    height: var(--loan-slider-thumb);
+}
+
+main .form .loan-slider-widget.decorated input.loan-slider-range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
     appearance: none;
     background: transparent;
     cursor: pointer;
 }
 
-.loan-slider-range::-webkit-slider-runnable-track {
-    height: 10px;
-    border-radius: 5px;
-    background: linear-gradient(to right, var(--accent) calc(var(--progress) * (100% - var(--thumb)) + var(--thumb) / 2), var(--rail) 0);
+main .form .loan-slider-widget.decorated input.loan-slider-range:focus {
+    outline: none;
 }
 
-.loan-slider-range::-moz-range-track {
+.loan-slider-widget.decorated input.loan-slider-range::-webkit-slider-runnable-track {
     height: 10px;
     border-radius: 5px;
-    background: var(--rail);
+    background: linear-gradient(to right, var(--loan-slider-accent) var(--loan-slider-percent), var(--loan-slider-rail) var(--loan-slider-percent));
 }
 
-.loan-slider-range::-moz-range-progress {
+.loan-slider-widget.decorated input.loan-slider-range::-moz-range-track {
     height: 10px;
     border-radius: 5px;
-    background: var(--accent);
+    background: linear-gradient(to right, var(--loan-slider-accent) var(--loan-slider-percent), var(--loan-slider-rail) var(--loan-slider-percent));
 }
 
-.loan-slider-range::-webkit-slider-thumb {
+.loan-slider-widget.decorated input.loan-slider-range::-webkit-slider-thumb {
     appearance: none;
-    width: var(--thumb);
-    height: var(--thumb);
-    margin-top: -9px;
+    width: var(--loan-slider-thumb);
+    height: var(--loan-slider-thumb);
+    margin-top: -7px;
     border: none;
     border-radius: 50%;
-    background: var(--accent);
-    position: relative;
-    z-index: 2;
+    background: var(--loan-slider-accent);
 }
 
-.loan-slider-range::-moz-range-thumb {
-    width: var(--thumb);
-    height: var(--thumb);
+.loan-slider-widget.decorated input.loan-slider-range::-moz-range-thumb {
+    width: var(--loan-slider-thumb);
+    height: var(--loan-slider-thumb);
     border: none;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--loan-slider-accent);
 }
 
-.loan-slider-range:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
+.loan-slider-widget.decorated input.loan-slider-range:focus-visible::-webkit-slider-thumb {
+    outline: 3px solid rgb(235 165 79 / 40%);
 }
 
-.loan-slider-labels {
+.loan-slider-widget.decorated input.loan-slider-range:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* inset by half a thumb so marks line up with the thumb centre */
+.loan-slider-widget.decorated .loan-slider-ticks,
+.loan-slider-widget.decorated .loan-slider-labels {
     position: relative;
-    height: 24px;
-    margin: 8px calc(var(--thumb) / 2) 0;
-    color: #6b7280;
-    font-size: 16px;
+    margin: 0 calc(var(--loan-slider-thumb) / 2);
 }
 
-.loan-slider-label {
+.loan-slider-widget.decorated .loan-slider-ticks {
     position: absolute;
-    left: calc(var(--pos) * 100%);
+    inset: 0 calc(var(--loan-slider-thumb) / 2);
+    margin: 0;
+    pointer-events: none;
+}
+
+.loan-slider-widget.decorated .loan-slider-ticks span {
+    position: absolute;
+    top: 50%;
+    width: 1px;
+    height: 12px;
+    transform: translate(-50%, -50%);
+    background: rgb(0 0 0 / 15%);
+}
+
+.loan-slider-widget.decorated .loan-slider-labels {
+    height: 22px;
+}
+
+.loan-slider-widget.decorated .loan-slider-tick {
+    position: absolute;
     transform: translateX(-50%);
+    font-size: 14px;
+    line-height: 22px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+@media (width <= 600px) {
+    .loan-slider-widget.decorated .loan-slider-tick:nth-child(even) {
+        display: none;
+    }
 }

@@ -4732,10 +4732,10 @@
       },
       {
         "component": "number",
-        "name": "stepValue",
-        "label": "Split Amount (step)",
+        "name": "splits",
+        "label": "Number of Splits",
         "valueType": "number",
-        "description": "Amount between two consecutive splits. Min and Max come from the validation tab."
+        "description": "Number of equal splits between min and max"
       },
       {
         "component": "tab",
