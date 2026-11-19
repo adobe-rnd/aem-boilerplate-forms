@@ -41,6 +41,9 @@
       "id": "custom-components",
       "components": [
         {
+          "...": "../blocks/form/components/image-choice/_image-choice.json#/definitions"
+        },
+        {
           "...": "../blocks/form/components/range/_range.json#/definitions"
         }
       ]

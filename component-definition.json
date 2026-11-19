@@ -669,6 +669,32 @@
       "id": "custom-components",
       "components": [
         {
+          "title": "Image choice",
+          "id": "image-choice",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                "template": {
+                  "jcr:title": "Image choice",
+                  "fieldType": "checkbox-group",
+                  "enum": [
+                    "0",
+                    "1"
+                  ],
+                  "enumNames": [
+                    "Option 1",
+                    "Option 2"
+                  ],
+                  "orientation": "horizontal",
+                  "type": "string[]",
+                  "fd:viewType": "image-choice"
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Range",
           "id": "range",
           "plugins": {

@@ -45,6 +45,7 @@ blocks/form/
 ├── components/                       — Custom component decorators
 │   ├── accordion/
 │   ├── file/
+│   ├── image-choice/
 │   ├── modal/
 │   ├── password/
 │   ├── rating/
