@@ -724,7 +724,9 @@
                     "Option 2"
                   ],
                   "type": "string[]",
-                  "orientation": "horizontal"
+                  "selectionMode": "single",
+                  "columns": 4,
+                  "showLabels": false
                 }
               }
             }

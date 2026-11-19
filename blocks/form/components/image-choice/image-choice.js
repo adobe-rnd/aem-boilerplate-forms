@@ -1,55 +1,75 @@
-function parseImageUrls(urls) {
-  if (Array.isArray(urls)) return urls.map((u) => String(u).trim());
-  if (typeof urls === 'string') return urls.split(/[\n,]/).map((u) => u.trim());
-  return [];
+import { subscribe } from '../../rules/index.js';
+
+function parseUrls(imageUrls) {
+  if (Array.isArray(imageUrls)) return imageUrls;
+  return String(imageUrls || '').split(/\r?\n/).map((url) => url.trim());
 }
 
-export default function decorate(fieldDiv, fieldJson) {
-  const props = fieldJson?.properties || {};
-  const isSingle = props.selectionMode !== 'multiple';
-  const showLabels = props.showLabels === true || props.showLabels === 'true';
-  const images = parseImageUrls(props.imageUrls);
-
-  const sizeClasses = { small: 'image-choice-small', large: 'image-choice-large' };
+function enhanceOptions(fieldDiv, props) {
+  const urls = parseUrls(props.imageUrls);
+  const single = props.selectionMode !== 'multi';
   fieldDiv.classList.add('image-choice');
-  if (sizeClasses[props.imageSize]) fieldDiv.classList.add(sizeClasses[props.imageSize]);
-  fieldDiv.dataset.selectionMode = isSingle ? 'single' : 'multiple';
+  fieldDiv.classList.toggle('image-choice-labels', props.showLabels === true || props.showLabels === 'true');
+  fieldDiv.style.setProperty('--image-choice-columns', Math.max(1, Number(props.columns) || 4));
+  if (single) fieldDiv.setAttribute('role', 'radiogroup');
+  else fieldDiv.removeAttribute('role');
 
-  // Core rebuilds the options on enum changes, so enhancement must be idempotent.
-  const enhance = () => {
-    fieldDiv.querySelectorAll(':scope > .checkbox-wrapper').forEach((option, index) => {
-      if (option.dataset.imageChoiceOption) return;
-      const label = option.querySelector('label');
-      if (!label) return;
-      const text = label.textContent.trim();
-      const text$ = document.createElement('span');
-      text$.className = showLabels ? 'image-choice-label' : 'image-choice-label visually-hidden';
-      text$.textContent = text;
-      label.replaceChildren(text$);
-      if (images[index]) {
-        const img = document.createElement('img');
-        img.src = images[index];
-        img.alt = text;
-        img.loading = 'lazy';
-        img.className = 'image-choice-image';
-        label.prepend(img);
-      }
-      option.dataset.imageChoiceOption = 'true';
-      option.classList.add('image-choice-option');
-    });
-  };
+  fieldDiv.querySelectorAll(':scope > div').forEach((option, index) => {
+    const input = option.querySelector('input[type="checkbox"]');
+    const label = option.querySelector('label');
+    if (!input || !label) return;
+    option.classList.add('image-choice-option');
+    if (single) input.setAttribute('role', 'radio');
+    else input.removeAttribute('role');
+    if (option.querySelector('.image-choice-image')) return;
+    const text = document.createElement('span');
+    text.className = 'image-choice-text';
+    text.textContent = label.textContent;
+    label.replaceChildren(text);
+    if (urls[index]) {
+      const img = document.createElement('img');
+      img.className = 'image-choice-image';
+      img.src = urls[index];
+      img.alt = '';
+      img.loading = 'lazy';
+      label.prepend(img);
+    }
+  });
+}
 
-  enhance();
-  new MutationObserver(enhance).observe(fieldDiv, { childList: true });
+export default function decorate(fieldDiv, fieldJson, container, formId) {
+  const props = fieldJson?.properties || {};
+  const isSingle = () => props.selectionMode !== 'multi';
+  let model = null;
 
-  // Runs before the form-level handler so the group value is computed from the final state.
+  // the core re-renders the options when enum/enumNames change, so re-apply the decoration
+  const observer = new MutationObserver(() => {
+    observer.disconnect();
+    enhanceOptions(fieldDiv, props);
+    observer.observe(fieldDiv, { childList: true });
+  });
+  enhanceOptions(fieldDiv, props);
+  observer.observe(fieldDiv, { childList: true });
+
+  // runs before the form-level change handler, so the model receives the final selection
   fieldDiv.addEventListener('change', (e) => {
-    const input = e.target;
-    if (!isSingle || input.type !== 'checkbox' || !input.checked) return;
-    fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((other) => {
-      if (other !== input) other.checked = false;
+    const { target } = e;
+    if (!isSingle() || target.type !== 'checkbox' || !target.checked) return;
+    fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+      if (input !== target) input.checked = false;
     });
   });
+
+  subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
+    if (eventType === 'register') {
+      model = fieldModel;
+    } else if (eventType === 'change' && isSingle()) {
+      const change = payload?.changes?.find((c) => c.propertyName === 'value');
+      if (Array.isArray(change?.currentValue) && change.currentValue.length > 1) {
+        model.value = [change.currentValue[0]];
+      }
+    }
+  }, { listenChanges: true });
 
   return fieldDiv;
 }

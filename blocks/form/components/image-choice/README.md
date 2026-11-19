@@ -1,30 +1,30 @@
 # Image Choice
 
-A checkbox-group rendered as a grid of selectable images (e.g. "Select your team"), configurable as single or multiple choice.
+A tile picker where each option is an image (for example team logos); the author chooses whether one or several can be selected.
 
 ## How to Use
 
-Add an **Image Choice** component, define the options (`enum` / `enumNames`), and provide one image URL per option, in the same order.
+Add an **Image Choice** component, enter the options (data value and display value) and list one image URL per line in **Image URLs**, in the same order as the options.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `selectionMode` | `single` (default) or `multiple` |
-| `imageUrls` | Image URL for each option, same order as the options |
-| `imageSize` | `small`, `medium` (default) or `large` |
-| `showLabels` | Show the option text under the image (otherwise it is visually hidden but kept as the image alt text/accessible name) |
+| `enum` / `enumNames` | Option values and names. Names are used as the accessible label |
+| `selectionMode` | `single` (default) or `multi` |
+| `imageUrls` | One image URL per line, matching the option order |
+| `columns` | Number of tiles per row (default 4; capped at 3 on narrow screens) |
+| `showLabels` | Show the option name under the image. Hidden visually (still read by screen readers) when off |
 
 ## Model Subscriptions
 
-None. Model → UI sync (checked state, enum changes) is handled by the form block; the component only enhances the rendered options.
+Listens to `value` changes. In `single` mode, if a rule sets more than one value, only the first is kept.
 
 ## Model Properties Set
 
-`value` is an array (`string[]` by default), committed on each native `change` of an option, so change rules fire once per click. In single mode the array holds at most one item; clicking the selected image again clears it.
+`value` is always an array (`string[]` or `number[]`). In `single` mode it holds at most one entry; clicking the selected tile again clears it. The value is committed on the native `change` of the clicked option, so field change rules fire once per click.
 
 ## Usage Notes
 
-- Base type: `checkbox-group`; `fd:viewType`: `image-choice`.
-- Options remain native, visually hidden checkboxes, so keyboard (Tab, Space) and screen readers work. Required/min/max validation of the base type still applies.
-- Options re-render correctly when `enum`/`enumNames` change.
+- Base type: `checkbox-group`, `fd:viewType`: `image-choice`.
+- The native checkboxes stay in the DOM (visually hidden over the tile), so keyboard (Tab, Space) and screen readers work. In single mode they expose `role="radio"` inside a `radiogroup`.

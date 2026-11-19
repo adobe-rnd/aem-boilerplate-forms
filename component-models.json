@@ -4203,83 +4203,10 @@
             "value": "string[]"
           },
           {
-            "name": "Boolean",
-            "value": "boolean[]"
-          },
-          {
             "name": "Number",
             "value": "number[]"
           }
         ]
-      },
-      {
-        "component": "radio-group",
-        "label": "Display Options",
-        "name": "orientation",
-        "valueType": "string",
-        "value": "horizontal",
-        "options": [
-          {
-            "name": "Horizontally",
-            "value": "horizontal"
-          },
-          {
-            "name": "Vertically",
-            "value": "vertical"
-          }
-        ]
-      },
-      {
-        "component": "select",
-        "name": "selectionMode",
-        "label": "Selection Mode",
-        "valueType": "string",
-        "value": "single",
-        "options": [
-          {
-            "name": "Single choice",
-            "value": "single"
-          },
-          {
-            "name": "Multiple choice",
-            "value": "multiple"
-          }
-        ]
-      },
-      {
-        "component": "text",
-        "name": "imageUrls",
-        "label": "Option Images (URL, same order as options)",
-        "valueType": "string",
-        "multi": true
-      },
-      {
-        "component": "select",
-        "name": "imageSize",
-        "label": "Image Size",
-        "valueType": "string",
-        "value": "medium",
-        "options": [
-          {
-            "name": "Small",
-            "value": "small"
-          },
-          {
-            "name": "Medium",
-            "value": "medium"
-          },
-          {
-            "name": "Large",
-            "value": "large"
-          }
-        ]
-      },
-      {
-        "component": "boolean",
-        "name": "showLabels",
-        "label": "Show option labels",
-        "valueType": "boolean",
-        "value": false
       },
       {
         "component": "tab",
@@ -4305,6 +4232,48 @@
         "label": "Script validation message",
         "valueType": "string",
         "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
+        "label": "Custom Properties",
+        "name": "custom"
+      },
+      {
+        "component": "radio-group",
+        "name": "selectionMode",
+        "label": "Selection mode",
+        "valueType": "string",
+        "value": "single",
+        "options": [
+          {
+            "name": "Single",
+            "value": "single"
+          },
+          {
+            "name": "Multiple",
+            "value": "multi"
+          }
+        ]
+      },
+      {
+        "component": "textarea",
+        "name": "imageUrls",
+        "label": "Image URLs",
+        "valueType": "string",
+        "description": "One image URL per line, in the same order as the options."
+      },
+      {
+        "component": "number",
+        "name": "columns",
+        "label": "Columns",
+        "valueType": "number",
+        "value": 4
+      },
+      {
+        "component": "boolean",
+        "name": "showLabels",
+        "label": "Show option labels",
+        "valueType": "boolean"
       },
       {
         "component": "tab",

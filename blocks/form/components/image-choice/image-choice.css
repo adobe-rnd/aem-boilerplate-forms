@@ -1,38 +1,23 @@
-main .form .image-choice {
-    --image-choice-size: 96px;
-    --image-choice-selected-color: var(--link-color, #1473e6);
-}
-
-main .form .image-choice-small {
-    --image-choice-size: 64px;
-}
-
-main .form .image-choice-large {
-    --image-choice-size: 140px;
-}
-
-main .form .image-choice.image-choice {
-    display: flex;
-    flex-wrap: wrap;
+/** styling for image-choice */
+main .form fieldset.image-choice {
+    display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns, 4), minmax(0, 1fr));
     gap: 16px;
-    justify-content: center;
+    border: none;
+    padding: 0;
 }
 
-main .form .image-choice > legend {
-    flex-basis: 100%;
-    text-align: center;
+main .form fieldset.image-choice > legend,
+main .form fieldset.image-choice > .field-description {
+    grid-column: 1 / -1;
 }
 
-main .form .image-choice > .field-description {
-    flex-basis: 100%;
-}
-
-main .form .image-choice .image-choice-option {
+main .form fieldset.image-choice > .image-choice-option {
     position: relative;
     margin: 0;
 }
 
-main .form .image-choice .image-choice-option > input {
+main .form fieldset.image-choice .image-choice-option input[type="checkbox"] {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -42,59 +27,64 @@ main .form .image-choice .image-choice-option > input {
     cursor: pointer;
 }
 
-main .form .image-choice .image-choice-option > label {
+main .form fieldset.image-choice .image-choice-option label {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    box-sizing: border-box;
-    width: calc(var(--image-choice-size) + 24px);
-    min-height: calc(var(--image-choice-size) + 24px);
-    padding: 12px;
     justify-content: center;
+    gap: 8px;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 12px;
     border: 2px solid transparent;
     border-radius: 8px;
     text-align: center;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    pointer-events: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-main .form .image-choice .image-choice-image {
-    width: var(--image-choice-size);
-    height: var(--image-choice-size);
+main .form fieldset.image-choice .image-choice-option label::before,
+main .form fieldset.image-choice .image-choice-option label::after {
+    display: none;
+}
+
+main .form fieldset.image-choice .image-choice-image {
+    width: 100%;
+    max-height: 96px;
     object-fit: contain;
 }
 
-main .form .image-choice.field-invalid .image-choice-option > label {
-    border-color: var(--form-error-color, #d31510);
-}
-
-main .form .image-choice .image-choice-option > input:hover + label {
-    border-color: #ccc;
-}
-
-main .form .image-choice .image-choice-option > input:checked + label {
-    border-color: var(--image-choice-selected-color);
-    box-shadow: 0 0 0 2px var(--image-choice-selected-color);
-}
-
-main .form .image-choice .image-choice-option > input:focus-visible + label {
-    outline: 2px solid var(--image-choice-selected-color);
-    outline-offset: 2px;
-}
-
-main .form .image-choice .image-choice-option > input:disabled {
-    cursor: not-allowed;
-}
-
-main .form .image-choice .image-choice-option > input:disabled + label {
-    opacity: 0.5;
-}
-
-main .form .image-choice .visually-hidden {
+main .form fieldset.image-choice:not(.image-choice-labels) .image-choice-text {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
-    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
     white-space: nowrap;
+}
+
+main .form fieldset.image-choice .image-choice-option:hover label {
+    border-color: #c5c5c5;
+}
+
+main .form fieldset.image-choice .image-choice-option input:checked + label {
+    border-color: var(--link-color, #035fe6);
+    background-color: rgb(3 95 230 / 8%);
+}
+
+main .form fieldset.image-choice .image-choice-option input:focus-visible + label {
+    outline: 2px solid var(--link-color, #035fe6);
+    outline-offset: 2px;
+}
+
+main .form fieldset.image-choice .image-choice-option input:disabled,
+main .form fieldset.image-choice .image-choice-option input:disabled + label {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+@media (width <= 600px) {
+    main .form fieldset.image-choice {
+        grid-template-columns: repeat(min(var(--image-choice-columns, 4), 3), minmax(0, 1fr));
+    }
 }
