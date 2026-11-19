@@ -1,0 +1,35 @@
+{
+  "id": "card-choice-test-form",
+  "fieldType": "form",
+  "title": "card-choice e2e test",
+  "action": "/adobe/forms/af/submit/card-choice-test-form",
+  "properties": {},
+  "items": [
+    {
+      "id": "field-under-test",
+      "name": "fieldUnderTest",
+      "fieldType": "text-input",
+      ":type": "card-choice",
+      "visible": true,
+      "enabled": true,
+      "label": {
+        "value": "Card Choice",
+        "visible": true
+      },
+      "properties": {}
+    },
+    {
+      "id": "next-field",
+      "name": "nextField",
+      "fieldType": "text-input",
+      "label": {
+        "value": "Next field"
+      }
+    }
+  ],
+  "events": {
+    "initialize": [
+      "dispatchEvent($form.fieldUnderTest, 'custom:setProperty', {properties: {cards: `[{\"title\": \"Card 1\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Retail\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 2\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Retail\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 3\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Retail\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 4\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Retail\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 5\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Business\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}, {\"title\": \"Card 6\", \"subtitle\": \"Best Card for Rewards\", \"category\": \"Business\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - 500/-\"], \"linkText\": \"All Features & Benefits\", \"link\": \"https://example.com\", \"amountLabel\": \"Min. FD Amount\", \"amount\": \"\\u20b9 15,000/-\"}]`}})"
+    ]
+  }
+}
