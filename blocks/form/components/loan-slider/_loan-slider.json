@@ -1,0 +1,67 @@
+{
+    "definitions": [
+      {
+        "title": "Loan Slider",
+        "id": "loan-slider",
+        "plugins": {
+          "xwalk": {
+            "page": {
+              "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+              "template": {
+                "jcr:title": "Loan Amount",
+                "fieldType": "number-input",
+                "fd:viewType": "loan-slider",
+                "enabled": true,
+                "visible": true
+              }
+            }
+          }
+        }
+      }
+    ],
+    "models": [
+      {
+        "id": "loan-slider",
+        "fields": [
+          {
+            "component": "tab",
+            "label": "Basic",
+            "name": "basic"
+          },
+          {
+            "...": "../../models/form-common/_basic-input-fields.json#/fields"
+          },
+          {
+            "component": "tab",
+            "label": "Validation",
+            "name": "validation"
+          },
+          {
+            "...": "../../models/form-common/_number-validation-fields.json#/fields"
+          },
+          {
+            "component": "tab",
+            "label": "Custom Properties",
+            "name": "custom"
+          },
+          {
+            "component": "number",
+            "name": "splits",
+            "label": "Number of Splits",
+            "valueType": "number",
+            "description": "Number of equal splits between minimum and maximum (default 10)"
+          },
+          {
+            "component": "number",
+            "name": "stepValue",
+            "label": "Step Value",
+            "valueType": "number",
+            "description": "Granularity of the slider (default 1)"
+          },
+          {
+            "...": "../../models/form-common/_help-container.json#/fields"
+          }
+        ]
+      }
+    ]
+}
