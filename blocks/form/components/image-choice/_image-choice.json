@@ -1,0 +1,93 @@
+{
+    "definitions": [
+        {
+            "title": "Image Choice",
+            "id": "image-choice",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+                        "template": {
+                            "jcr:title": "Image Choice",
+                            "fieldType": "checkbox-group",
+                            "fd:viewType": "image-choice",
+                            "enum": [
+                                "0",
+                                "1"
+                            ],
+                            "enumNames": [
+                                "Item 1",
+                                "Item 2"
+                            ],
+                            "type": "string[]"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "image-choice",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-select-fields.json#/fields"
+                },
+                {
+                    "component": "text",
+                    "name": "imageUrls",
+                    "label": "Option images (URL or path, same order as options)",
+                    "valueType": "string",
+                    "multi": true
+                },
+                {
+                    "component": "select",
+                    "name": "selectionMode",
+                    "label": "Selection mode",
+                    "valueType": "string",
+                    "value": "single",
+                    "options": [
+                        {
+                            "name": "Single",
+                            "value": "single"
+                        },
+                        {
+                            "name": "Multiple",
+                            "value": "multiple"
+                        }
+                    ]
+                },
+                {
+                    "component": "number",
+                    "name": "columns",
+                    "label": "Columns",
+                    "valueType": "number",
+                    "value": 4
+                },
+                {
+                    "component": "boolean",
+                    "name": "showLabels",
+                    "label": "Show option labels",
+                    "valueType": "boolean",
+                    "value": false
+                },
+                {
+                    "component": "tab",
+                    "label": "Validation",
+                    "name": "validation"
+                },
+                {
+                    "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
+        }
+    ]
+}
