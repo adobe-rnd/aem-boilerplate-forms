@@ -1,36 +1,45 @@
 # Card Choice
 
-Horizontally scrollable carousel of cards populated by a rule. Selecting a card stores its details in the field's model value.
+Horizontally scrollable carousel of cards (name, tagline, image, features, benefits link, minimum amount, call-to-action) that lets the user pick one card.
 
 ## How to Use
 
-Add **Card choice** to a form. In a rule, set the `cards` property of the field, for example `setProperty(field, { properties: { cards: [...] } })`. Cards can also be provided via the field's `properties.cards` in the form JSON. The data may be an array or a JSON string of an array.
+Add the **Card choice** component to a form. Cards are supplied at runtime by a rule or custom function that sets the `cards` property on the field, e.g. `globals.functions.setProperty(field, { properties: { cards: [...] } })`.
 
 ## Authoring Properties
 
-Standard text-input properties (label, required, help text). Card data is supplied at runtime, not authored.
+Only the standard text-input properties (name, title, visibility, enabled, read-only, column span, help text). Card data is not authored; it comes from the rule.
 
-| Card key | Description |
-|----------|-------------|
-| `id` | Unique key used to match the selection (falls back to `name`, then index) |
-| `name`, `tagline` | Title and subtitle |
-| `image`, `imageAlt` | Card image URL and alt text |
-| `features` | Array of strings (or `{ text }`) |
-| `linkText`, `linkUrl` | "All Features & Benefits" link (http(s), relative or `#` URLs only) |
-| `minAmountLabel`, `minAmount` | Amount box (display text) |
-| `buttonLabel` | Select button label (default "Get This Card") |
-| `category` | Optional; two or more categories render filter tabs |
+## Cards Data Shape
+
+```json
+[{
+  "id": "freedom",
+  "name": "Freedom",
+  "tagline": "Best Card for Rewards & Offers",
+  "image": "https://.../freedom.png",
+  "imageAlt": "Freedom card",
+  "features": ["Upto 10X CashPoints", { "icon": "https://.../icon.svg", "text": "Joining Fees - ₹500/-" }],
+  "link": { "label": "All Features & Benefits", "url": "https://..." },
+  "minAmountLabel": "Min. FD Amount",
+  "minAmount": 15000,
+  "ctaLabel": "Get This Card"
+}]
+```
+
+`id` identifies the card (falls back to `name`). A numeric `minAmount` is shown as `₹ 15,000/-`; a string is shown as is. All keys except `name` are optional.
 
 ## Model Subscriptions
 
-- `properties` change: re-renders cards from `properties.cards`.
-- `value` change: highlights the matching card.
+- `properties.cards` (or `properties`): re-renders the cards.
+- `value`: highlights the card matching the model value.
+- `enabled` / `readOnly`: enables or disables the select buttons.
 
 ## Model Properties Set
 
-`model.value` is the selected card as a JSON string (`JSON.parse` it in rules). It is committed on click via the input's native `change` event, so change rules fire once per selection. Clearing the value clears the highlight.
+On clicking a card's button, the input's `change` event is dispatched once; `model.value` becomes the JSON string of the selected card object (`JSON.parse` it in rules). Change rules fire once per selection. Re-selecting the same card is a no-op.
 
 ## Usage Notes
 
 - Base type: `text-input`; `fd:viewType`: `card-choice`.
-- Carousel uses CSS scroll-snap with previous/next buttons, page dots and arrow-key scrolling.
+- Carousel uses CSS scroll-snap: swipe/drag, prev/next buttons, arrow keys on the track, and pagination dots.

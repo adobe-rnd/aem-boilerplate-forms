@@ -1,6 +1,6 @@
 import { subscribe } from '../../rules/index.js';
 
-const ALL = 'All';
+const CARDS_PROPERTY = 'cards';
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -9,224 +9,212 @@ function el(tag, className, text) {
   return node;
 }
 
-function parseCards(raw) {
-  let data = raw;
-  if (typeof data === 'string') {
+function parseCards(data) {
+  let cards = data;
+  if (typeof cards === 'string') {
     try {
-      data = JSON.parse(data);
+      cards = JSON.parse(cards);
     } catch (e) {
       return [];
     }
   }
-  return Array.isArray(data) ? data.filter((c) => c && typeof c === 'object') : [];
-}
-
-function safeUrl(url) {
-  return typeof url === 'string' && /^(https?:\/\/|\/|#)/i.test(url) ? url : null;
+  return Array.isArray(cards) ? cards.filter((card) => card && typeof card === 'object') : [];
 }
 
 function cardKey(card, index) {
   return String(card.id ?? card.name ?? index);
 }
 
-function parseSelection(value) {
+function parseSelected(value) {
   if (!value) return null;
   try {
-    const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+    const parsed = JSON.parse(value);
     return parsed && typeof parsed === 'object' ? parsed : null;
   } catch (e) {
     return null;
   }
 }
 
-function buildCard(card, key, onSelect) {
-  const item = el('li', 'card-choice-card');
-  item.dataset.cardKey = key;
-  item.append(el('h3', 'card-choice-card-title', card.name));
-  if (card.tagline) item.append(el('p', 'card-choice-card-tagline', card.tagline));
-  if (card.image) {
-    const img = el('img', 'card-choice-card-image');
-    img.src = card.image;
-    img.alt = card.imageAlt || card.name || '';
-    img.loading = 'lazy';
+function formatAmount(amount) {
+  if (typeof amount === 'number') return `₹ ${amount.toLocaleString('en-IN')}/-`;
+  return amount;
+}
+
+function createFeature(feature) {
+  const item = el('li', 'card-choice-feature');
+  const text = typeof feature === 'object' ? feature.text : feature;
+  const icon = typeof feature === 'object' ? feature.icon : null;
+  if (icon) {
+    const img = el('img', 'card-choice-feature-icon');
+    img.src = icon;
+    img.alt = '';
     item.append(img);
+  } else {
+    item.append(el('span', 'card-choice-feature-icon card-choice-feature-icon-default'));
   }
-  if (Array.isArray(card.features) && card.features.length) {
-    const list = el('ul', 'card-choice-card-features');
-    card.features.forEach((f) => list.append(el('li', '', typeof f === 'object' ? f?.text : f)));
-    item.append(list);
-  }
-  if (card.linkText) {
-    const href = safeUrl(card.linkUrl);
-    const link = el(href ? 'a' : 'span', 'card-choice-card-link', card.linkText);
-    if (href) link.href = href;
-    item.append(link);
-  }
-  if (card.minAmount !== undefined && card.minAmount !== null) {
-    const amount = el('div', 'card-choice-card-amount');
-    amount.append(
-      el('span', 'card-choice-card-amount-label', card.minAmountLabel || 'Min. FD Amount'),
-      el('span', 'card-choice-card-amount-value', card.minAmount),
-    );
-    item.append(amount);
-  }
-  const button = el('button', 'card-choice-card-select', card.buttonLabel || 'Get This Card');
-  button.type = 'button';
-  button.addEventListener('click', onSelect);
-  item.append(button);
+  item.append(el('span', 'card-choice-feature-text', text));
   return item;
 }
 
-export default function decorate(fieldDiv, fieldJson, container, formId) {
-  const input = fieldDiv.querySelector('input, textarea');
-  if (input) input.hidden = true;
+function createCard(card, index, selected, enabled, onSelect) {
+  const article = el('article', 'card-choice-card');
+  article.dataset.cardKey = cardKey(card, index);
+  article.append(el('h3', 'card-choice-title', card.name));
+  if (card.tagline) article.append(el('p', 'card-choice-tagline', card.tagline));
+  if (card.image) {
+    const img = el('img', 'card-choice-image');
+    img.src = card.image;
+    img.alt = card.imageAlt || card.name || '';
+    img.loading = 'lazy';
+    article.append(img);
+  }
+  if (Array.isArray(card.features) && card.features.length) {
+    const list = el('ul', 'card-choice-features');
+    card.features.forEach((feature) => list.append(createFeature(feature)));
+    article.append(list);
+  }
+  if (card.link?.url || card.link?.label) {
+    const link = el('a', 'card-choice-link', card.link.label || 'All Features & Benefits');
+    link.href = card.link.url || '#';
+    article.append(link);
+  }
+  if (card.minAmount !== undefined && card.minAmount !== null) {
+    const amount = el('div', 'card-choice-amount');
+    amount.append(
+      el('span', 'card-choice-amount-label', card.minAmountLabel || 'Min. FD Amount'),
+      el('span', 'card-choice-amount-value', formatAmount(card.minAmount)),
+    );
+    article.append(amount);
+  }
+  const button = el('button', 'card-choice-select', card.ctaLabel || 'Get This Card');
+  button.type = 'button';
+  button.disabled = !enabled;
+  button.setAttribute('aria-pressed', 'false');
+  button.addEventListener('click', () => onSelect(card));
+  article.append(button);
+  if (selected) article.classList.add('selected');
+  return article;
+}
 
-  const root = el('div', 'card-choice');
-  const tabs = el('div', 'card-choice-tabs');
-  tabs.setAttribute('role', 'tablist');
-  const viewport = el('div', 'card-choice-viewport');
-  const track = el('ul', 'card-choice-track');
+export default function decorate(fieldDiv, fieldJson, container, formId) {
+  const input = fieldDiv.querySelector('input');
+  input.type = 'hidden';
+  fieldDiv.classList.add('card-choice-wrapper');
+
+  const widget = el('div', 'card-choice-widget');
+  const prev = el('button', 'card-choice-nav card-choice-prev');
+  const next = el('button', 'card-choice-nav card-choice-next');
+  [[prev, 'Previous cards', '‹'], [next, 'Next cards', '›']].forEach(([btn, label, glyph]) => {
+    btn.type = 'button';
+    btn.setAttribute('aria-label', label);
+    btn.textContent = glyph;
+  });
+  const track = el('div', 'card-choice-track');
   track.tabIndex = 0;
-  const prev = el('button', 'card-choice-nav card-choice-prev', '‹');
-  const next = el('button', 'card-choice-nav card-choice-next', '›');
-  prev.type = 'button';
-  next.type = 'button';
-  prev.setAttribute('aria-label', 'Previous cards');
-  next.setAttribute('aria-label', 'Next cards');
+  track.setAttribute('role', 'group');
+  track.setAttribute('aria-label', 'Cards');
   const dots = el('div', 'card-choice-dots');
-  viewport.append(prev, track, next);
-  root.append(tabs, viewport, dots);
-  const anchor = input || fieldDiv.querySelector('.field-description');
-  if (anchor) anchor.after(root);
-  else fieldDiv.append(root);
+  widget.append(prev, track, next, dots);
+  input.after(widget);
 
   let model = null;
-  let cards = parseCards(fieldJson?.properties?.cards);
-  let category = ALL;
-  let selectedKey = null;
+  let cards = parseCards(fieldJson?.properties?.[CARDS_PROPERTY]);
+  let enabled = fieldJson?.enabled !== false && fieldJson?.readOnly !== true;
 
-  const pageWidth = () => track.clientWidth || 1;
+  const pageCount = () => Math.max(
+    1,
+    Math.ceil(track.scrollWidth / Math.max(track.clientWidth, 1) - 0.05),
+  );
 
   const updateNav = () => {
-    const max = track.scrollWidth - track.clientWidth;
+    const maxScroll = track.scrollWidth - track.clientWidth;
     prev.hidden = track.scrollLeft <= 1;
-    next.hidden = max <= 1 || track.scrollLeft >= max - 1;
-    const pages = Math.max(1, Math.ceil(track.scrollWidth / pageWidth() - 0.05));
-    const ratio = max <= 1 ? 0 : track.scrollLeft / max;
-    const current = Math.min(pages - 1, Math.round(ratio * (pages - 1)));
+    next.hidden = maxScroll <= 1 || track.scrollLeft >= maxScroll - 1;
+    const pages = pageCount();
+    const atEnd = maxScroll > 0 && track.scrollLeft >= maxScroll - 1;
+    const page = atEnd
+      ? pages - 1
+      : Math.min(pages - 1, Math.round(track.scrollLeft / Math.max(track.clientWidth, 1)));
     dots.hidden = pages <= 1;
     if (dots.children.length !== pages) {
-      dots.replaceChildren(...Array.from({ length: pages }, (_, i) => {
-        const dot = el('button', 'card-choice-dot');
-        dot.type = 'button';
-        dot.setAttribute('aria-label', `Go to page ${i + 1}`);
-        dot.addEventListener('click', () => track.scrollTo({ left: i * pageWidth(), behavior: 'smooth' }));
-        return dot;
-      }));
+      dots.replaceChildren(...Array.from({ length: pages }, () => el('span', 'card-choice-dot')));
     }
-    Array.from(dots.children).forEach((d, i) => d.classList.toggle('active', i === current));
+    Array.from(dots.children).forEach((dot, i) => dot.classList.toggle('active', i === page));
   };
 
-  const markSelected = () => {
-    track.querySelectorAll('.card-choice-card').forEach((c) => {
-      const on = c.dataset.cardKey === selectedKey;
-      c.classList.toggle('selected', on);
-      c.querySelector('.card-choice-card-select').setAttribute('aria-pressed', String(on));
-    });
+  const scrollByPage = (direction) => {
+    track.scrollBy({ left: direction * track.clientWidth * 0.9, behavior: 'smooth' });
   };
-
-  const select = (card, key) => {
-    selectedKey = key;
-    markSelected();
-    const value = JSON.stringify(card);
-    if (input) {
-      input.value = value;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    } else if (model && model.value !== value) {
-      model.value = value;
-    }
-  };
-
-  const renderCards = () => {
-    const visible = cards
-      .map((card, i) => ({ card, key: cardKey(card, i) }))
-      .filter(({ card }) => category === ALL || card.category === category);
-    track.replaceChildren(...visible.map(({ card, key }) => (
-      buildCard(card, key, () => select(card, key))
-    )));
-    markSelected();
-    track.scrollLeft = 0;
-    updateNav();
-  };
-
-  const renderTabs = () => {
-    const categories = [...new Set(cards.map((c) => c.category).filter(Boolean))];
-    if (category !== ALL && !categories.includes(category)) category = ALL;
-    tabs.hidden = categories.length < 2;
-    tabs.replaceChildren(...categories.map((name) => {
-      const tab = el('button', 'card-choice-tab', name);
-      tab.type = 'button';
-      tab.setAttribute('role', 'tab');
-      const active = name === category;
-      tab.classList.toggle('active', active);
-      tab.setAttribute('aria-selected', String(active));
-      tab.addEventListener('click', () => {
-        category = category === name ? ALL : name;
-        renderTabs();
-        renderCards();
-      });
-      return tab;
-    }));
-  };
-
-  const syncSelection = (value) => {
-    const picked = parseSelection(value);
-    if (!picked) {
-      selectedKey = null;
-    } else {
-      const index = cards.findIndex((c, i) => (picked.id !== undefined
-        ? cardKey(c, i) === String(picked.id)
-        : JSON.stringify(c) === JSON.stringify(picked)));
-      selectedKey = index >= 0 ? cardKey(cards[index], index) : null;
-    }
-    markSelected();
-  };
-
-  const setCards = (raw) => {
-    cards = parseCards(raw);
-    renderTabs();
-    renderCards();
-    syncSelection(model?.value ?? input?.value);
-  };
-
-  prev.addEventListener('click', () => track.scrollBy({ left: -pageWidth(), behavior: 'smooth' }));
-  next.addEventListener('click', () => track.scrollBy({ left: pageWidth(), behavior: 'smooth' }));
+  prev.addEventListener('click', () => scrollByPage(-1));
+  next.addEventListener('click', () => scrollByPage(1));
   track.addEventListener('scroll', updateNav, { passive: true });
   track.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') track.scrollBy({ left: pageWidth() / 2, behavior: 'smooth' });
-    if (e.key === 'ArrowLeft') track.scrollBy({ left: -pageWidth() / 2, behavior: 'smooth' });
+    if (e.key === 'ArrowRight') scrollByPage(1);
+    if (e.key === 'ArrowLeft') scrollByPage(-1);
   });
   if (typeof ResizeObserver !== 'undefined') new ResizeObserver(updateNav).observe(track);
 
-  setCards(cards);
+  const currentKey = () => {
+    const selected = parseSelected(input.value);
+    if (!selected) return null;
+    const idx = cards.findIndex((card, i) => cardKey(card, i) === cardKey(selected, -1)
+      || (selected.id === undefined && selected.name === card.name));
+    return idx >= 0 ? cardKey(cards[idx], idx) : null;
+  };
+
+  const markSelected = () => {
+    const key = currentKey();
+    track.querySelectorAll('.card-choice-card').forEach((node) => {
+      const isSelected = node.dataset.cardKey === key;
+      node.classList.toggle('selected', isSelected);
+      node.querySelector('.card-choice-select')?.setAttribute('aria-pressed', String(isSelected));
+    });
+  };
+
+  const select = (card) => {
+    const value = JSON.stringify(card);
+    if (input.value === value) return;
+    input.value = value;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    markSelected();
+  };
+
+  const render = () => {
+    track.replaceChildren(...cards.map((card, i) => createCard(card, i, false, enabled, select)));
+    widget.classList.toggle('empty', cards.length === 0);
+    markSelected();
+    updateNav();
+  };
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
     if (eventType === 'register') {
       model = fieldModel;
-      setCards(model.properties?.cards ?? cards);
+      cards = parseCards(model.properties?.[CARDS_PROPERTY]);
+      enabled = model.enabled !== false && model.readOnly !== true;
+      if (model.value && !input.value) input.value = model.value;
+      render();
     } else if (eventType === 'change') {
-      payload?.changes?.forEach((change) => {
-        if (change?.propertyName === 'properties') {
-          const incoming = change.currentValue?.cards;
-          if (JSON.stringify(incoming) !== JSON.stringify(change.prevValue?.cards)) {
-            setCards(incoming);
-          }
-        } else if (change?.propertyName === 'value') {
-          syncSelection(change.currentValue);
+      let rerender = false;
+      payload?.changes?.forEach(({ propertyName, currentValue }) => {
+        if (propertyName === `properties.${CARDS_PROPERTY}`) {
+          cards = parseCards(currentValue);
+          rerender = true;
+        } else if (propertyName === 'properties') {
+          cards = parseCards(currentValue?.[CARDS_PROPERTY]);
+          rerender = true;
+        } else if (propertyName === 'enabled' || propertyName === 'readOnly') {
+          enabled = model.enabled !== false && model.readOnly !== true;
+          rerender = true;
+        } else if (propertyName === 'value') {
+          const newValue = currentValue ?? '';
+          if (input.value !== newValue) input.value = newValue;
+          markSelected();
         }
       });
+      if (rerender) render();
     }
   }, { listenChanges: true });
 
+  render();
   return fieldDiv;
 }

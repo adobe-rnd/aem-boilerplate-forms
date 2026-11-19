@@ -30,14 +30,6 @@
           "...": "../../models/form-common/_basic-input-fields.json#/fields"
         },
         {
-          "component": "tab",
-          "label": "Validation",
-          "name": "validation"
-        },
-        {
-          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
-        },
-        {
           "...": "../../models/form-common/_help-container.json#/fields"
         }
       ]
