@@ -1,32 +1,34 @@
 # Image Choice
 
-A grid of selectable images (for example team logos). Authors choose whether users can pick a single image or several.
+A checkbox group rendered as a grid of selectable images, with configurable single or multiple selection.
 
 ## How to Use
 
-Add an **Image choice** component to the form in the Universal Editor, list the options (data value and display value), and provide one image URL/path per option, in the same order.
+Add an **Image choice** component to the form. Define the options (data value and display value) and, in the **Image Choice** tab, one image URL/path per line in the same order as the options.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `enum` / `enumNames` | Option values and names (names are used as image `alt` text and optional captions) |
-| `images` | Image URL or path for each option, in option order |
-| `selectionMode` | `single` (default) or `multi` |
-| `columns` | Choices per row (default 4; 2 on small screens) |
-| `showCaptions` | `show` displays the option name under the image; `hide` (default) keeps it for screen readers only |
+| `selectionMode` | `single` (default) allows one image; `multi` allows several. |
+| `images` | Image URL or path for each option, in option order. Options without an image render as text tiles. |
+| `columns` | Fixed number of images per row. Empty fits as many as possible. |
+| `showLabels` | Show the option display value below each image. Labels are always available to screen readers. |
 
-Standard validation (`required`, `minItems`, `maxItems`) and help properties are inherited from the checkbox group.
+All other fields (options, required, min/max items, help text) come from the checkbox group.
 
 ## Model Subscriptions
 
-Subscribes to its own `value` changes. In single mode, if the model is set to several values (e.g. by a rule), only the first is kept.
+- `value` changes: in `single` mode, if a rule sets more than one value, only the first is kept.
 
 ## Model Properties Set
 
-`model.value` is an array of the selected option values (`string[]`, `number[]` or `boolean[]` per "Save value as"). In single mode the array has at most one item. The value is committed on the native checkbox `change` event, i.e. once per click, so change rules fire once per selection change. In single mode, selecting an image deselects the previous one before the value is committed; clicking the selected image again clears it.
+- `value` is an array (single mode: zero or one item). It is committed by the form block on each native `change` of a checkbox, i.e. once per click, so change rules fire once per selection.
+- In single mode the component unchecks the other options before the form block reads the group, so the committed value never contains more than one item.
+- Selected state is driven by the native `:checked` state, so rule-driven value changes are reflected automatically.
 
 ## Usage Notes
 
-- Base type: `checkbox-group`; `fd:viewType`: `image-choice`.
-- Options remain native, visually hidden checkboxes, so keyboard (Tab, Space) and screen readers work.
+- Base type: `checkbox-group`, `fd:viewType`: `image-choice`.
+- Clicking the selected image again deselects it.
+- Keyboard: Tab to an option, Space toggles it. Focus is shown on the tile.

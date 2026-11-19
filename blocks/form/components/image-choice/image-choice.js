@@ -1,80 +1,64 @@
 import { subscribe } from '../../rules/index.js';
+import { createOptimizedPicture } from '../../../../scripts/aem.js';
 
 function toList(value) {
-  if (Array.isArray(value)) return value.map((v) => String(v).trim());
-  if (typeof value === 'string') return value.split(/[\n,]/).map((v) => v.trim());
-  return [];
+  if (Array.isArray(value)) return value;
+  return value === undefined || value === null || value === '' ? [] : [value];
 }
 
-function checkedValues(fieldDiv) {
-  return [...fieldDiv.querySelectorAll('input[type="checkbox"]:checked')].map((i) => i.value);
-}
-
-/**
- * Renders the options of a checkbox group as a grid of selectable images.
- * Selection mode (single or multi) is authored via `selectionMode`.
- */
 export default function decorate(fieldDiv, fieldJson, container, formId) {
-  const {
-    images, selectionMode, columns, showCaptions,
-  } = fieldJson?.properties || {};
-  const isSingle = selectionMode !== 'multi';
-  const imageList = toList(images);
+  const props = fieldJson?.properties || {};
+  const isMulti = props.selectionMode === 'multi';
+  const images = toList(props.images).map((src) => String(src).trim());
+  const columns = Number(props.columns);
+  const fieldset = fieldDiv.matches('fieldset') ? fieldDiv : fieldDiv.querySelector('fieldset');
+  const group = fieldset || fieldDiv;
 
-  fieldDiv.classList.add('image-choice', isSingle ? 'image-choice-single' : 'image-choice-multi');
-  if (showCaptions === 'show') fieldDiv.classList.add('image-choice-captions');
-  const cols = Number(columns);
-  if (cols > 0) fieldDiv.style.setProperty('--image-choice-columns', cols);
+  group.classList.add('image-choice', isMulti ? 'image-choice-multi' : 'image-choice-single');
+  if (props.showLabels === true || props.showLabels === 'true') {
+    group.classList.add('image-choice-labels');
+  }
+  if (columns > 0) {
+    group.style.setProperty('--image-choice-columns', columns);
+  }
 
-  fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((input, index) => {
-    const option = input.parentElement;
-    const label = option.querySelector('label');
-    option.classList.add('image-choice-option');
-    const text = label?.textContent?.trim() || input.value;
-    const src = imageList[index];
-    if (label) {
-      label.textContent = '';
-      if (src) {
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = text;
-        img.loading = 'lazy';
-        label.append(img);
-      }
-      const caption = document.createElement('span');
-      caption.className = 'image-choice-caption';
-      caption.textContent = text;
-      label.append(caption);
+  const options = [...group.querySelectorAll('input[type="checkbox"]')];
+  options.forEach((input, index) => {
+    const label = group.querySelector(`label[for="${input.id}"]`);
+    if (!label) return;
+    const text = label.textContent.trim();
+    label.classList.add('image-choice-tile');
+    label.textContent = '';
+    if (images[index]) {
+      const picture = createOptimizedPicture(images[index], text, false, [{ width: '300' }]);
+      picture.classList.add('image-choice-image');
+      label.append(picture);
     }
-    if (!src) option.classList.add('image-choice-no-image');
+    const caption = document.createElement('span');
+    caption.className = 'image-choice-caption';
+    caption.textContent = text;
+    label.append(caption);
+    if (!images[index]) label.classList.add('image-choice-no-image');
+    input.setAttribute('aria-label', text);
   });
 
-  // Runs before the form-level change listener, so the model sees the final selection.
-  fieldDiv.addEventListener('change', (e) => {
-    const { target } = e;
-    if (isSingle && target.checked) {
-      fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((other) => {
-        if (other !== target) other.checked = false;
+  // Runs before the form-level handler, so the model receives the single value.
+  if (!isMulti) {
+    group.addEventListener('change', (e) => {
+      const changed = e.target;
+      if (changed.type !== 'checkbox' || !changed.checked) return;
+      options.forEach((input) => {
+        if (input !== changed) input.checked = false;
       });
-    }
-  });
+    });
+  }
 
-  subscribe(fieldDiv, formId, (_fieldDiv, model, eventType, payload) => {
-    if (!isSingle) return;
-    const valueChanged = eventType === 'register'
-      || payload?.changes?.some((c) => c.propertyName === 'value');
-    if (!valueChanged) return;
-    const selected = checkedValues(fieldDiv);
-    if (selected.length > 1) {
-      // Model was set to several values (e.g. by a rule): keep the first only.
-      const [keep] = selected;
-      fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((i) => {
-        i.checked = i.value === keep;
-      });
-      const current = Array.isArray(model.value) ? model.value : [];
-      if (current.length !== 1 || String(current[0]) !== keep) {
-        model.value = [keep];
-      }
+  subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
+    if (isMulti || eventType !== 'change') return;
+    const valueChange = payload?.changes?.find((c) => c.propertyName === 'value');
+    const current = toList(valueChange?.currentValue);
+    if (current.length > 1) {
+      fieldModel.value = [current[0]];
     }
   }, { listenChanges: true });
 

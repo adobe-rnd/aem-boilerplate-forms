@@ -4199,11 +4199,30 @@
         "valueType": "string"
       },
       {
-        "component": "text",
-        "name": "images",
-        "label": "Option images (URL or path, in the same order as the options)",
+        "component": "select",
+        "label": "Save value as",
+        "name": "type",
         "valueType": "string",
-        "multi": true
+        "value": "string[]",
+        "options": [
+          {
+            "name": "String",
+            "value": "string[]"
+          },
+          {
+            "name": "Boolean",
+            "value": "boolean[]"
+          },
+          {
+            "name": "Number",
+            "value": "number[]"
+          }
+        ]
+      },
+      {
+        "component": "tab",
+        "label": "Image Choice",
+        "name": "imagechoice"
       },
       {
         "component": "radio-group",
@@ -4213,38 +4232,35 @@
         "value": "single",
         "options": [
           {
-            "name": "Single choice",
+            "name": "Single",
             "value": "single"
           },
           {
-            "name": "Multiple choice",
+            "name": "Multiple",
             "value": "multi"
           }
         ]
       },
       {
-        "component": "number",
-        "name": "columns",
-        "label": "Choices per row",
-        "valueType": "number",
-        "value": 4
+        "component": "text",
+        "name": "images",
+        "label": "Option images (URL or path, in the same order as the options)",
+        "valueType": "string",
+        "multi": true
       },
       {
-        "component": "radio-group",
-        "name": "showCaptions",
-        "label": "Show option names under images",
-        "valueType": "string",
-        "value": "hide",
-        "options": [
-          {
-            "name": "Hide",
-            "value": "hide"
-          },
-          {
-            "name": "Show",
-            "value": "show"
-          }
-        ]
+        "component": "number",
+        "name": "columns",
+        "label": "Columns",
+        "valueType": "number",
+        "description": "Number of images per row. Leave empty to fit as many as possible."
+      },
+      {
+        "component": "boolean",
+        "name": "showLabels",
+        "label": "Show option labels below images",
+        "valueType": "boolean",
+        "value": false
       },
       {
         "component": "tab",
