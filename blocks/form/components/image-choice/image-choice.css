@@ -1,0 +1,105 @@
+.form .image-choice {
+    --image-choice-columns: 4;
+    --image-choice-border: var(--form-input-border-color, #ccc);
+    --image-choice-selected: var(--link-color, #3b63fb);
+
+    display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns), minmax(0, 1fr));
+    gap: 16px;
+    border: 0;
+    padding: 0;
+}
+
+.form .image-choice > legend {
+    grid-column: 1 / -1;
+}
+
+.form .image-choice > .field-description {
+    grid-column: 1 / -1;
+}
+
+.form .image-choice > .checkbox-wrapper {
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.form .image-choice > .checkbox-wrapper > input[type="checkbox"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.form .image-choice > .checkbox-wrapper > label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form .image-choice > .checkbox-wrapper > label::before,
+.form .image-choice > .checkbox-wrapper > label::after {
+    content: none;
+}
+
+.form .image-choice .image-choice-image {
+    display: block;
+    width: 100%;
+    max-width: 120px;
+    aspect-ratio: 1;
+    object-fit: contain;
+}
+
+.form .image-choice .image-choice-label {
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.form .image-choice:not(.show-labels) .image-choice-image + .image-choice-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.form .image-choice.field-invalid > .checkbox-wrapper > label {
+    border-color: var(--form-error-color, #d31510);
+}
+
+.form .image-choice > .checkbox-wrapper:hover > label {
+    border-color: var(--image-choice-border);
+}
+
+.form .image-choice > .checkbox-wrapper > input:checked + label {
+    border-color: var(--image-choice-selected);
+    box-shadow: 0 0 0 2px var(--image-choice-selected);
+}
+
+.form .image-choice > .checkbox-wrapper > input:focus-visible + label {
+    outline: 2px solid var(--image-choice-selected);
+    outline-offset: 2px;
+}
+
+.form .image-choice > .checkbox-wrapper > input:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (width <= 600px) {
+    .form .image-choice {
+        grid-template-columns: repeat(min(var(--image-choice-columns), 3), minmax(0, 1fr));
+    }
+}

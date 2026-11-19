@@ -45,6 +45,9 @@
         },
         {
           "...": "../blocks/form/components/loan-slider/_loan-slider.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/image-choice/_image-choice.json#/definitions"
         }
       ]
     }
