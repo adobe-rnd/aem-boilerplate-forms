@@ -91,11 +91,11 @@
         },
         {
           "component": "text",
-          "name": "images",
-          "label": "Option images (URL or path)",
+          "name": "imageUrls",
+          "label": "Option images (URLs)",
           "valueType": "string",
           "multi": true,
-          "description": "One image per option, in the same order as the options. Option display values are used as alt text."
+          "description": "One image URL per option, in the same order as the options"
         },
         {
           "component": "number",
@@ -103,6 +103,12 @@
           "label": "Columns",
           "valueType": "number",
           "description": "Number of images per row (default 4)"
+        },
+        {
+          "component": "boolean",
+          "name": "showLabels",
+          "label": "Show option labels below images",
+          "valueType": "boolean"
         },
         {
           "...": "../../models/form-common/_help-container.json#/fields"

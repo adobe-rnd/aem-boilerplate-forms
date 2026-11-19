@@ -1,101 +1,99 @@
+/* image choice: grid of selectable images */
 .form .image-choice {
-    display: grid;
-    grid-template-columns: repeat(var(--image-choice-columns, 4), minmax(0, 1fr));
-    gap: 16px;
-    border: none;
-    padding: 0;
-}
+    --image-choice-columns: 4;
 
-.form .image-choice > legend,
-.form .image-choice > .field-description {
-    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns), minmax(0, 1fr));
+    gap: 16px;
+    padding: 16px;
+    border: none;
 }
 
 .form .image-choice > legend {
+    grid-column: 1 / -1;
     text-align: center;
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-weight: bold;
+    padding: 0;
+}
+
+.form .image-choice > .field-description {
+    grid-column: 1 / -1;
 }
 
 .form .image-choice .image-choice-option {
     position: relative;
     margin: 0;
-    padding: 0;
 }
 
 .form .image-choice .image-choice-option input[type="checkbox"] {
     position: absolute;
-    inset: 0;
+    opacity: 0;
     width: 100%;
     height: 100%;
     margin: 0;
-    opacity: 0;
+    inset: 0;
     cursor: pointer;
-    z-index: 1;
 }
 
-.form .image-choice .image-choice-label {
+.form .image-choice .image-choice-option label.image-choice-label {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    min-height: 96px;
+    gap: 8px;
     padding: 12px;
     border: 2px solid transparent;
     border-radius: 8px;
-    background: var(--background-color, #fff);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
 }
 
-.form .image-choice .image-choice-label::before,
-.form .image-choice .image-choice-label::after {
-    display: none;
+.form .image-choice .image-choice-option label.image-choice-label::before,
+.form .image-choice .image-choice-option label.image-choice-label::after {
+    content: none;
 }
 
-.form .image-choice .image-choice-label img {
-    max-width: 100%;
-    max-height: 80px;
+.form .image-choice .image-choice-option img {
+    width: 100%;
+    max-width: 120px;
+    aspect-ratio: 1;
     object-fit: contain;
 }
 
-.form .image-choice.field-invalid .image-choice-label {
-    border-color: var(--form-error-color, #d31510);
+.form .image-choice .image-choice-option:hover label.image-choice-label {
+    background-color: rgb(0 0 0 / 5%);
 }
 
-.form .image-choice .image-choice-option:hover .image-choice-label {
-    border-color: #c5c5c5;
-    transform: scale(1.04);
-}
-
-.form .image-choice .image-choice-option input:checked + .image-choice-label {
+.form .image-choice .image-choice-option input:checked + label.image-choice-label {
     border-color: var(--link-color, #1473e6);
-    box-shadow: 0 0 0 2px var(--link-color, #1473e6);
+    background-color: rgb(20 115 230 / 10%);
 }
 
-.form .image-choice .image-choice-option input:focus-visible + .image-choice-label {
+.form .image-choice .image-choice-option input:focus-visible + label.image-choice-label {
     outline: 2px solid var(--link-color, #1473e6);
     outline-offset: 2px;
 }
 
-.form .image-choice .image-choice-option input:disabled + .image-choice-label {
+.form .image-choice .image-choice-option input:disabled + label.image-choice-label {
     opacity: 0.5;
-}
-
-.form .image-choice .image-choice-option input:disabled {
     cursor: not-allowed;
 }
 
-.form .image-choice .visually-hidden {
+.form .image-choice.image-choice-hide-labels .image-choice-text {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
-    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
     white-space: nowrap;
 }
 
-@media (width < 600px) {
+.form .image-choice.field-invalid {
+    outline: 1px solid var(--error-color, #d31510);
+    border-radius: 8px;
+}
+
+@media (width <= 600px) {
     .form .image-choice {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(min(var(--image-choice-columns), 3), minmax(0, 1fr));
     }
 }
