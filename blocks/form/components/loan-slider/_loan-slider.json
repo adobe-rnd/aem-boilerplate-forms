@@ -1,0 +1,62 @@
+{
+    "definitions": [
+      {
+        "title": "Loan Slider",
+        "id": "loan-slider",
+        "plugins": {
+          "xwalk": {
+            "page": {
+              "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+              "template": {
+                "jcr:title": "Loan Slider",
+                "fieldType": "number-input",
+                "fd:viewType": "loan-slider",
+                "minimum": 50000,
+                "maximum": 1250000,
+                "enabled": true,
+                "visible": true
+              }
+            }
+          }
+        }
+      }
+    ],
+    "models": [
+      {
+        "id": "loan-slider",
+        "fields": [
+          {
+            "component": "tab",
+            "label": "Basic",
+            "name": "basic"
+          },
+          {
+            "...": "../../models/form-common/_basic-input-fields.json#/fields"
+          },
+          {
+            "component": "tab",
+            "label": "Validation",
+            "name": "validation"
+          },
+          {
+            "...": "../../models/form-common/_number-validation-fields.json#/fields"
+          },
+          {
+            "component": "tab",
+            "label": "Custom Properties",
+            "name": "custom"
+          },
+          {
+            "component": "number",
+            "name": "splits",
+            "label": "Number of Splits",
+            "valueType": "number",
+            "description": "Number of equal parts the range between minimum and maximum is divided into"
+          },
+          {
+            "...": "../../models/form-common/_help-container.json#/fields"
+          }
+        ]
+      }
+    ]
+}
