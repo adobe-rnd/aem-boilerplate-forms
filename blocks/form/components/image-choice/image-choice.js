@@ -1,63 +1,55 @@
-import { subscribe } from '../../rules/index.js';
-
-function toList(value) {
-  if (Array.isArray(value)) return value;
-  if (typeof value === 'string' && value) return value.split(',').map((v) => v.trim());
+function parseImageUrls(urls) {
+  if (Array.isArray(urls)) return urls.map((u) => String(u).trim());
+  if (typeof urls === 'string') return urls.split(/[\n,]/).map((u) => u.trim());
   return [];
 }
 
-function decorateOptions(fieldDiv, images, showLabels) {
-  fieldDiv.querySelectorAll(':scope > div').forEach((option, index) => {
-    const input = option.querySelector('input[type="checkbox"]');
-    const label = option.querySelector('label');
-    if (!input || !label || option.classList.contains('image-choice-option')) return;
-    option.classList.add('image-choice-option');
-    const text = label.textContent;
-    const src = images[index];
-    if (src) {
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = text;
-      img.loading = 'lazy';
-      label.prepend(img);
-    }
-    label.title = text;
-    if (src) {
-      const caption = document.createElement('span');
-      caption.className = showLabels ? 'image-choice-caption' : 'image-choice-caption image-choice-sr-only';
-      caption.textContent = text;
-      label.replaceChildren(label.querySelector('img'), caption);
-    }
-  });
-}
+export default function decorate(fieldDiv, fieldJson) {
+  const props = fieldJson?.properties || {};
+  const isSingle = props.selectionMode !== 'multiple';
+  const showLabels = props.showLabels === true || props.showLabels === 'true';
+  const images = parseImageUrls(props.imageUrls);
 
-export default function decorate(fieldDiv, fieldJson, container, formId) {
-  const {
-    selectionMode = 'single', images, columns, showLabels,
-  } = fieldJson?.properties || {};
-  const single = selectionMode !== 'multiple';
-  const imageList = toList(images);
-  const showCaptions = showLabels === true || showLabels === 'true';
+  const sizeClasses = { small: 'image-choice-small', large: 'image-choice-large' };
+  fieldDiv.classList.add('image-choice');
+  if (sizeClasses[props.imageSize]) fieldDiv.classList.add(sizeClasses[props.imageSize]);
+  fieldDiv.dataset.selectionMode = isSingle ? 'single' : 'multiple';
 
-  fieldDiv.classList.add('image-choice', single ? 'image-choice-single' : 'image-choice-multiple');
-  fieldDiv.style.setProperty('--image-choice-columns', Number(columns) > 0 ? Number(columns) : 4);
-  decorateOptions(fieldDiv, imageList, showCaptions);
+  // Core rebuilds the options on enum changes, so enhancement must be idempotent.
+  const enhance = () => {
+    fieldDiv.querySelectorAll(':scope > .checkbox-wrapper').forEach((option, index) => {
+      if (option.dataset.imageChoiceOption) return;
+      const label = option.querySelector('label');
+      if (!label) return;
+      const text = label.textContent.trim();
+      const text$ = document.createElement('span');
+      text$.className = showLabels ? 'image-choice-label' : 'image-choice-label visually-hidden';
+      text$.textContent = text;
+      label.replaceChildren(text$);
+      if (images[index]) {
+        const img = document.createElement('img');
+        img.src = images[index];
+        img.alt = text;
+        img.loading = 'lazy';
+        img.className = 'image-choice-image';
+        label.prepend(img);
+      }
+      option.dataset.imageChoiceOption = 'true';
+      option.classList.add('image-choice-option');
+    });
+  };
 
-  // runs before the form-level listener that commits the value to the model
+  enhance();
+  new MutationObserver(enhance).observe(fieldDiv, { childList: true });
+
+  // Runs before the form-level handler so the group value is computed from the final state.
   fieldDiv.addEventListener('change', (e) => {
     const input = e.target;
-    if (!single || input.type !== 'checkbox' || !input.checked) return;
+    if (!isSingle || input.type !== 'checkbox' || !input.checked) return;
     fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((other) => {
       if (other !== input) other.checked = false;
     });
   });
-
-  subscribe(fieldDiv, formId, (_el, fieldModel, eventType, payload) => {
-    if (eventType !== 'change') return;
-    if (payload?.changes?.some((c) => c.propertyName === 'enum' || c.propertyName === 'enumNames')) {
-      decorateOptions(fieldDiv, imageList, showCaptions);
-    }
-  }, { listenChanges: true });
 
   return fieldDiv;
 }

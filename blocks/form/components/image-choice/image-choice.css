@@ -1,31 +1,38 @@
-.form .image-choice {
-    --image-choice-border: var(--form-input-border-color, #c5c5c5);
-    --image-choice-selected: var(--link-color, #1473e6);
+main .form .image-choice {
+    --image-choice-size: 96px;
+    --image-choice-selected-color: var(--link-color, #1473e6);
+}
 
-    display: grid;
-    grid-template-columns: repeat(var(--image-choice-columns, 4), minmax(0, 1fr));
+main .form .image-choice-small {
+    --image-choice-size: 64px;
+}
+
+main .form .image-choice-large {
+    --image-choice-size: 140px;
+}
+
+main .form .image-choice.image-choice {
+    display: flex;
+    flex-wrap: wrap;
     gap: 16px;
-    border: 0;
-    padding: 0;
+    justify-content: center;
 }
 
-.form .image-choice > legend {
-    grid-column: 1 / -1;
-    margin-bottom: 8px;
-    padding: 0;
+main .form .image-choice > legend {
+    flex-basis: 100%;
+    text-align: center;
 }
 
-.form .image-choice > .field-description {
-    grid-column: 1 / -1;
+main .form .image-choice > .field-description {
+    flex-basis: 100%;
 }
 
-.form .image-choice .image-choice-option {
+main .form .image-choice .image-choice-option {
     position: relative;
     margin: 0;
-    padding: 0;
 }
 
-.form .image-choice .image-choice-option input[type="checkbox"] {
+main .form .image-choice .image-choice-option > input {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -35,78 +42,59 @@
     cursor: pointer;
 }
 
-.form .image-choice .image-choice-option label {
+main .form .image-choice .image-choice-option > label {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 8px;
     box-sizing: border-box;
-    height: 100%;
+    width: calc(var(--image-choice-size) + 24px);
+    min-height: calc(var(--image-choice-size) + 24px);
     padding: 12px;
+    justify-content: center;
     border: 2px solid transparent;
     border-radius: 8px;
-    pointer-events: none;
-    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    text-align: center;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form .image-choice .image-choice-option label::before,
-.form .image-choice .image-choice-option label::after {
-    content: none;
-}
-
-.form .image-choice .image-choice-option label img {
-    display: block;
-    width: 100%;
-    max-width: 120px;
-    height: auto;
-    aspect-ratio: 1;
+main .form .image-choice .image-choice-image {
+    width: var(--image-choice-size);
+    height: var(--image-choice-size);
     object-fit: contain;
 }
 
-.form .image-choice.field-invalid .image-choice-option label {
+main .form .image-choice.field-invalid .image-choice-option > label {
     border-color: var(--form-error-color, #d31510);
 }
 
-.form .image-choice .image-choice-option input:hover + label {
-    border-color: var(--image-choice-border);
-    transform: scale(1.04);
+main .form .image-choice .image-choice-option > input:hover + label {
+    border-color: #ccc;
 }
 
-.form .image-choice .image-choice-option input:checked + label {
-    border-color: var(--image-choice-selected);
-    background-color: rgb(20 115 230 / 10%);
+main .form .image-choice .image-choice-option > input:checked + label {
+    border-color: var(--image-choice-selected-color);
+    box-shadow: 0 0 0 2px var(--image-choice-selected-color);
 }
 
-.form .image-choice .image-choice-option input:focus-visible + label {
-    outline: 2px solid var(--image-choice-selected);
+main .form .image-choice .image-choice-option > input:focus-visible + label {
+    outline: 2px solid var(--image-choice-selected-color);
     outline-offset: 2px;
 }
 
-.form .image-choice .image-choice-option input:disabled + label {
-    opacity: 0.5;
-}
-
-.form .image-choice .image-choice-option input:disabled {
+main .form .image-choice .image-choice-option > input:disabled {
     cursor: not-allowed;
 }
 
-.form .image-choice .image-choice-sr-only {
+main .form .image-choice .image-choice-option > input:disabled + label {
+    opacity: 0.5;
+}
+
+main .form .image-choice .visually-hidden {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip: rect(0 0 0 0);
     white-space: nowrap;
-}
-
-.form .image-choice .image-choice-caption {
-    text-align: center;
-    font-size: 0.875rem;
-}
-
-@media (width < 600px) {
-    .form .image-choice {
-        grid-template-columns: repeat(min(var(--image-choice-columns, 4), 3), minmax(0, 1fr));
-    }
 }

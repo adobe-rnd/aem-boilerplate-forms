@@ -17,14 +17,15 @@
         "visible": true
       },
       "properties": {
-        "selectionMode": "single",
-        "columns": 4,
-        "showLabels": false,
         "type": "string[]",
-        "images": [
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='red'/%3E%3C/svg%3E",
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='red'/%3E%3C/svg%3E",
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='red'/%3E%3C/svg%3E"
+        "orientation": "horizontal",
+        "selectionMode": "single",
+        "imageSize": "medium",
+        "showLabels": true,
+        "imageUrls": [
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E#a",
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E#b",
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E#c"
         ]
       },
       "enum": [

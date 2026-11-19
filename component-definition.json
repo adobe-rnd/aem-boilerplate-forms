@@ -714,18 +714,17 @@
                 "template": {
                   "jcr:title": "Image Choice",
                   "fieldType": "checkbox-group",
+                  "fd:viewType": "image-choice",
                   "enum": [
                     "0",
                     "1"
                   ],
                   "enumNames": [
-                    "Item 1",
-                    "Item 2"
+                    "Option 1",
+                    "Option 2"
                   ],
-                  "orientation": "horizontal",
                   "type": "string[]",
-                  "fd:viewType": "image-choice",
-                  "selectionMode": "single"
+                  "orientation": "horizontal"
                 }
               }
             }
