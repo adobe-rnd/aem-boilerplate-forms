@@ -1,0 +1,157 @@
+/** styling for loan-slider */
+main .form .loan-slider-wrapper.decorated {
+    --loan-slider-color: #eba550;
+    --loan-slider-track: #d3d4da;
+    --loan-slider-thumb: 24px;
+    width: 100%;
+}
+
+main .form .loan-slider-wrapper .loan-slider-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+main .form .loan-slider-wrapper .loan-slider-header label {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+main .form .loan-slider-wrapper .loan-slider-input {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 20px;
+    border: 1px solid var(--loan-slider-track);
+    border-radius: 12px;
+    background: #fff;
+}
+
+main .form .loan-slider-wrapper .loan-slider-currency {
+    font-size: 20px;
+}
+
+main .form .loan-slider-wrapper .loan-slider-input input {
+    width: 8ch;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 20px;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+main .form .loan-slider-wrapper .loan-slider-input input::-webkit-inner-spin-button,
+main .form .loan-slider-wrapper .loan-slider-input input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+main .form .loan-slider-wrapper .loan-slider-input:focus-within {
+    border-color: var(--loan-slider-color);
+}
+
+main .form .loan-slider-wrapper .loan-slider-track {
+    position: relative;
+    height: var(--loan-slider-thumb);
+}
+
+main .form .loan-slider-wrapper input[type="range"].loan-slider-range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    appearance: none;
+    cursor: pointer;
+}
+
+main .form .loan-slider-wrapper input[type="range"].loan-slider-range:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+main .form .loan-slider-wrapper .loan-slider-range::-webkit-slider-runnable-track {
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, var(--loan-slider-color) 0 calc(var(--loan-slider-thumb) / 2 + (100% - var(--loan-slider-thumb)) * var(--pos, 0)), var(--loan-slider-track) 0);
+}
+
+main .form .loan-slider-wrapper .loan-slider-range::-webkit-slider-thumb {
+    width: var(--loan-slider-thumb);
+    height: var(--loan-slider-thumb);
+    margin-top: -7px;
+    border: none;
+    border-radius: 50%;
+    background: var(--loan-slider-color);
+    box-shadow: 0 0 0 3px #fff;
+    appearance: none;
+}
+
+main .form .loan-slider-wrapper .loan-slider-range::-moz-range-track {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--loan-slider-track);
+}
+
+main .form .loan-slider-wrapper .loan-slider-range::-moz-range-progress {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--loan-slider-color);
+}
+
+main .form .loan-slider-wrapper .loan-slider-range::-moz-range-thumb {
+    width: var(--loan-slider-thumb);
+    height: var(--loan-slider-thumb);
+    border: none;
+    border-radius: 50%;
+    background: var(--loan-slider-color);
+}
+
+main .form .loan-slider-wrapper .loan-slider-range:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid #17252e;
+}
+
+main .form .loan-slider-wrapper .loan-slider-ticks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+main .form .loan-slider-wrapper .loan-slider-tick {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--loan-slider-thumb) / 2 + (100% - var(--loan-slider-thumb)) * var(--pos));
+    width: 1px;
+    height: 14px;
+    transform: translate(-50%, -50%);
+    background: #b9bac2;
+}
+
+main .form .loan-slider-wrapper .loan-slider-tick.filled {
+    background: var(--loan-slider-color);
+}
+
+main .form .loan-slider-wrapper .loan-slider-labels {
+    position: relative;
+    height: 22px;
+    margin-top: 12px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+main .form .loan-slider-wrapper .loan-slider-label {
+    position: absolute;
+    left: calc(var(--loan-slider-thumb) / 2 + (100% - var(--loan-slider-thumb)) * var(--pos));
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
