@@ -1,0 +1,104 @@
+/* loan slider */
+.form .loan-slider-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.form .loan-slider-header .field-label {
+    margin: 0;
+    font-weight: 600;
+}
+
+.form .loan-slider-header input.loan-slider-value {
+    width: 180px;
+    max-width: 50%;
+    margin: 0;
+    padding: 14px 20px;
+    border: 1px solid #d4d5db;
+    border-radius: 12px;
+    font-size: 1.125rem;
+    box-sizing: border-box;
+}
+
+.form .loan-slider-widget {
+    --loan-slider-color: #eba550;
+    --loan-slider-track: #d4d5db;
+
+    position: relative;
+    padding-bottom: 40px;
+}
+
+.form .loan-slider-widget input.loan-slider-range {
+    display: block;
+    width: 100%;
+    height: 14px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 7px;
+    appearance: none;
+    cursor: pointer;
+    background: linear-gradient(to right, var(--loan-slider-color) var(--loan-slider-progress), var(--loan-slider-track) var(--loan-slider-progress));
+}
+
+.form .loan-slider-widget input.loan-slider-range:focus {
+    outline: none;
+}
+
+.form .loan-slider-widget input.loan-slider-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: var(--loan-slider-color);
+}
+
+.form .loan-slider-widget input.loan-slider-range::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: var(--loan-slider-color);
+}
+
+.form .loan-slider-widget input.loan-slider-range:focus-visible::-webkit-slider-thumb {
+    outline: 3px solid rgb(235 165 80 / 40%);
+}
+
+.form .loan-slider-widget input.loan-slider-range:focus-visible::-moz-range-thumb {
+    outline: 3px solid rgb(235 165 80 / 40%);
+}
+
+.form .loan-slider-widget input.loan-slider-range:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.form .loan-slider-scale {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 14px;
+    pointer-events: none;
+}
+
+.form .loan-slider-tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 14px;
+    background: rgb(0 0 0 / 15%);
+    transform: translateX(-50%);
+}
+
+.form .loan-slider-label {
+    position: absolute;
+    top: 26px;
+    color: #6b6d7b;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    transform: translateX(-50%);
+}
