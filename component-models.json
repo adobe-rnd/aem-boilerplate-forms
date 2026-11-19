@@ -4678,7 +4678,14 @@
         "name": "splits",
         "label": "Number of splits",
         "valueType": "number",
-        "description": "Number of equal parts between minimum and maximum. The slider moves in steps of (maximum - minimum) / splits."
+        "description": "Number of equal splits between the minimum and the maximum (default 12)"
+      },
+      {
+        "component": "text",
+        "name": "currencySymbol",
+        "label": "Currency symbol",
+        "valueType": "string",
+        "description": "Symbol shown before the amount (default ₹)"
       },
       {
         "component": "tab",
