@@ -1,58 +1,60 @@
 import { subscribe } from '../../rules/index.js';
 
-function parseUrls(value) {
+const DEFAULT_IMAGE_SIZE = 80;
+
+function toArray(value) {
   if (Array.isArray(value)) return value;
-  if (typeof value === 'string') return value.split(/\r?\n|,/).map((s) => s.trim());
-  return [];
+  return value ? [value] : [];
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const props = fieldJson?.properties || {};
-  const single = props.selectionMode !== 'multiple';
-  const urls = parseUrls(props.imageUrls);
-  const columns = parseInt(props.columns, 10);
+  const images = toArray(props.images);
+  const isMulti = props.selectionMode === 'multi';
+  const size = Number(props.imageSize) > 0 ? Number(props.imageSize) : DEFAULT_IMAGE_SIZE;
+  const names = toArray(fieldJson?.enumNames);
 
   fieldDiv.classList.add('image-choice');
-  fieldDiv.classList.toggle('image-choice-single', single);
-  fieldDiv.classList.toggle('image-choice-multiple', !single);
-  fieldDiv.classList.toggle('image-choice-hide-labels', props.showLabels !== true && props.showLabels !== 'true');
-  if (columns > 0) fieldDiv.style.setProperty('--image-choice-columns', columns);
+  fieldDiv.classList.toggle('image-choice-multi', isMulti);
+  fieldDiv.style.setProperty('--image-choice-size', `${size}px`);
 
-  const inputs = [...fieldDiv.querySelectorAll('input[type="checkbox"]')];
+  const inputs = Array.from(fieldDiv.querySelectorAll('input[type="checkbox"]'));
   inputs.forEach((input, index) => {
-    const option = input.closest('div');
-    const label = option?.querySelector('label');
-    option?.classList.add('image-choice-option');
-    const url = urls[index];
-    if (!label || !url) return;
+    const item = input.parentElement;
+    const label = item.querySelector('label');
+    const src = images[index]?.trim();
+    item.classList.add('image-choice-item');
+    if (!src || !label) return;
+    const text = label.textContent.trim() || names[index] || input.value;
     const img = document.createElement('img');
-    img.src = url;
+    img.src = src;
     img.alt = '';
     img.loading = 'lazy';
+    img.className = 'image-choice-img';
     label.classList.add('image-choice-label');
-    const text = document.createElement('span');
-    text.className = 'image-choice-text';
-    text.textContent = label.textContent;
-    label.replaceChildren(img, text);
+    label.title = text;
+    const caption = document.createElement('span');
+    caption.className = 'image-choice-text';
+    caption.textContent = text;
+    label.replaceChildren(img, caption);
   });
 
-  // Runs before the form-level change handler, so the model sees the final selection.
+  // Runs before the form-level listener, which reads the checked state to build the model value.
   fieldDiv.addEventListener('change', (e) => {
     const { target } = e;
-    if (single && target.type === 'checkbox' && target.checked) {
-      inputs.forEach((input) => {
-        if (input !== target) input.checked = false;
-      });
-    }
+    if (isMulti || target.type !== 'checkbox' || !target.checked) return;
+    inputs.forEach((other) => {
+      if (other !== target) other.checked = false;
+    });
   });
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
-    if (eventType === 'change' && single) {
-      const change = payload?.changes?.find((c) => c.propertyName === 'value');
-      const value = change?.currentValue;
-      if (Array.isArray(value) && value.length > 1) {
-        // a rule or prefill set several values; keep only the last one
-        fieldModel.value = [value[value.length - 1]];
+    if (eventType === 'change' && !isMulti) {
+      const valueChange = payload?.changes?.find((c) => c?.propertyName === 'value');
+      const current = valueChange?.currentValue;
+      // Single mode keeps at most one selection, e.g. when a rule sets several values.
+      if (Array.isArray(current) && current.length > 1) {
+        fieldModel.value = [current[0]];
       }
     }
   }, { listenChanges: true });

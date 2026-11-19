@@ -4154,25 +4154,35 @@
         "valueType": "string"
       },
       {
-        "component": "select",
-        "label": "Save value as",
-        "name": "type",
+        "component": "text",
+        "name": "images",
+        "label": "Option images (URLs, same order as options)",
         "valueType": "string",
-        "value": "string[]",
+        "multi": true
+      },
+      {
+        "component": "select",
+        "name": "selectionMode",
+        "label": "Selection mode",
+        "valueType": "string",
+        "value": "single",
         "options": [
           {
-            "name": "String",
-            "value": "string[]"
+            "name": "Single choice",
+            "value": "single"
           },
           {
-            "name": "Boolean",
-            "value": "boolean[]"
-          },
-          {
-            "name": "Number",
-            "value": "number[]"
+            "name": "Multiple choice",
+            "value": "multi"
           }
         ]
+      },
+      {
+        "component": "number",
+        "name": "imageSize",
+        "label": "Image size (px)",
+        "valueType": "number",
+        "value": 80
       },
       {
         "component": "tab",
@@ -4198,49 +4208,6 @@
         "label": "Script validation message",
         "valueType": "string",
         "description": "Displayed when validation script fails."
-      },
-      {
-        "component": "tab",
-        "label": "Image Choice",
-        "name": "imagechoice"
-      },
-      {
-        "component": "select",
-        "name": "selectionMode",
-        "label": "Selection mode",
-        "valueType": "string",
-        "value": "single",
-        "options": [
-          {
-            "name": "Single choice",
-            "value": "single"
-          },
-          {
-            "name": "Multiple choice",
-            "value": "multiple"
-          }
-        ]
-      },
-      {
-        "component": "text",
-        "name": "imageUrls",
-        "label": "Option images (URLs)",
-        "valueType": "string",
-        "multi": true,
-        "description": "One image URL per option, in the same order as the options"
-      },
-      {
-        "component": "number",
-        "name": "columns",
-        "label": "Columns",
-        "valueType": "number",
-        "description": "Number of images per row (default 4)"
-      },
-      {
-        "component": "boolean",
-        "name": "showLabels",
-        "label": "Show option labels below images",
-        "valueType": "boolean"
       },
       {
         "component": "tab",

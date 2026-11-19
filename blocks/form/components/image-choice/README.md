@@ -1,32 +1,29 @@
 # Image Choice
 
-A grid of selectable images (e.g. "Select your team") that works as a single-choice or multiple-choice field, configurable by the author.
+A checkbox group rendered as a grid of selectable images (e.g. "Select your team"), in single or multiple choice mode.
 
 ## How to Use
 
-Add an **Image choice** component to a form. Define options in **Options (Data Value)** / **Options (Display Value)**, then list one image URL per option, in the same order, under **Image Choice → Option images (URLs)**.
+Add **Image choice** in the Universal Editor, define the options (data values and display values), and list one image URL per option, in the same order.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `selectionMode` | `single` (default) or `multiple` |
-| `imageUrls` | Image URL per option, in option order |
-| `columns` | Images per row (default 4) |
-| `showLabels` | Show option display values below images (default hidden, kept as accessible text) |
-
-Standard checkbox-group properties (options, required, min/max items, help text) also apply.
+| `images` | Image URL per option, same order as the options. Options without an image render as text. |
+| `selectionMode` | `single` (default): selecting an option deselects the others. `multi`: any number of options. |
+| `imageSize` | Image width/height in px (default 80). |
 
 ## Model Subscriptions
 
-Subscribes to its own `value` changes. In single mode, if a rule or prefill sets more than one value, only the last is kept.
+Subscribes to `value` changes. In single mode, if a rule sets more than one value, only the first is kept.
 
 ## Model Properties Set
 
-`value` is an array (`string[]` by default) — one entry in single mode, any number in multiple mode. It is committed on each `change` event of an option, i.e. once per click, so change rules fire once per click.
+`model.value` is an array of selected option values (`string[]`; one item at most in single mode). It is committed on each click via the native `change` event, so change rules fire once per click.
 
 ## Usage Notes
 
 - Base type: `checkbox-group`; `fd:viewType`: `image-choice`.
-- Single mode unchecks the other options before the form model reads the selection.
-- Options are visually hidden native checkboxes, so keyboard (Tab, Space) and screen readers work. Images are decorative; the option label is the accessible name.
+- Option display values are used as the accessible name and tooltip of each image.
+- Keyboard: Tab to move, Space to toggle.

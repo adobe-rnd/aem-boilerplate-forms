@@ -720,8 +720,8 @@
                     "1"
                   ],
                   "enumNames": [
-                    "Item 1",
-                    "Item 2"
+                    "Option 1",
+                    "Option 2"
                   ],
                   "type": "string[]"
                 }
