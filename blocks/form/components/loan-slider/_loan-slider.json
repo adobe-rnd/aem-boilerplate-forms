@@ -11,8 +11,6 @@
                 "jcr:title": "Loan Slider",
                 "fieldType": "number-input",
                 "fd:viewType": "loan-slider",
-                "minimum": 50000,
-                "maximum": 1250000,
                 "enabled": true,
                 "visible": true
               }
@@ -48,10 +46,10 @@
           },
           {
             "component": "number",
-            "name": "splits",
-            "label": "Number of Splits",
+            "name": "stepValue",
+            "label": "Split Amount (step)",
             "valueType": "number",
-            "description": "Number of equal parts the range between minimum and maximum is divided into"
+            "description": "Amount between two consecutive splits. Min and Max come from the validation tab."
           },
           {
             "...": "../../models/form-common/_help-container.json#/fields"

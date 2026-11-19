@@ -1,155 +1,152 @@
 import { subscribe } from '../../rules/index.js';
 
-const DEFAULT_MIN = 50000;
-const DEFAULT_MAX = 1250000;
-const DEFAULT_SPLITS = 12;
+const MAX_LABELS = 6;
 
-const inr = new Intl.NumberFormat('en-IN');
-
-function formatInr(value) {
-  return `₹${inr.format(value)}`;
+export function formatINR(value) {
+  return `₹${Number(value).toLocaleString('en-IN')}`;
 }
 
-// 50000 -> 50K, 200000 -> 2L, 1250000 -> 12.5L, 10000000 -> 1Cr
-function shortLabel(value) {
-  const trim = (n) => `${Math.round(n * 100) / 100}`;
-  if (value >= 10000000) return `${trim(value / 10000000)}Cr`;
-  if (value >= 100000) return `${trim(value / 100000)}L`;
-  if (value >= 1000) return `${trim(value / 1000)}K`;
-  return `${value}`;
+export function shortINR(value) {
+  const v = Number(value);
+  const fmt = (n, unit) => `${Number.isInteger(n) ? n : +n.toFixed(2)}${unit}`;
+  if (v >= 10000000) return fmt(v / 10000000, 'Cr');
+  if (v >= 100000) return fmt(v / 100000, 'L');
+  if (v >= 1000) return fmt(v / 1000, 'K');
+  return `${v}`;
 }
 
-function toNumber(v) {
-  const n = parseFloat(`${v ?? ''}`.replace(/[^\d.]/g, ''));
+export function parseAmount(text) {
+  const n = parseFloat(String(text).replace(/[^\d.]/g, ''));
   return Number.isNaN(n) ? null : n;
 }
 
-export default function decorate(fieldDiv, fieldJson, container, formId) {
-  const nativeInput = fieldDiv.querySelector('input');
-  const props = fieldJson?.properties || {};
-  let min = toNumber(fieldJson?.minimum) ?? DEFAULT_MIN;
-  let max = toNumber(fieldJson?.maximum) ?? DEFAULT_MAX;
-  if (max <= min) {
-    min = DEFAULT_MIN;
-    max = DEFAULT_MAX;
-  }
-  const splits = Math.max(1, Math.floor(toNumber(props.splits) || DEFAULT_SPLITS));
-  const stepSize = (max - min) / splits;
-  let model = null;
+/** Clamps to [min, max] and snaps to the nearest split. */
+export function snap(value, min, max, step) {
+  const clamped = Math.min(max, Math.max(min, value));
+  const snapped = min + Math.round((clamped - min) / step) * step;
+  return Math.min(max, snapped);
+}
 
-  const clampSnap = (n) => {
-    const index = Math.round((Math.min(max, Math.max(min, n)) - min) / stepSize);
-    return Math.round(min + index * stepSize);
-  };
+export default async function decorate(fieldDiv, fieldJson, container, formId) {
+  const input = fieldDiv.querySelector('input');
+  const min = Number(fieldJson?.minimum ?? input.min ?? 0) || 0;
+  let max = Number(fieldJson?.maximum ?? input.max ?? 100) || 100;
+  if (max <= min) max = min + 1;
+  const stepProp = Number(fieldJson?.properties?.stepValue ?? fieldJson?.step);
+  const step = stepProp > 0 ? stepProp : (max - min) / 10;
+  const splits = Math.max(1, Math.round((max - min) / step));
 
-  // the native input stays in the DOM (hidden) so the form block keeps its field wiring
-  nativeInput.hidden = true;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'loan-slider-wrapper';
 
-  const widget = document.createElement('div');
-  widget.className = 'loan-slider-widget';
-
-  const textBox = document.createElement('input');
-  textBox.type = 'text';
-  textBox.inputMode = 'numeric';
-  textBox.className = 'loan-slider-value';
-  textBox.setAttribute('aria-label', fieldJson?.label?.value || 'Loan amount');
-
-  const track = document.createElement('div');
-  track.className = 'loan-slider-track';
+  const display = document.createElement('input');
+  display.type = 'text';
+  display.inputMode = 'numeric';
+  display.className = 'loan-slider-text';
+  display.id = input.id;
+  display.autocomplete = 'off';
+  input.removeAttribute('id');
+  input.type = 'hidden';
 
   const slider = document.createElement('input');
   slider.type = 'range';
   slider.className = 'loan-slider-range';
-  slider.min = 0;
-  slider.max = splits;
-  slider.step = 1;
-  slider.setAttribute('aria-label', 'Loan amount slider');
+  slider.min = min;
+  slider.max = max;
+  slider.step = step;
+  slider.setAttribute('aria-label', fieldJson?.label?.value || 'Loan amount');
 
+  const track = document.createElement('div');
+  track.className = 'loan-slider-track';
   const ticks = document.createElement('div');
   ticks.className = 'loan-slider-ticks';
   const labels = document.createElement('div');
   labels.className = 'loan-slider-labels';
-  // show at most ~6 labels, always including min and max
-  const labelEvery = Math.ceil(splits / 6);
+  const labelEvery = Math.ceil((splits + 1) / MAX_LABELS);
   for (let i = 0; i <= splits; i += 1) {
-    const pct = (i / splits) * 100;
+    const value = Math.min(max, min + i * step);
+    const pos = `--pos:${i / splits}`;
     const tick = document.createElement('span');
     tick.className = 'loan-slider-tick';
-    tick.style.left = `${pct}%`;
+    tick.setAttribute('style', pos);
     ticks.append(tick);
-    if (i === 0 || i === splits || (i % labelEvery === 0 && splits - i >= labelEvery / 2)) {
+    if (i % labelEvery === 0 || i === splits) {
       const label = document.createElement('span');
       label.className = 'loan-slider-label';
-      label.style.left = `${pct}%`;
-      label.textContent = shortLabel(Math.round(min + i * stepSize));
+      label.setAttribute('style', pos);
+      label.textContent = shortINR(value);
       labels.append(label);
     }
   }
-
   track.append(ticks, slider);
-  widget.append(textBox, track, labels);
-  nativeInput.after(widget);
+  wrapper.append(track, labels);
 
-  const render = (value, updateText = true) => {
-    const index = Math.round((value - min) / stepSize);
-    slider.value = index;
-    slider.setAttribute('aria-valuetext', formatInr(value));
-    widget.style.setProperty('--loan-slider-progress', `${(index / splits) * 100}%`);
-    if (updateText) textBox.value = formatInr(value);
-    nativeInput.value = value;
+  const header = document.createElement('div');
+  header.className = 'loan-slider-header';
+  const label = fieldDiv.querySelector('label');
+  if (label) header.append(label);
+  header.append(display);
+  input.before(header);
+  input.after(wrapper);
+
+  const render = (value) => {
+    slider.value = value;
+    display.value = formatINR(value);
+    wrapper.style.setProperty('--progress', (value - min) / (max - min));
   };
 
   const commit = (value) => {
-    render(value);
-    if (model && model.value !== value) model.value = value;
+    const next = snap(value, min, max, step);
+    render(next);
+    if (String(input.value) !== String(next)) {
+      input.value = next;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   };
 
-  // the extra inputs are not form fields: keep their events away from the form-level handler
-  [slider, textBox].forEach((el) => el.addEventListener('change', (e) => e.stopPropagation()));
-
-  slider.addEventListener('input', () => render(Math.round(min + Number(slider.value) * stepSize)));
-  slider.addEventListener('change', () => commit(Math.round(min + Number(slider.value) * stepSize)));
-
-  textBox.addEventListener('focus', () => {
-    textBox.value = `${toNumber(textBox.value) ?? ''}`;
-    textBox.select();
+  slider.addEventListener('input', () => {
+    render(Number(slider.value));
   });
-  textBox.addEventListener('input', () => {
-    const n = toNumber(textBox.value);
-    if (n !== null) render(clampSnap(n), false);
+  slider.addEventListener('change', () => commit(Number(slider.value)));
+  display.addEventListener('focus', () => {
+    display.value = display.value.replace(/[^\d.]/g, '');
   });
-  const commitText = () => {
-    const n = toNumber(textBox.value);
-    commit(clampSnap(n ?? toNumber(model?.value) ?? min));
+  display.addEventListener('input', () => {
+    const typed = parseAmount(display.value);
+    if (typed !== null && typed >= min && typed <= max) {
+      slider.value = snap(typed, min, max, step);
+      wrapper.style.setProperty('--progress', (slider.value - min) / (max - min));
+    }
+  });
+  const onTextCommit = () => {
+    const typed = parseAmount(display.value);
+    commit(typed === null ? Number(slider.value) : typed);
   };
-  textBox.addEventListener('blur', commitText);
-  textBox.addEventListener('keydown', (e) => {
+  display.addEventListener('blur', onTextCommit);
+  display.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      commitText();
+      onTextCommit();
     }
   });
 
-  const initial = toNumber(fieldJson?.value) ?? toNumber(fieldJson?.default) ?? min;
-  render(clampSnap(initial));
+  const initial = parseAmount(input.value);
+  render(snap(initial ?? min, min, max, step));
+  if (initial === null) input.value = min;
 
-  subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
-    if (eventType === 'register') {
-      model = fieldModel;
-      const n = toNumber(model.value);
-      if (n !== null) render(clampSnap(n));
-    } else if (eventType === 'change') {
-      payload?.changes?.forEach((change) => {
+  // reflect model-driven changes (rules, prefill, reset)
+  subscribe(fieldDiv, formId, (_, fieldModel) => {
+    fieldModel?.subscribe((e) => {
+      e.payload?.changes?.forEach((change) => {
         if (change.propertyName === 'value') {
-          const n = toNumber(change.currentValue);
-          if (n !== null && document.activeElement !== textBox) render(clampSnap(n));
-        } else if (change.propertyName === 'enabled') {
-          slider.disabled = change.currentValue === false;
-          textBox.disabled = change.currentValue === false;
+          const v = Number(change.currentValue);
+          if (!Number.isNaN(v) && change.currentValue !== '') {
+            input.value = v;
+            render(snap(v, min, max, step));
+          }
         }
       });
-    }
-  }, { listenChanges: true });
-
+    }, 'change');
+  });
   return fieldDiv;
 }

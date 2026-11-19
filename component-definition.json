@@ -697,8 +697,6 @@
                   "jcr:title": "Loan Slider",
                   "fieldType": "number-input",
                   "fd:viewType": "loan-slider",
-                  "minimum": 50000,
-                  "maximum": 1250000,
                   "enabled": true,
                   "visible": true
                 }
