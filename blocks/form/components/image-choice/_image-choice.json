@@ -1,0 +1,117 @@
+{
+  "definitions": [
+    {
+      "title": "Image Choice",
+      "id": "image-choice",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/checkboxgroup/v1/checkboxgroup",
+            "template": {
+              "jcr:title": "Image Choice",
+              "fieldType": "checkbox-group",
+              "fd:viewType": "image-choice",
+              "enum": [
+                "0",
+                "1"
+              ],
+              "enumNames": [
+                "Option 1",
+                "Option 2"
+              ],
+              "type": "string[]",
+              "selectionMode": "single",
+              "columns": 4,
+              "showLabels": false
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "image-choice",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-select-fields.json#/fields"
+        },
+        {
+          "component": "select",
+          "label": "Save value as",
+          "name": "type",
+          "valueType": "string",
+          "value": "string[]",
+          "options": [
+            {
+              "name": "String",
+              "value": "string[]"
+            },
+            {
+              "name": "Number",
+              "value": "number[]"
+            }
+          ]
+        },
+        {
+          "component": "tab",
+          "label": "Validation",
+          "name": "validation"
+        },
+        {
+          "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+        },
+        {
+          "component": "tab",
+          "label": "Custom Properties",
+          "name": "custom"
+        },
+        {
+          "component": "radio-group",
+          "name": "selectionMode",
+          "label": "Selection mode",
+          "valueType": "string",
+          "value": "single",
+          "options": [
+            {
+              "name": "Single",
+              "value": "single"
+            },
+            {
+              "name": "Multiple",
+              "value": "multi"
+            }
+          ]
+        },
+        {
+          "component": "textarea",
+          "name": "imageUrls",
+          "label": "Image URLs",
+          "valueType": "string",
+          "description": "One image URL per line, in the same order as the options."
+        },
+        {
+          "component": "number",
+          "name": "columns",
+          "label": "Columns",
+          "valueType": "number",
+          "value": 4
+        },
+        {
+          "component": "boolean",
+          "name": "showLabels",
+          "label": "Show option labels",
+          "valueType": "boolean"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        }
+      ]
+    }
+  ]
+}
