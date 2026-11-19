@@ -1,32 +1,31 @@
 # Image Choice
 
-A checkbox group rendered as a grid of selectable images. Authors choose whether users can pick a single image or several.
+Image-based option picker (e.g. "Select your team"): each option is shown as a clickable image, and the author chooses whether one or many can be selected.
 
 ## How to Use
 
-Add the **Image choice** component from the *Custom Form Components* group, define the options (data value and display value) and give each option an image URL in the same order.
+Add an **Image choice** field in the Universal Editor. Set the options in *Options (Data Value)* / *Options (Display Value)*, then list one image URL per option, in the same order, in *Option images*. The display value is used as the image `alt` text and tooltip. Options without an image fall back to showing their text.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `selectionMode` | `single` (default) allows one image at a time; `multi` allows several. |
-| `imageUrls` | Image URL per option, in the same order as the options. |
-| `columns` | Images per row. Empty fits as many as possible. |
-| `showLabels` | Shows the display value under each image. It is always used as the image `alt`. |
+| `selectionMode` | `single` (default) selects one image at a time; `multiple` allows several (use Min/Max items validation to constrain) |
+| `images` | Image URL/path per option, in option order |
+| `columns` | Images per row (default 4; 2 on narrow screens) |
 
-All other properties come from the checkbox group (options, default, required, `minItems`/`maxItems`, help text, ...).
+All standard checkbox-group properties (label, required, enum, enumNames, default, help text, etc.) are available.
 
 ## Model Subscriptions
 
-- `enum` / `enumNames`: the form block re-renders the options, so the images are applied again.
+Listens to its own `value` changes. In `single` mode, if a rule sets more than one value, only the last one is kept.
 
 ## Model Properties Set
 
-`value` is an array of the selected option values (as with a checkbox group), committed from the native checkbox `change` event, once per click. In `single` mode the other checkboxes are unchecked before the event reaches the form, so the model changes once and only holds one value. Clicking the selected image again clears the selection unless the field is required.
+Sets `value` (an array) via the native `change` event of the underlying checkbox, i.e. once per click; change rules fire once per selection change. In single mode the other checkboxes are cleared before the model is read, and clicking the selected image again deselects it.
 
 ## Usage Notes
 
 - Base type: `checkbox-group`; `fd:viewType`: `image-choice`.
-- The native checkboxes stay in the DOM (visually transparent over the image), so keyboard (Space, Tab) and validation behave as usual.
-- An option without an image URL falls back to its text label.
+- The native checkboxes stay in the DOM (visually hidden over the image), so keyboard (Tab/Space), required validation and disabled/read-only state keep working.
+- If options are re-rendered by the form block (enum changes), the image decoration is re-applied.

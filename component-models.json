@@ -4200,46 +4200,6 @@
         ]
       },
       {
-        "component": "radio-group",
-        "label": "Selection mode",
-        "name": "selectionMode",
-        "valueType": "string",
-        "value": "single",
-        "options": [
-          {
-            "name": "Single",
-            "value": "single"
-          },
-          {
-            "name": "Multiple",
-            "value": "multi"
-          }
-        ]
-      },
-      {
-        "component": "text",
-        "name": "imageUrls",
-        "label": "Option images (URLs)",
-        "valueType": "string",
-        "multi": true,
-        "description": "One image URL per option, in the same order as the options."
-      },
-      {
-        "component": "number",
-        "name": "columns",
-        "label": "Columns",
-        "valueType": "number",
-        "description": "Number of images per row. Leave empty to fit automatically."
-      },
-      {
-        "component": "boolean",
-        "name": "showLabels",
-        "label": "Show option labels",
-        "valueType": "boolean",
-        "value": false,
-        "description": "Show the display value below each image. It is always used as the image alt text."
-      },
-      {
         "component": "tab",
         "label": "Validation",
         "name": "validation"
@@ -4263,6 +4223,43 @@
         "label": "Script validation message",
         "valueType": "string",
         "description": "Displayed when validation script fails."
+      },
+      {
+        "component": "tab",
+        "label": "Image Choice",
+        "name": "imagechoice"
+      },
+      {
+        "component": "select",
+        "name": "selectionMode",
+        "label": "Selection mode",
+        "valueType": "string",
+        "value": "single",
+        "options": [
+          {
+            "name": "Single choice",
+            "value": "single"
+          },
+          {
+            "name": "Multiple choice",
+            "value": "multiple"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "name": "images",
+        "label": "Option images (URL or path)",
+        "valueType": "string",
+        "multi": true,
+        "description": "One image per option, in the same order as the options. Option display values are used as alt text."
+      },
+      {
+        "component": "number",
+        "name": "columns",
+        "label": "Columns",
+        "valueType": "number",
+        "description": "Number of images per row (default 4)"
       },
       {
         "component": "tab",

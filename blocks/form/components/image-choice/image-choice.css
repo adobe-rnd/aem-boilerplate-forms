@@ -1,20 +1,9 @@
 .form .image-choice {
-    --image-choice-size: 96px;
-    --image-choice-selected-color: var(--link-color, #3b63fb);
-}
-
-.form .image-choice.image-choice-fixed-columns,
-.form .image-choice:not(.image-choice-fixed-columns) {
     display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns, 4), minmax(0, 1fr));
     gap: 16px;
-}
-
-.form .image-choice:not(.image-choice-fixed-columns) {
-    grid-template-columns: repeat(auto-fill, minmax(var(--image-choice-size), 1fr));
-}
-
-.form .image-choice.image-choice-fixed-columns {
-    grid-template-columns: repeat(var(--image-choice-columns), minmax(0, 1fr));
+    border: none;
+    padding: 0;
 }
 
 .form .image-choice > legend,
@@ -22,13 +11,19 @@
     grid-column: 1 / -1;
 }
 
-.form .image-choice .image-choice-item {
+.form .image-choice > legend {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.form .image-choice .image-choice-option {
     position: relative;
     margin: 0;
     padding: 0;
 }
 
-.form .image-choice .image-choice-item input {
+.form .image-choice .image-choice-option input[type="checkbox"] {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -39,57 +34,68 @@
     z-index: 1;
 }
 
-.form .image-choice .image-choice-item input:disabled {
-    cursor: not-allowed;
-}
-
-.form .image-choice .image-choice-item label {
+.form .image-choice .image-choice-label {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     box-sizing: border-box;
-    height: 100%;
+    min-height: 96px;
     padding: 12px;
     border: 2px solid transparent;
     border-radius: 8px;
-    text-align: center;
-    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    background: var(--background-color, #fff);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.form .image-choice .image-choice-item label::before,
-.form .image-choice .image-choice-item label::after {
+.form .image-choice .image-choice-label::before,
+.form .image-choice .image-choice-label::after {
     display: none;
 }
 
-.form .image-choice .image-choice-item label img {
-    width: 100%;
-    max-width: var(--image-choice-size);
-    height: auto;
-    aspect-ratio: 1;
+.form .image-choice .image-choice-label img {
+    max-width: 100%;
+    max-height: 80px;
     object-fit: contain;
 }
 
-.form .image-choice.field-invalid .image-choice-item label {
+.form .image-choice.field-invalid .image-choice-label {
     border-color: var(--form-error-color, #d31510);
 }
 
-.form .image-choice .image-choice-item input:checked + label {
-    border-color: var(--image-choice-selected-color);
-    background-color: rgb(59 99 251 / 8%);
-    box-shadow: 0 0 0 1px var(--image-choice-selected-color);
+.form .image-choice .image-choice-option:hover .image-choice-label {
+    border-color: #c5c5c5;
+    transform: scale(1.04);
 }
 
-.form .image-choice .image-choice-item input:focus-visible + label {
-    outline: 2px solid var(--image-choice-selected-color);
+.form .image-choice .image-choice-option input:checked + .image-choice-label {
+    border-color: var(--link-color, #1473e6);
+    box-shadow: 0 0 0 2px var(--link-color, #1473e6);
+}
+
+.form .image-choice .image-choice-option input:focus-visible + .image-choice-label {
+    outline: 2px solid var(--link-color, #1473e6);
     outline-offset: 2px;
 }
 
-.form .image-choice .image-choice-item input:disabled + label {
+.form .image-choice .image-choice-option input:disabled + .image-choice-label {
     opacity: 0.5;
 }
 
-.form .image-choice .image-choice-item:hover input:not(:checked, :disabled) + label {
-    border-color: #ccc;
+.form .image-choice .image-choice-option input:disabled {
+    cursor: not-allowed;
+}
+
+.form .image-choice .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+@media (width < 600px) {
+    .form .image-choice {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }

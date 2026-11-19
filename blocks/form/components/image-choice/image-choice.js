@@ -1,76 +1,72 @@
 import { subscribe } from '../../rules/index.js';
 
 function toList(value) {
-  if (Array.isArray(value)) return value;
-  if (typeof value === 'string' && value.trim()) return value.split(',').map((v) => v.trim());
+  if (Array.isArray(value)) return value.map((v) => String(v).trim());
+  if (typeof value === 'string') return value.split(/[\n,]/).map((v) => v.trim());
   return [];
 }
 
-function isTrue(value) {
-  return value === true || value === 'true';
-}
-
-function decorateOptions(fieldDiv, { images, showLabels }) {
-  fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((input, index) => {
-    const item = input.parentElement;
-    const label = item.querySelector('label');
-    if (!label || item.classList.contains('image-choice-item')) return;
-    item.classList.add('image-choice-item');
+function decorateOptions(fieldDiv, images, columns) {
+  const options = [...fieldDiv.querySelectorAll(':scope > div')]
+    .filter((div) => div.querySelector('input[type="checkbox"]'));
+  options.forEach((option, index) => {
+    if (option.classList.contains('image-choice-option')) return;
+    option.classList.add('image-choice-option');
+    const input = option.querySelector('input');
+    const label = option.querySelector('label');
     const text = label.textContent.trim();
     const src = images[index];
+    label.textContent = '';
+    label.classList.add('image-choice-label');
     if (src) {
       const img = document.createElement('img');
       img.src = src;
       img.alt = text;
       img.loading = 'lazy';
-      label.textContent = '';
       label.append(img);
-      if (showLabels) {
-        const caption = document.createElement('span');
-        caption.className = 'image-choice-caption';
-        caption.textContent = text;
-        label.append(caption);
-      } else {
-        label.title = text;
-      }
     }
+    const caption = document.createElement('span');
+    caption.className = src ? 'image-choice-text visually-hidden' : 'image-choice-text';
+    caption.textContent = text;
+    label.append(caption);
+    input.title = text;
   });
+  if (columns > 0) {
+    fieldDiv.style.setProperty('--image-choice-columns', columns);
+  }
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const props = fieldJson?.properties || {};
-  const isSingle = props.selectionMode !== 'multi';
-  const options = {
-    images: toList(props.imageUrls),
-    showLabels: isTrue(props.showLabels),
-  };
-  const columns = parseInt(props.columns, 10);
+  const single = props.selectionMode !== 'multiple';
+  const images = toList(props.images);
+  const columns = parseInt(props.columns, 10) || 0;
 
-  fieldDiv.classList.add('image-choice');
-  fieldDiv.dataset.selectionMode = isSingle ? 'single' : 'multi';
-  if (columns > 0) {
-    fieldDiv.style.setProperty('--image-choice-columns', columns);
-    fieldDiv.classList.add('image-choice-fixed-columns');
+  fieldDiv.classList.add('image-choice', single ? 'image-choice-single' : 'image-choice-multiple');
+  decorateOptions(fieldDiv, images, columns);
+
+  // options are rebuilt by the form block when enum/enumNames change
+  new MutationObserver(() => decorateOptions(fieldDiv, images, columns))
+    .observe(fieldDiv, { childList: true });
+
+  if (single) {
+    // uncheck siblings before the form block reads the group value on bubble
+    fieldDiv.addEventListener('change', (event) => {
+      const { target } = event;
+      if (target.type !== 'checkbox' || !target.checked) return;
+      fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+        if (input !== target) input.checked = false;
+      });
+    });
   }
 
-  decorateOptions(fieldDiv, options);
-
-  // Runs before the form's own change handler, so the model sees only the final selection.
-  fieldDiv.addEventListener('change', (e) => {
-    const { target } = e;
-    if (isSingle && target.type === 'checkbox' && target.checked) {
-      fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((other) => {
-        if (other !== target && other.checked) other.checked = false;
-      });
-    }
-  });
-
-  subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
-    if (eventType !== 'change') return;
-    const changes = payload?.changes || [];
-    if (changes.some((c) => ['enum', 'enumNames'].includes(c.propertyName))) {
-      // The form block re-renders the options on enum changes; decorate the new markup afterwards.
-      Promise.resolve().then(() => decorateOptions(fieldDiv, options));
+  subscribe(fieldDiv, formId, (_fieldDiv, model, eventType, payload) => {
+    if (eventType !== 'change' || !single) return;
+    const change = payload?.changes?.find((c) => c.propertyName === 'value');
+    const value = change?.currentValue;
+    // a rule may set several values; keep a single selection in the model
+    if (Array.isArray(value) && value.length > 1) {
+      model.value = [value[value.length - 1]];
     }
   }, { listenChanges: true });
 
