@@ -685,6 +685,22 @@
               }
             }
           }
+        },
+        {
+          "title": "INR Input",
+          "id": "inr-input",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                "template": {
+                  "jcr:title": "INR Input",
+                  "fieldType": "text-input",
+                  "fd:viewType": "inr-input"
+                }
+              }
+            }
+          }
         }
       ]
     }
