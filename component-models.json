@@ -3993,19 +3993,6 @@
         ]
       },
       {
-        "component": "text",
-        "name": "subtitle",
-        "label": "Subtitle",
-        "valueType": "string"
-      },
-      {
-        "component": "text",
-        "name": "selectLabel",
-        "label": "Select button label",
-        "valueType": "string",
-        "value": "Get This Card"
-      },
-      {
         "component": "tab",
         "label": "Validation",
         "name": "validation"

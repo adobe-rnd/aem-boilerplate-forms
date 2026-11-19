@@ -1,229 +1,169 @@
-.form .card-choice-wrapper .card-choice-widget {
+.form .card-choice-widget {
     position: relative;
-    width: 100%;
+    padding-bottom: 32px;
 }
 
-.form .card-choice-wrapper .card-choice-header {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 16px;
+.form .card-choice-viewport {
+    overflow: hidden;
 }
 
-.form .card-choice-wrapper .card-choice-subtitle {
-    margin: 0 0 16px;
-    color: #5f6368;
-}
-
-.form .card-choice-wrapper .card-choice-categories {
-    display: flex;
-    gap: 12px;
-}
-
-.form .card-choice-wrapper .card-choice-category {
-    padding: 6px 14px;
-    border: 1px solid #1f3fc5;
-    border-radius: 20px;
-    background: #fff;
-    color: #1f3fc5;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.form .card-choice-wrapper .card-choice-category.active {
-    background: #1f3fc5;
-    color: #fff;
-}
-
-.form .card-choice-wrapper .card-choice-viewport {
-    position: relative;
-}
-
-.form .card-choice-wrapper .card-choice-track {
+.form .card-choice-track {
     display: flex;
     gap: 24px;
     margin: 0;
-    padding: 4px 2px 8px;
+    padding: 4px;
     list-style: none;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    scroll-padding: 4px;
     scroll-behavior: smooth;
     scrollbar-width: none;
 }
 
-.form .card-choice-wrapper .card-choice-track::-webkit-scrollbar {
+.form .card-choice-track::-webkit-scrollbar {
     display: none;
 }
 
-.form .card-choice-wrapper .card-choice-card {
-    flex: 0 0 min(292px, 80%);
-    box-sizing: border-box;
-    padding: 20px;
-    border: 1px solid #dcdfe6;
-    border-radius: 12px;
-    background: #fff;
+.form .card-choice-card {
+    flex: 0 0 min(300px, 85%);
     scroll-snap-align: start;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #d9dce3;
+    border-radius: 16px;
+    cursor: pointer;
 }
 
-.form .card-choice-wrapper .card-choice-card.selected {
-    border-color: #1f3fc5;
-    box-shadow: 0 0 0 2px #1f3fc5;
+.form .card-choice-card.selected {
+    border-color: #1f3fc4;
+    box-shadow: 0 0 0 2px #1f3fc4;
 }
 
-.form .card-choice-wrapper .card-choice-title {
-    margin: 0 0 6px;
+.form .card-choice-title {
+    margin: 0;
     font-size: 18px;
     font-weight: 600;
 }
 
-.form .card-choice-wrapper .card-choice-card-subtitle {
-    margin: 0 0 16px;
-    color: #5f6368;
+.form .card-choice-tagline {
+    margin: 0;
+    color: #5b6170;
     font-size: 14px;
 }
 
-.form .card-choice-wrapper .card-choice-image {
-    display: block;
+.form .card-choice-image {
     width: 166px;
     max-width: 100%;
     height: auto;
-    margin-bottom: 16px;
     border-radius: 8px;
 }
 
-.form .card-choice-wrapper .card-choice-features {
-    margin: 0 0 12px;
+.form .card-choice-features {
+    margin: 0;
     padding: 0;
     list-style: none;
     font-size: 13px;
 }
 
-.form .card-choice-wrapper .card-choice-features li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+.form .card-choice-features li {
+    padding: 4px 0;
 }
 
-.form .card-choice-wrapper .card-choice-feature-icon {
-    flex: 0 0 14px;
-    width: 14px;
-    height: 14px;
-}
-
-.form .card-choice-wrapper .card-choice-feature-bullet {
-    border: 1.5px solid #333;
-    border-radius: 3px;
-    box-sizing: border-box;
-}
-
-.form .card-choice-wrapper .card-choice-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 16px;
-    color: #1f3fc5;
+.form .card-choice-link {
+    color: #1f3fc4;
     font-weight: 600;
     font-size: 14px;
     text-decoration: none;
 }
 
-.form .card-choice-wrapper .card-choice-link svg {
-    width: 12px;
-    height: 12px;
-}
-
-.form .card-choice-wrapper .card-choice-amount {
+.form .card-choice-amount {
     display: flex;
     align-items: stretch;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    border: 1px solid #dcdfe6;
+    margin-top: auto;
+    border: 1px solid #d9dce3;
     border-radius: 8px;
     overflow: hidden;
     font-size: 13px;
 }
 
-.form .card-choice-wrapper .card-choice-amount-label {
+.form .card-choice-amount-label {
+    flex: 1;
     padding: 12px;
 }
 
-.form .card-choice-wrapper .card-choice-amount-value {
+.form .card-choice-amount-value {
     padding: 12px;
-    background: #f3f4f8;
-    font-weight: 700;
+    background: #f1f2f6;
+    font-weight: 600;
     font-size: 15px;
 }
 
-.form .card-choice-wrapper .card-choice-select {
+.form .card-choice-select {
     width: 100%;
     padding: 12px;
-    border: 1px solid #1f3fc5;
-    border-radius: 8px;
+    color: #1f3fc4;
     background: #fff;
-    color: #1f3fc5;
+    border: 1px solid #1f3fc4;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
 }
 
-.form .card-choice-wrapper .card-choice-select:hover,
-.form .card-choice-wrapper .card-choice-card.selected .card-choice-select {
-    background: #1f3fc5;
+.form .card-choice-card.selected .card-choice-select {
     color: #fff;
+    background: #1f3fc4;
 }
 
-.form .card-choice-wrapper .card-choice-next {
+.form .card-choice-nav {
     position: absolute;
-    top: 50%;
-    right: -8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 45%;
+    right: 0;
     width: 36px;
     height: 36px;
     padding: 0;
+    color: #fff;
+    background: #1f3fc4;
     border: 0;
     border-radius: 50%;
-    background: #1f3fc5;
-    color: #fff;
-    transform: translateY(-50%);
+    font-size: 22px;
+    line-height: 1;
     cursor: pointer;
 }
 
-.form .card-choice-wrapper .card-choice-next[hidden] {
+.form .card-choice-prev {
+    right: auto;
+    left: 0;
+}
+
+.form .card-choice-nav:disabled {
     display: none;
 }
 
-.form .card-choice-wrapper .card-choice-next svg {
-    width: 16px;
-    height: 16px;
-}
-
-.form .card-choice-wrapper .card-choice-dots {
+.form .card-choice-dots {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 12px;
 }
 
-.form .card-choice-wrapper .card-choice-dot {
+.form .card-choice-dot {
     width: 8px;
     height: 8px;
     padding: 0;
+    background: #c9cde0;
     border: 0;
     border-radius: 4px;
-    background: #c5cbe0;
     cursor: pointer;
 }
 
-.form .card-choice-wrapper .card-choice-dot.active {
+.form .card-choice-dot.active {
     width: 32px;
-    background: #4f6bdc;
-}
-
-.form .card-choice-wrapper .card-choice-select:focus-visible,
-.form .card-choice-wrapper .card-choice-next:focus-visible,
-.form .card-choice-wrapper .card-choice-track:focus-visible,
-.form .card-choice-wrapper .card-choice-category:focus-visible {
-    outline: 2px solid #1f3fc5;
-    outline-offset: 2px;
+    background: #4c63d2;
 }

@@ -1,43 +1,33 @@
 # Card Choice
 
-A horizontally scrollable carousel of cards. A rule sets the card data on the field; the customer picks one and its details are stored in the model.
+Horizontally scrollable carousel of selectable cards, populated by a rule.
 
 ## How to Use
 
-Insert **Card Choice** in the form. Use a rule (or custom function) to set the card data:
-
-```js
-dispatchEvent($form.cardChoice, 'custom:setProperty', { properties: { cards: `[ /* card objects */ ]` } });
-```
-
-Card object:
+Insert the "Card Choice" component. A rule sets the cards on the field's `properties.cards`
+(for example `setProperty(field, { properties: { cards: [...] } })`). Each card is an object:
 
 | Key | Description |
 |-----|-------------|
-| `id` | Unique id (falls back to `title`) |
-| `title`, `subtitle` | Heading and tagline |
+| `id` | Unique key (falls back to `name`) |
+| `name` | Card title |
+| `tagline` | Sub heading |
 | `image`, `imageAlt` | Card image |
-| `features` | Array of strings or `{ icon, text }` |
+| `features` | Array of strings |
 | `linkText`, `linkUrl` | "All Features & Benefits" link |
-| `minAmountLabel`, `minAmount` | Display-ready label and amount (e.g. `₹ 15,000/-`) |
-| `ctaLabel` | Overrides the select button label |
-| `category` | Optional; when 2+ categories exist, filter chips are shown |
-
-## Authoring Properties
-
-| Property | Description |
-|----------|-------------|
-| `subtitle` | Text shown above the carousel |
-| `selectLabel` | Default select button label (default `Get This Card`) |
+| `minAmountLabel`, `minAmount` | Min. FD amount box (numbers formatted as ₹ en-IN) |
+| `buttonLabel` | Button text (default "Get This Card") |
 
 ## Model Subscriptions
 
-Subscribes to `properties.cards` (data) and `value` (selection) changes.
+`properties.cards` (the entry re-renders the carousel) and `value` (highlights the selected card).
 
 ## Model Properties Set
 
-`value` is set to the JSON string of the selected card object, once per click (committed immediately, not on blur). Rules can `JSON.parse($field.$value)`.
+`value` is set to the JSON string of the selected card object when the user clicks a card or its
+button. It is committed once per selection.
 
 ## Usage Notes
 
-Base type `text-input`, `fd:viewType` `card-choice`. Scroll with touch, the next button, dots, or arrow keys on the track.
+Base type `text-input`, `fd:viewType` `card-choice`. The carousel uses CSS scroll snapping, prev/next
+buttons, pagination dots and arrow-key navigation.

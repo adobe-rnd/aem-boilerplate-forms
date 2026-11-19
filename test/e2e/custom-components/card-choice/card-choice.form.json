@@ -16,9 +16,7 @@
         "value": "Card Choice",
         "visible": true
       },
-      "properties": {
-        "selectLabel": "Pick It"
-      }
+      "properties": {}
     },
     {
       "id": "next-field",
@@ -26,11 +24,6 @@
       "fieldType": "text-input",
       "label": {
         "value": "Next field"
-      },
-      "events": {
-        "change": [
-          "dispatchEvent($form.fieldUnderTest, 'custom:setProperty', {properties: {cards: `[{\"id\": \"freedom\", \"title\": \"Freedom\", \"subtitle\": \"Best Card for Rewards & Offers\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - \\u20b9500/-\"], \"linkText\": \"All Features & Benefits\", \"minAmount\": \"\\u20b9 15,000/-\", \"category\": \"Retail Cards\"}, {\"id\": \"oil\", \"title\": \"Indian Oil\", \"features\": [\"Upto 5% Fuel Points\"], \"minAmount\": \"\\u20b9 30,000/-\", \"category\": \"Retail Cards\"}, {\"id\": \"money\", \"title\": \"Moneyback+\", \"minAmount\": \"\\u20b9 30,000/-\", \"category\": \"Retail Cards\"}, {\"id\": \"tata\", \"title\": \"Tata Neu\", \"minAmount\": \"\\u20b9 50,000/-\", \"category\": \"Retail Cards\"}, {\"id\": \"biz\", \"title\": \"Business Gold\", \"minAmount\": \"\\u20b9 1,00,000/-\", \"category\": \"Business Cards\"}]`}})"
-        ]
       }
     }
   ]
