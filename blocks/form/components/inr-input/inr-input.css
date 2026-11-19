@@ -1,0 +1,55 @@
+.form .inr-input-wrapper .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: var(--form-input-border-size, 1px) solid var(--form-input-border-color, #c5c5c5);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.form .inr-input-wrapper .inr-input-group:focus-within {
+    outline: 2px solid var(--button-primary-color, #1473e6);
+    outline-offset: 1px;
+}
+
+.form .inr-input-wrapper .inr-input-symbol {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 1.25rem;
+    background: #f1f2f6;
+    border-right: 1px solid var(--form-input-border-color, #c5c5c5);
+    color: #4b5160;
+}
+
+.form .inr-input-wrapper .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    margin: 0;
+}
+
+.form .inr-input-wrapper[data-invalid="true"] .inr-input-group {
+    border-color: var(--form-error-color, #d31510);
+}
+
+.form .inr-input-wrapper .inr-input-words {
+    margin-top: 16px;
+}
+
+.form .inr-input-wrapper .inr-input-words-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.form .inr-input-wrapper .inr-input-words-output {
+    width: 100%;
+    box-sizing: border-box;
+    background: #f1f2f6;
+    border: var(--form-input-border-size, 1px) solid var(--form-input-border-color, #c5c5c5);
+    border-radius: 8px;
+    cursor: default;
+}
