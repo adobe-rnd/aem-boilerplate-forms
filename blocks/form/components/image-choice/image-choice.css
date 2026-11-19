@@ -1,0 +1,108 @@
+.form .image-choice {
+    border: 0;
+    padding: 0;
+}
+
+.form .image-choice > .image-choice-item {
+    margin: 0;
+}
+
+.form .image-choice .field-description {
+    grid-column: 1 / -1;
+}
+
+.form .image-choice > legend {
+    grid-column: 1 / -1;
+}
+
+.form .image-choice {
+    display: grid;
+    grid-template-columns: repeat(var(--image-choice-columns, 4), minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.form .image-choice .image-choice-item {
+    position: relative;
+}
+
+.form .image-choice .image-choice-item > input[type="checkbox"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.form .image-choice .image-choice-item > label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 0.75rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
+}
+
+.form .image-choice .image-choice-item > label::before,
+.form .image-choice .image-choice-item > label::after {
+    display: none;
+}
+
+.form .image-choice .image-choice-item:hover > label {
+    background-color: rgb(0 0 0 / 4%);
+    transform: translateY(-1px);
+}
+
+.form .image-choice .image-choice-item > label img {
+    display: block;
+    width: 100%;
+    max-width: 96px;
+    aspect-ratio: 1;
+    object-fit: contain;
+}
+
+.form .image-choice .image-choice-item > input:checked + label {
+    border-color: var(--link-color, #035fe6);
+    background-color: rgb(3 95 230 / 8%);
+}
+
+.form .image-choice .image-choice-item > input:focus-visible + label {
+    outline: 2px solid var(--link-color, #035fe6);
+    outline-offset: 2px;
+}
+
+.form .image-choice .image-choice-item > input:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form .image-choice.field-invalid .image-choice-item > label {
+    border-color: var(--form-error-color, #d31510);
+}
+
+.form .image-choice .image-choice-label {
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.form .image-choice .image-choice-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+@media (width < 600px) {
+    .form .image-choice {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
