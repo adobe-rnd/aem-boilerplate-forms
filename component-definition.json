@@ -694,9 +694,11 @@
               "page": {
                 "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                 "template": {
-                  "jcr:title": "Loan Amount",
+                  "jcr:title": "Loan Slider",
                   "fieldType": "number-input",
                   "fd:viewType": "loan-slider",
+                  "minimum": 50000,
+                  "maximum": 1250000,
                   "enabled": true,
                   "visible": true
                 }
