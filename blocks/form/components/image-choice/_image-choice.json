@@ -39,42 +39,21 @@
                     "...": "../../models/form-common/_basic-select-fields.json#/fields"
                 },
                 {
-                    "component": "text",
-                    "name": "imageUrls",
-                    "label": "Option images (URL or path, same order as options)",
-                    "valueType": "string",
-                    "multi": true
-                },
-                {
                     "component": "select",
-                    "name": "selectionMode",
-                    "label": "Selection mode",
+                    "label": "Save value as",
+                    "name": "type",
                     "valueType": "string",
-                    "value": "single",
+                    "value": "string[]",
                     "options": [
                         {
-                            "name": "Single",
-                            "value": "single"
+                            "name": "String",
+                            "value": "string[]"
                         },
                         {
-                            "name": "Multiple",
-                            "value": "multiple"
+                            "name": "Number",
+                            "value": "number[]"
                         }
                     ]
-                },
-                {
-                    "component": "number",
-                    "name": "columns",
-                    "label": "Columns",
-                    "valueType": "number",
-                    "value": 4
-                },
-                {
-                    "component": "boolean",
-                    "name": "showLabels",
-                    "label": "Show option labels",
-                    "valueType": "boolean",
-                    "value": false
                 },
                 {
                     "component": "tab",
@@ -83,6 +62,51 @@
                 },
                 {
                     "...": "../../models/form-common/_basic-validation-fields.json#/fields"
+                },
+                {
+                    "component": "tab",
+                    "label": "Image Choice",
+                    "name": "imagechoice"
+                },
+                {
+                    "component": "radio-group",
+                    "label": "Selection mode",
+                    "name": "selectionMode",
+                    "valueType": "string",
+                    "value": "single",
+                    "options": [
+                        {
+                            "name": "Single choice",
+                            "value": "single"
+                        },
+                        {
+                            "name": "Multiple choice",
+                            "value": "multi"
+                        }
+                    ]
+                },
+                {
+                    "component": "textarea",
+                    "label": "Image URLs",
+                    "name": "imageUrls",
+                    "valueType": "string",
+                    "description": "One image URL per line, in the same order as the options"
+                },
+                {
+                    "component": "number",
+                    "label": "Columns",
+                    "name": "columns",
+                    "valueType": "number",
+                    "value": 4,
+                    "description": "Number of images per row"
+                },
+                {
+                    "component": "boolean",
+                    "label": "Show labels",
+                    "name": "showLabels",
+                    "valueType": "boolean",
+                    "value": false,
+                    "description": "Show option names below the images"
                 },
                 {
                     "...": "../../models/form-common/_help-container.json#/fields"

@@ -1,57 +1,73 @@
 import { subscribe } from '../../rules/index.js';
 
-const toArray = (v) => {
-  if (Array.isArray(v)) return v;
-  return v === undefined || v === null || v === '' ? [] : [v];
-};
+function parseUrls(value) {
+  return (value || '').split(/\r?\n/).map((url) => url.trim());
+}
 
-function enhance(fieldDiv, props) {
-  const images = toArray(props.imageUrls);
-  const columns = parseInt(props.columns, 10);
-  fieldDiv.classList.add('image-choice');
-  if (columns > 0) fieldDiv.style.setProperty('--image-choice-columns', columns);
-  fieldDiv.classList.toggle('show-labels', props.showLabels === true || props.showLabels === 'true');
-
+function buildOptions(fieldDiv, urls) {
   fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((input, index) => {
-    const label = input.parentElement.querySelector('label');
-    if (!label || label.querySelector('.image-choice-image')) return;
-    const text = label.textContent.trim();
-    const caption = document.createElement('span');
-    caption.className = 'image-choice-label';
-    caption.textContent = text;
-    label.replaceChildren();
-    if (images[index]) {
+    const option = input.closest('div');
+    const label = option.querySelector('label');
+    option.classList.add('image-choice-option');
+    const url = urls[index];
+    if (url && !label.querySelector('.image-choice-image')) {
       const img = document.createElement('img');
       img.className = 'image-choice-image';
-      img.src = images[index];
-      img.alt = '';
+      img.src = url;
+      img.alt = label.textContent.trim();
       img.loading = 'lazy';
-      label.append(img);
+      label.prepend(img);
     }
-    label.append(caption);
-    label.title = text;
+    const text = [...label.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+    if (text && !label.querySelector('.image-choice-text')) {
+      const span = document.createElement('span');
+      span.className = 'image-choice-text';
+      span.textContent = text.textContent;
+      text.replaceWith(span);
+    }
   });
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const props = fieldJson?.properties || {};
-  const single = props.selectionMode !== 'multiple';
-  enhance(fieldDiv, props);
-  fieldDiv.dataset.selectionMode = single ? 'single' : 'multiple';
+  const isSingle = props.selectionMode !== 'multi';
+  const columns = Number.parseInt(props.columns, 10) || 4;
+  const showLabels = props.showLabels === true || props.showLabels === 'true';
 
-  // Runs before the form-level change listener, so the model receives one combined value.
+  fieldDiv.classList.add('image-choice', isSingle ? 'image-choice-single' : 'image-choice-multi');
+  fieldDiv.classList.toggle('image-choice-show-labels', showLabels);
+  fieldDiv.style.setProperty('--image-choice-columns', columns);
+  buildOptions(fieldDiv, parseUrls(props.imageUrls));
+
+  // Runs before the form-level listener so the model sees a single selection.
   fieldDiv.addEventListener('change', (e) => {
-    const { target } = e;
-    if (!single || target.type !== 'checkbox' || !target.checked) return;
-    fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((other) => {
-      if (other !== target) other.checked = false;
-    });
-  });
+    const input = e.target;
+    if (isSingle && input.checked) {
+      fieldDiv.querySelectorAll('input[type="checkbox"]').forEach((other) => {
+        if (other !== input) other.checked = false;
+      });
+    }
+  }, true);
+
+  const enforceSingle = (model) => {
+    const value = model?.value;
+    if (isSingle && Array.isArray(value) && value.length > 1) {
+      const [first] = value;
+      const inputs = fieldDiv.querySelectorAll('input[type="checkbox"]');
+      inputs.forEach((input) => { input.checked = String(input.value) === String(first); });
+    }
+  };
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
-    if (eventType === 'change') {
-      const changed = payload?.changes?.some((c) => c?.propertyName === 'properties');
-      if (changed) enhance(fieldDiv, fieldModel.properties || {});
+    if (eventType === 'register') {
+      enforceSingle(fieldModel);
+    } else if (eventType === 'change') {
+      if (payload?.changes?.some((c) => c.propertyName === 'enum' || c.propertyName === 'enumNames')) {
+        buildOptions(fieldDiv, parseUrls(props.imageUrls));
+      }
+      if (payload?.changes?.some((c) => c.propertyName === 'value')) {
+        enforceSingle(fieldModel);
+      }
     }
   }, { listenChanges: true });
 

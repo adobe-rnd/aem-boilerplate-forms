@@ -17,13 +17,11 @@
         "visible": true
       },
       "properties": {
+        "type": "string[]",
         "selectionMode": "single",
         "columns": 4,
         "showLabels": false,
-        "imageUrls": [
-          "/icons/search.svg",
-          "/icons/search.svg"
-        ]
+        "imageUrls": "data:image/gif;base64,R0lGODlhAQABAAAAACw=\ndata:image/gif;base64,R0lGODlhAQABAAAAACw=\ndata:image/gif;base64,R0lGODlhAQABAAAAACw="
       },
       "enum": [
         "a",

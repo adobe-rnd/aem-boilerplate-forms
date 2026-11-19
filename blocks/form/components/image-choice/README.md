@@ -1,31 +1,30 @@
 # Image Choice
 
-A grid of selectable images (e.g. "Select your team" logos) with configurable single or multiple selection.
+Image-based option picker (e.g. "Select your team" logo grid) supporting single or multiple selection.
 
 ## How to Use
 
-Insert **Image Choice** in the Universal Editor. Define the options (`Options (Data Value)` / `Options (Display Value)`) and, in the same order, the image URL/path for each option.
+Add the **Image Choice** component to a form, define the options (`enum` / `enumNames`), and list one image URL per line in **Image URLs**, in the same order as the options.
 
 ## Authoring Properties
 
-| Property | Name | Description |
-|----------|------|-------------|
-| Option images | `imageUrls` | Multi-value; image URL/path for the option at the same index |
-| Selection mode | `selectionMode` | `single` (default) or `multiple` |
-| Columns | `columns` | Grid columns (default 4, max 3 on narrow screens) |
-| Show option labels | `showLabels` | Show the display value under each image. Otherwise it is visually hidden but still read by screen readers and shown as tooltip |
-
-Standard checkbox-group properties (required, min/max items, etc.) apply.
+| Property | Description |
+|----------|-------------|
+| `selectionMode` | `single` (default) or `multi` |
+| `imageUrls` | One image URL per line, matching the option order |
+| `columns` | Images per row (default 4; max 3 on narrow screens) |
+| `showLabels` | Show option names under the images (default: visually hidden, still read by screen readers and used as `alt`) |
 
 ## Model Subscriptions
 
-- `properties` changes re-apply columns, labels and images.
+- `value`: in single mode, trims a multi-value model to the first entry.
+- `enum` / `enumNames`: re-decorates options.
 
 ## Model Properties Set
 
-`value` is an array (`string[]`) in both modes; in single mode it holds at most one entry. It is committed on the native `change` event of the underlying checkbox, so change rules fire once per click (selecting a new image in single mode swaps the selection in one change). Clicking a selected image deselects it.
+`model.value` is written by the OOTB checkbox-group `change` handling, once per click. In single mode the previously selected image is unchecked before that handler runs, so the value is always an array with at most one item (e.g. `["kc"]`). Clicking the selected image again clears it.
 
 ## Usage Notes
 
 - Base type: `checkbox-group`; `fd:viewType`: `image-choice`.
-- The native checkboxes remain in the DOM (visually hidden) so keyboard operation (Tab, Space), validation and model sync are provided by the core form block.
+- Native checkboxes stay in the DOM (visually hidden), so keyboard (Tab, Space) and validation (`required`, `minItems`, `maxItems`) work as usual.
