@@ -1,0 +1,56 @@
+{
+    "definitions": [
+        {
+            "title": "Card choice",
+            "id": "card-choice",
+            "plugins": {
+                "xwalk": {
+                    "page": {
+                        "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                        "template": {
+                            "jcr:title": "Card choice",
+                            "fieldType": "text-input",
+                            "fd:viewType": "card-choice"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "models": [
+        {
+            "id": "card-choice",
+            "fields": [
+                {
+                    "component": "tab",
+                    "label": "Basic",
+                    "name": "basic"
+                },
+                {
+                    "...": "../../models/form-common/_basic-input-fields.json#/fields"
+                },
+                {
+                    "component": "text",
+                    "name": "subtitle",
+                    "label": "Subtitle",
+                    "valueType": "string"
+                },
+                {
+                    "component": "text",
+                    "name": "ctaLabel",
+                    "label": "Select button label",
+                    "valueType": "string"
+                },
+                {
+                    "component": "text",
+                    "name": "minAmountLabel",
+                    "label": "Minimum amount label",
+                    "valueType": "string"
+                },
+                {
+                    "...": "../../models/form-common/_help-container.json#/fields"
+                }
+            ]
+        }
+    ]
+}

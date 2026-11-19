@@ -1,0 +1,219 @@
+/* styling for card choice */
+.form .card-choice-wrapper {
+    --card-choice-accent: #1e40c8;
+    --card-choice-border: #d9dce3;
+
+    background: #f3f4f8;
+    padding: 24px 16px;
+}
+
+.form .card-choice-wrapper .card-choice-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.form .card-choice-wrapper .card-choice-heading {
+    display: block;
+    margin: 0;
+    color: var(--card-choice-accent);
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.form .card-choice-wrapper .card-choice-subtitle {
+    margin: 8px 0 0;
+    color: #5b6170;
+}
+
+.form .card-choice-wrapper .card-choice-filters {
+    display: flex;
+    gap: 12px;
+}
+
+.form .card-choice-wrapper .card-choice-filter {
+    padding: 6px 16px;
+    border: 1px solid var(--card-choice-accent);
+    border-radius: 20px;
+    background: #fff;
+    color: var(--card-choice-accent);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.form .card-choice-wrapper .card-choice-filter.active {
+    background: var(--card-choice-accent);
+    color: #fff;
+}
+
+.form .card-choice-wrapper .card-choice-carousel {
+    position: relative;
+}
+
+.form .card-choice-wrapper .card-choice-track {
+    display: flex;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.form .card-choice-wrapper .card-choice-track::-webkit-scrollbar {
+    display: none;
+}
+
+.form .card-choice-wrapper .card-choice-card {
+    flex: 0 0 min(100%, 292px);
+    box-sizing: border-box;
+    padding: 20px;
+    border: 1px solid var(--card-choice-border);
+    border-radius: 16px;
+    background: #fff;
+    scroll-snap-align: start;
+}
+
+.form .card-choice-wrapper .card-choice-card.selected {
+    border-color: var(--card-choice-accent);
+    box-shadow: 0 0 0 2px var(--card-choice-accent);
+}
+
+.form .card-choice-wrapper .card-choice-card-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.form .card-choice-wrapper .card-choice-card-description {
+    margin: 0 0 16px;
+    color: #5b6170;
+    font-size: 14px;
+}
+
+.form .card-choice-wrapper .card-choice-card-image img {
+    display: block;
+    width: 166px;
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+.form .card-choice-wrapper .card-choice-card-features {
+    margin: 16px 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+}
+
+.form .card-choice-wrapper .card-choice-card-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.form .card-choice-wrapper .card-choice-feature-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.form .card-choice-wrapper .card-choice-card-link {
+    display: block;
+    margin-bottom: 16px;
+    color: var(--card-choice-accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.form .card-choice-wrapper .card-choice-card-amount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border: 1px solid var(--card-choice-border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.form .card-choice-wrapper .card-choice-amount-label {
+    padding: 12px;
+}
+
+.form .card-choice-wrapper .card-choice-amount-value {
+    padding: 12px;
+    background: #f3f4f8;
+    font-weight: 700;
+}
+
+.form .card-choice-wrapper .card-choice-card-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--card-choice-accent);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--card-choice-accent);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form .card-choice-wrapper .card-choice-card.selected .card-choice-card-select {
+    background: var(--card-choice-accent);
+    color: #fff;
+}
+
+.form .card-choice-wrapper .card-choice-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--card-choice-accent);
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.form .card-choice-wrapper .card-choice-prev {
+    left: -12px;
+}
+
+.form .card-choice-wrapper .card-choice-next {
+    right: -12px;
+}
+
+.form .card-choice-wrapper .card-choice-nav[hidden],
+.form .card-choice-wrapper .card-choice-dots[hidden],
+.form .card-choice-wrapper .card-choice-filters[hidden] {
+    display: none;
+}
+
+.form .card-choice-wrapper .card-choice-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.form .card-choice-wrapper .card-choice-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: #c5c9d6;
+    cursor: pointer;
+}
+
+.form .card-choice-wrapper .card-choice-dot.active {
+    width: 32px;
+    background: #5470d6;
+}
