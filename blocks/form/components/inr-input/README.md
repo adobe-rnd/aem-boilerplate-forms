@@ -1,29 +1,30 @@
 # INR Input
 
-Text input for Indian Rupee amounts with a live, read-only amount-in-words field below it.
+An editable Indian Rupee (₹) amount field with a read-only amount-in-words display below it that updates live as the user types.
 
 ## How to Use
 
-Insert **INR Input** from the Universal Editor, or set `fd:viewType` to `inr-input` on a `text-input` field.
+Add the **INR Input** component in the Universal Editor, or set `fd:viewType` to `inr-input` on a `number-input` field.
 
 ## Authoring Properties
 
+All `number-input` properties are supported, plus:
+
 | Property | Description |
 |----------|-------------|
-| `wordsLabel` | Label of the amount-in-words field (default `Amount (in words)`) |
-
-All standard text-input properties (required, placeholder, default value, validation, help) apply.
+| `wordsLabel` | Label of the amount-in-words field. Defaults to `Amount (in words)`. |
 
 ## Model Subscriptions
 
-Listens to `value` changes on the field and refreshes the input and the words.
+Subscribes to the field's own `value` changes (and the initial value on register) to keep the input and the words in sync, e.g. when a rule sets the value.
 
 ## Model Properties Set
 
-Sets `model.value` to the plain numeric string (no `₹`, no commas, e.g. `123456.5`) **on every keystroke** (component-handled `input` event), so change rules fire per keystroke. Writes are guarded by comparing with the current value. The words field is DOM-only and is not part of the model.
+Sets `model.value` (a number, or `null` when empty) on every keystroke via the `input` event, so change rules fire per keystroke. The native `change` on blur re-writes the same value. The words field is display-only and is not part of the model.
 
 ## Usage Notes
 
-- Base type `text-input`, `fd:viewType` `inr-input`.
-- The display is grouped in the Indian system (`12,34,567.50`); only digits and one decimal point with up to two decimals are accepted.
-- Words use Thousand, Lakh and Crore, e.g. `Rupees One Lakh Twenty Three Thousand Four Hundred Fifty Six and Fifty Paise Only`.
+- Base type: `number-input`; `fd:viewType`: `inr-input`.
+- Only digits and one decimal point are accepted, with at most two decimal places (Paise).
+- Words use the Indian system (Thousand, Lakh, Crore), e.g. `123456.5` → `One Lakh Twenty Three Thousand Four Hundred Fifty Six Rupees and Fifty Paise Only`.
+- `amountToWords` is exported from `inr-input.js`.

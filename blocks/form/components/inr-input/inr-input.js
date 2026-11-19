@@ -1,85 +1,75 @@
 import { subscribe } from '../../rules/index.js';
 
 const ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-  'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen',
+  'Nineteen'];
 const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-const MAX_INTEGER_DIGITS = 15;
 
-function belowThousand(n) {
-  const parts = [];
-  const hundreds = Math.floor(n / 100);
-  const rest = n % 100;
-  if (hundreds) parts.push(`${ONES[hundreds]} Hundred`);
-  if (rest < 20) {
-    if (rest) parts.push(ONES[rest]);
-  } else {
-    parts.push(`${TENS[Math.floor(rest / 10)]}${rest % 10 ? ` ${ONES[rest % 10]}` : ''}`);
-  }
-  return parts.join(' ');
+function belowHundred(n) {
+  if (n < 20) return ONES[n];
+  return [TENS[Math.floor(n / 10)], ONES[n % 10]].filter(Boolean).join(' ');
 }
 
-function integerToWords(value) {
-  let n = Number(value);
-  if (n === 0) return 'Zero';
-  const crore = Math.floor(n / 10000000);
-  n %= 10000000;
-  const parts = [];
-  if (crore) parts.push(`${integerToWords(crore)} Crore`);
-  const lakh = Math.floor(n / 100000);
-  n %= 100000;
-  const thousand = Math.floor(n / 1000);
-  const rest = n % 1000;
-  if (lakh) parts.push(`${belowThousand(lakh)} Lakh`);
-  if (thousand) parts.push(`${belowThousand(thousand)} Thousand`);
-  if (rest) parts.push(belowThousand(rest));
-  return parts.join(' ');
+function belowThousand(n) {
+  const hundreds = Math.floor(n / 100);
+  const rest = n % 100;
+  return [hundreds ? `${ONES[hundreds]} Hundred` : '', belowHundred(rest)].filter(Boolean).join(' ');
 }
 
 /**
- * Converts an amount to words using the Indian numbering system.
- * @param {string|number} amount - e.g. "1,23,456.50"
- * @returns {string} e.g. "Rupees One Lakh ... and Fifty Paise Only", or '' when not a valid amount
+ * Converts a non-negative integer to words using the Indian numbering system.
+ * Crore is applied recursively, so 100 crore reads "One Hundred Crore".
+ * @param {number} n
+ * @returns {string}
+ */
+function integerToWords(n) {
+  if (n === 0) return 'Zero';
+  const crore = Math.floor(n / 10000000);
+  const lakh = Math.floor((n % 10000000) / 100000);
+  const thousand = Math.floor((n % 100000) / 1000);
+  const rest = n % 1000;
+  return [
+    crore ? `${integerToWords(crore)} Crore` : '',
+    lakh ? `${belowHundred(lakh)} Lakh` : '',
+    thousand ? `${belowHundred(thousand)} Thousand` : '',
+    rest ? belowThousand(rest) : '',
+  ].filter(Boolean).join(' ');
+}
+
+/**
+ * Converts an amount string (for example "1234.5") to Rupees and Paise in words.
+ * Works on the string so that no floating point rounding is involved; digits beyond
+ * two decimals are ignored.
+ * @param {string|number} amount
+ * @returns {string} words, or an empty string when the amount is empty or invalid.
  */
 export function amountToWords(amount) {
-  const text = String(amount ?? '').replace(/[₹,\s]/g, '');
-  if (!/^(\d+\.?\d*|\.\d+)$/.test(text)) return '';
-  const [intPart = '', decPart = ''] = text.split('.');
+  const text = String(amount ?? '').trim();
+  if (!/^\d*\.?\d*$/.test(text) || !/\d/.test(text)) return '';
+  const [intPart = '', fracPart = ''] = text.split('.');
   const rupees = Number(intPart || '0');
-  const paise = Number(`${decPart}00`.slice(0, 2));
-  if (rupees === 0 && paise === 0) return '';
+  const paise = Number(`${fracPart}00`.slice(0, 2));
+  if (!Number.isSafeInteger(rupees)) return '';
   const parts = [];
-  if (rupees > 0) parts.push(`Rupees ${integerToWords(rupees)}`);
-  if (paise > 0) parts.push(`${rupees > 0 ? 'and ' : ''}${belowThousand(paise)} Paise`);
-  return `${parts.join(' ')} Only`;
-}
-
-/** Formats a plain numeric string with Indian digit grouping (12,34,567.5). */
-export function formatIndian(raw) {
-  const [intPart, decPart] = raw.split('.');
-  let grouped = intPart;
-  if (intPart.length > 3) {
-    grouped = `${intPart.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ',')},${intPart.slice(-3)}`;
+  if (rupees > 0 || paise === 0) {
+    parts.push(`${integerToWords(rupees)} ${rupees === 1 ? 'Rupee' : 'Rupees'}`);
   }
-  return decPart === undefined ? grouped : `${grouped}.${decPart}`;
+  if (paise > 0) {
+    parts.push(`${integerToWords(paise)} Paise`);
+  }
+  return `${parts.join(' and ')} Only`;
 }
 
-/** Keeps digits and a single decimal point, with at most two decimals. */
-export function sanitizeAmount(text) {
-  const cleaned = String(text ?? '').replace(/[^\d.]/g, '');
+/** Keeps digits and a single decimal point, with at most two decimal places. */
+function sanitize(raw) {
+  const cleaned = raw.replace(/[^\d.]/g, '');
   const dot = cleaned.indexOf('.');
-  if (dot === -1) return cleaned.slice(0, MAX_INTEGER_DIGITS);
-  const intPart = cleaned.slice(0, dot).slice(0, MAX_INTEGER_DIGITS);
-  const decPart = cleaned.slice(dot + 1).replace(/\./g, '').slice(0, 2);
-  return `${intPart}.${decPart}`;
+  if (dot === -1) return cleaned;
+  return `${cleaned.slice(0, dot)}.${cleaned.slice(dot + 1).replace(/\./g, '').slice(0, 2)}`;
 }
 
 export default function decorate(fieldDiv, fieldJson, container, formId) {
   const input = fieldDiv.querySelector('input');
-  if (!input) return fieldDiv;
-  const id = fieldJson?.id || input.id;
-  const wordsLabelText = fieldJson?.properties?.wordsLabel || 'Amount (in words)';
-  let model = null;
-
   input.type = 'text';
   input.inputMode = 'decimal';
   input.autocomplete = 'off';
@@ -93,58 +83,52 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   input.before(group);
   group.append(symbol, input);
 
-  const wordsWrapper = document.createElement('div');
-  wordsWrapper.className = 'inr-input-words-wrapper';
-  const wordsId = `${id}-words`;
-  const wordsLabel = document.createElement('label');
-  wordsLabel.className = 'field-label inr-input-words-label';
-  wordsLabel.htmlFor = wordsId;
-  wordsLabel.textContent = wordsLabelText;
-  const words = document.createElement('input');
-  words.type = 'text';
-  words.id = wordsId;
+  const wordsId = `${fieldJson.id}-words`;
+  const words = document.createElement('div');
   words.className = 'inr-input-words';
-  words.readOnly = true;
-  words.tabIndex = -1;
-  words.setAttribute('aria-live', 'polite');
-  const hint = document.createElement('div');
-  hint.className = 'inr-input-readonly';
-  hint.textContent = 'Read-only';
-  wordsWrapper.append(wordsLabel, words, hint);
-  group.after(wordsWrapper);
+  const wordsLabel = document.createElement('label');
+  wordsLabel.className = 'field-label';
+  wordsLabel.setAttribute('for', wordsId);
+  wordsLabel.textContent = fieldJson?.properties?.wordsLabel || 'Amount (in words)';
+  const output = document.createElement('output');
+  output.id = wordsId;
+  output.className = 'inr-input-words-value';
+  output.setAttribute('aria-live', 'polite');
+  words.append(wordsLabel, output);
+  group.after(words);
 
-  const rawValue = () => input.value.replace(/,/g, '');
-  const updateWords = (raw) => {
-    const text = amountToWords(raw);
-    words.value = text;
-    words.title = text;
+  const updateWords = () => {
+    output.textContent = amountToWords(input.value);
   };
 
+  let model = null;
+  const toModelValue = (text) => (/\d/.test(text) ? Number(text) : null);
+
+  // commit on every keystroke so that rules see the live value
   input.addEventListener('input', () => {
-    const raw = sanitizeAmount(rawValue());
-    const formatted = formatIndian(raw);
-    if (input.value !== formatted) input.value = formatted;
-    updateWords(raw);
-    // commit on each keystroke so change rules see the live value
-    if (model && String(model.value ?? '') !== raw) model.value = raw;
+    const cleaned = sanitize(input.value);
+    if (cleaned !== input.value) input.value = cleaned;
+    updateWords();
+    const next = toModelValue(cleaned);
+    if (model && model.value !== next) model.value = next;
   });
 
   subscribe(fieldDiv, formId, (_fieldDiv, fieldModel, eventType, payload) => {
     if (eventType === 'register') {
       model = fieldModel;
-      const initial = sanitizeAmount(model.value);
-      input.value = formatIndian(initial);
-      updateWords(initial);
-    } else if (eventType === 'change') {
-      payload?.changes?.forEach((change) => {
-        if (change?.propertyName === 'value') {
-          const raw = sanitizeAmount(change.currentValue);
-          if (raw !== rawValue()) input.value = formatIndian(raw);
-          updateWords(raw);
-        }
-      });
+    }
+    const incoming = eventType === 'register'
+      ? { currentValue: fieldModel.value }
+      : payload?.changes?.find((c) => c?.propertyName === 'value');
+    if (incoming) {
+      const value = incoming.currentValue;
+      if (toModelValue(input.value) !== (value ?? null)) {
+        input.value = value === null || value === undefined ? '' : String(value);
+      }
+      updateWords();
     }
   }, { listenChanges: true });
 
+  updateWords();
   return fieldDiv;
 }
