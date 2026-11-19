@@ -1,0 +1,62 @@
+main .form .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: var(--form-input-border-size, 1px) solid var(--form-input-border-color, #ccc);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+main .form .inr-input-group:focus-within {
+    outline: 2px solid var(--form-focus-color, #1473e6);
+    outline-offset: 1px;
+}
+
+main .form .field-invalid .inr-input-group {
+    border-color: var(--form-error-color, #d31510);
+}
+
+main .form .inr-input-symbol {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    background: #f1f2f6;
+    border-right: 1px solid var(--form-input-border-color, #ccc);
+    font-size: 1.25rem;
+    color: #4b5563;
+}
+
+main .form .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    border-radius: 0;
+    margin: 0;
+    background: transparent;
+    appearance: textfield;
+}
+
+main .form .inr-input-group input::-webkit-outer-spin-button,
+main .form .inr-input-group input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+main .form .inr-input-words-wrapper {
+    margin-top: 1rem;
+}
+
+main .form .inr-input-words {
+    width: 100%;
+    box-sizing: border-box;
+    background: #f1f2f6;
+    border: var(--form-input-border-size, 1px) solid var(--form-input-border-color, #ccc);
+    border-radius: 8px;
+    cursor: default;
+    text-overflow: ellipsis;
+}
+
+main .form .inr-input-words:focus {
+    outline: 0;
+}
