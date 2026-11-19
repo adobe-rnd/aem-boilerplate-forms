@@ -669,6 +669,24 @@
       "id": "custom-components",
       "components": [
         {
+          "title": "Loan Slider",
+          "id": "loan-slider",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
+                "template": {
+                  "jcr:title": "Loan Slider",
+                  "fieldType": "number-input",
+                  "fd:viewType": "loan-slider",
+                  "enabled": true,
+                  "visible": true
+                }
+              }
+            }
+          }
+        },
+        {
           "title": "Range",
           "id": "range",
           "plugins": {
