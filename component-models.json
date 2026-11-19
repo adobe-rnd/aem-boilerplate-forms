@@ -4661,7 +4661,14 @@
         "name": "splits",
         "label": "Number of Splits",
         "valueType": "number",
-        "description": "Number of equal splits between min and max"
+        "description": "Number of equal splits between minimum and maximum (default 10)"
+      },
+      {
+        "component": "number",
+        "name": "stepValue",
+        "label": "Step Value",
+        "valueType": "number",
+        "description": "Granularity of the slider (default 1)"
       },
       {
         "component": "tab",

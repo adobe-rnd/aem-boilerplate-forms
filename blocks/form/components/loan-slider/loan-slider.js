@@ -1,159 +1,111 @@
+import { subscribe } from '../../rules/index.js';
+
 const DEFAULT_SPLITS = 10;
 
-export function formatInr(value) {
-  return `₹${Number(value).toLocaleString('en-IN')}`;
-}
-
-export function formatShort(value) {
-  const abs = Math.abs(value);
-  const trim = (n) => `${Math.round(n * 100) / 100}`;
-  if (abs >= 10000000) return `${trim(value / 10000000)}Cr`;
-  if (abs >= 100000) return `${trim(value / 100000)}L`;
-  if (abs >= 1000) return `${trim(value / 1000)}K`;
+export function formatCompact(value) {
+  const fmt = (n, unit) => `${Number(n.toFixed(2))}${unit}`;
+  if (value >= 10000000) return fmt(value / 10000000, 'Cr');
+  if (value >= 100000) return fmt(value / 100000, 'L');
+  if (value >= 1000) return fmt(value / 1000, 'K');
   return `${value}`;
 }
 
-export function parseAmount(text) {
-  const digits = `${text}`.replace(/[^\d.]/g, '');
-  return digits === '' ? NaN : Number(digits);
+export function buildSplits(min, max, splits) {
+  const count = Math.max(1, Math.floor(splits) || DEFAULT_SPLITS);
+  const size = (max - min) / count;
+  return Array.from({ length: count + 1 }, (_, i) => (i === count ? max : min + size * i));
 }
 
 export function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-export function getSplitValues(min, max, splits) {
-  const count = Math.max(1, splits);
-  return Array.from({ length: count + 1 }, (_, i) => Math.round(min + ((max - min) * i) / count));
-}
-
-export function snapToSplit(value, min, max, splits) {
-  const count = Math.max(1, splits);
-  const size = (max - min) / count;
-  return Math.round(min + Math.round((value - min) / size) * size);
-}
-
-export default async function decorate(fieldDiv, fieldJson) {
+export default async function decorate(fieldDiv, fieldJson, container, formId) {
   const input = fieldDiv.querySelector('input');
-  const min = Number(fieldJson?.minimum ?? input.min) || 0;
+  let min = Number(fieldJson?.minimum ?? input.min);
   let max = Number(fieldJson?.maximum ?? input.max);
-  if (!max || max <= min) max = min + 100;
-  const splits = Math.max(1, Math.floor(Number(fieldJson?.properties?.splits)) || DEFAULT_SPLITS);
+  if (!Number.isFinite(min)) min = 0;
+  if (!Number.isFinite(max) || max <= min) max = min + 100;
+  const step = Number(fieldJson?.properties?.stepValue) || 1;
+  const splits = buildSplits(min, max, Number(fieldJson?.properties?.splits));
 
-  input.type = 'range';
+  input.type = 'number';
   input.min = min;
   input.max = max;
-  input.step = 1;
-  input.classList.add('loan-slider-input');
+  input.step = step;
 
   const wrapper = document.createElement('div');
   wrapper.className = 'loan-slider-wrapper decorated';
 
-  const textbox = document.createElement('input');
-  textbox.type = 'text';
-  textbox.inputMode = 'numeric';
-  textbox.className = 'loan-slider-textbox';
-  textbox.setAttribute('aria-label', 'Loan amount');
+  const inputBox = document.createElement('div');
+  inputBox.className = 'loan-slider-input';
+  const prefix = document.createElement('span');
+  prefix.className = 'loan-slider-currency';
+  prefix.textContent = '₹';
+  input.after(wrapper);
+  inputBox.append(prefix, input);
 
   const track = document.createElement('div');
   track.className = 'loan-slider-track';
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.className = 'loan-slider-range';
+  slider.min = min;
+  slider.max = max;
+  slider.step = step;
+  slider.setAttribute('aria-label', fieldJson?.label?.value || 'Loan amount');
   const ticks = document.createElement('div');
   ticks.className = 'loan-slider-ticks';
   const labels = document.createElement('div');
   labels.className = 'loan-slider-labels';
-
-  const values = getSplitValues(min, max, splits);
-  // thin out labels so they stay readable when there are many splits
-  const labelStride = Math.ceil(values.length / 7);
-  values.forEach((v, i) => {
-    const pos = `${((v - min) / (max - min)) * 100}%`;
-    if (i > 0 && i < values.length - 1) {
-      const tick = document.createElement('span');
-      tick.className = 'loan-slider-tick';
-      tick.style.left = pos;
-      tick.dataset.value = v;
-      ticks.appendChild(tick);
-    }
-    if (i % labelStride === 0 || i === values.length - 1) {
-      const label = document.createElement('span');
-      label.className = 'loan-slider-label';
-      label.style.left = pos;
-      label.textContent = formatShort(v);
-      labels.appendChild(label);
-    }
+  splits.forEach((val) => {
+    const pos = `${((val - min) / (max - min)) * 100}%`;
+    const tick = document.createElement('span');
+    tick.className = 'loan-slider-tick';
+    tick.style.left = pos;
+    ticks.append(tick);
+    const label = document.createElement('span');
+    label.className = 'loan-slider-label';
+    label.style.left = pos;
+    label.textContent = formatCompact(Math.round(val));
+    labels.append(label);
   });
+  track.append(ticks, slider);
+  wrapper.append(inputBox, track, labels);
 
-  input.after(wrapper);
-  track.append(input, ticks);
-  wrapper.append(textbox, track, labels);
-
-  const renderSlider = (value) => {
-    wrapper.style.setProperty('--loan-slider-progress', `${((value - min) / (max - min)) * 100}%`);
-    input.setAttribute('aria-valuetext', formatInr(value));
-    ticks.querySelectorAll('.loan-slider-tick').forEach((t) => {
-      t.classList.toggle('filled', Number(t.dataset.value) <= value);
-    });
+  const paint = (value) => {
+    const pct = ((value - min) / (max - min)) * 100;
+    wrapper.style.setProperty('--loan-slider-progress', `${pct}%`);
   };
 
-  const render = (value) => {
-    renderSlider(value);
-    textbox.value = formatInr(value);
+  const syncSlider = () => {
+    const raw = parseFloat(input.value);
+    const value = Number.isNaN(raw) ? min : clamp(raw, min, max);
+    slider.value = value;
+    paint(value);
   };
 
-  const rawAttr = input.getAttribute('value');
-  const parsedInitial = Number(rawAttr);
-  const start = rawAttr === null || rawAttr === '' || Number.isNaN(parsedInitial)
-    ? min : clamp(parsedInitial, min, max);
-  input.value = start;
-  render(start);
-
-  // set while dispatching our own events so they are not re-snapped
-  let internal = false;
-  const fire = (type) => {
-    internal = true;
-    input.dispatchEvent(new Event(type, { bubbles: true }));
-    internal = false;
-  };
-
-  // slider head moves between the equal splits
-  input.addEventListener('input', () => {
-    if (internal) return;
-    const snapped = snapToSplit(Number(input.value), min, max, splits);
-    input.value = snapped;
-    render(snapped);
+  // slider -> textbox
+  slider.addEventListener('input', () => {
+    input.value = slider.value;
+    paint(Number(slider.value));
   });
+  slider.addEventListener('change', (e) => {
+    e.stopPropagation();
+    input.value = slider.value;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  // textbox -> slider
+  input.addEventListener('input', syncSlider);
+  input.addEventListener('change', syncSlider);
 
-  // textbox accepts any amount within range; slider follows
-  const commitText = () => {
-    const parsed = parseAmount(textbox.value);
-    const value = Number.isNaN(parsed) ? Number(input.value) : clamp(Math.round(parsed), min, max);
-    const changed = value !== Number(input.value);
-    input.value = value;
-    render(value);
-    if (changed) {
-      fire('input');
-      fire('change');
-    }
-  };
-  textbox.addEventListener('focus', () => {
-    textbox.value = `${Number(input.value)}`;
-    textbox.select();
-  });
-  textbox.addEventListener('blur', commitText);
-  textbox.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      commitText();
-    }
-  });
-  textbox.addEventListener('input', () => {
-    const parsed = parseAmount(textbox.value);
-    if (!Number.isNaN(parsed)) {
-      const value = clamp(Math.round(parsed), min, max);
-      input.value = value;
-      renderSlider(value);
+  // model driven updates (rules, reset, data binding)
+  subscribe(fieldDiv, formId, (_el, fieldModel) => {
+    if (fieldModel) {
+      fieldModel.subscribe(() => syncSlider(), 'change');
     }
   });
 
+  syncSlider();
   return fieldDiv;
 }

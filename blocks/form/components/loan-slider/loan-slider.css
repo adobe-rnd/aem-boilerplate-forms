@@ -1,115 +1,119 @@
-.loan-slider-wrapper.decorated {
-    --loan-slider-accent: #eba54f;
+/* styling for loan slider */
+main .form .loan-slider-wrapper.decorated {
     --loan-slider-progress: 0%;
+    --loan-slider-color: #eba550;
+    --loan-slider-rail: #d3d4d9;
 
     position: relative;
     padding-bottom: 32px;
 }
 
-.loan-slider-wrapper.decorated .loan-slider-textbox {
-    display: block;
-    width: 200px;
-    margin: 0 0 24px auto;
-    padding: 14px 20px;
-    border: 1px solid #d5d6da;
-    border-radius: 14px;
-    font-size: 20px;
-    color: #111827;
-    background: #fff;
+main .form .loan-slider-wrapper .loan-slider-input {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    margin: 0 0 16px auto;
+    padding: 12px 20px;
+    border: 1px solid var(--loan-slider-rail);
+    border-radius: 12px;
 }
 
-.loan-slider-wrapper.decorated .loan-slider-track {
+main .form .loan-slider-wrapper .loan-slider-input input {
+    width: 10ch;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    background: transparent;
+}
+
+main .form .loan-slider-wrapper .loan-slider-currency {
+    font-size: 20px;
+}
+
+main .form .loan-slider-wrapper .loan-slider-track {
     position: relative;
     height: 28px;
+    margin: 0 14px;
 }
 
-.loan-slider-wrapper.decorated .loan-slider-ticks {
+main .form .loan-slider-wrapper .loan-slider-ticks {
     position: absolute;
-    inset: 0 14px;
+    inset: 0;
     pointer-events: none;
 }
 
-.loan-slider-wrapper.decorated .loan-slider-tick {
+main .form .loan-slider-wrapper .loan-slider-tick {
     position: absolute;
     top: 50%;
     width: 1px;
     height: 12px;
+    background: #fff;
+    opacity: .7;
     transform: translate(-50%, -50%);
-    background: #c1c3c9;
 }
 
-.loan-slider-wrapper.decorated .loan-slider-tick.filled {
-    background: var(--loan-slider-accent);
-}
-
-.loan-slider-wrapper.decorated input.loan-slider-input[type="range"] {
+main .form .loan-slider-wrapper input.loan-slider-range {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 28px;
     margin: 0;
     padding: 0;
+    border: none;
     appearance: none;
     background: transparent;
-    border: none;
     cursor: pointer;
 }
 
-.loan-slider-wrapper.decorated input.loan-slider-input[type="range"]:focus {
-    outline: none;
+main .form .loan-slider-wrapper input.loan-slider-range::-webkit-slider-runnable-track {
+    height: 8px;
+    border-radius: 8px;
+    background: linear-gradient(to right, var(--loan-slider-color) var(--loan-slider-progress), var(--loan-slider-rail) var(--loan-slider-progress));
 }
 
-.loan-slider-wrapper.decorated input.loan-slider-input[type="range"]::-webkit-slider-runnable-track {
-    height: 10px;
-    border-radius: 5px;
-    background: linear-gradient(to right, var(--loan-slider-accent) var(--loan-slider-progress), #d3d4d9 var(--loan-slider-progress));
+main .form .loan-slider-wrapper input.loan-slider-range::-moz-range-track {
+    height: 8px;
+    border-radius: 8px;
+    background: linear-gradient(to right, var(--loan-slider-color) var(--loan-slider-progress), var(--loan-slider-rail) var(--loan-slider-progress));
 }
 
-.loan-slider-wrapper.decorated input.loan-slider-input[type="range"]::-moz-range-track {
-    height: 10px;
-    border-radius: 5px;
-    background: #d3d4d9;
-}
-
-.loan-slider-wrapper.decorated input.loan-slider-input[type="range"]::-moz-range-progress {
-    height: 10px;
-    border-radius: 5px;
-    background: var(--loan-slider-accent);
-}
-
-.loan-slider-wrapper.decorated input.loan-slider-input[type="range"]::-webkit-slider-thumb {
+main .form .loan-slider-wrapper input.loan-slider-range::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+    margin-top: -10px;
+    border: none;
+    border-radius: 50%;
     appearance: none;
-    width: 28px;
-    height: 28px;
-    margin-top: -9px;
-    border: none;
-    border-radius: 50%;
-    background: var(--loan-slider-accent);
+    background: var(--loan-slider-color);
 }
 
-.loan-slider-wrapper.decorated input.loan-slider-input[type="range"]::-moz-range-thumb {
+main .form .loan-slider-wrapper input.loan-slider-range::-moz-range-thumb {
     width: 28px;
     height: 28px;
     border: none;
     border-radius: 50%;
-    background: var(--loan-slider-accent);
+    background: var(--loan-slider-color);
 }
 
-.loan-slider-wrapper.decorated input.loan-slider-input[type="range"]:focus-visible::-webkit-slider-thumb {
-    box-shadow: 0 0 0 4px rgb(235 165 79 / 35%);
+main .form .loan-slider-wrapper input.loan-slider-range:focus-visible {
+    outline: 2px solid var(--loan-slider-color);
+    outline-offset: 4px;
+    border-radius: 14px;
 }
 
-.loan-slider-wrapper.decorated .loan-slider-labels {
+main .form .loan-slider-wrapper .loan-slider-labels {
+    position: relative;
+    height: 20px;
+    margin: 8px 14px 0;
+}
+
+main .form .loan-slider-wrapper .loan-slider-label {
     position: absolute;
-    left: 14px;
-    right: 14px;
-    margin-top: 8px;
-}
-
-.loan-slider-wrapper.decorated .loan-slider-label {
-    position: absolute;
-    transform: translateX(-50%);
-    font-size: 16px;
+    font-size: 14px;
     color: #6b7280;
+    transform: translateX(-50%);
     white-space: nowrap;
 }
