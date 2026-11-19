@@ -1,29 +1,29 @@
 # INR Input
 
-Rupee (₹) amount field with a read-only amount-in-words display that updates as the user types.
+Indian Rupee (₹) amount field with a read-only "amount in words" field below it that updates as the user types.
 
 ## How to Use
 
-Insert **INR Input** from the custom components group in the Universal Editor, or set `fd:viewType` to `inr-input` on a `text-input` field. Typing is restricted to digits and one decimal point (max 2 decimals, 15 integer digits).
+Add an **INR Input** component to a form in the Universal Editor. The words field uses the Indian numbering system (Thousand, Lakh, Crore) and supports Rupees and Paise, e.g. `1234567.5` → `Rupees Twelve Lakh Thirty Four Thousand Five Hundred Sixty Seven and Fifty Paise Only`.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `amountInWordsLabel` | Label of the words field (default `Amount (in words)`) |
+| `wordsLabel` | Label of the read-only words field (default `Amount (in words)`) |
 
-Standard text-input placeholder, default value, validation and help properties are also available.
+All standard number-input properties (placeholder, default, validation, help) are available.
 
 ## Model Subscriptions
 
-Subscribes to `value` changes (e.g. set by rules) to resync the input and the words.
+Subscribes to `value` changes so the words update when rules or prefill set the value.
 
 ## Model Properties Set
 
-Does not set model properties. `model.value` holds the plain numeric string (e.g. `123456.50`) and is committed by the native `change` event, i.e. on blur. The words update on every keystroke and are display-only.
+None directly. `model.value` is committed by the OOTB `change` event (on blur), so change rules fire once per edit. The words field is display-only and is not part of the model; it is refreshed on each `input` event locally.
 
 ## Usage Notes
 
-- Base type: `text-input`; `fd:viewType`: `inr-input`.
-- Words use the Indian system: Thousand, Lakh, Crore; e.g. `1,23,456.50` → `Rupees One Lakh Twenty Three Thousand Four Hundred Fifty Six and Fifty Paise Only`.
-- `amountToWords` is exported for reuse and testing.
+- Base type: `number-input`; `fd:viewType`: `inr-input`.
+- Digits beyond two decimals are truncated in the words; negative or empty values show nothing.
+- Values of 100 Crore and above read e.g. "One Hundred Crore".

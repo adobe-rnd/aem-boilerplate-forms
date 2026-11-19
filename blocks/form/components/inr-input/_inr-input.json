@@ -6,10 +6,10 @@
             "plugins": {
                 "xwalk": {
                     "page": {
-                        "resourceType": "core/fd/components/form/textinput/v1/textinput",
+                        "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                         "template": {
                             "jcr:title": "INR Input",
-                            "fieldType": "text-input",
+                            "fieldType": "number-input",
                             "fd:viewType": "inr-input"
                         }
                     }
@@ -30,11 +30,14 @@
                     "...": "../../models/form-common/_basic-input-placeholder-fields.json#/fields"
                 },
                 {
-                    "...": "../../models/form-common/_basic-input-default-value-fields.json#/fields"
+                    "component": "number",
+                    "name": "default",
+                    "label": "Default Value",
+                    "valueType": "number"
                 },
                 {
                     "component": "text",
-                    "name": "amountInWordsLabel",
+                    "name": "wordsLabel",
                     "label": "Amount in words label",
                     "valueType": "string"
                 },
@@ -44,7 +47,7 @@
                     "name": "validation"
                 },
                 {
-                    "...": "../../models/form-common/_string-validation-fields.json#/fields"
+                    "...": "../../models/form-common/_number-validation-fields.json#/fields"
                 },
                 {
                     "...": "../../models/form-common/_help-container.json#/fields"
