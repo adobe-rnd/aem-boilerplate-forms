@@ -1,0 +1,221 @@
+.form .card-choice {
+    position: relative;
+    margin-top: 16px;
+}
+
+.form .card-choice-categories {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    justify-content: flex-end;
+}
+
+.form .card-choice-category {
+    padding: 6px 16px;
+    border: 1px solid #2a3fcf;
+    border-radius: 20px;
+    background: #fff;
+    color: #2a3fcf;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.form .card-choice-category.active {
+    background: #2a3fcf;
+    color: #fff;
+}
+
+.form .card-choice-viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 2px;
+}
+
+.form .card-choice-viewport::-webkit-scrollbar {
+    display: none;
+}
+
+.form .card-choice-viewport:focus-visible {
+    outline: 2px solid #2a3fcf;
+}
+
+.form .card-choice-track {
+    display: flex;
+    gap: 24px;
+}
+
+.form .card-choice-card {
+    flex: 0 0 min(290px, 80%);
+    box-sizing: border-box;
+    padding: 20px;
+    border: 1px solid #d9dce3;
+    border-radius: 14px;
+    background: #fff;
+    scroll-snap-align: start;
+}
+
+.form .card-choice-card.selected {
+    border-color: #2a3fcf;
+    box-shadow: 0 0 0 2px #2a3fcf;
+}
+
+.form .card-choice-title {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.form .card-choice-subtitle {
+    margin: 0 0 16px;
+    color: #5f6573;
+    font-size: 14px;
+}
+
+.form .card-choice-image {
+    display: block;
+    width: 166px;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 16px;
+    border-radius: 8px;
+}
+
+.form .card-choice-features {
+    margin: 0 0 16px;
+    padding: 0;
+    list-style: none;
+}
+
+.form .card-choice-feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.form .card-choice-feature-icon,
+.form .card-choice-feature-bullet {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.form .card-choice-feature-bullet {
+    border: 1.5px solid #555;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.form .card-choice-link {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: #2a3fcf;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.form .card-choice-amount {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    border: 1px solid #d9dce3;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+.form .card-choice-amount-label {
+    padding: 12px;
+}
+
+.form .card-choice-amount-value {
+    padding: 12px;
+    background: #f1f2f6;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.form .card-choice-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #2a3fcf;
+    border-radius: 8px;
+    background: #fff;
+    color: #2a3fcf;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form .card-choice-select:hover,
+.form .card-choice-card.selected .card-choice-select {
+    background: #2a3fcf;
+    color: #fff;
+}
+
+.form .card-choice-prev,
+.form .card-choice-next {
+    position: absolute;
+    top: 45%;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #2a3fcf;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 25%);
+}
+
+.form .card-choice-prev[hidden],
+.form .card-choice-next[hidden] {
+    display: none;
+}
+
+.form .card-choice-prev {
+    left: -10px;
+}
+
+.form .card-choice-next {
+    right: -10px;
+}
+
+.form .card-choice-prev::before {
+    content: '\2039';
+    font-size: 24px;
+}
+
+.form .card-choice-next::before {
+    content: '\203A';
+    font-size: 24px;
+}
+
+.form .card-choice-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.form .card-choice-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: #c9cde0;
+    cursor: pointer;
+}
+
+.form .card-choice-dot.active {
+    width: 32px;
+    background: #5470de;
+}
+
+.form .card-choice.disabled .card-choice-select {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
