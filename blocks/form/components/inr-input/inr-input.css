@@ -1,0 +1,62 @@
+main .form .inr-input-group {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid #d9dbe3;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+}
+
+main .form .inr-input-group:focus-within {
+    border-color: var(--button-primary-color, #3b63fb);
+}
+
+main .form .inr-input-group .inr-input-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    background: #f1f2f6;
+    border-right: 1px solid #d9dbe3;
+    color: #4a5062;
+    font-size: 22px;
+}
+
+main .form .inr-input-group input {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    padding: 16px;
+    background: transparent;
+}
+
+main .form .inr-input-words {
+    margin-top: 16px;
+}
+
+main .form .inr-input-words .inr-input-words-output {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid #d9dbe3;
+    border-radius: 16px;
+    padding: 16px;
+    background: #f1f2f6;
+    color: #4a5062;
+    cursor: default;
+    min-height: 56px;
+}
+
+main .form .inr-input-words .inr-input-readonly {
+    display: block;
+    text-align: right;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #6b7080;
+}
+
+main .form .inr-input-group:has(input[aria-invalid="true"]) {
+    border-color: var(--error-color, #d31510);
+}
