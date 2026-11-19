@@ -69,7 +69,7 @@ blocks/form/
 
 ## Coding Conventions
 
-- **Linter**: Airbnb ESLint config
+- **Linter**: Airbnb/XWalk plus [AEM Forms JavaScript checks](docs/javascript-linting.md) in `eslint.config.js`
 - **Imports**: Always use `.js` extensions in import paths
 - **Indentation**: 2 spaces for JavaScript, 4 spaces for CSS
 - **Linebreaks**: Unix (`\n`), not Windows (`\r\n`)

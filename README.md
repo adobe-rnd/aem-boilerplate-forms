@@ -6,6 +6,8 @@ Your project's description...
 - Live: https://main--aem-boilerplate-forms--adobe-rnd.aem.live/
 
 ## Documentation
+See the [documentation index](docs/index.md) for repository-specific guides.
+
 Before using the aem-boilerplate, we recommand you to go through the documentation on [www.aem.live](https://www.aem.live/docs/) and [experienceleague.adobe.com](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/wysiwyg-authoring/authoring), more specifically:
 
 - [Getting Started Guide](https://experienceleague.adobe.com/en/docs/experience-manager-cloud-service/content/edge-delivery/wysiwyg-authoring/edge-dev-getting-started)
@@ -32,6 +34,10 @@ npm i
 ```sh
 npm run lint
 ```
+
+JavaScript linting includes [AEM Forms best-practice checks](docs/javascript-linting.md)
+for custom functions, fragments, component rules, and component views. The same
+configuration runs in ESLint-enabled editors and CI.
 
 ## Local development
 

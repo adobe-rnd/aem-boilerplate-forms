@@ -31,14 +31,53 @@ test('allows tracked model reads in custom functions', async () => {
   assert.deepEqual(formMessages(result), []);
 });
 
+test('rejects direct model-internal reads that bypass dependency tracking', async () => {
+  const [result] = await linter.lintText(
+    'export function readValue(globals) { return globals.field._jsonModel.value; }\n',
+    { filePath: 'blocks/form/functions.source.js' },
+  );
+  assert.ok(formMessages(result).some(
+    (message) => message.ruleId === 'aem-forms/custom-fn-correctness'
+      && message.severity === 2,
+  ));
+});
+
+test('warns when a component changes DOM input values without syncing the model', async () => {
+  const [result] = await linter.lintText(
+    `export default function decorate(element) {
+      element.addEventListener('input', (event) => {
+        event.target.value = 'changed';
+      });
+    }\n`,
+    { filePath: 'blocks/form/components/example/example.js' },
+  );
+  assert.ok(formMessages(result).some(
+    (message) => message.ruleId === 'aem-forms/block-decorator-input-mutation'
+      && message.severity === 1,
+  ));
+});
+
 test('does not treat component views or browser infrastructure as headless code', async () => {
-  for (const filePath of ['blocks/form/components/example/example.js', 'scripts/scripts.js']) {
+  for (const filePath of [
+    'blocks/form/components/example/example.js',
+    'scripts/scripts.js',
+    'blocks/fragment/fragment.js',
+  ]) {
     const [result] = await linter.lintText(
       "export function readInput() { return document.querySelector('input'); }\n",
       { filePath },
     );
     assert.deepEqual(formMessages(result), []);
   }
+});
+
+test('preserves Node.js lint overrides for the distributable package', async () => {
+  const [result] = await linter.lintText(
+    "import esbuild from 'esbuild';\n\nconsole.log(esbuild, process.cwd(), __dirname);\n",
+    { filePath: 'packages/aem-forms-block/build.js' },
+  );
+  assert.deepEqual(result.messages, []);
+  assert.equal(await linter.isPathIgnored('packages/aem-forms-block/styles-entry.css'), true);
 });
 
 test('preserves base JavaScript and JSON linting', async () => {
