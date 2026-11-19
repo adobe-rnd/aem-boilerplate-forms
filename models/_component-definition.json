@@ -48,6 +48,9 @@
         },
         {
           "...": "../blocks/form/components/image-choice/_image-choice.json#/definitions"
+        },
+        {
+          "...": "../blocks/form/components/inr-input/_inr-input.json#/definitions"
         }
       ]
     }
