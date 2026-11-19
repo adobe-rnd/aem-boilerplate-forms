@@ -16,7 +16,9 @@
         "value": "Card Choice",
         "visible": true
       },
-      "properties": {}
+      "properties": {
+        "selectLabel": "Pick It"
+      }
     },
     {
       "id": "next-field",
@@ -27,7 +29,7 @@
       },
       "events": {
         "change": [
-          "dispatchEvent($form.fieldUnderTest, 'custom:setProperty', `{\"properties\":{\"cards\":[{\"name\": \"Card 1\", \"tagline\": \"Best Card for Rewards & Offers\", \"image\": \"data:image/gif;base64,R0lGODlhAQABAAAAACw=\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - Rs 500/-\"], \"detailsLabel\": \"All Features & Benefits\", \"detailsUrl\": \"https://example.com\", \"minAmountLabel\": \"Min. FD Amount\", \"minAmount\": \"Rs 15,000/-\", \"buttonLabel\": \"Get This Card\"}, {\"name\": \"Card 2\", \"tagline\": \"Best Card for Rewards & Offers\", \"image\": \"data:image/gif;base64,R0lGODlhAQABAAAAACw=\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - Rs 500/-\"], \"detailsLabel\": \"All Features & Benefits\", \"detailsUrl\": \"https://example.com\", \"minAmountLabel\": \"Min. FD Amount\", \"minAmount\": \"Rs 30,000/-\", \"buttonLabel\": \"Get This Card\"}, {\"name\": \"Card 3\", \"tagline\": \"Best Card for Rewards & Offers\", \"image\": \"data:image/gif;base64,R0lGODlhAQABAAAAACw=\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - Rs 500/-\"], \"detailsLabel\": \"All Features & Benefits\", \"detailsUrl\": \"https://example.com\", \"minAmountLabel\": \"Min. FD Amount\", \"minAmount\": \"Rs 45,000/-\", \"buttonLabel\": \"Get This Card\"}, {\"name\": \"Card 4\", \"tagline\": \"Best Card for Rewards & Offers\", \"image\": \"data:image/gif;base64,R0lGODlhAQABAAAAACw=\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - Rs 500/-\"], \"detailsLabel\": \"All Features & Benefits\", \"detailsUrl\": \"https://example.com\", \"minAmountLabel\": \"Min. FD Amount\", \"minAmount\": \"Rs 60,000/-\", \"buttonLabel\": \"Get This Card\"}, {\"name\": \"Card 5\", \"tagline\": \"Best Card for Rewards & Offers\", \"image\": \"data:image/gif;base64,R0lGODlhAQABAAAAACw=\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - Rs 500/-\"], \"detailsLabel\": \"All Features & Benefits\", \"detailsUrl\": \"https://example.com\", \"minAmountLabel\": \"Min. FD Amount\", \"minAmount\": \"Rs 75,000/-\", \"buttonLabel\": \"Get This Card\"}, {\"name\": \"Card 6\", \"tagline\": \"Best Card for Rewards & Offers\", \"image\": \"data:image/gif;base64,R0lGODlhAQABAAAAACw=\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - Rs 500/-\"], \"detailsLabel\": \"All Features & Benefits\", \"detailsUrl\": \"https://example.com\", \"minAmountLabel\": \"Min. FD Amount\", \"minAmount\": \"Rs 90,000/-\", \"buttonLabel\": \"Get This Card\"}]}}`)"
+          "dispatchEvent($form.fieldUnderTest, 'custom:setProperty', {properties: {cards: `[{\"id\": \"freedom\", \"title\": \"Freedom\", \"subtitle\": \"Best Card for Rewards & Offers\", \"features\": [\"Upto 10X CashPoints\", \"Joining Fees - \\u20b9500/-\"], \"linkText\": \"All Features & Benefits\", \"minAmount\": \"\\u20b9 15,000/-\", \"category\": \"Retail Cards\"}, {\"id\": \"oil\", \"title\": \"Indian Oil\", \"features\": [\"Upto 5% Fuel Points\"], \"minAmount\": \"\\u20b9 30,000/-\", \"category\": \"Retail Cards\"}, {\"id\": \"money\", \"title\": \"Moneyback+\", \"minAmount\": \"\\u20b9 30,000/-\", \"category\": \"Retail Cards\"}, {\"id\": \"tata\", \"title\": \"Tata Neu\", \"minAmount\": \"\\u20b9 50,000/-\", \"category\": \"Retail Cards\"}, {\"id\": \"biz\", \"title\": \"Business Gold\", \"minAmount\": \"\\u20b9 1,00,000/-\", \"category\": \"Business Cards\"}]`}})"
         ]
       }
     }
