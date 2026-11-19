@@ -1,0 +1,192 @@
+/* card-choice.css */
+main .form .card-choice {
+    position: relative;
+    width: 100%;
+}
+
+main .form .card-choice-tabs {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+main .form .card-choice-tab {
+    padding: 6px 18px;
+    border: 1px solid #2a3fc9;
+    border-radius: 20px;
+    background: #fff;
+    color: #2a3fc9;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+main .form .card-choice-tab.active {
+    background: #2a3fc9;
+    color: #fff;
+}
+
+main .form .card-choice-viewport {
+    position: relative;
+}
+
+main .form .card-choice-track {
+    display: flex;
+    gap: 24px;
+    margin: 0;
+    padding: 4px 2px;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+main .form .card-choice-track::-webkit-scrollbar {
+    display: none;
+}
+
+main .form .card-choice-card {
+    flex: 0 0 min(292px, 85%);
+    box-sizing: border-box;
+    padding: 20px;
+    border: 1px solid #dcdfe6;
+    border-radius: 16px;
+    background: #fff;
+    scroll-snap-align: start;
+}
+
+main .form .card-choice-card.selected {
+    border-color: #2a3fc9;
+    box-shadow: 0 0 0 2px #2a3fc9;
+}
+
+main .form .card-choice-card-title {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+main .form .card-choice-card-tagline {
+    margin: 0 0 16px;
+    color: #5c6370;
+    font-size: 14px;
+}
+
+main .form .card-choice-card-image {
+    display: block;
+    width: 166px;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 16px;
+    border-radius: 6px;
+}
+
+main .form .card-choice-card-features {
+    margin: 0 0 16px;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+}
+
+main .form .card-choice-card-features li {
+    margin-bottom: 10px;
+}
+
+main .form .card-choice-card-link {
+    display: block;
+    margin-bottom: 16px;
+    color: #2a3fc9;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+main .form .card-choice-card-amount {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+main .form .card-choice-card-amount-label {
+    padding: 12px;
+}
+
+main .form .card-choice-card-amount-value {
+    padding: 12px;
+    background: #f3f4f8;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+main .form .card-choice-card-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #2a3fc9;
+    border-radius: 8px;
+    background: #fff;
+    color: #2a3fc9;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+main .form .card-choice-card.selected .card-choice-card-select,
+main .form .card-choice-card-select:hover,
+main .form .card-choice-card-select:focus-visible {
+    background: #2a3fc9;
+    color: #fff;
+}
+
+main .form .card-choice-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 50%;
+    background: #2a3fc9;
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+main .form .card-choice-prev {
+    left: -12px;
+}
+
+main .form .card-choice-next {
+    right: -12px;
+}
+
+main .form .card-choice [hidden] {
+    display: none;
+}
+
+main .form .card-choice-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+main .form .card-choice-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: #c9cfe6;
+    cursor: pointer;
+}
+
+main .form .card-choice-dot.active {
+    width: 32px;
+    background: #5a72e0;
+}
