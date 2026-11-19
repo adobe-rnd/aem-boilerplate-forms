@@ -27,6 +27,7 @@ module.exports = {
       wizard: 12,
       'form-button': 7,
       'checkbox-group': 20,
+      'image-choice': 22,
       checkbox: 19,
       'date-input': 21,
       'drop-down': 20,
