@@ -1,62 +1,41 @@
-/* eslint-env mocha */
-import assert from 'assert';
-import decorate, {
-  formatCompact, getTickValues, parseAmount,
-} from '../../blocks/form/components/loan-slider/loan-slider.js';
+import { expect } from 'chai';
+import decorate, { formatShort, getBounds } from '../../blocks/form/components/loan-slider/loan-slider.js';
 
-describe('loan-slider', () => {
-  it('formats compact Indian amounts', () => {
-    assert.deepStrictEqual([50000, 200000, 1250000, 10000000].map(formatCompact), ['50K', '2L', '12.5L', '1Cr']);
+function setup(fd) {
+  const field = document.createElement('div');
+  field.dataset.id = 'loan';
+  field.innerHTML = '<label>Loan</label><input type="number" name="loan">';
+  return decorate(field, fd, null, 'form1').then(() => field);
+}
+
+describe('Loan slider component', () => {
+  it('formats amounts in Indian shorthand', () => {
+    expect(formatShort(50000)).to.equal('50K');
+    expect(formatShort(1250000)).to.equal('12.5L');
+    expect(formatShort(20000000)).to.equal('2Cr');
   });
 
-  it('generates equal splits including both bounds', () => {
-    assert.deepStrictEqual(getTickValues(0, 100, 4), [0, 25, 50, 75, 100]);
+  it('falls back to default bounds', () => {
+    expect(getBounds({})).to.deep.equal({ min: 0, max: 100, splits: 10 });
+    expect(getBounds({ minimum: 10, maximum: 5, properties: { splits: 4 } }).max).to.equal(11);
   });
 
-  it('parses formatted text', () => {
-    assert.strictEqual(parseAmount('₹5,00,000'), 500000);
-    assert.ok(Number.isNaN(parseAmount('abc')));
+  it('generates equal splits between min and max', async () => {
+    const field = await setup({ minimum: 0, maximum: 1000000, properties: { splits: 5 } });
+    const ticks = [...field.querySelectorAll('.loan-slider-tick')].map((t) => t.dataset.value);
+    expect(ticks).to.deep.equal(['200000', '400000', '600000', '800000']);
+    expect(field.querySelector('.loan-slider-range').step).to.equal('200000');
   });
 
-  describe('widget', () => {
-    let fieldDiv;
-    let input;
-    let changes;
-    beforeEach(() => {
-      document.body.innerHTML = '<form><div class="field-wrapper" data-id="ls"><label for="i">Loan</label><input id="i" type="number"></div></form>';
-      fieldDiv = document.querySelector('.field-wrapper');
-      input = fieldDiv.querySelector('input');
-      changes = 0;
-      document.querySelector('form').addEventListener('change', () => { changes += 1; });
-      decorate(fieldDiv, { id: 'ls', minimum: 50000, maximum: 1250000, properties: { splits: 12 } }, null, 'f');
-    });
-
-    it('renders ticks and syncs slider and text box both ways', () => {
-      const slider = fieldDiv.querySelector('.loan-slider-range');
-      const text = fieldDiv.querySelector('.loan-slider-input');
-      assert.strictEqual(fieldDiv.querySelectorAll('.loan-slider-tick').length, 13);
-      assert.strictEqual(text.value, '50,000');
-
-      slider.value = 600000;
-      slider.dispatchEvent(new Event('input'));
-      slider.dispatchEvent(new Event('change', { bubbles: true }));
-      assert.strictEqual(text.value, '6,00,000');
-      assert.strictEqual(input.value, '600000');
-      assert.strictEqual(changes, 1);
-
-      text.value = '5,00,000';
-      text.dispatchEvent(new Event('change', { bubbles: true }));
-      assert.strictEqual(slider.value, '500000');
-      assert.strictEqual(input.value, '500000');
-      assert.strictEqual(changes, 2);
-    });
-
-    it('clamps text box values to the range', () => {
-      const text = fieldDiv.querySelector('.loan-slider-input');
-      text.value = '99,99,999';
-      text.dispatchEvent(new Event('change', { bubbles: true }));
-      assert.strictEqual(input.value, '1250000');
-      assert.strictEqual(text.value, '12,50,000');
-    });
+  it('syncs slider and text box both ways', async () => {
+    const field = await setup({ minimum: 0, maximum: 1000, properties: { splits: 10 } });
+    const input = field.querySelector('.loan-slider-input input');
+    const slider = field.querySelector('.loan-slider-range');
+    slider.value = '300';
+    slider.dispatchEvent(new window.Event('input'));
+    expect(input.value).to.equal('300');
+    input.value = '700';
+    input.dispatchEvent(new window.Event('input'));
+    expect(slider.value).to.equal('700');
   });
 });

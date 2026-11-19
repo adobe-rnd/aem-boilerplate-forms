@@ -687,16 +687,21 @@
           }
         },
         {
-          "title": "Loan slider",
+          "title": "Loan Slider",
           "id": "loan-slider",
           "plugins": {
             "xwalk": {
               "page": {
                 "resourceType": "core/fd/components/form/numberinput/v1/numberinput",
                 "template": {
-                  "jcr:title": "Loan slider",
+                  "jcr:title": "Loan Amount (INR)",
                   "fieldType": "number-input",
-                  "fd:viewType": "loan-slider"
+                  "fd:viewType": "loan-slider",
+                  "enabled": true,
+                  "visible": true,
+                  "minimum": 50000,
+                  "maximum": 1250000,
+                  "splits": 12
                 }
               }
             }

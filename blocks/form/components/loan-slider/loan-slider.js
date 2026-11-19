@@ -1,79 +1,53 @@
 import { subscribe } from '../../rules/index.js';
 
-const MAX_TICK_LABELS = 7;
+const DEFAULT_SPLITS = 10;
+const MAX_LABELS = 7;
 
-function toNumber(value, fallback) {
+export function formatShort(value) {
+  const trim = (n) => `${Math.round(n * 100) / 100}`;
+  if (value >= 10000000) return `${trim(value / 10000000)}Cr`;
+  if (value >= 100000) return `${trim(value / 100000)}L`;
+  if (value >= 1000) return `${trim(value / 1000)}K`;
+  return `${trim(value)}`;
+}
+
+const toNumber = (value, fallback) => {
+  if (value === undefined || value === null || value === '') return fallback;
   const num = Number(value);
-  return value !== undefined && value !== null && value !== '' && Number.isFinite(num)
-    ? num
-    : fallback;
+  return Number.isFinite(num) ? num : fallback;
+};
+
+export function getBounds(fd) {
+  const min = toNumber(fd?.minimum, 0);
+  let max = toNumber(fd?.maximum, min + 100);
+  if (max <= min) max = min + 1;
+  const splitsNum = Math.floor(toNumber(fd?.properties?.splits ?? fd?.splits, 0));
+  const splits = splitsNum > 0 ? splitsNum : DEFAULT_SPLITS;
+  return { min, max, splits };
 }
 
-export function formatAmount(value) {
-  return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(value);
-}
-
-/** Compact Indian notation: 50K, 2L, 12.5L, 1Cr */
-export function formatCompact(value) {
-  const units = [[10000000, 'Cr'], [100000, 'L'], [1000, 'K']];
-  const unit = units.find(([size]) => Math.abs(value) >= size);
-  if (!unit) {
-    return `${Math.round(value * 100) / 100}`;
-  }
-  return `${Math.round((value / unit[0]) * 100) / 100}${unit[1]}`;
-}
-
-export function parseAmount(text) {
-  const cleaned = `${text ?? ''}`.replace(/[^0-9.]/g, '');
-  if (cleaned === '' || cleaned === '.') {
-    return NaN;
-  }
-  return Number(cleaned);
-}
-
-export function getTickValues(min, max, splits) {
-  const size = (max - min) / splits;
-  return Array.from({ length: splits + 1 }, (_, i) => (i === splits ? max : min + size * i));
-}
-
-export default function decorate(fieldDiv, fieldJson, container, formId) {
+export default async function decorate(fieldDiv, fd, container, formId) {
   const input = fieldDiv.querySelector('input');
-  const label = fieldDiv.querySelector('label');
-  const props = fieldJson?.properties || {};
+  const { min, max, splits } = getBounds(fd);
+  const splitSize = (max - min) / splits;
+  const customStep = toNumber(fd?.properties?.stepValue ?? fd?.stepValue, 0);
+  const step = customStep > 0 ? customStep : splitSize;
 
-  const min = toNumber(fieldJson?.minimum, 0);
-  const maxValue = toNumber(fieldJson?.maximum, 100000);
-  const max = maxValue > min ? maxValue : min + 1;
-  const splits = Math.max(1, Math.floor(toNumber(props.splits, 10)));
-  const step = toNumber(props.stepValue, 1) > 0 ? toNumber(props.stepValue, 1) : 1;
-  const symbol = props.currencySymbol ?? '₹';
-
-  const clamp = (num) => Math.min(max, Math.max(min, num));
-  const percent = (num) => ((clamp(num) - min) / (max - min)) * 100;
-
-  // the original input keeps the committed numeric value and no longer renders
-  input.type = 'hidden';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'loan-slider-wrapper decorated';
 
   const header = document.createElement('div');
   header.className = 'loan-slider-header';
-  const textWrapper = document.createElement('div');
-  textWrapper.className = 'loan-slider-text';
-  const symbolEl = document.createElement('span');
-  symbolEl.className = 'loan-slider-symbol';
-  symbolEl.textContent = symbol;
-  symbolEl.setAttribute('aria-hidden', 'true');
-  const textBox = document.createElement('input');
-  textBox.type = 'text';
-  textBox.inputMode = 'numeric';
-  textBox.className = 'loan-slider-input';
-  textBox.autocomplete = 'off';
-  if (input.id) {
-    textBox.id = `${input.id}-text`;
-    if (label) {
-      label.setAttribute('for', textBox.id);
-    }
-  }
-  textWrapper.append(symbolEl, textBox);
+  const label = fieldDiv.querySelector('label');
+  if (label) header.appendChild(label);
+  const box = document.createElement('div');
+  box.className = 'loan-slider-input';
+  const symbol = document.createElement('span');
+  symbol.className = 'loan-slider-currency';
+  symbol.textContent = '₹';
+  symbol.setAttribute('aria-hidden', 'true');
+  box.append(symbol, input);
+  header.appendChild(box);
 
   const track = document.createElement('div');
   track.className = 'loan-slider-track';
@@ -83,115 +57,80 @@ export default function decorate(fieldDiv, fieldJson, container, formId) {
   slider.min = min;
   slider.max = max;
   slider.step = step;
-  if (label) {
-    slider.setAttribute('aria-labelledby', label.id || (label.id = `${input.id || fieldJson.id}-label`));
-  }
+  slider.value = input.value !== '' ? input.value : min;
+  slider.setAttribute('aria-label', label?.textContent || fd?.name || 'Loan amount');
+  slider.disabled = input.disabled;
 
   const ticks = document.createElement('div');
   ticks.className = 'loan-slider-ticks';
   const labels = document.createElement('div');
   labels.className = 'loan-slider-labels';
-  const labelEvery = Math.ceil((splits + 1) / MAX_TICK_LABELS);
-  getTickValues(min, max, splits).forEach((tick, i) => {
-    const pos = `${percent(tick)}`;
-    const mark = document.createElement('span');
-    mark.className = 'loan-slider-tick';
-    mark.style.setProperty('--pos', pos);
-    mark.dataset.value = tick;
-    ticks.append(mark);
-    if (i === 0 || i === splits || i % labelEvery === 0) {
+  const labelEvery = Math.ceil(splits / (MAX_LABELS - 1));
+  for (let i = 0; i <= splits; i += 1) {
+    const pos = i / splits;
+    if (i > 0 && i < splits) {
+      const tick = document.createElement('span');
+      tick.className = 'loan-slider-tick';
+      tick.style.setProperty('--pos', pos);
+      tick.dataset.value = min + i * splitSize;
+      ticks.appendChild(tick);
+    }
+    if (i % labelEvery === 0 || i === splits) {
       const text = document.createElement('span');
       text.className = 'loan-slider-label';
       text.style.setProperty('--pos', pos);
-      text.textContent = formatCompact(tick);
-      labels.append(text);
+      text.textContent = formatShort(min + i * splitSize);
+      labels.appendChild(text);
     }
-  });
-  // drop a penultimate label that would collide with the max label
-  if (splits % labelEvery !== 0 && labels.children.length > 2) {
-    labels.children[labels.children.length - 2].remove();
   }
+  track.append(slider, ticks);
+  wrapper.append(header, track, labels);
+  fieldDiv.appendChild(wrapper);
 
-  track.append(ticks, slider, labels);
-  if (label) {
-    header.append(label);
-  }
-  header.append(textWrapper);
-  input.after(header, track);
-
-  const render = (num) => {
-    const value = clamp(num);
-    slider.value = value;
-    textBox.value = formatAmount(value);
-    track.style.setProperty('--fill', percent(value));
+  const paint = () => {
+    const value = Number(slider.value);
+    const pct = (value - min) / (max - min);
+    track.style.setProperty('--pos', Math.min(Math.max(pct, 0), 1));
     ticks.querySelectorAll('.loan-slider-tick').forEach((tick) => {
       tick.classList.toggle('filled', Number(tick.dataset.value) <= value);
     });
-    slider.setAttribute('aria-valuetext', `${symbol}${formatAmount(value)}`);
-    return value;
   };
 
-  const commit = (num) => {
-    const value = render(num);
-    if (Number(input.value) !== value || input.value === '') {
-      input.value = value;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
+  const syncFromInput = () => {
+    if (input.value === '') {
+      slider.value = min;
+    } else {
+      // out of range typed values pin the thumb to the nearest end
+      slider.value = Math.min(Math.max(Number(input.value), min), max);
     }
+    paint();
   };
 
-  // The form block commits any bubbling change event to the model; the widget's own
-  // inputs hold display text, so only the hidden input is allowed to commit.
-  [slider, textBox].forEach((el) => el.addEventListener('change', (e) => e.stopPropagation()));
-
-  slider.addEventListener('input', () => render(Number(slider.value)));
-  slider.addEventListener('change', () => commit(Number(slider.value)));
-
-  textBox.addEventListener('input', () => {
-    const num = parseAmount(textBox.value);
-    if (!Number.isNaN(num)) {
-      const value = clamp(num);
-      slider.value = value;
-      track.style.setProperty('--fill', percent(value));
-    }
+  slider.addEventListener('input', () => {
+    input.value = slider.value;
+    paint();
   });
-  const commitText = () => {
-    const num = parseAmount(textBox.value);
-    commit(Number.isNaN(num) ? Number(input.value) || min : num);
-  };
-  textBox.addEventListener('change', commitText);
-  textBox.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      commitText();
-    }
+  slider.addEventListener('change', () => {
+    input.value = slider.value;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
   });
+  input.addEventListener('input', syncFromInput);
+  input.addEventListener('change', syncFromInput);
 
-  const setDisabled = (disabled) => {
-    slider.disabled = disabled;
-    textBox.disabled = disabled;
-  };
-  setDisabled(fieldJson?.enabled === false || fieldJson?.readOnly === true);
-
-  const initial = toNumber(fieldJson?.value ?? input.value, min);
-  render(initial);
-
-  subscribe(fieldDiv, formId, (_fieldDiv, model, eventType, payload) => {
+  subscribe(fieldDiv, formId, (el, model, eventType, payload) => {
     if (eventType === 'register') {
-      const start = toNumber(model.value, min);
-      const value = render(start);
-      if (model.value !== value) {
-        model.value = value;
-      }
+      syncFromInput();
     } else if (eventType === 'change') {
       payload?.changes?.forEach((change) => {
-        if (change?.propertyName === 'value') {
-          render(toNumber(change.currentValue, min));
-        } else if (change?.propertyName === 'enabled' || change?.propertyName === 'readOnly') {
-          setDisabled(model.enabled === false || model.readOnly === true);
+        if (change.propertyName === 'value') {
+          syncFromInput();
+        } else if (change.propertyName === 'enabled' || change.propertyName === 'readOnly') {
+          slider.disabled = input.disabled || input.getAttribute('aria-readonly') === 'true';
         }
       });
     }
   }, { listenChanges: true });
 
+  paint();
   return fieldDiv;
 }
