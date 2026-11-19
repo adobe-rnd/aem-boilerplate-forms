@@ -1,67 +1,59 @@
-.form .inr-input-group {
+.form .inr-input .inr-input-group {
     display: flex;
     align-items: stretch;
-    border: 2px solid var(--form-input-border-color, #d0d5dd);
+    border: 2px solid #d9dbe3;
     border-radius: 12px;
     overflow: hidden;
     background: #fff;
 }
 
-.form .inr-input-group:focus-within {
-    border-color: var(--form-focus-color, #1473e6);
+.form .inr-input .inr-input-group:focus-within {
+    border-color: var(--link-color, #3b63fb);
 }
 
-.form .field-invalid .inr-input-group {
-    border-color: var(--form-error-color, #d31510);
-}
-
-.form .inr-input-symbol {
+.form .inr-input .inr-input-symbol {
     display: flex;
     align-items: center;
-    justify-content: center;
     padding: 0 20px;
-    font-size: 1.5rem;
     background: #f1f2f6;
-    border-right: 1px solid #d0d5dd;
-    color: #4b5563;
+    border-right: 1px solid #d9dbe3;
+    font-size: 1.5rem;
+    color: #4a4f63;
 }
 
-.form .inr-input-group input {
+.form .inr-input .inr-input-group input {
     flex: 1;
     min-width: 0;
     border: 0;
-    outline: 0;
     border-radius: 0;
+    outline: 0;
+    margin: 0;
     padding: 16px;
-    font-size: 1.25rem;
+    background: transparent;
 }
 
-.form .inr-input-words-wrapper {
-    margin-top: 24px;
+.form .inr-input .inr-input-words-wrapper {
+    margin-top: 16px;
 }
 
-.form .inr-input-words-label {
+.form .inr-input .inr-input-words-label {
     display: block;
-    margin-bottom: 8px;
     font-weight: 700;
+    margin-bottom: 8px;
 }
 
-.form .inr-input-words {
-    display: block;
-    min-height: 3.5rem;
+.form .inr-input .inr-input-words {
+    width: 100%;
     box-sizing: border-box;
+    min-height: 3.5rem;
     padding: 16px;
-    border: 2px solid #d0d5dd;
+    border: 2px solid #d9dbe3;
     border-radius: 12px;
     background: #f1f2f6;
-    color: #374151;
-    overflow-wrap: anywhere;
+    cursor: default;
 }
 
-.form .inr-input-readonly {
-    display: block;
-    text-align: right;
-    margin-top: 8px;
-    font-size: 0.875rem;
-    color: #6b7280;
+.form .inr-input[data-invalid='true'] .inr-input-group,
+.form .inr-input .inr-input-group:has(input[aria-invalid='true']) {
+    border-color: #d31510;
 }

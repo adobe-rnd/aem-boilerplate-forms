@@ -4410,12 +4410,6 @@
         "valueType": "string"
       },
       {
-        "component": "text",
-        "name": "wordsLabel",
-        "label": "Amount in words label",
-        "valueType": "string"
-      },
-      {
         "component": "tab",
         "label": "Validation",
         "name": "validation"
@@ -4481,6 +4475,18 @@
         "valueType": "string",
         "label": "Pattern Error message",
         "description": "Error message shown when the pattern is not matched."
+      },
+      {
+        "component": "tab",
+        "label": "Custom Properties",
+        "name": "custom"
+      },
+      {
+        "component": "text",
+        "name": "wordsLabel",
+        "label": "Amount in words label",
+        "valueType": "string",
+        "value": "Amount (in words)"
       },
       {
         "component": "tab",

@@ -739,7 +739,9 @@
                 "template": {
                   "jcr:title": "INR Input",
                   "fieldType": "text-input",
-                  "fd:viewType": "inr-input"
+                  "fd:viewType": "inr-input",
+                  "enabled": true,
+                  "visible": true
                 }
               }
             }
