@@ -1,27 +1,30 @@
 # INR Input
 
-Editable Indian Rupee (₹) amount field with a read-only amount-in-words field below it.
+Editable Indian Rupee (₹) amount field with a read-only amount-in-words field below it that updates live as the user types.
 
 ## How to Use
 
-Insert **INR Input** from the Custom Form Components group. Typing `1234567.5` shows "Twelve Lakh Thirty Four Thousand Five Hundred Sixty Seven Rupees and Fifty Paise Only".
+Insert **INR Input** from the Custom Form Components group, or set `fd:viewType` to `inr-input` on a number input.
 
 ## Authoring Properties
 
 | Property | Description |
 |----------|-------------|
-| `wordsLabel` | Label of the words field (default "Amount (in words)") |
+| `wordsLabel` | Label of the amount-in-words field (default `Amount (in words)`) |
 
-All text-input properties (placeholder, default value, validation, help) are also available.
+All number-input properties (label, required, min/max, default value, …) also apply.
 
 ## Model Subscriptions
 
-Subscribes to the field's `value` changes and refreshes the words when the model value is set externally (rules, prefill).
+Subscribes to the field's own `value` changes (rules, reset, default values) and refreshes the words.
 
 ## Model Properties Set
 
-The component sets nothing itself. `model.value` holds the plain amount string (e.g. `"1234.50"`) and is committed on blur/`change` (OOTB default), so change rules fire once per edit. The words field updates on every keystroke from the `input` event and is not part of the model.
+Nothing is written by the component. `model.value` is committed by the OOTB `change` handler, on blur, so rules fire once per edit. The words field is display-only and not part of the model or the submission; it updates on every `input` event.
 
 ## Usage Notes
 
-Base type `text-input`, `fd:viewType` `inr-input`. Input is restricted to digits, one decimal point, up to 2 decimals and 13 integer digits. Uses the Indian system (Thousand, Lakh, Crore); amounts of 100 Crore and above read e.g. "One Hundred Crore".
+- Base type: `number-input`; `fd:viewType`: `inr-input`.
+- The input is switched to `type="text"` with `inputmode="decimal"`; only digits and one `.` with up to 2 decimals are accepted.
+- Words use the Indian system (Thousand, Lakh, Crore), e.g. `123456.50` → `One Lakh Twenty Three Thousand Four Hundred Fifty Six Rupees and Fifty Paise Only`.
+- `amountToWords(value)` is exported for reuse.

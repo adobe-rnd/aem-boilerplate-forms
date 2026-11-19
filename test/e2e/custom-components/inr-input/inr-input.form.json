@@ -8,7 +8,7 @@
     {
       "id": "field-under-test",
       "name": "fieldUnderTest",
-      "fieldType": "text-input",
+      "fieldType": "number-input",
       ":type": "inr-input",
       "visible": true,
       "enabled": true,
@@ -16,7 +16,12 @@
         "value": "INR Input",
         "visible": true
       },
-      "properties": {}
+      "properties": {
+        "type": "number",
+        "wordsLabel": "Amount (in words)",
+        "displayFormat": ""
+      },
+      "type": "number"
     },
     {
       "id": "next-field",
