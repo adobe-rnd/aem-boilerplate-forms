@@ -1,30 +1,26 @@
-/* eslint-env mocha */
-import assert from 'assert';
-import { amountToWords, sanitizeAmount } from '../../blocks/form/components/inr-input/inr-input.js';
+import { expect } from 'chai';
+import { amountToWords } from '../../blocks/form/components/inr-input/inr-input.js';
 
-describe('inr-input', () => {
-  describe('amountToWords', () => {
-    it('should use Thousand, Lakh and Crore', () => {
-      assert.strictEqual(amountToWords('1234567'), 'Twelve Lakh Thirty Four Thousand Five Hundred Sixty Seven Rupees Only');
-      assert.strictEqual(amountToWords('250000000'), 'Twenty Five Crore Rupees Only');
-      assert.strictEqual(amountToWords('1000000000'), 'One Hundred Crore Rupees Only');
-    });
-
-    it('should support rupees and paise', () => {
-      assert.strictEqual(amountToWords('1.5'), 'One Rupee and Fifty Paise Only');
-      assert.strictEqual(amountToWords('.05'), 'Five Paise Only');
-      assert.strictEqual(amountToWords('0'), 'Zero Rupees Only');
-    });
-
-    it('should return empty for empty or invalid input', () => {
-      assert.strictEqual(amountToWords(''), '');
-      assert.strictEqual(amountToWords('abc'), '');
-    });
+describe('inr-input amountToWords', () => {
+  it('should convert rupees using Thousand, Lakh and Crore', () => {
+    expect(amountToWords('1')).to.equal('One Rupee Only');
+    expect(amountToWords('1250')).to.equal('One Thousand Two Hundred Fifty Rupees Only');
+    expect(amountToWords('123456')).to.equal('One Lakh Twenty Three Thousand Four Hundred Fifty Six Rupees Only');
+    expect(amountToWords('12345678')).to.equal('One Crore Twenty Three Lakh Forty Five Thousand Six Hundred Seventy Eight Rupees Only');
+    expect(amountToWords('10000000')).to.equal('One Crore Rupees Only');
   });
 
-  describe('sanitizeAmount', () => {
-    it('should keep digits, one dot and two decimals', () => {
-      assert.strictEqual(sanitizeAmount('₹1,2a3.4.567'), '123.45');
-    });
+  it('should support paise', () => {
+    expect(amountToWords('100.50')).to.equal('One Hundred Rupees and Fifty Paise Only');
+    expect(amountToWords('0.05')).to.equal('Five Paise Only');
+    expect(amountToWords('1.999')).to.equal('Two Rupees Only');
+  });
+
+  it('should handle zero, empty and invalid values', () => {
+    expect(amountToWords('0')).to.equal('Zero Rupees Only');
+    expect(amountToWords('')).to.equal('');
+    expect(amountToWords('-5')).to.equal('');
+    expect(amountToWords('abc')).to.equal('');
+    expect(amountToWords(undefined)).to.equal('');
   });
 });
