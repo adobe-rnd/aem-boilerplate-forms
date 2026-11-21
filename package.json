@@ -63,7 +63,7 @@
     "@aemforms/af-formatters": "0.22.167",
     "@aemforms/af-custom-functions": "1.0.14",
     "@babel/eslint-parser": "7.28.0",
-    "@playwright/test": "^1.43.1",
+    "@playwright/test": "^1.65.1",
     "@testing-library/dom": "9.3.4",
     "@testing-library/user-event": "14.3.0",
     "@types/node": "20.12.7",
