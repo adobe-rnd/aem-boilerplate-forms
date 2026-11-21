@@ -189,6 +189,7 @@ function removeInvalidMsg(fieldElement) {
 
 export const validityKeyMsgMap = {
   patternMismatch: { key: 'pattern', attribute: 'type' },
+  typeMismatch: { key: 'pattern', attribute: 'type' },
   rangeOverflow: { key: 'maximum', attribute: 'max' },
   rangeUnderflow: { key: 'minimum', attribute: 'min' },
   tooLong: { key: 'maxLength', attribute: 'maxlength' },

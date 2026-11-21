@@ -24,7 +24,7 @@ blocks/form/
 ├── form.css                          — Base form styling
 ├── mappings.js                       — Component decorator registry (OOTBComponentDecorators)
 ├── util.js                           — DOM creation helpers (createLabel, createInput, etc.)
-├── constant.js                       — Shared constants (LOG_LEVEL, emailPattern, etc.)
+├── constant.js                       — Shared constants (LOG_LEVEL, defaultErrorMessages, etc.)
 ├── submit.js                         — Form submission handlers
 ├── transform.js                      — Document-based form transformer
 ├── rules/
