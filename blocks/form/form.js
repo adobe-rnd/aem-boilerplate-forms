@@ -1,7 +1,7 @@
 import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import transferRepeatableDOM, { insertAddButton, insertRemoveButton } from './components/repeat/repeat.js';
 import {
-  emailPattern, getSubmitBaseUrl, SUBMISSION_SERVICE, SUPPORTED_SUBMISSION_ACTION_TYPES,
+  getSubmitBaseUrl, SUBMISSION_SERVICE, SUPPORTED_SUBMISSION_ACTION_TYPES,
 } from './constant.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorator from './mappings.js';
@@ -232,9 +232,6 @@ function inputDecorator(field, element) {
     }
     if (field.default !== undefined) {
       input.setAttribute('value', field.default);
-    }
-    if (input.type === 'email') {
-      input.pattern = emailPattern;
     }
     setConstraintsMessage(element, field.constraintMessages);
     element.dataset.required = field.required;

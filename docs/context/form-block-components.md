@@ -75,7 +75,7 @@ All 11 registered field renderers:
 5. **Validation attributes:**
    - Required attribute
    - aria-describedby for description
-   - Email pattern validation
+   - No pattern is forced on email inputs; the browser's `type=email` check applies, plus any author-defined pattern
 6. **File constraints:** minItems, maxItems, maxFileSize
 7. **Constraint messages:** setConstraintsMessage stores custom error messages
 
