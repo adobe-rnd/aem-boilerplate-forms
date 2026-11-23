@@ -6,7 +6,7 @@ export function submitSuccess(e, form) {
   const thankYouMsg = form.dataset.thankYouMsg || payload?.body?.thankYouMessage;
   if (redirectUrl) {
     window.location.assign(encodeURI(redirectUrl));
-  } else {
+  } else if (form.parentNode) {
     let thankYouMessage = form.parentNode.querySelector('.form-message.success-message');
     if (!thankYouMessage) {
       thankYouMessage = document.createElement('div');
@@ -20,7 +20,8 @@ export function submitSuccess(e, form) {
     form.reset();
   }
   form.setAttribute('data-submitting', 'false');
-  form.querySelector('button[type="submit"]').disabled = false;
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = false;
 }
 
 export function submitFailure(e, form) {
@@ -33,7 +34,8 @@ export function submitFailure(e, form) {
   form.prepend(errorMessage);
   errorMessage.scrollIntoView({ behavior: 'smooth' });
   form.setAttribute('data-submitting', 'false');
-  form.querySelector('button[type="submit"]').disabled = false;
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = false;
 }
 
 function generateUnique() {
