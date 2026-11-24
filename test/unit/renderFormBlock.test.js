@@ -108,6 +108,29 @@ describe('renderFormBlock Test Cases', () => {
     assert.ok(!blockDiv.classList.contains('edit-mode'), 'Block should not have edit-mode class when editMode is false');
   });
 
+  [false, true].forEach((enabled) => {
+    it(`preserves the saved WebMCP Boolean ${enabled} when reloading the exported form`, async () => {
+      const savedDefinition = {
+        ...renderFormBlockFormDef,
+        properties: {
+          ...renderFormBlockFormDef.properties,
+          'fd:webMcpEnabled': enabled,
+        },
+      };
+      const { form } = createFormBlockStructure(savedDefinition, { hasEditMode: true });
+      fetchStub = sinon.stub(global, 'fetch').resolves({
+        json: () => Promise.resolve(JSON.parse(JSON.stringify(savedDefinition))),
+      });
+
+      const result = await renderFormBlock(form, false);
+
+      assert.ok(result.formEl);
+      assert.deepStrictEqual(result.formDef.properties, savedDefinition.properties);
+      assert.strictEqual(result.formDef.properties['fd:webMcpEnabled'], enabled);
+      assert.ok(fetchStub.calledWith(`${form.dataset.formpath}.model.json`));
+    });
+  });
+
   it('should use fallback fetchForm when primary fetch fails', async () => {
     const { form, blockDiv } = createFormBlockStructure(renderFormBlockFormDef);
 

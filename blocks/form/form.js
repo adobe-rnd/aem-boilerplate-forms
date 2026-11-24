@@ -368,9 +368,11 @@ export async function createForm(formDef, data, source = 'aem') {
   }
   transferRepeatableDOM(form, formDef, form, formId);
 
-  if (afModule && typeof Worker === 'undefined') {
+  if (source === 'aem' && afModule && typeof Worker === 'undefined') {
     window.setTimeout(async () => {
-      afModule.loadRuleEngine(formDef, form, captcha, generateFormRendition, data);
+      if (form.dataset.rules !== 'true') {
+        await afModule.loadRuleEngine(formDef, form, captcha, generateFormRendition, data);
+      }
     }, DELAY_MS);
   }
 
