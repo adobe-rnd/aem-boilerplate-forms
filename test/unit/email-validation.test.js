@@ -2,6 +2,7 @@
 import assert from 'assert';
 import { createForm } from '../../blocks/form/form.js';
 import DocBasedFormToAF from '../../blocks/form/transform.js';
+import { validateContainer } from '../../blocks/form/components/wizard/wizard.js';
 
 const sheet = {
   total: 2,
@@ -68,5 +69,31 @@ describe('Email validation in document-based forms', () => {
     assert.equal(errorOf(workEmail), 'Use your example.com address.');
     setValue(workEmail, 'user@example.com');
     assert.equal(errorOf(workEmail), '');
+  });
+});
+
+describe('Email validation in AEM (UE) authored forms', () => {
+  it('does not block wizard navigation for valid addresses', async () => {
+    const def = {
+      id: 'ue-email-form',
+      fieldType: 'form',
+      items: [{
+        id: 'step-1', fieldType: 'panel', name: 'step1', items: [{
+          id: 'email-1', fieldType: 'email', name: 'email', type: 'string', required: true,
+        }],
+      }],
+    };
+    const { form } = await createForm(def);
+    document.body.replaceChildren(form);
+    const email = form.querySelector('input[name="email"]');
+    const step = email.closest('fieldset');
+    // The wizard uses the browser's checkValidity() before moving to the next step.
+    ['name+tag@example.com', 'first-last@mail.example.co.jp'].forEach((value) => {
+      email.value = value;
+      assert.equal(validateContainer(step), true, `${value} should not block the wizard`);
+    });
+    email.value = 'not-an-email';
+    assert.equal(validateContainer(step), false);
+    document.body.innerHTML = '';
   });
 });
